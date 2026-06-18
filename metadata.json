@@ -1,0 +1,6 @@
+{
+  "name": "AI Kuchařka",
+  "description": "Automatický generátor a vylepšovač receptů z pěti kulinářských zdrojů s optimalizací pro moderní spotřebiče.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
