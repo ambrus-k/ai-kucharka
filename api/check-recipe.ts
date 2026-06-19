@@ -96,7 +96,7 @@ Při úpravě receptu a simulaci dbej na tyto pilíře:
 - Odstranění jakýchkoliv konzervačních látek (vše musí být čerstvé a přírodní).
 - Srozumitelnost pro domácnosti.
 - Zkrácení názvu na jasné gastronomické jádro bez marketingového balastu.
-Všechny texty musí být v bezchybné ČEŠTINĚ.
+Všechny texty musí být v bezchybné ČEŠTINĚ. Krok za krokem postup (instructions) rozepiš do velmi podrobných, detailních a popsaných vět. Popiš přesné kulinářské nebo mechanické úkony s kuchyňským náčiním. DO KAŽDÉHO JEDNOTLIVÉHO KROKU (v poli 'modifiedRecipe.instructions') MUSÍŠ EXPLICITNĚ ZAPSAT PŘESNÉ VÁHY NEBO MNOŽSTVÍ VŠECH SUROVIN, KTERÉ SE V DANÉM KROKU PŘIDÁVAJÍ NEBO ZPRACOVÁVAJÍ (např. místo 'přidejte mouku' musíš napsat 'přidejte 250 g hladké mouky'). Časovače jako samostatné odpočítávače u kroků zruš, vůbec na nich netrvej, důležité jsou detailní popisy děje.
 `;
 
     const userPrompt = `

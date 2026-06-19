@@ -38,7 +38,8 @@ import {
   Timer,
   Settings,
   RefreshCw,
-  Database
+  Database,
+  Scale
 } from "lucide-react";
 import { Recipe } from "./types";
 import { DEFAULT_RECIPES as LOCAL_FALLBACK } from "./defaultRecipes";
@@ -267,6 +268,52 @@ export function playBeep(): void {
   }
 }
 
+export function getStepIngredients(stepText: string, ingredients: string[], factor: number) {
+  if (!ingredients) return [];
+  const cleanStep = stepText.toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Diacritics
+    .replace(/[^a-z0-9\s]/g, " ");
+
+  return ingredients.map((ing) => {
+    const parsed = parseIngredientString(ing);
+    const displayIng = scaleIngredient(parsed, factor);
+    
+    // Clean ingredient name from words like numbers, units, brackets
+    const cleanIngName = ing.toLowerCase()
+      .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+      .replace(/[0-9\-\/]/g, "") // remove numbers
+      .replace(/\b(g|kg|ml|l|ks|baleni|lzi|lzic|lzice|pl|kl|smichat|pridat|na|do|hrnek|hrnky|hrnku)\b/g, "") // remove common units
+      .replace(/[^a-z\s]/g, " ")
+      .trim();
+
+    const words = cleanIngName.split(/\s+/).filter(w => w.length > 2); // only significant stems
+
+    let isMatched = false;
+    if (words.length === 0) {
+      // fallback to basic matching if no long words parsed
+      const fallbackCheck = ing.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z]/g, "").substring(0, 5);
+      if (fallbackCheck.length >= 3 && cleanStep.includes(fallbackCheck)) {
+        isMatched = true;
+      }
+    } else {
+      // Match if some significant words or their stems appear in the instruction text
+      isMatched = words.some(w => {
+        if (cleanStep.includes(w)) return true;
+        // Check Czech genitive endings or simple root endings (e.g., máslo -> másl, mouka -> mouk, vejce -> vejc, cukr -> cukr)
+        const stem = w.substring(0, w.length - 1);
+        if (stem.length >= 3 && cleanStep.includes(stem)) return true;
+        return false;
+      });
+    }
+
+    return {
+      original: ing,
+      display: displayIng,
+      isMatched
+    };
+  });
+}
+
 export default function App() {
   // State for recipe database
   const [recipes, setRecipes] = useState<Recipe[]>([]);
@@ -313,6 +360,7 @@ export default function App() {
   // States for Hands-free / Cooking Mode with Wake Lock
   const [isHandsFree, setIsHandsFree] = useState(false);
   const [currentHandsFreeStep, setCurrentHandsFreeStep] = useState(0);
+  const [showAllIngredientsInStep, setShowAllIngredientsInStep] = useState(false);
   const [wakeLock, setWakeLock] = useState<any>(null);
   const [wakeLockSupported, setWakeLockSupported] = useState(false);
   const [wakeLockError, setWakeLockError] = useState<string | null>(null);
@@ -2551,145 +2599,117 @@ ${separator}`;
                   </motion.p>
                 </div>
 
-                {/* Real-time Countdown Timer */}
+                {/* Real-time Step Ingredients and Weights Checklist */}
                 {(() => {
-                  const activeTimer = timers[currentHandsFreeStep] || {
-                    secondsLeft: 0,
-                    isRunning: false,
-                    totalSeconds: 0,
-                    beeped: false
-                  };
+                  const allIngs = getStepIngredients(
+                    selectedRecipe.instructions[currentHandsFreeStep] || "",
+                    selectedRecipe.ingredients || [],
+                    scaleFactor
+                  );
+                  const matchedIngs = allIngs.filter(i => i.isMatched);
+
                   return (
-                    <div className="flex flex-col items-center bg-slate-900/50 border border-slate-800/80 rounded-2xl px-6 py-4 max-w-sm w-full gap-3 shadow-md animate-fade-in">
-                      <div className="flex items-center gap-2 text-[11px] font-bold uppercase text-slate-400 tracking-wider">
-                        <Timer className="h-4 w-4 text-amber-500 animate-pulse-subtle" />
-                        <span>Časovač kroku</span>
+                    <div className="w-full max-w-2xl bg-slate-900/60 border border-slate-800/80 rounded-2xl p-5 shadow-lg space-y-4 animate-fade-in" id="step-ingredients-box">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800/80 pb-3">
+                        <div className="flex items-center gap-2.5">
+                          <Scale className="h-5 w-5 text-amber-500 shrink-0" />
+                          <div>
+                            <h3 className="font-bold text-sm text-slate-200">Suroviny a váhy pro tento krok</h3>
+                            <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Metrické váhy jsou automaticky přepočítané</p>
+                          </div>
+                        </div>
+                        {scaleFactor !== 1 && (
+                          <span className="bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[10px] font-bold px-2.5 py-1 rounded-full shrink-0">
+                            Koeficient: {scaleFactor}x
+                          </span>
+                        )}
                       </div>
 
-                      {/* Circular Progress + Digital Clock */}
-                      <div className="relative flex items-center justify-center my-1">
-                        <svg className="w-28 h-28 transform -rotate-90">
-                          <circle
-                            cx="56"
-                            cy="56"
-                            r="48"
-                            className="stroke-slate-800 stroke-[4] fill-none"
-                          />
-                          <circle
-                            cx="56"
-                            cy="56"
-                            r="48"
-                            className={`stroke-[4] fill-none transition-all duration-1000 ${
-                              activeTimer.secondsLeft === 0 && activeTimer.beeped
-                                ? "stroke-red-500 animate-pulse"
-                                : activeTimer.isRunning
-                                ? "stroke-emerald-500"
-                                : "stroke-amber-500"
-                            }`}
-                            strokeDasharray="301"
-                            strokeDashoffset={
-                              activeTimer.totalSeconds > 0
-                                ? 301 - (301 * activeTimer.secondsLeft) / activeTimer.totalSeconds
-                                : 301
-                            }
-                          />
-                        </svg>
-
-                        <div className="absolute inset-0 flex flex-col items-center justify-center">
-                          <span 
-                            className={`font-mono text-2xl font-extrabold tracking-tight transition-colors ${
-                              activeTimer.secondsLeft === 0 && activeTimer.beeped
-                                ? "text-red-500 animate-bounce"
-                                : "text-slate-100"
-                            }`}
-                          >
-                            {formatTime(activeTimer.secondsLeft)}
-                          </span>
-                          <span className="text-[9px] text-slate-400 font-bold uppercase tracking-widest mt-0.5 animate-fade-in">
-                            {activeTimer.secondsLeft === 0 && activeTimer.beeped
-                              ? "HOTOVO!"
-                              : activeTimer.isRunning
-                              ? "BĚŽÍ"
-                              : "PAUZA"}
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Interactive Controls */}
-                      <div className="flex flex-col items-center gap-2.5 w-full">
-                        {/* Adjusters and Control bar */}
-                        <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => adjustTimer(currentHandsFreeStep, -60)}
-                            className="bg-slate-800 hover:bg-slate-750 p-1.5 rounded-lg border border-slate-700/60 text-slate-300 text-[11px] font-extrabold cursor-pointer transition-all active:scale-95 h-8 w-11 flex items-center justify-center hover:text-white"
-                            title="Odebrat minutu"
-                          >
-                            -1m
-                          </button>
-                          <button
-                            onClick={() => adjustTimer(currentHandsFreeStep, -10)}
-                            className="bg-slate-800 hover:bg-slate-750 p-1.5 rounded-lg border border-slate-700/60 text-slate-300 text-[11px] font-extrabold cursor-pointer transition-all active:scale-95 h-8 w-11 flex items-center justify-center hover:text-white"
-                            title="Odebrat 10 vteřin"
-                          >
-                            -10s
-                          </button>
-
-                          <button
-                            onClick={() => toggleTimer(currentHandsFreeStep)}
-                            disabled={activeTimer.secondsLeft === 0 && !activeTimer.isRunning}
-                            className={`p-2 rounded-full shadow-md text-white transition-all active:scale-90 cursor-pointer ${
-                              activeTimer.secondsLeft === 0 && !activeTimer.isRunning
-                                ? "bg-slate-850 text-slate-600 border border-slate-800 cursor-not-allowed"
-                                : activeTimer.isRunning
-                                ? "bg-amber-600 hover:bg-amber-500"
-                                : "bg-emerald-600 hover:bg-emerald-500"
-                            }`}
-                            title={activeTimer.isRunning ? "Pozastavit" : "Spustit"}
-                          >
-                            {activeTimer.isRunning ? (
-                              <Pause className="h-4.5 w-4.5 fill-current" />
-                            ) : (
-                              <Play className="h-4.5 w-4.5 fill-current ml-0.5" />
-                            )}
-                          </button>
-
-                          <button
-                            onClick={() => resetTimer(currentHandsFreeStep)}
-                            className="bg-slate-800 hover:bg-slate-750 p-2 rounded-full border border-slate-700/60 text-slate-300 cursor-pointer transition-all active:scale-95 flex items-center justify-center h-8 w-8 hover:text-white"
-                            title="Resetovat"
-                          >
-                            <RotateCcw className="h-4 w-4" />
-                          </button>
-
-                          <button
-                            onClick={() => adjustTimer(currentHandsFreeStep, 10)}
-                            className="bg-slate-800 hover:bg-slate-750 p-1.5 rounded-lg border border-slate-700/60 text-slate-300 text-[11px] font-extrabold cursor-pointer transition-all active:scale-95 h-8 w-11 flex items-center justify-center hover:text-white"
-                            title="Přidat 10 vteřin"
-                          >
-                            +10s
-                          </button>
-                          <button
-                            onClick={() => adjustTimer(currentHandsFreeStep, 60)}
-                            className="bg-slate-800 hover:bg-slate-750 p-1.5 rounded-lg border border-slate-700/60 text-slate-300 text-[11px] font-extrabold cursor-pointer transition-all active:scale-95 h-8 w-11 flex items-center justify-center hover:text-white"
-                            title="Přidat minutu"
-                          >
-                            +1m
-                          </button>
-                        </div>
-
-                        {/* Presets Row */}
-                        {activeTimer.totalSeconds === 0 && (
-                          <div className="flex items-center gap-1.5 mt-0.5 justify-center">
-                            <span className="text-[9px] text-slate-500 uppercase tracking-wider font-extrabold">Rychlé:</span>
-                            {[1, 2, 3, 5, 10, 15].map((mins) => (
-                              <button
-                                key={mins}
-                                onClick={() => adjustTimer(currentHandsFreeStep, mins * 60)}
-                                className="bg-slate-950 hover:bg-slate-850 text-[9px] font-extrabold text-[#D97706] hover:text-amber-400 px-1.5 py-0.5 rounded border border-slate-800 cursor-pointer"
+                      {matchedIngs.length > 0 ? (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                          {matchedIngs.map((ing, i) => {
+                            const isChecked = !!checkedIngredients[ing.original];
+                            return (
+                              <div
+                                key={i}
+                                onClick={() => toggleIngredient(ing.original)}
+                                className={`flex items-start gap-3 p-3 rounded-xl border transition-all cursor-pointer select-none ${
+                                  isChecked
+                                    ? "bg-emerald-950/20 border-emerald-500/30 text-emerald-300"
+                                    : "bg-slate-950/40 border-slate-850 text-slate-350 hover:bg-slate-950/60 hover:border-slate-800"
+                                }`}
                               >
-                                {mins}m
-                              </button>
-                            ))}
+                                <div className={`mt-0.5 h-4.5 w-4.5 rounded border flex items-center justify-center shrink-0 transition-all ${
+                                  isChecked
+                                    ? "bg-emerald-500 border-emerald-400 text-slate-950"
+                                    : "border-slate-700"
+                                }`}>
+                                  {isChecked && <Check className="h-3 w-3 stroke-[3]" />}
+                                </div>
+                                <span className={`text-sm leading-tight ${isChecked ? "line-through text-slate-500 font-medium" : "font-semibold"}`}>
+                                  {ing.display}
+                                </span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      ) : (
+                        <div className="text-center py-5 bg-slate-950/20 rounded-xl border border-dashed border-slate-800/60">
+                          <p className="text-xs text-slate-400 font-medium font-serif italic">
+                            V popisu tohoto kroku nebyly nalezeny žádné konkrétní suroviny.
+                          </p>
+                          <p className="text-[10px] text-slate-500 mt-1">
+                            Všechny suroviny a jejich váhy si můžete zobrazit rozkliknutím seznamu níže.
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Collapsible section for all ingredients in the recipe */}
+                      <div className="pt-2 border-t border-slate-800/40">
+                        <button
+                          onClick={() => setShowAllIngredientsInStep(prev => !prev)}
+                          className="w-full flex items-center justify-between text-xs font-bold text-slate-400 hover:text-slate-200 py-1.5 transition-all focus:outline-none cursor-pointer"
+                        >
+                          <span className="flex items-center gap-2">
+                            <span>{showAllIngredientsInStep ? "Skrýt" : "Zobrazit"} kompletní suroviny receptu</span>
+                            <span className="bg-slate-800 text-[10px] text-slate-350 px-1.5 py-0.5 rounded font-mono">
+                              {selectedRecipe.ingredients ? selectedRecipe.ingredients.length : 0}
+                            </span>
+                          </span>
+                          <span className={`transform transition-transform duration-200 ${showAllIngredientsInStep ? "rotate-180" : ""}`}>
+                            ▼
+                          </span>
+                        </button>
+                        
+                        {showAllIngredientsInStep && (
+                          <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-1 animate-fade-in">
+                            {allIngs.map((ing, i) => {
+                              const isChecked = !!checkedIngredients[ing.original];
+                              return (
+                                <div
+                                  key={i}
+                                  onClick={() => toggleIngredient(ing.original)}
+                                  className={`flex items-start gap-2.5 p-2 rounded-lg border text-xs cursor-pointer transition-all select-none ${
+                                    isChecked
+                                      ? "bg-emerald-950/10 border-emerald-500/20 text-emerald-400/90"
+                                      : ing.isMatched
+                                      ? "bg-[#D97706]/5 border-[#D97706]/20 text-amber-200/95 font-semibold"
+                                      : "bg-slate-950/35 border-slate-850/80 text-slate-400 hover:bg-slate-950/50"
+                                  }`}
+                                >
+                                  <div className={`mt-0.5 h-3.5 w-3.5 rounded border flex items-center justify-center shrink-0 transition-all ${
+                                    isChecked
+                                      ? "bg-emerald-500 border-emerald-400 text-slate-950"
+                                      : "border-slate-800"
+                                  }`}>
+                                    {isChecked && <Check className="h-2 w-2 stroke-[3]" />}
+                                  </div>
+                                  <span className={`leading-tight flex-1 ${isChecked ? "line-through text-slate-500" : ""}`}>
+                                    {ing.display} {ing.isMatched && !isChecked && <span className="text-[9px] uppercase tracking-wider text-amber-500 font-extrabold ml-1">(Tento krok)</span>}
+                                  </span>
+                                </div>
+                              );
+                            })}
                           </div>
                         )}
                       </div>
