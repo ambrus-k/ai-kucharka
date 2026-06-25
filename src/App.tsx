@@ -44,6 +44,18 @@ import {
 import { Recipe } from "./types";
 import { DEFAULT_RECIPES as LOCAL_FALLBACK } from "./defaultRecipes";
 
+// Check if running inside Google AI Studio environment
+export const isStudioEnv = (() => {
+  if (typeof window === "undefined") return false;
+  const host = window.location.hostname;
+  return (
+    host.includes("europe-west2.run.app") ||
+    host.includes("google") ||
+    host.includes("localhost") ||
+    host.includes("127.0.0.1")
+  );
+})();
+
 // Dynamic Remote Database URL selection to enable Github export zero-code changes
 const REMOTE_DB_URL = (() => {
   // 1. Look for VITE_REMOTE_DB_URL environment variable (injected during deployment build)
@@ -55,14 +67,19 @@ const REMOTE_DB_URL = (() => {
   // 2. Look for personal GitHub username override in localStorage for sharing
   const storedGithubName = localStorage.getItem("ai_kucharka_github_username");
   if (storedGithubName && storedGithubName.trim() !== "") {
-    const repo = localStorage.getItem("ai_kucharka_github_repo") || "kucharka-data";
+    const repo = localStorage.getItem("ai_kucharka_github_repo") || "AI-kocharka-data";
     const branch = localStorage.getItem("ai_kucharka_github_branch") || "main";
     const path = localStorage.getItem("ai_kucharka_github_path") || "db.json";
     return `https://raw.githubusercontent.com/${storedGithubName.trim()}/${repo.trim()}/${branch.trim()}/${path.trim()}`;
   }
 
-  // 3. Fallback to default template (which works seamlessly or falls back to local storage defaults)
-  return "https://raw.githubusercontent.com/[VASE_GITHUB_JMENO]/kucharka-data/main/db.json";
+  // 3. Fallback when NOT in Studio (the live Vercel version): always load from karelaa/AI-kocharka-data
+  if (!isStudioEnv) {
+    return "https://raw.githubusercontent.com/karelaa/AI-kocharka-data/main/db.json";
+  }
+
+  // 4. Default template in Studio
+  return "https://raw.githubusercontent.com/karelaa/AI-kocharka-data/main/db.json";
 })();
 
 
@@ -405,8 +422,8 @@ export default function App() {
 
   // States for GitHub integration
   const [showGithubConfig, setShowGithubConfig] = useState(false);
-  const [githubUser, setGithubUser] = useState(() => localStorage.getItem("ai_kucharka_github_username") || "");
-  const [githubRepo, setGithubRepo] = useState(() => localStorage.getItem("ai_kucharka_github_repo") || "kucharka-data");
+  const [githubUser, setGithubUser] = useState(() => localStorage.getItem("ai_kucharka_github_username") || "karelaa");
+  const [githubRepo, setGithubRepo] = useState(() => localStorage.getItem("ai_kucharka_github_repo") || "AI-kocharka-data");
   const [githubToken, setGithubToken] = useState(() => localStorage.getItem("ai_kucharka_github_token") || "");
   const [githubBranch, setGithubBranch] = useState(() => localStorage.getItem("ai_kucharka_github_branch") || "main");
   const [githubPath, setGithubPath] = useState(() => localStorage.getItem("ai_kucharka_github_path") || "db.json");
@@ -846,6 +863,10 @@ export default function App() {
   const [loginError, setLoginError] = useState<string | null>(null);
 
   const handleLoginWithPassword = async (passwordToVerify: string) => {
+    if (!isStudioEnv) {
+      setLoginError("Administrační přihlášení je povolené pouze v AI Google Studiu.");
+      return false;
+    }
     if (!passwordToVerify.trim()) {
       setLoginError("Zadejte prosím platný kulinářský API klíč.");
       return false;
@@ -2130,33 +2151,53 @@ ${separator}`;
 
   // Load admin state and recipes (dynamic remote URL with local storage fallbacks)
   useEffect(() => {
-    // Hidden admin check
-    const savedAdminToken = localStorage.getItem("admin_password_token");
-    if (savedAdminToken) {
-      setIsAdmin(true);
-      setAdminPassword(savedAdminToken);
+    // Hidden admin check (Only permitted in Google AI Studio environment)
+    if (isStudioEnv) {
+      const savedAdminToken = localStorage.getItem("admin_password_token");
+      if (savedAdminToken) {
+        setIsAdmin(true);
+        setAdminPassword(savedAdminToken);
+      }
+    } else {
+      setIsAdmin(false);
     }
 
     const loadRecipes = async () => {
       let loadedList: Recipe[] | null = null;
-      const isInitialized = localStorage.getItem("ai_kucharka_initialized") === "true";
 
-      if (isInitialized) {
+      // 1. Prioritize loading from Serverless API /api (safely connected to custom GitHub repo)
+      try {
+        const serverlessResponse = await fetch("/api");
+        if (serverlessResponse.ok) {
+          const data = await serverlessResponse.json();
+          const list = Array.isArray(data) ? data : (data.recipes || []);
+          if (list && list.length > 0) {
+            loadedList = list;
+            console.log("Úspěšně načteny aktuální recepty ze Severless API /api (GitHub direct source)");
+          }
+        }
+      } catch (error) {
+        console.log("Nepodařilo se stáhnout data přes /api, zkusíme další zdroje...", error);
+      }
+
+      // 2. Fallback to localStorage (if already stored and initialized)
+      if (loadedList === null) {
         const stored = localStorage.getItem("ai_kucharka_recipes");
         if (stored) {
           try {
             const parsed = JSON.parse(stored);
-            if (Array.isArray(parsed)) {
+            if (Array.isArray(parsed) && parsed.length > 0) {
               loadedList = parsed;
+              console.log("Načteny uložené recepty z lokálního úložiště prohlížeče.");
             }
           } catch (e) {
-            console.error("Failed to load local storage recipes", e);
+            console.error("Chyba při čtení receptů z lokálního úložiště", e);
           }
         }
       }
 
+      // 3. Fallback to dynamic remote URL (direct GitHub Raw)
       if (loadedList === null) {
-        // 1. Try fetching from dynamic remote URL
         try {
           const response = await fetch(REMOTE_DB_URL);
           if (response.ok) {
@@ -2167,31 +2208,14 @@ ${separator}`;
             }
           }
         } catch (error) {
-          console.log("Could not load from remote DB URL, using local database instead.", error);
+          console.log("Nepodařilo se načíst z REMOTE_DB_URL, zkusíme lokální fallback.", error);
         }
+      }
 
-        // 2. Fallback to localStorage
-        if (!loadedList) {
-          const stored = localStorage.getItem("ai_kucharka_recipes");
-          if (stored) {
-            try {
-              const parsed = JSON.parse(stored);
-              if (parsed && parsed.length > 0) {
-                loadedList = parsed;
-              }
-            } catch (e) {
-              console.error("Failed to load local storage recipes", e);
-            }
-          }
-        }
-
-        // 3. Fallback to local default recipes
-        if (!loadedList) {
-          loadedList = LOCAL_FALLBACK;
-        }
-
-        // Mark as initialized so localStorage has priority on next reloads
-        localStorage.setItem("ai_kucharka_initialized", "true");
+      // 4. Fallback to local default recipes
+      if (loadedList === null) {
+        loadedList = LOCAL_FALLBACK;
+        console.log("Použity výchozí vestavěné recepty.");
       }
 
       // Save and set
@@ -2205,16 +2229,36 @@ ${separator}`;
         return cleaned[0] || null;
       });
       localStorage.setItem("ai_kucharka_recipes", JSON.stringify(cleaned));
+      localStorage.setItem("ai_kucharka_initialized", "true");
     };
 
     loadRecipes();
   }, []);
 
   // Save recipes to localStorage whenever they change
-  const saveRecipesToStorage = (newRecipes: Recipe[], targetRecipe?: Recipe, isDelete = false) => {
+  const saveRecipesToStorage = async (newRecipes: Recipe[], targetRecipe?: Recipe, isDelete = false) => {
     const cleaned = newRecipes.map(removePreservativesFromSoup);
     setRecipes(cleaned);
     localStorage.setItem("ai_kucharka_recipes", JSON.stringify(cleaned));
+
+    // Automatically replicate/save to Vercel/Local Serverless API /api
+    try {
+      const response = await fetch("/api", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ recipes: cleaned })
+      });
+      if (response.ok) {
+        console.log("Změny kuchařky byly automaticky uloženy na GitHub přes Serverless API!");
+      } else {
+        console.warn(`Serverless API vrátil kód: ${response.status}`);
+      }
+    } catch (e) {
+      console.error("Nepodařilo se odeslat uložení na Serverless API:", e);
+    }
+
     syncRecipesWithGithub(cleaned, targetRecipe, isDelete);
   };
 
@@ -3290,14 +3334,16 @@ ${separator}`;
                       <span>export receptu</span>
                     </button>
                     
-                    <button
-                      id={`btn-delete-recipe-detail-${selectedRecipe.id}`}
-                      onClick={(e) => handleDeleteRecipe(selectedRecipe.id, e)}
-                      className="bg-slate-100 hover:bg-red-50 text-slate-600 hover:text-red-600 border border-slate-200 hover:border-red-100 font-semibold p-2 rounded-xl transition-all cursor-pointer"
-                      title="Smazat recept"
-                    >
-                      <Trash2 className="h-4.5 w-4.5" />
-                    </button>
+                    {isAdmin && (
+                      <button
+                        id={`btn-delete-recipe-detail-${selectedRecipe.id}`}
+                        onClick={(e) => handleDeleteRecipe(selectedRecipe.id, e)}
+                        className="bg-slate-100 hover:bg-red-50 text-slate-600 hover:text-red-600 border border-slate-200 hover:border-red-100 font-semibold p-2 rounded-xl transition-all cursor-pointer"
+                        title="Smazat recept"
+                      >
+                        <Trash2 className="h-4.5 w-4.5" />
+                      </button>
+                    )}
                   </div>
                 </div>
 
@@ -4276,70 +4322,102 @@ ${separator}`;
                 className="max-w-3xl mx-auto space-y-6"
               >
                 {!isAdmin ? (
-                  /* Admin/API key Lock Screen */
-                  <div className="bg-white border border-[#E8E8E1] rounded-2xl p-8 text-center space-y-6 shadow-md max-w-xl mx-auto my-8">
-                    <div className="mx-auto w-16 h-16 bg-amber-50 rounded-full flex items-center justify-center text-amber-600 border border-amber-100">
-                      <Lock className="w-8 h-8 animate-bounce-subtle" />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <h3 className="font-serif italic font-bold text-xl text-[#1B4332]">
-                        Přidávání nových receptů je zabezpečeno
-                      </h3>
-                      <p className="text-sm text-[#4A4A40] leading-relaxed">
-                        Chcete-li generovat a vkládat nové AI recepty (ověřené <strong>pěti pilíři gastrotechnologie</strong> a zcela bez konzervantů), musíte se nejprve přihlásit administračním / API klíčem.
-                      </p>
-                    </div>
-
-                    <form
-                      onSubmit={async (e) => {
-                        e.preventDefault();
-                        await handleLoginWithPassword(adminPassword);
-                      }}
-                      className="space-y-4 pt-2 text-left"
-                    >
-                      <div className="space-y-1.5">
-                        <label className="block text-xs font-extrabold text-[#1B4332] uppercase tracking-wider">
-                          Administrační / API klíč:
-                        </label>
-                        <div className="relative">
-                          <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
-                            <Key className="w-4 h-4" />
-                          </span>
-                          <input
-                            type="password"
-                            placeholder="Zadejte administrační kód nebo API klíč..."
-                            value={adminPassword}
-                            onChange={(e) => {
-                              setAdminPassword(e.target.value);
-                              setLoginError(null);
-                            }}
-                            className="w-full text-sm pl-10 pr-4 py-3 border border-[#E8E8E1] rounded-xl focus:outline-hidden focus:ring-1 focus:ring-[#1B4332] focus:border-[#1B4332] bg-[#FDFCF7] text-[#2C2C2C] placeholder-[#9A9A8C]"
-                          />
-                        </div>
+                  !isStudioEnv ? (
+                    /* Elegant read-only Welcome Screen for normal visitors */
+                    <div className="bg-white border border-[#E8E8E1] rounded-2xl p-8 text-center space-y-6 shadow-md max-w-xl mx-auto my-8">
+                      <div className="mx-auto w-16 h-16 bg-amber-50 rounded-full flex items-center justify-center text-[#2D6A4F] border border-amber-100">
+                        <ChefHat className="w-8 h-8 animate-bounce-subtle" />
+                      </div>
+                      
+                      <div className="space-y-3">
+                        <h3 className="font-serif italic font-bold text-2xl text-[#1B4332]">
+                          Vítejte v AI Kuchařce
+                        </h3>
+                        <p className="text-sm text-[#4A4A40] leading-relaxed font-semibold">
+                          Vyberte si prosím některý z našich skvělých receptů v levém menu a objevte kouzlo vědecky podložené a technologicky vyladěné gastronomie!
+                        </p>
+                        <p className="text-xs text-slate-500 leading-relaxed">
+                          Všechny recepty jsou ověřeny pěti pilíři moderní kulinářské vědy a sestaveny zcela bez konzervantů či barviv. Každý krok obsahuje přesně odměřené hmotnosti a objemy surovin přímo v popisu, abyste při vaření nikdy nemuseli tápat.
+                        </p>
                       </div>
 
-                      {loginError && (
-                        <div className="bg-red-50 border border-red-100 text-red-800 text-xs py-2 px-3 rounded-lg flex items-center gap-2">
-                          <AlertCircle className="h-4 w-4 text-red-600 shrink-0" />
-                          <span>{loginError}</span>
+                      <div className="pt-4 border-t border-slate-100 grid grid-cols-2 gap-4 text-left">
+                        <div className="p-3 bg-[#FDFCF7] border border-[#E8E8E1] rounded-xl">
+                          <span className="block text-[10px] text-[#9A9A8C] uppercase font-bold tracking-wider">Mistrovská technika</span>
+                          <span className="text-xs text-[#4A4A40] mt-1 block font-medium">Fyzikálně optimalizované časy a teploty tepelné úpravy.</span>
                         </div>
-                      )}
+                        <div className="p-3 bg-[#FDFCF7] border border-[#E8E8E1] rounded-xl">
+                          <span className="block text-[10px] text-[#9A9A8C] uppercase font-bold tracking-wider">Bez konzervantů</span>
+                          <span className="text-xs text-[#4A4A40] mt-1 block font-medium">100% přírodní suroviny a poctivé domácí postupy.</span>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    /* Admin/API key Lock Screen (Only in AI Google Studio) */
+                    <div className="bg-white border border-[#E8E8E1] rounded-2xl p-8 text-center space-y-6 shadow-md max-w-xl mx-auto my-8">
+                      <div className="mx-auto w-16 h-16 bg-amber-50 rounded-full flex items-center justify-center text-amber-600 border border-amber-100">
+                        <Lock className="w-8 h-8 animate-bounce-subtle" />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <h3 className="font-serif italic font-bold text-xl text-[#1B4332]">
+                          Přidávání nových receptů je zabezpečeno
+                        </h3>
+                        <p className="text-sm text-[#4A4A40] leading-relaxed">
+                          Chcete-li generovat a vkládat nové AI recepty (ověřené <strong>pěti pilíři gastrotechnologie</strong> a zcela bez konzervantů), musíte se nejprve přihlásit administračním / API klíčem.
+                        </p>
+                      </div>
 
-                      <button
-                        type="submit"
-                        disabled={isLoginLoading}
-                        className="w-full bg-[#D97706] hover:bg-[#C26405] disabled:bg-amber-800/40 active:scale-95 text-white font-bold py-3.5 px-6 rounded-xl transition-all shadow-sm hover:shadow-md flex items-center justify-center gap-2 cursor-pointer"
+                      <form
+                        onSubmit={async (e) => {
+                          e.preventDefault();
+                          await handleLoginWithPassword(adminPassword);
+                        }}
+                        className="space-y-4 pt-2 text-left"
                       >
-                        {isLoginLoading ? (
-                          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                        ) : (
-                          <LogIn className="w-4.5 h-4.5 text-amber-200" />
+                        <div className="space-y-1.5">
+                          <label className="block text-xs font-extrabold text-[#1B4332] uppercase tracking-wider">
+                            Administrační / API klíč:
+                          </label>
+                          <div className="relative">
+                            <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
+                              <Key className="w-4 h-4" />
+                            </span>
+                            <input
+                              type="password"
+                              placeholder="Zadejte administrační kód nebo API klíč..."
+                              value={adminPassword}
+                              onChange={(e) => {
+                                setAdminPassword(e.target.value);
+                                setLoginError(null);
+                              }}
+                              className="w-full text-sm pl-10 pr-4 py-3 border border-[#E8E8E1] rounded-xl focus:outline-hidden focus:ring-1 focus:ring-[#1B4332] focus:border-[#1B4332] bg-[#FDFCF7] text-[#2C2C2C] placeholder-[#9A9A8C]"
+                            />
+                          </div>
+                        </div>
+
+                        {loginError && (
+                          <div className="bg-red-50 border border-red-100 text-red-800 text-xs py-2 px-3 rounded-lg flex items-center gap-2">
+                            <AlertCircle className="h-4 w-4 text-red-600 shrink-0" />
+                            <span>{loginError}</span>
+                          </div>
                         )}
-                        <span>{isLoginLoading ? "Ověřování..." : "Ověřit a pokračovat k zadání"}</span>
-                      </button>
-                    </form>
-                  </div>
+
+                        <button
+                          type="submit"
+                          disabled={isLoginLoading}
+                          className="w-full bg-[#D97706] hover:bg-[#C26405] disabled:bg-amber-800/40 active:scale-95 text-white font-bold py-3.5 px-6 rounded-xl transition-all shadow-sm hover:shadow-md flex items-center justify-center gap-2 cursor-pointer"
+                        >
+                          {isLoginLoading ? (
+                            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                          ) : (
+                            <LogIn className="w-4.5 h-4.5 text-amber-200" />
+                          )}
+                          <span>{isLoginLoading ? "Ověřování..." : "Ověřit a pokračovat k zadání"}</span>
+                        </button>
+                      </form>
+                    </div>
+                  )
                 ) : (
                   <>
                     {/* Welcome Card Info */}
@@ -4538,86 +4616,88 @@ ${separator}`;
           <span>© 2026 AI Kuchařka. Všechna práva vyhrazena.</span>
 
           {/* Discrete Admin Activation Panel */}
-          <div className="flex items-center gap-2">
-            {isAdmin ? (
-              <div className="flex items-center gap-4 text-[#2D6A4F] font-bold flex-wrap justify-center sm:justify-end">
-                <span className="flex items-center gap-1">✓ Administrátor</span>
-                <button
-                  type="button"
-                  onClick={handleConfigureGithub}
-                  className="text-xs text-[#2D6A4F] hover:underline hover:text-[#1B4332] cursor-pointer font-bold flex items-center gap-1"
-                  title="Klikněte pro nastavení GitHub repozitáře"
-                >
-                  🗄️ Nastavit GitHub
-                </button>
-                {githubUser && (
-                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold flex items-center gap-1 border border-solid ${
-                    githubSyncStatus === "syncing" 
-                      ? "bg-amber-100 text-amber-800 border-amber-200 animate-pulse"
-                      : githubSyncStatus === "error"
-                      ? "bg-red-100 text-red-800 border-red-200"
-                      : githubSyncStatus === "success"
-                      ? "bg-emerald-100 text-emerald-800 border-emerald-200"
-                      : "bg-teal-50 text-teal-800 border-teal-100"
-                  }`} title={githubSyncStatus === "error" ? githubSyncError || "Chyba" : "Stav propojení s repozitářem GitHub"}>
-                    <span className={`w-1.5 h-1.5 rounded-full ${
+          {isStudioEnv && (
+            <div className="flex items-center gap-2">
+              {isAdmin ? (
+                <div className="flex items-center gap-4 text-[#2D6A4F] font-bold flex-wrap justify-center sm:justify-end">
+                  <span className="flex items-center gap-1">✓ Administrátor</span>
+                  <button
+                    type="button"
+                    onClick={handleConfigureGithub}
+                    className="text-xs text-[#2D6A4F] hover:underline hover:text-[#1B4332] cursor-pointer font-bold flex items-center gap-1"
+                    title="Klikněte pro nastavení GitHub repozitáře"
+                  >
+                    🗄️ Nastavit GitHub
+                  </button>
+                  {githubUser && (
+                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold flex items-center gap-1 border border-solid ${
                       githubSyncStatus === "syncing" 
-                        ? "bg-amber-500 animate-ping" 
-                        : githubSyncStatus === "error" 
-                        ? "bg-red-500" 
+                        ? "bg-amber-100 text-amber-800 border-amber-200 animate-pulse"
+                        : githubSyncStatus === "error"
+                        ? "bg-red-100 text-red-800 border-red-200"
                         : githubSyncStatus === "success"
-                        ? "bg-emerald-500 animate-bounce"
-                        : "bg-teal-500"
-                    }`} />
-                    <span>
-                      {githubSyncStatus === "syncing" 
-                        ? "Nahrávám..." 
-                        : githubSyncStatus === "error" 
-                        ? "Chyba synchronizace" 
-                        : githubSyncStatus === "success"
-                        ? "Synchronizováno!"
-                        : `GitHub: ${githubUser}/${githubRepo}`}
+                        ? "bg-emerald-100 text-emerald-800 border-emerald-200"
+                        : "bg-teal-50 text-teal-800 border-teal-100"
+                    }`} title={githubSyncStatus === "error" ? githubSyncError || "Chyba" : "Stav propojení s repozitářem GitHub"}>
+                      <span className={`w-1.5 h-1.5 rounded-full ${
+                        githubSyncStatus === "syncing" 
+                          ? "bg-amber-500 animate-ping" 
+                          : githubSyncStatus === "error" 
+                          ? "bg-red-500" 
+                          : githubSyncStatus === "success"
+                          ? "bg-emerald-500 animate-bounce"
+                          : "bg-teal-500"
+                      }`} />
+                      <span>
+                        {githubSyncStatus === "syncing" 
+                          ? "Nahrávám..." 
+                          : githubSyncStatus === "error" 
+                          ? "Chyba synchronizace" 
+                          : githubSyncStatus === "success"
+                          ? "Synchronizováno!"
+                          : `GitHub: ${githubUser}/${githubRepo}`}
+                      </span>
                     </span>
-                  </span>
-                )}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsAdmin(false);
-                    setAdminPassword("");
-                    localStorage.removeItem("admin_password_token");
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsAdmin(false);
+                      setAdminPassword("");
+                      localStorage.removeItem("admin_password_token");
+                    }}
+                    className="text-xs text-red-600 hover:underline hover:text-red-700 cursor-pointer font-bold"
+                  >
+                    Odhlásit se
+                  </button>
+                </div>
+              ) : (
+                <form
+                  onSubmit={async (e) => {
+                    e.preventDefault();
+                    await handleLoginWithPassword(adminPassword);
                   }}
-                  className="text-xs text-red-600 hover:underline hover:text-red-700 cursor-pointer font-bold"
+                  className="flex items-center gap-2"
                 >
-                  Odhlásit se
-                </button>
-              </div>
-            ) : (
-              <form
-                onSubmit={async (e) => {
-                  e.preventDefault();
-                  await handleLoginWithPassword(adminPassword);
-                }}
-                className="flex items-center gap-2"
-              >
-                <input
-                  type="password"
-                  placeholder="Administrační klíč..."
-                  value={adminPassword}
-                  onChange={(e) => setAdminPassword(e.target.value)}
-                  disabled={isLoginLoading}
-                  className="px-2.5 py-1 text-xs border border-[#E8E8E1] rounded-lg focus:outline-hidden focus:border-[#2D6A4F] bg-[#FDFCF7]/60 text-slate-800 w-32"
-                />
-                <button
-                  type="submit"
-                  disabled={isLoginLoading}
-                  className="px-3 py-1 bg-[#2D6A4F] hover:bg-[#1B4332] text-white rounded-lg text-xs transition-all font-bold cursor-pointer shadow-xs disabled:bg-slate-400"
-                >
-                  {isLoginLoading ? "..." : "Přihlásit se"}
-                </button>
-              </form>
-            )}
-          </div>
+                  <input
+                    type="password"
+                    placeholder="Administrační klíč..."
+                    value={adminPassword}
+                    onChange={(e) => setAdminPassword(e.target.value)}
+                    disabled={isLoginLoading}
+                    className="px-2.5 py-1 text-xs border border-[#E8E8E1] rounded-lg focus:outline-hidden focus:border-[#2D6A4F] bg-[#FDFCF7]/60 text-slate-800 w-32"
+                  />
+                  <button
+                    type="submit"
+                    disabled={isLoginLoading}
+                    className="px-3 py-1 bg-[#2D6A4F] hover:bg-[#1B4332] text-white rounded-lg text-xs transition-all font-bold cursor-pointer shadow-xs disabled:bg-slate-400"
+                  >
+                    {isLoginLoading ? "..." : "Přihlásit se"}
+                  </button>
+                </form>
+              )}
+            </div>
+          )}
 
           <div className="flex items-center gap-4">
             <span className="text-[#E8E8E1]">|</span>
@@ -4735,7 +4815,7 @@ ${separator}`;
                     type="text"
                     value={githubRepo}
                     onChange={(e) => setGithubRepo(e.target.value)}
-                    placeholder="Např. kucharka-data"
+                    placeholder="Např. AI-kocharka-data"
                     className="w-full text-sm p-2.5 border border-[#E8E8E1] rounded-xl bg-white text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-1 focus:ring-[#1B4332]"
                   />
                 </div>
