@@ -2419,21 +2419,19 @@ ${separator}`;
 
   // Load admin state and recipes (dynamic remote URL with local storage fallbacks)
   useEffect(() => {
-    // Load admin state from localStorage (Only in AI Studio)
-    if (isStudioEnv) {
-      const savedAdminToken = localStorage.getItem("admin_password_token");
-      if (savedAdminToken) {
-        setIsAdmin(true);
-        setAdminPassword(savedAdminToken);
-      }
+    // Load admin state from localStorage
+    const savedAdminToken = localStorage.getItem("admin_password_token");
+    if (savedAdminToken) {
+      setIsAdmin(true);
+      setAdminPassword(savedAdminToken);
     }
 
     const loadRecipes = async () => {
       let loadedList: Recipe[] | null = null;
 
-      // 1. Prioritize loading from Serverless API /api (safely connected to custom GitHub repo)
+      // 1. Prioritize loading from Serverless API /api/recipes (safely connected to custom GitHub repo)
       try {
-        const serverlessResponse = await fetch("/api");
+        const serverlessResponse = await fetch("/api/recipes");
         if (serverlessResponse.ok) {
           const data = await serverlessResponse.json();
           const list = Array.isArray(data) ? data : (data.recipes || []);
@@ -2441,9 +2439,9 @@ ${separator}`;
             loadedList = list;
             setServerlessApiSuccess(true);
             setServerlessApiError(null);
-            console.log("Úspěšně načteny aktuální recepty ze Severless API /api (GitHub direct source)");
+            console.log("Úspěšně načteny aktuální recepty ze Severless API /api/recipes (GitHub direct source)");
           } else {
-            console.log("Severless API /api vrátil prázdný seznam receptů.");
+            console.log("Severless API /api/recipes vrátil prázdný seznam receptů.");
           }
         } else {
           const errData = await serverlessResponse.json().catch(() => ({}));
@@ -2453,7 +2451,7 @@ ${separator}`;
         }
       } catch (error: any) {
         setServerlessApiError(error?.message || "Nelze se připojit k Serverless API.");
-        console.log("Nepodařilo se stáhnout data přes /api, zkusíme další zdroje...", error);
+        console.log("Nepodařilo se stáhnout data přes /api/recipes, zkusíme další zdroje...", error);
       }
 
       // 2. Fallback to localStorage (if already stored and initialized)
@@ -2515,28 +2513,28 @@ ${separator}`;
     setRecipes(cleaned);
     localStorage.setItem("ai_kucharka_recipes", JSON.stringify(cleaned));
 
-    // Automatically replicate/save to Vercel/Local Serverless API /api
-    if (isStudioEnv) {
-      try {
-        const response = await fetch("/api", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({ recipes: cleaned })
-        });
-        if (response.ok) {
-          console.log("Změny kuchařky byly automaticky uloženy na GitHub přes Serverless API!");
-        } else {
-          console.warn(`Serverless API vrátil kód: ${response.status}`);
-        }
-      } catch (e) {
-        console.error("Nepodařilo se odeslat uložení na Serverless API:", e);
+    // Automatically replicate/save to Vercel/Local Serverless API /api/recipes
+    try {
+      const response = await fetch("/api/recipes", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ recipes: cleaned })
+      });
+      if (response.ok) {
+        console.log("Změny kuchařky byly automaticky uloženy na GitHub přes Serverless API!");
+      } else {
+        console.warn(`Serverless API vrátil kód: ${response.status}`);
       }
+    } catch (e) {
+      console.error("Nepodařilo se odeslat uložení na Serverless API:", e);
+    }
 
+    if (isStudioEnv) {
       syncRecipesWithGithub(cleaned, targetRecipe, isDelete);
     } else {
-      console.log("Zápis na API a GitHub synchronizace přeskočeny v produkčním exportu na Vercelu.");
+      console.log("Zápis na direct GitHub přeskočen na Vercelu (synchronizace probíhá bezpečně server-side přes /api/recipes).");
     }
   };
 
