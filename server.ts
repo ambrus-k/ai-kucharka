@@ -13,7 +13,17 @@ const PORT = 3000;
 // Set up JSON parsing with generous limits to support image uploads
 app.use(express.json({ limit: "15mb" }));
 app.use(express.urlencoded({ limit: "15mb", extended: true }));
-
+// Fix pro routování serverless funkcí na Vercelu
+if (process.env.VERCEL) {
+  app.use((req, res, next) => {
+    if (req.url && !req.url.startsWith("/api")) {
+      const originalUrl = req.url;
+      req.url = "/api" + (originalUrl.startsWith("/") ? "" : "/") + originalUrl;
+      console.log(`[Vercel URL Rewrite] Normalized ${originalUrl} to ${req.url}`);
+    }
+    next();
+  });
+}
 // Lazy initializer for GoogleGenAI to prevent crashes if key is empty during start
 let aiClient: GoogleGenAI | null = null;
 function getAi(): GoogleGenAI {
