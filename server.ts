@@ -9,6 +9,12 @@ dotenv.config();
 const app = express();
 const PORT = 3000;
 
+// Konfigurace pro přístup k externímu datovému repozitáři na GitHubu
+const GITHUB_TOKEN = process.env.GITHUB_DATA_TOKEN;
+const REPO_OWNER = "karelaa-4082s"; // Váš GitHub owner/organizace podle Vercel URL
+const REPO_NAME = "ai-kucharka-data";
+const FILE_PATH = "recepty.json"; // Název JSON souboru ve vašem datovém repozitáři
+
 // Set up JSON parsing with generous limits to support image uploads
 app.use(express.json({ limit: "15mb" }));
 app.use(express.urlencoded({ limit: "15mb", extended: true }));
@@ -35,7 +41,6 @@ function getAi(): GoogleGenAI {
 
 // Robust retry wrapper for Gemini Content Generation with model fallback to handle transient 503/429 errors gracefully
 async function generateContentWithRetry(ai: GoogleGenAI, options: any, maxRetries = 5, initialDelayMs = 1500) {
-  // Define fallback models if primary model suffers from service issues
   const originalModel = options.model || "gemini-3.5-flash";
   const modelFallbackSequence = [originalModel];
   if (!modelFallbackSequence.includes("gemini-flash-latest")) {
@@ -46,10 +51,9 @@ async function generateContentWithRetry(ai: GoogleGenAI, options: any, maxRetrie
   }
 
   let lastError: any = null;
-  // Loop through fallback models to ensure extremely high availability and success rate
   for (const currentModel of modelFallbackSequence) {
     let attempt = 0;
-    while (attempt < 2) { // try each model up to 2 times
+    while (attempt < 2) {
       try {
         const currentOptions = { ...options, model: currentModel };
         return await ai.models.generateContent(currentOptions);
@@ -71,7 +75,6 @@ async function generateContentWithRetry(ai: GoogleGenAI, options: any, maxRetrie
           console.log(`[Gemini API] Model ${currentModel} dočasně nedostupný, zkouším pokus ${attempt}/2 za ${Math.round(delay)}ms...`);
           await new Promise(resolve => setTimeout(resolve, delay));
         } else {
-          // Structural error - throw immediately instead of falling back
           throw error;
         }
       }
@@ -91,21 +94,53 @@ function checkAuth(adminPassword: any): boolean {
   const apiKey = (process.env.GEMINI_API_KEY || "").trim();
   const envAdminPassword = (process.env.ADMIN_PASSWORD || "").trim();
 
-  // 1. Verify against explicit custom administrator password (safe and recommended)
   if (envAdminPassword && password === envAdminPassword) {
     return true;
   }
-  // 2. Fallback: Verify against GEMINI_API_KEY as the access token
   if (apiKey && password === apiKey) {
     return true;
   }
   return false;
 }
 
-
 // 1. API Endpoint for Health checks
 app.get("/api/health", (req, res) => {
   res.json({ status: "healthy", time: new Date().toISOString() });
+});
+
+// NOVÝ ENDPOINT: Načtení receptů z externího GitHub repozitáře ai-kucharka-data
+app.get("/api/recipes", async (req, res) => {
+  try {
+    if (!GITHUB_TOKEN) {
+      return res.status(500).json({ 
+        error: "Konfigurační chyba", 
+        details: "V prostředí Vercel chybí nastavení proměnné GITHUB_DATA_TOKEN." 
+      });
+    }
+
+    const url = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${FILE_PATH}`;
+    
+    const response = await fetch(url, {
+      headers: {
+        "Authorization": `Bearer ${GITHUB_TOKEN}`,
+        "Accept": "application/vnd.github.v3.raw",
+        "User-Agent": "AI-Kucharika-App"
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`GitHub API odpovědělo kódem ${response.status}: ${response.statusText}`);
+    }
+
+    const recipesData = await response.json();
+    return res.json(recipesData);
+  } catch (error: any) {
+    console.error("Chyba při načítání receptů z GitHubu:", error);
+    return res.status(500).json({ 
+      error: "Nepodařilo se načíst dynamická data z GitHub repozitáře.", 
+      details: error.message 
+    });
+  }
 });
 
 // Endpoint to verify administrator / API key
@@ -138,7 +173,6 @@ app.post("/api/enhance-recipe", async (req, res) => {
     const ai = getAi();
     const parts: any[] = [];
 
-    // System instruction details representing the exact 5-source synthesis models requested by the user:
     const systemInstruction = `
 Jsi odborný asistent pro vaření "AI Kuchařka", pokročilý kulinářský syntezátor a technologický gastronom.
 Tvým úkolem je vzít chaotický, syrový, nepřesný nebo neuspořádaný recept (který ti uživatel zadá v textu a/nebo v nahraném obrázku či PDF) a kompletně jej přepracovat a vylepšit na profesionální standard pro domácí kuchaře.
@@ -152,7 +186,7 @@ Při syntéze a úpravě receptu MUSÍŠ kombinovat přesně těchto pět zdrojo
 
 ZÁSADNÍ PRAVIDLA:
 - Zkracuj názvy receptů (title) na naprosté kulinářské minimum a jádro věci. Nepoužívej zbytečné přívlastky. Např. nepiš 'domácí kváskový chléb s žitnou moukou', ale pouze 'Kváskový chléb'; nepiš 'pomalé tažené kuřecí stehno na česneku', ale jen 'Kuřecí stehna na česneku'.
-- Shrnutí receptu (summary) musí být velmi krátké, věcné a přehledné (cca 1-2 věty), žádné plané vycpávky ani přemíra marketingu. Nepiš zde o věcech jako 'speciální autolýza' nebo vznosné popisy, - Suroviny upřesni na přesné metrické jednotky vhodné pro domácnost.
+- Shrnutí receptu (summary) must be very krátké, věcné a přehledné (cca 1-2 věty), žádné plané vycpávky ani přemíra marketingu. Nepiš zde o věcech jako 'speciální autolýza' nebo vznosné popisy, - Suroviny upřesni na přesné metrické jednotky vhodné pro domácnost.
 - Krok za krokem postup (instructions) rozepiš do velmi podrobných, detailních a popsaných vět. Popiš přesné kulinářské nebo mechanické úkony s kuchyňským náčiním.
 - DO KAŽDÉHO JEDNOTLIVÉHO KROKU (v poli 'instructions') MUSÍŠ EXPLICITNĚ ZAPSAT PŘESNÉ VÁHY NEBO MNOŽSTVÍ VŠECH SUROVIN, KTERÉ SE V DANÉM KROKU PŘIDÁVAJÍ NEBO ZPRACOVÁVAJÍ! (Např. místo 'přidejte mouku, máslo a cukr' musíš napsat 'do mísy přidejte 250 g hladké mouky, 120 g změklého másla a 50 g moučkového cukru'). Toto je kritické, aby měl kuchař váhy přímo před sebou v aktuálním kroku!
 - Časovače jako samostatné odpočítávače u kroků zruš, vůbec na nich netrvej, důležité jsou detailní popisy děje a kulinářské kroky.
@@ -161,15 +195,13 @@ ZÁSADNÍ PRAVIDLA:
 - ODSTRANĚNÍ KONZERVANTŮ: V ŽÁDNÉM RECEPTU (ZEJMÉNA V POLÉVKÁCH COŽ JSOU POLIEVKY) NESMÍ BÝT POUŽITY ŽÁDNÉ KONZERVAČNÍ LÁTKY, KONZERVANTY ANI UMĚLÁ DOCHUCOVADLA. Používej výhradně čerstvé přírodní suroviny.
 `;
 
-    // Add manual text notes
     let userPrompt = "Zde je můj původní recept k vylepšení:\n";
     if (rawText) {
       userPrompt += `--- TEXT RECEPTU ---\n${rawText}\n`;
     }
 
     if (fileData) {
-      // Inline document or image part for Gemini multimodal understanding
-      const cleanBase64 = fileData.replace(/^data:.*,/, ""); // strip the data uri header if present
+      const cleanBase64 = fileData.replace(/^data:.*,/, "");
       parts.push({
         inlineData: {
           mimeType: mimeType || "image/jpeg",
@@ -181,7 +213,6 @@ ZÁSADNÍ PRAVIDLA:
 
     parts.push({ text: userPrompt });
 
-    // Call the model gemini-3.5-flash for basic text + multimodal tasks with retry mechanism
     const response = await generateContentWithRetry(ai, {
       model: "gemini-3.5-flash",
       contents: { parts },
@@ -191,60 +222,20 @@ ZÁSADNÍ PRAVIDLA:
         responseSchema: {
           type: Type.OBJECT,
           properties: {
-            title: { 
-              type: Type.STRING, 
-              description: "Název vylepšeného receptu (např. 'Pikantní pečená křídla s medem')" 
-            },
-            summary: { 
-              type: Type.STRING, 
-              description: "Strohá specifikace v 1-2 českých větách vystihující podstatu vylepšení." 
-            },
-            ingredients: { 
-              type: Type.ARRAY, 
-              items: { type: Type.STRING },
-              description: "Přesný seznam surovin s metrickými jednotkami. Nesmí obsahovat konzervační látky ani konzervanty." 
-            },
-            instructions: { 
-              type: Type.ARRAY, 
-              items: { type: Type.STRING },
-              description: "Postup přípravy krok za krokem v postupných čitelných odstavcích" 
-            },
-            applianceTips: { 
-              type: Type.STRING, 
-              description: "Konkrétní tip pro moderní kuchyňské pomocníky (Air Fryer, Thermomix, Remosku, pomalý hrnec atd.)" 
-            },
-            expertJustification: { 
-              type: Type.STRING, 
-              description: "Jasné a srozumitelné odůvodnění z pohledu chemie jídla a kuchařských chyb, proč je tento upravený postup lepší" 
-            },
-            applianceType: { 
-              type: Type.STRING, 
-              description: "Název spotřebiče, který je doporučen pro optimalizaci (např. 'Horkovzdušná fritéza', 'Thermomix / Kuchyňský robot', 'Pomalý hrnec', 'Domácí pekárna', 'Multifunkční hrnec', 'Klasická trouba')" 
-            },
-            cookingTime: { 
-              type: Type.STRING, 
-              description: "Celková doba přípravy vaření (např. '45 min')" 
-            },
-            difficulty: { 
-              type: Type.STRING, 
-              description: "Náročnost receptu. Musí být přesně jedna z hodnot: 'Snadné', 'Střední', 'Složité'" 
-            },
-            category: {
-              type: Type.STRING,
-              description: "Kategorie jídla. Vyber přesně jednu z hodnot: 'Pečivo', 'Maso', 'Polévky', 'Sladká jídla a moučníky', 'Ostatní'."
-            }
+            title: { type: Type.STRING, description: "Název vylepšeného receptu" },
+            summary: { type: Type.STRING, description: "Strohá specifikace v 1-2 českých větách." },
+            ingredients: { type: Type.ARRAY, items: { type: Type.STRING }, description: "Přesný seznam surovin s metrickými jednotkami." },
+            instructions: { type: Type.ARRAY, items: { type: Type.STRING }, description: "Postup přípravy krok za krokem." },
+            applianceTips: { type: Type.STRING, description: "Konkrétní tip pro moderní kuchyňské pomocníky." },
+            expertJustification: { type: Type.STRING, description: "Jasné a srozumitelné odůvodnění." },
+            applianceType: { type: Type.STRING, description: "Název spotřebiče, který je doporučen." },
+            cookingTime: { type: Type.STRING, description: "Celková doba přípravy vaření." },
+            difficulty: { type: Type.STRING, description: "Náročnost receptu ('Snadné', 'Střední', 'Složité')." },
+            category: { type: Type.STRING, description: "Kategorie jídla ('Pečivo', 'Maso', 'Polévky', 'Sladká jídla a moučníky', 'Ostatní')." }
           },
           required: [
-            "title", 
-            "summary", 
-            "ingredients", 
-            "instructions", 
-            "applianceTips", 
-            "expertJustification", 
-            "applianceType", 
-            "cookingTime", 
-            "difficulty",
-            "category"
+            "title", "summary", "ingredients", "instructions", "applianceTips", 
+            "expertJustification", "applianceType", "cookingTime", "difficulty", "category"
           ]
         }
       }
@@ -258,7 +249,6 @@ ZÁSADNÍ PRAVIDLA:
     const enhancedRecipe = JSON.parse(outputText.trim());
     enhancedRecipe.id = `gen-${Date.now()}`;
     
-    // Return the response
     res.json({ recipe: enhancedRecipe });
 
   } catch (error: any) {
@@ -290,24 +280,19 @@ Jsi odborný asistent pro vaření "AI Kuchařka", pokročilý kulinářský syn
 Tvým úkolem je upravit stávající recept na základě konkrétních pokynů a modifikací od uživatele.
 
 Při úpravě receptu MUSÍŠ zachovat stávající strukturu, ale modifikovat obsah tak, aby odpovídal pokynům. Opět kombinuj pět zdrojových pilířů:
-1. Akademická literatura (Food science): optimalizace denaturace proteinů, želatinizace škrobů a zachování nutričních hodnot s ohledem na provedené změny.
-2. Odborně posouzené zdroje (Masterclass): kulinářská zručnost mistrů zjednodušená do jasných kroků.
-3. Online registry receptů: analýza tisíců poměrů surovin a koření.
-4. Diskuzní kulinářská fóra: odhalení nejčastějších chyb a jejich prevence.
-5. Inženýrství moderních spotřebičů: úprava teplot, časů, nebo změna doporučeného spotřebiče, pokud to uživatel požaduje.
+1. Akademická literatura (Food science)
+2. Odborně posouzené zdroje (Masterclass)
+3. Online registry receptů
+4. Diskuzní kulinářská fóra
+5. Inženýrství moderních spotřebičů
 
 ZÁSADNÍ PRAVIDLA:
-- Zkracuj názvy receptů (title) na naprosté kulinářské minimum a jádro věci. Nepoužívej zbytečné přívlastky. Např. piš 'Kváskový chléb' místo 'domácí kváskový chléb s žitnou moukou'.
-- Shrnutí receptu (summary) musí být velmi krátké, věcné a přehledné (cca 1-2 věty). Omez nepotřebné kulinářské klišé.
-- Všechny texty v odpovědi MUSÍ být napsány bezchybně v ČESKÉM JAZYCE (čeština).
-- Tón musí zůstat odborný, přátelský, povzbuzující a srozumitelný.
-- Suroviny upřesni na přesné metrické jednotky vhodné pro domácnost.
-- Krok za krokem postup (instructions) rozepiš do velmi podrobných, detailních a popsaných vět. Popiš přesné kulinářské nebo mechanické úkony s kuchyňským náčiním.
-- DO KAŽDÉHO JEDNOTLIVÉHO KROKU (v poli 'instructions') MUSÍŠ EXPLICITNĚ ZAPSAT PŘESNÉ VÁHY NEBO MNOŽSTVÍ VŠECH SUROVIN, KTERÉ SE V DANÉM KROKU PŘIDÁVAJÍ NEBO ZPRACOVÁVAJÍ! (Např. místo 'přidejte mouku, máslo a cukr' musíš napsat 'do mísy přidejte 250 g hladké mouky, 120 g změklého másla a 50 g moučkového cukru'). Toto je kritické, aby měl kuchař váhy přímo před sebou v aktuálním kroku!
-- Časovače jako samostatné odpočítávače u kroků zruš, vůbec na nich netrvej, důležité jsou detailní popisy děje a kulinářské kroky.
-- Tipy pro moderní kuchyni musí konkrétně popsat využití spotřebiče pro tento recept.
-- V odůvodnění 'expertJustification' popiš, jaké změny jsi udělal a proč jsou tyto úpravy lepší a chemicky/kuchařsky vyvážené.
-- ODSTRANĚNÍ KONZERVANTŮ: V ŽÁDNÉM RECEPTU (ZEJMÉNA V POLÉVKÁCH) NESMÍ BÝT POUŽITY ŽÁDNÉ KONZERVAČNÍ LÁTKY, KONZERVANTY ANI UMĚLÁ DOCHUCOVADLA. Používej výhradně čerstvé přírodní suroviny.
+- Zkracuj názvy receptů (title) na naprosté kulinářské minimum.
+- Shrnutí receptu (summary) musí být velmi krátké, věcné a přehledné (cca 1-2 věty).
+- Všechny texty v odpovědi MUSÍ být napsány bezchybně v ČESKÉM JAZYCE.
+- Suroviny upřesni na přesné metrické jednotky.
+- DO KAŽDÉHO JEDNOTLIVÉHO KROKU (v poli 'instructions') MUSÍŠ EXPLICITNĚ ZAPSAT PŘESNÉ VÁHY NEBO MNOŽSTVÍ VŠECH SUROVIN!
+- ODSTRANĚNÍ KONZERVANTŮ: V ŽÁDNÉM RECEPTU NESMÍ BÝT POUŽITY ŽÁDNÉ KONZERVAČNÍ LÁTKY ANI UMĚLÁ DOCHUCOVADLA.
 `;
 
     const userPrompt = `
@@ -318,8 +303,6 @@ A zde jsou požadavky na úpravu od uživatele:
 "${modificationPrompt}"
 
 Vytvoř kompletně aktualizovaný recept se všemi poli. Ujisti se, že pokud se jedná o polévku, neobsahuje žádné konzervační látky ani konzervanty.
-
-Kompletní aktualizovaný recept:
 `;
 
     const response = await generateContentWithRetry(ai, {
@@ -332,27 +315,19 @@ Kompletní aktualizovaný recept:
           type: Type.OBJECT,
           properties: {
             title: { type: Type.STRING, description: "Název upraveného receptu" },
-            summary: { type: Type.STRING, description: "Strohá specifikace v 1-2 českých větách vystihující podstatu úpravy." },
-            ingredients: { type: Type.ARRAY, items: { type: Type.STRING }, description: "Přesný seznam surovin s metrickými jednotkami. Nesmí obsahovat konzervační látky." },
+            summary: { type: Type.STRING, description: "Strohá specifikace v 1-2 českých větách." },
+            ingredients: { type: Type.ARRAY, items: { type: Type.STRING }, description: "Přesný seznam surovin bez konzervantů." },
             instructions: { type: Type.ARRAY, items: { type: Type.STRING }, description: "Postup přípravy krok za krokem" },
             applianceTips: { type: Type.STRING, description: "Konkrétní tip pro moderní kuchyňské pomocníky" },
-            expertJustification: { type: Type.STRING, description: "Jasné a srozumitelné odůvodnění provedených změn" },
+            expertJustification: { type: Type.STRING, description: "Jasné a srozumitelné odůvodnění" },
             applianceType: { type: Type.STRING, description: "Název spotřebiče pro optimalizaci" },
             cookingTime: { type: Type.STRING, description: "Celková doba přípravy" },
             difficulty: { type: Type.STRING, description: "Náročnost receptu ('Snadné', 'Střední', 'Složité')" },
-            category: { type: Type.STRING, description: "Kategorie jídla. Vyber přesně jednu z hodnot: 'Pečivo', 'Maso', 'Polévky', 'Sladká jídla a moučníky', 'Ostatní'." }
+            category: { type: Type.STRING, description: "Kategorie jídla ('Pečivo', 'Maso', 'Polévky', 'Sladká jídla a moučníky', 'Ostatní')." }
           },
           required: [
-            "title", 
-            "summary", 
-            "ingredients", 
-            "instructions", 
-            "applianceTips", 
-            "expertJustification", 
-            "applianceType", 
-            "cookingTime", 
-            "difficulty",
-            "category"
+            "title", "summary", "ingredients", "instructions", "applianceTips", 
+            "expertJustification", "applianceType", "cookingTime", "difficulty", "category"
           ]
         }
       }
@@ -396,16 +371,7 @@ app.post(["/api/audit-recipe", "/api/check-recipe"], async (req, res) => {
 Jsi odborný kulinářský simulátor, auditní systém a analyzátor receptů "AI Kuchařka".
 Tvým úkolem je podrobit předložený recept kompletní kulinářské simulaci ("přehrát ho" od začátku do konce), odhalit slabá místa (fyzika, chemie jídla, poměry, časy, teploty) a navrhnout jedno konkrétní významné zlepšení.
 
-Následně vrátíš strukturovanou odpověď:
-1. 'simulationSteps': Krok za krokem popiš průběh tvé kulinářské simulace (4-5 kroků). Popiš chemické a kulinářské detaily toho, co se v každém kroku simulace dělo a co jsi zjistil (např. 'Simulace hnětení: Zjistili jsme, že lepek se tvořil pomalu kvůli nízké hydrataci...', 'Simulace pečení: Maillardova reakce neproběhla rovnoměrně...').
-2. 'proposedChange': Stručný (1-2 věty) popis navrhované změny a vylepšení.
-3. 'modifiedRecipe': Kompletní strukturovaný objekt receptu se všemi poli, kde je tato změna plně zapracována.
-
-Při úpravě receptu a simulaci dbej na tyto pilíře:
-- Food science (chemie a fyzika jídla).
-- Odstranění jakýchkoliv konzervačních látek (vše musí být čerstvé a přírodní).
-- Srozumitelnost pro domácnosti.
-- Zkrácení názvu na jasné gastronomické jádro bez marketingového balastu.
+Následně vrátíš strukturovanou odpověď obsahující simulationSteps, proposedChange a modifiedRecipe.
 Všechny texty musí být v bezchybné ČEŠTINĚ.
 `;
 
@@ -432,34 +398,26 @@ Spusť virtuální kulinářskou simulaci vaření, zapiš její kroky, navrhni 
             },
             proposedChange: {
               type: Type.STRING,
-              description: "Jasný a stručný popis navrhované změny (1-2 věty, česky)"
+              description: "Jasný a stručný popis navrhované změny."
             },
             modifiedRecipe: {
               type: Type.OBJECT,
               description: "Kompletní upravený recept jako objekt",
               properties: {
-                title: { type: Type.STRING, description: "Název upraveného receptu" },
-                summary: { type: Type.STRING, description: "Velmi krátké shrnutí upraveného receptu v 1-2 českých větách" },
-                ingredients: { type: Type.ARRAY, items: { type: Type.STRING }, description: "Suroviny s metrickými jednotkami, bez konzervantů" },
-                instructions: { type: Type.ARRAY, items: { type: Type.STRING }, description: "Postup přípravy" },
-                applianceTips: { type: Type.STRING, description: "Tip pro moderní kuchyňské pomocníky" },
-                expertJustification: { type: Type.STRING, description: "Kondenzované odůvodnění změny" },
-                applianceType: { type: Type.STRING, description: "Doporučený spotřebič" },
-                cookingTime: { type: Type.STRING, description: "Doba přípravy doložená simulací" },
-                difficulty: { type: Type.STRING, description: "Náročnost receptu ('Snadné', 'Střední', 'Složité')" },
-                category: { type: Type.STRING, description: "Kategorie jídla." }
+                title: { type: Type.STRING },
+                summary: { type: Type.STRING },
+                ingredients: { type: Type.ARRAY, items: { type: Type.STRING } },
+                instructions: { type: Type.ARRAY, items: { type: Type.STRING } },
+                applianceTips: { type: Type.STRING },
+                expertJustification: { type: Type.STRING },
+                applianceType: { type: Type.STRING },
+                cookingTime: { type: Type.STRING },
+                difficulty: { type: Type.STRING },
+                category: { type: Type.STRING }
               },
               required: [
-                "title", 
-                "summary", 
-                "ingredients", 
-                "instructions", 
-                "applianceTips", 
-                "expertJustification", 
-                "applianceType", 
-                "cookingTime", 
-                "difficulty",
-                "category"
+                "title", "summary", "ingredients", "instructions", "applianceTips", 
+                "expertJustification", "applianceType", "cookingTime", "difficulty", "category"
               ]
             }
           },
@@ -512,7 +470,7 @@ async function startServer() {
   });
 }
 
-// Export app instance so it can be used by serverless platforms (like Vercel) or other loaders
+// Export app instance so it can be used by serverless platforms (like Vercel)
 export default app;
 
 if (!process.env.VERCEL) {
