@@ -120,9 +120,8 @@ app.get("/api/health", (req, res) => {
 // GET /api - Načtení všech receptů ze složky recipes/ z GitHubu
 app.get("/api", async (req, res) => {
   try {
-    // Sjednocení na GITHUB_DATA_TOKEN s fallbackem na GITHUB_TOKEN
     const token = (process.env.GITHUB_DATA_TOKEN || process.env.GITHUB_TOKEN || "").trim();
-    const owner = (process.env.GITHUB_USERNAME || "ambrus-k").trim(); // OPRAVENO pro váš GitHub účet
+    const owner = (process.env.GITHUB_USERNAME || "ambrus-k").trim();
     const repo = (process.env.GITHUB_REPO || "ai-kucharka-data").trim();
     const branch = "main";
 
@@ -156,7 +155,7 @@ app.get("/api", async (req, res) => {
             if (file.download_url) {
               const fileRes = await fetch(file.download_url, {
                 headers: {
-                  "Authorization": `token ${token}`, // Zajištění správného přístupu k raw obsahu
+                  "Authorization": `token ${token}`,
                   "User-Agent": "AI-Kucharka"
                 }
               });
@@ -222,11 +221,7 @@ app.get("/api", async (req, res) => {
 
 // POST / PUT /api - Hromadná aktualizace složky recipes/ na GitHubu
 app.all("/api", async (req, res) => {
-  if (process.env.VERCEL) {
-    return res.status(403).json({
-      error: "Přístup k databázi a synchronizace jsou v produkčním exportu na Vercelu zakázány z bezpečnostních důvodů."
-    });
-  }
+  // OPRAVENO: Odstraněna blokační podmínka process.env.VERCEL, která v produkci vracela chybu 403
   if (req.method !== "POST" && req.method !== "PUT" && req.method !== "GET") {
     return res.status(405).json({ error: "Metoda nepovolena." });
   }
@@ -234,7 +229,7 @@ app.all("/api", async (req, res) => {
 
   try {
     const token = (process.env.GITHUB_DATA_TOKEN || process.env.GITHUB_TOKEN || "").trim();
-    const owner = (process.env.GITHUB_USERNAME || "ambrus-k").trim(); // OPRAVENO pro váš GitHub účet
+    const owner = (process.env.GITHUB_USERNAME || "ambrus-k").trim();
     const repo = (process.env.GITHUB_REPO || "ai-kucharka-data").trim();
     const branch = "main";
 
