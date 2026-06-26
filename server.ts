@@ -11,7 +11,7 @@ const PORT = 3000;
 
 // Konfigurace pro přístup k externímu datovému repozitáři na GitHubu
 const GITHUB_TOKEN = process.env.GITHUB_DATA_TOKEN;
-const REPO_OWNER = "karelaa-4082s"; // Váš GitHub owner/organizace podle Vercel URL
+const REPO_OWNER = "ambrus-k"; // Váš GitHub owner/organizace podle Vercel URL
 const REPO_NAME = "ai-kucharka-data";
 const FILE_PATH = "recepty.json"; // Název JSON souboru ve vašem datovém repozitáři
 
