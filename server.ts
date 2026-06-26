@@ -14,6 +14,20 @@ const PORT = 3000;
 app.use(express.json({ limit: "15mb" }));
 app.use(express.urlencoded({ limit: "15mb", extended: true }));
 
+// On Vercel, the "/api" prefix might be stripped from incoming URLs by Vercel's serverless router.
+// This middleware normalizes req.url to start with "/api" if it runs in Vercel environment,
+// ensuring that Express correctly matches "/api/..." endpoints.
+if (process.env.VERCEL) {
+  app.use((req, res, next) => {
+    if (req.url && !req.url.startsWith("/api")) {
+      const originalUrl = req.url;
+      req.url = "/api" + (originalUrl.startsWith("/") ? "" : "/") + originalUrl;
+      console.log(`[Vercel URL Rewrite] Normalized ${originalUrl} to ${req.url}`);
+    }
+    next();
+  });
+}
+
 // Lazy initializer for GoogleGenAI to prevent crashes if key is empty during start
 let aiClient: GoogleGenAI | null = null;
 function getAi(): GoogleGenAI {
