@@ -42,7 +42,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   // 2. Integration with GitHub API via environment variables
   const token = process.env.GITHUB_TOKEN || "";
   const owner = process.env.GITHUB_USERNAME || "karelaa";
-  const repo = process.env.GITHUB_REPO || "AI-kocharka-data";
+  const repo = process.env.GITHUB_REPO || "ai-kucharka-data";
   const path = "db.json";
 
   if (!token) {

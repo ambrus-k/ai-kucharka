@@ -22,6 +22,7 @@ import {
   Search, 
   Upload, 
   X,
+  ExternalLink,
   History,
   Info,
   ChevronDown,
@@ -67,19 +68,19 @@ const REMOTE_DB_URL = (() => {
   // 2. Look for personal GitHub username override in localStorage for sharing
   const storedGithubName = localStorage.getItem("ai_kucharka_github_username");
   if (storedGithubName && storedGithubName.trim() !== "") {
-    const repo = localStorage.getItem("ai_kucharka_github_repo") || "AI-kocharka-data";
+    const repo = localStorage.getItem("ai_kucharka_github_repo") || "ai-kucharka-data";
     const branch = localStorage.getItem("ai_kucharka_github_branch") || "main";
     const path = localStorage.getItem("ai_kucharka_github_path") || "db.json";
     return `https://raw.githubusercontent.com/${storedGithubName.trim()}/${repo.trim()}/${branch.trim()}/${path.trim()}`;
   }
 
-  // 3. Fallback when NOT in Studio (the live Vercel version): always load from karelaa/AI-kocharka-data
+  // 3. Fallback when NOT in Studio (the live Vercel version): always load from karelaa/ai-kucharka-data
   if (!isStudioEnv) {
-    return "https://raw.githubusercontent.com/karelaa/AI-kocharka-data/main/db.json";
+    return "https://raw.githubusercontent.com/karelaa/ai-kucharka-data/main/db.json";
   }
 
   // 4. Default template in Studio
-  return "https://raw.githubusercontent.com/karelaa/AI-kocharka-data/main/db.json";
+  return "https://raw.githubusercontent.com/karelaa/ai-kucharka-data/main/db.json";
 })();
 
 
@@ -423,7 +424,7 @@ export default function App() {
   // States for GitHub integration
   const [showGithubConfig, setShowGithubConfig] = useState(false);
   const [githubUser, setGithubUser] = useState(() => localStorage.getItem("ai_kucharka_github_username") || "karelaa");
-  const [githubRepo, setGithubRepo] = useState(() => localStorage.getItem("ai_kucharka_github_repo") || "AI-kocharka-data");
+  const [githubRepo, setGithubRepo] = useState(() => localStorage.getItem("ai_kucharka_github_repo") || "ai-kucharka-data");
   const [githubToken, setGithubToken] = useState(() => localStorage.getItem("ai_kucharka_github_token") || "");
   const [githubBranch, setGithubBranch] = useState(() => localStorage.getItem("ai_kucharka_github_branch") || "main");
   const [githubPath, setGithubPath] = useState(() => localStorage.getItem("ai_kucharka_github_path") || "db.json");
@@ -431,6 +432,12 @@ export default function App() {
   const [githubTestMessage, setGithubTestMessage] = useState<string | null>(null);
   const [githubSyncStatus, setGithubSyncStatus] = useState<"idle" | "syncing" | "success" | "error">("idle");
   const [githubSyncError, setGithubSyncError] = useState<string | null>(null);
+  const [githubSyncLogs, setGithubSyncLogs] = useState<string[]>([]);
+  const [githubPendingAction, setGithubPendingAction] = useState<"import" | "export" | "sync" | null>(null);
+  const addSyncLog = (message: string) => {
+    const time = new Date().toLocaleTimeString();
+    setGithubSyncLogs(prev => [...prev, `[${time}] ${message}`]);
+  };
 
   const handleAuditRecipe = async () => {
     if (!selectedRecipe) return;
@@ -1042,15 +1049,365 @@ export default function App() {
     const dbPath = githubPath.trim();
 
     if (!user || !repo || !token) {
-      alert("Pro export musíte nejdříve vyplnit GitHub Uživatelské jméno, Název repozitáře a Přístupový token (PAT).");
+      setGithubSyncStatus("error");
+      setGithubSyncError("Pro export musíte nejdříve vyplnit GitHub Uživatelské jméno, Název repozitáře a Přístupový token (PAT).");
       return;
     }
 
     setGithubSyncStatus("syncing");
     setGithubSyncError(null);
+    setGithubSyncLogs([]);
+    const log = (msg: string) => {
+      console.log(msg);
+      addSyncLog(msg);
+    };
 
     try {
+      log("Zahájení nahrávání databáze na GitHub...");
+      
       // 1. Sync db.json
+      const dbUrl = `https://api.github.com/repos/${user}/${repo}/contents/${dbPath}`;
+      let dbSha: string | undefined;
+
+      log(`1. Načítání metadat souboru ${dbPath}...`);
+      try {
+        const getFileResponse = await fetch(`${dbUrl}?ref=${branch}`, {
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Accept": "application/vnd.github.v3+json"
+          }
+        });
+        if (getFileResponse.status === 200) {
+          const fileData = await getFileResponse.json();
+          dbSha = fileData.sha;
+          log(`Nalezen stávající soubor ${dbPath} (SHA: ${dbSha?.slice(0, 7)}).`);
+        } else {
+          log(`Soubor ${dbPath} zatím neexistuje, bude vytvořen.`);
+        }
+      } catch (e) {
+        log(`Poznámka: Nepodařilo se zjistit SHA souboru ${dbPath}, předpokládám že neexistuje.`);
+      }
+
+      log(`Dekódování a příprava obsahu ${dbPath} (celkem ${recipes.length} receptů)...`);
+      const dbContentB64 = window.btoa(unescape(encodeURIComponent(JSON.stringify(recipes, null, 2))));
+      
+      log(`Nahrávání nového ${dbPath} na GitHub...`);
+      const dbPutResponse = await fetch(dbUrl, {
+        method: "PUT",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Accept": "application/vnd.github.v3+json",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          message: `Kompletní nahrání databáze db.json (${recipes.length} receptů) přes AI Kuchařku`,
+          content: dbContentB64,
+          sha: dbSha,
+          branch: branch
+        })
+      });
+
+      if (!dbPutResponse.ok) {
+        throw new Error(`Nepodařilo se nahrát ${dbPath}. Kód: ${dbPutResponse.status}`);
+      }
+      log(`✓ Databáze ${dbPath} byla úspěšně nahrána.`);
+
+      // 2. Sync all individual recipes to recipes/ directory
+      log("2. Synchronizace jednotlivých souborů receptů v adresáři 'recipes/'...");
+      let successCount = 0;
+      
+      for (let i = 0; i < recipes.length; i++) {
+        const r = recipes[i];
+        const slug = r.title
+          .toString()
+          .toLowerCase()
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .replace(/\s+/g, '-')
+          .replace(/[^\w\-]+/g, '')
+          .replace(/\-\-+/g, '-')
+          .replace(/^-+/, '')
+          .replace(/-+$/, '');
+
+        const recipeFilePath = `recipes/${slug}.json`;
+        log(`Ukládání receptu (${i + 1}/${recipes.length}): ${r.title} -> ${recipeFilePath}`);
+
+        const recipeFileUrl = `https://api.github.com/repos/${user}/${repo}/contents/${recipeFilePath}`;
+        let recipeSha: string | undefined;
+
+        try {
+          const getRecipeResponse = await fetch(`${recipeFileUrl}?ref=${branch}`, {
+            headers: {
+              "Authorization": `Bearer ${token}`,
+              "Accept": "application/vnd.github.v3+json"
+            }
+          });
+          if (getRecipeResponse.status === 200) {
+            const fileData = await getRecipeResponse.json();
+            recipeSha = fileData.sha;
+          }
+        } catch (e) {}
+
+        const recipeContentB64 = window.btoa(unescape(encodeURIComponent(JSON.stringify(r, null, 2))));
+        const putRecipeRes = await fetch(recipeFileUrl, {
+          method: "PUT",
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Accept": "application/vnd.github.v3+json",
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            message: `Nahrání kulinářského zdroje pro: ${r.title}`,
+            content: recipeContentB64,
+            sha: recipeSha,
+            branch: branch
+          })
+        });
+
+        if (putRecipeRes.ok) {
+          successCount++;
+        } else {
+          log(`⚠️ Chyba při nahrávání souboru receptu ${r.title} (Kód: ${putRecipeRes.status})`);
+        }
+      }
+
+      setGithubSyncStatus("success");
+      log(`✓ Vše hotovo! Úspěšně uloženo ${recipes.length} receptů do databáze ${dbPath} a ${successCount} samostatných souborů do 'recipes/'.`);
+      setTimeout(() => setGithubSyncStatus("idle"), 8000);
+    } catch (err: any) {
+      console.error("Export all to GitHub failed", err);
+      setGithubSyncStatus("error");
+      setGithubSyncError(err?.message || "Neznáma chyba při exportu.");
+      log(`❌ Chyba exportu: ${err?.message || "Neznámá chyba"}`);
+    }
+  };
+
+  const fetchRecipesFromGithub = async (silentOrOptions?: boolean | { silent?: boolean; skipClearLogs?: boolean }): Promise<Recipe[]> => {
+    let silent = false;
+    let skipClearLogs = false;
+    if (typeof silentOrOptions === "boolean") {
+      silent = silentOrOptions;
+    } else if (silentOrOptions) {
+      silent = silentOrOptions.silent ?? false;
+      skipClearLogs = silentOrOptions.skipClearLogs ?? false;
+    }
+
+    const user = githubUser.trim();
+    const repo = githubRepo.trim();
+    const token = githubToken.trim();
+    const branch = githubBranch.trim();
+    const dbPath = githubPath.trim();
+
+    if (!silent && !skipClearLogs) {
+      setGithubSyncLogs([]);
+    }
+    const log = (msg: string) => {
+      console.log(msg);
+      if (!silent) addSyncLog(msg);
+    };
+
+    log(`Navazování spojení pro stažení ${dbPath} z větve ${branch}...`);
+
+    // Let's try fetching via GitHub contents API first
+    const dbUrl = `https://api.github.com/repos/${user}/${repo}/contents/${dbPath}`;
+    const headers: Record<string, string> = {
+      "Accept": "application/vnd.github.v3+json"
+    };
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+
+    let getFileResponse: Response;
+    try {
+      getFileResponse = await fetch(`${dbUrl}?ref=${branch}`, { headers });
+    } catch (fetchErr: any) {
+      log(`Chyba síťového požadavku: ${fetchErr?.message || fetchErr}. Zkusíme veřejnou raw URL...`);
+      // Fallback directly to public raw URL if fetch to API failed (e.g. CORS, offline)
+      const rawUrl = `https://raw.githubusercontent.com/${user}/${repo}/${branch}/${dbPath}`;
+      const rawRes = await fetch(rawUrl);
+      if (!rawRes.ok) {
+        throw new Error(`Nepodařilo se stáhnout db.json z API ani z veřejné raw URL. Kód: ${rawRes.status}`);
+      }
+      const data = await rawRes.json();
+      const list = Array.isArray(data) ? data : (data.recipes || []);
+      return list;
+    }
+
+    if (getFileResponse.status === 403) {
+      log(`Přístup odmítnut (403) - možný limit API požadavků. Zkouším veřejnou raw URL jako fallback...`);
+      const rawUrl = `https://raw.githubusercontent.com/${user}/${repo}/${branch}/${dbPath}`;
+      const rawRes = await fetch(rawUrl);
+      if (!rawRes.ok) {
+        throw new Error(`Přístup odmítnut API a nepodařilo se stáhnout ani přes veřejnou raw URL.`);
+      }
+      const data = await rawRes.json();
+      const list = Array.isArray(data) ? data : (data.recipes || []);
+      return list;
+    }
+
+    if (getFileResponse.status !== 200) {
+      log(`GitHub API vrátil kód ${getFileResponse.status}. Zkouším veřejnou raw URL jako fallback...`);
+      const rawUrl = `https://raw.githubusercontent.com/${user}/${repo}/${branch}/${dbPath}`;
+      const rawRes = await fetch(rawUrl);
+      if (!rawRes.ok) {
+        throw new Error(`Soubor db.json nebyl v repozitáři nalezen (Status API: ${getFileResponse.status}, Raw: ${rawRes.status})`);
+      }
+      const data = await rawRes.json();
+      const list = Array.isArray(data) ? data : (data.recipes || []);
+      return list;
+    }
+
+    const fileData = await getFileResponse.json();
+    let rawJsonContent = "";
+
+    if (fileData && typeof fileData === "object" && "content" in fileData && fileData.encoding === "base64") {
+      log(`Dekódování Base64 databáze z GitHub API...`);
+      // Clean up whitespace/newlines from base64 string
+      const b64 = fileData.content.replace(/\s/g, "");
+      // Decodes UTF-8 string safely
+      rawJsonContent = decodeURIComponent(
+        atob(b64)
+          .split("")
+          .map(c => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+          .join("")
+      );
+    } else if (Array.isArray(fileData) || (fileData && fileData.recipes)) {
+      rawJsonContent = JSON.stringify(fileData);
+    } else {
+      throw new Error("Nerozpoznaný formát odpovědi z GitHubu.");
+    }
+
+    const parsedData = JSON.parse(rawJsonContent);
+    const list = Array.isArray(parsedData) ? parsedData : (parsedData.recipes || []);
+    log(`Úspěšně staženo a zparsováno ${list.length} receptů z GitHubu.`);
+    return list;
+  };
+
+  const importAllFromGithub = async () => {
+    const user = githubUser.trim();
+    const repo = githubRepo.trim();
+
+    if (!user || !repo) {
+      setGithubSyncStatus("error");
+      setGithubSyncError("Pro import z GitHubu musíte nejprve vyplnit Uživatelské jméno a Název repozitáře.");
+      return;
+    }
+
+    setGithubSyncStatus("syncing");
+    setGithubSyncError(null);
+    setGithubSyncLogs([]);
+
+    try {
+      const list = await fetchRecipesFromGithub(false);
+      const cleaned = list.map(removePreservativesFromSoup);
+      setRecipes(cleaned);
+      localStorage.setItem("ai_kucharka_recipes", JSON.stringify(cleaned));
+      if (cleaned.length > 0) {
+        setSelectedRecipe(cleaned[0]);
+      }
+
+      setGithubSyncStatus("success");
+      addSyncLog(`✓ Úspěšně staženo a naimportováno ${cleaned.length} receptů!`);
+      setTimeout(() => setGithubSyncStatus("idle"), 8000);
+    } catch (err: any) {
+      console.error("Import from GitHub failed", err);
+      setGithubSyncStatus("error");
+      setGithubSyncError(err?.message || "Neznámá chyba při stahování.");
+      addSyncLog(`❌ Chyba při importu: ${err?.message || "Neznámá chyba"}`);
+    }
+  };
+
+  const syncAllWithGithub = async () => {
+    const user = githubUser.trim();
+    const repo = githubRepo.trim();
+    const token = githubToken.trim();
+    const branch = githubBranch.trim();
+    const dbPath = githubPath.trim();
+
+    if (!user || !repo) {
+      setGithubSyncStatus("error");
+      setGithubSyncError("Pro synchronizaci musíte nejprve vyplnit Uživatelské jméno a Název repozitáře.");
+      return;
+    }
+    if (!token) {
+      setGithubSyncStatus("error");
+      setGithubSyncError("Pro obousměrnou synchronizaci musíte vyplnit Osobní přístupový token (PAT).");
+      return;
+    }
+
+    setGithubSyncStatus("syncing");
+    setGithubSyncError(null);
+    setGithubSyncLogs([]);
+    const log = (msg: string) => {
+      console.log(msg);
+      addSyncLog(msg);
+    };
+
+    try {
+      log("Zahájení obousměrné synchronizace...");
+
+      // 1. Download recipes from GitHub
+      log("1. Stahování aktuálních receptů z GitHubu...");
+      let githubRecipes: Recipe[] = [];
+      try {
+        githubRecipes = await fetchRecipesFromGithub({ silent: false, skipClearLogs: true });
+        log(`✓ Staženo ${githubRecipes.length} receptů z GitHubu.`);
+      } catch (err: any) {
+        log(`Poznámka: Nepodařilo se stáhnout stávající recepty z GitHubu (${err?.message || err}).`);
+        log("Předpokládám, že repozitář je prázdný nebo db.json neexistuje. Budou nahrány pouze lokální recepty.");
+      }
+
+      // 2. Fetch local recipes
+      log(`2. Načítání lokálních receptů (aktuálně ${recipes.length} receptů)...`);
+      
+      // 3. Merging algorithm
+      log("3. Sloučení databází (spojení seznamů a vyřešení duplicit)...");
+      const mergedMap = new Map<string, Recipe>();
+
+      // First, add all GitHub recipes to the map
+      githubRecipes.forEach((r) => {
+        if (r && r.id) {
+          mergedMap.set(r.id, r);
+        }
+      });
+
+      // Second, add all local recipes (which will overwrite any matching GitHub recipes with the local version)
+      let addedLocallyCount = 0;
+      let updatedLocallyCount = 0;
+      
+      recipes.forEach((r) => {
+        if (r && r.id) {
+          if (!mergedMap.has(r.id)) {
+            addedLocallyCount++;
+          } else {
+            // Check if local is different
+            const githubVer = mergedMap.get(r.id);
+            if (JSON.stringify(githubVer) !== JSON.stringify(r)) {
+              updatedLocallyCount++;
+            }
+          }
+          mergedMap.set(r.id, r);
+        }
+      });
+
+      const finalRecipesList = Array.from(mergedMap.values()).map(removePreservativesFromSoup);
+      log(`Sloučení dokončeno. Celkem: ${finalRecipesList.length} receptů.`);
+      log(`- Nově staženo z GitHubu: ${finalRecipesList.length - recipes.length} receptů.`);
+      log(`- Lokálně přidaných receptů k nahrání: ${addedLocallyCount}`);
+      if (updatedLocallyCount > 0) {
+        log(`- Lokálně aktualizovaných receptů k přepsání: ${updatedLocallyCount}`);
+      }
+
+      // 4. Save merged list locally
+      log("4. Ukládání sloučeného seznamu do paměti prohlížeče...");
+      setRecipes(finalRecipesList);
+      localStorage.setItem("ai_kucharka_recipes", JSON.stringify(finalRecipesList));
+      if (finalRecipesList.length > 0) {
+        setSelectedRecipe(finalRecipesList[0]);
+      }
+
+      // 5. Upload merged list back to GitHub
+      log(`5. Nahrávání sjednocené databáze ${dbPath} zpět na GitHub...`);
       const dbUrl = `https://api.github.com/repos/${user}/${repo}/contents/${dbPath}`;
       let dbSha: string | undefined;
 
@@ -1067,8 +1424,7 @@ export default function App() {
         }
       } catch (e) {}
 
-      const dbContentB64 = window.btoa(unescape(encodeURIComponent(JSON.stringify(recipes, null, 2))));
-      
+      const dbContentB64 = window.btoa(unescape(encodeURIComponent(JSON.stringify(finalRecipesList, null, 2))));
       const dbPutResponse = await fetch(dbUrl, {
         method: "PUT",
         headers: {
@@ -1077,7 +1433,7 @@ export default function App() {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          message: "Prvotní nahrání celé databáze db.json pomocí systému AI Kuchařka",
+          message: `Synchronizace databáze db.json (${finalRecipesList.length} receptů) přes AI Kuchařku`,
           content: dbContentB64,
           sha: dbSha,
           branch: branch
@@ -1085,11 +1441,16 @@ export default function App() {
       });
 
       if (!dbPutResponse.ok) {
-        throw new Error(`Nepodařilo se nahrát db.json. Kód chyby: ${dbPutResponse.status}`);
+        throw new Error(`Nepodařilo se nahrát sjednocený db.json. Kód: ${dbPutResponse.status}`);
       }
+      log(`✓ Sjednocený soubor ${dbPath} byl nahrán na GitHub.`);
 
-      // 2. Sync all individual recipes to recipes/ directory
-      for (const r of recipes) {
+      // 6. Upload individual files
+      log("6. Nahrávání/aktualizace jednotlivých souborů receptů v 'recipes/'...");
+      let successCount = 0;
+      
+      for (let i = 0; i < finalRecipesList.length; i++) {
+        const r = finalRecipesList[i];
         const slug = r.title
           .toString()
           .toLowerCase()
@@ -1119,7 +1480,7 @@ export default function App() {
         } catch (e) {}
 
         const recipeContentB64 = window.btoa(unescape(encodeURIComponent(JSON.stringify(r, null, 2))));
-        await fetch(recipeFileUrl, {
+        const putRecipeRes = await fetch(recipeFileUrl, {
           method: "PUT",
           headers: {
             "Authorization": `Bearer ${token}`,
@@ -1127,78 +1488,26 @@ export default function App() {
             "Content-Type": "application/json"
           },
           body: JSON.stringify({
-            message: `Nahrání kulinářského zdroje pro: ${r.title}`,
+            message: `Synchronizace receptu: ${r.title}`,
             content: recipeContentB64,
             sha: recipeSha,
             branch: branch
           })
         });
+
+        if (putRecipeRes.ok) {
+          successCount++;
+        }
       }
 
       setGithubSyncStatus("success");
-      alert("✓ Všechny recepty i databáze db.json byly úspěšně nahrány a uloženy do vašeho repozitáře na GitHubu v adresáři 'recipes/' a kořenovém db.json!");
-      setTimeout(() => setGithubSyncStatus("idle"), 5000);
+      log(`✓ SYNCHRONIZACE DOKONČENA! Obě strany mají nyní identických ${finalRecipesList.length} receptů.`);
+      setTimeout(() => setGithubSyncStatus("idle"), 8000);
     } catch (err: any) {
-      console.error("Export all to GitHub failed", err);
+      console.error("Bidirectional sync failed", err);
       setGithubSyncStatus("error");
-      setGithubSyncError(err?.message || "Neznáma chyba při exportu.");
-      alert(`Nepodařilo se provést kompletní export: ${err?.message}`);
-    }
-  };
-
-  const importAllFromGithub = async () => {
-    const user = githubUser.trim();
-    const repo = githubRepo.trim();
-    const token = githubToken.trim();
-    const branch = githubBranch.trim();
-    const dbPath = githubPath.trim();
-
-    if (!user || !repo) {
-      alert("Pro import z GitHubu musíte nejprve vyplnit Uživatelské jméno a Název repozitáře.");
-      return;
-    }
-
-    const confirmImport = window.confirm("Opravdu chcete načíst (stáhnout) recepty z GitHubu? Tato akce nahradí váš současný seznam receptů v prohlížeči.");
-    if (!confirmImport) return;
-
-    setGithubSyncStatus("syncing");
-    setGithubSyncError(null);
-
-    try {
-      const dbUrl = `https://api.github.com/repos/${user}/${repo}/contents/${dbPath}`;
-      const headers: Record<string, string> = {
-        "Accept": "application/vnd.github.v3+raw"
-      };
-      if (token) {
-        headers["Authorization"] = `Bearer ${token}`;
-      }
-
-      const getFileResponse = await fetch(`${dbUrl}?ref=${branch}`, { headers });
-      if (getFileResponse.status !== 200) {
-        throw new Error(`Nepodařilo se stáhnout db.json. Kód chyby: ${getFileResponse.status}`);
-      }
-
-      const data = await getFileResponse.json();
-      const list = Array.isArray(data) ? data : (data.recipes || []);
-      if (!list || list.length === 0) {
-        throw new Error("Stažený soubor neobsahuje žádné platné recepty.");
-      }
-
-      const cleaned = list.map(removePreservativesFromSoup);
-      setRecipes(cleaned);
-      localStorage.setItem("ai_kucharka_recipes", JSON.stringify(cleaned));
-      if (cleaned.length > 0) {
-        setSelectedRecipe(cleaned[0]);
-      }
-
-      setGithubSyncStatus("success");
-      alert(`✓ Úspěšně staženo a naimportováno ${cleaned.length} receptů z repozitáře GitHub do vašeho prohlížeče!`);
-      setTimeout(() => setGithubSyncStatus("idle"), 5000);
-    } catch (err: any) {
-      console.error("Import from GitHub failed", err);
-      setGithubSyncStatus("error");
-      setGithubSyncError(err?.message || "Neznámá chyba při stahování.");
-      alert(`Nepodařilo se provést import z GitHubu: ${err?.message}`);
+      setGithubSyncError(err?.message || "Neznámá chyba při synchronizaci.");
+      log(`❌ Chyba synchronizace: ${err?.message || "Neznámá chyba"}`);
     }
   };
 
@@ -4815,7 +5124,7 @@ ${separator}`;
                     type="text"
                     value={githubRepo}
                     onChange={(e) => setGithubRepo(e.target.value)}
-                    placeholder="Např. AI-kocharka-data"
+                    placeholder="Např. ai-kucharka-data"
                     className="w-full text-sm p-2.5 border border-[#E8E8E1] rounded-xl bg-white text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-1 focus:ring-[#1B4332]"
                   />
                 </div>
@@ -4872,6 +5181,41 @@ ${separator}`;
                 </div>
               </div>
 
+              {/* Direct links to GitHub */}
+              {githubUser.trim() && githubRepo.trim() && (
+                <div className="bg-[#FAF9F2] p-3 rounded-xl border border-[#E8E8E1] space-y-2">
+                  <span className="block text-xs font-bold uppercase text-[#1B4332] tracking-wider">
+                    Přímé odkazy na GitHub:
+                  </span>
+                  <div className="space-y-1.5 text-xs">
+                    <div className="flex items-center justify-between">
+                      <span className="text-slate-500 font-medium font-sans">Repozitář:</span>
+                      <a
+                        href={`https://github.com/${githubUser.trim()}/${githubRepo.trim()}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-emerald-700 hover:text-emerald-800 font-bold underline flex items-center gap-1 cursor-pointer"
+                      >
+                        <span>{githubUser.trim()}/{githubRepo.trim()}</span>
+                        <ExternalLink className="h-3 w-3" />
+                      </a>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-slate-500 font-medium font-sans">Soubor databáze ({githubPath.trim() || "db.json"}):</span>
+                      <a
+                        href={`https://github.com/${githubUser.trim()}/${githubRepo.trim()}/blob/${githubBranch.trim() || "main"}/${githubPath.trim() || "db.json"}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-emerald-700 hover:text-emerald-800 font-bold underline flex items-center gap-1 cursor-pointer"
+                      >
+                        <span>Zobrazit soubor na GitHubu</span>
+                        <ExternalLink className="h-3 w-3" />
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Status Message */}
               {githubTestMessage && (
                 <div className={`p-3 rounded-lg text-xs font-semibold leading-relaxed border ${
@@ -4885,39 +5229,215 @@ ${separator}`;
                 </div>
               )}
 
-              {/* Advanced Actions and Test Connection section */}
-              <div className="flex gap-2 flex-wrap">
-                <button
-                  type="button"
-                  onClick={testGithubConnection}
-                  disabled={githubTestStatus === "testing"}
-                  className="px-3 py-2 border border-[#1B4332] text-[#1B4332] hover:bg-[#1B4332]/5 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-1 cursor-pointer disabled:opacity-50"
-                >
-                  <RefreshCw className={`h-3.5 w-3.5 ${githubTestStatus === "testing" ? "animate-spin" : ""}`} />
-                  <span>Otestovat spojení</span>
-                </button>
+              {/* Sync Status Banner */}
+              {githubSyncStatus !== "idle" && (
+                <div className={`p-3 rounded-lg text-xs font-semibold leading-relaxed border ${
+                  githubSyncStatus === "success" 
+                    ? "bg-emerald-50 border-emerald-200 text-emerald-800" 
+                    : githubSyncStatus === "error" 
+                    ? "bg-red-50 border-red-200 text-red-800"
+                    : "bg-amber-50 border-amber-200 text-amber-850 animate-pulse"
+                }`}>
+                  <div className="flex items-center gap-1.5 font-bold uppercase tracking-wider mb-1">
+                    {githubSyncStatus === "success" && "✓ Operace dokončena"}
+                    {githubSyncStatus === "error" && "❌ Chyba operace"}
+                    {githubSyncStatus === "syncing" && "⏳ Operace probíhá..."}
+                  </div>
+                  <div>
+                    {githubSyncStatus === "success" && "Všechny kroky synchronizace proběhly úspěšně. Detaily naleznete v logu níže."}
+                    {githubSyncStatus === "error" && (githubSyncError || "Při provádění operace s GitHubem došlo k chybě.")}
+                    {githubSyncStatus === "syncing" && "Provádím komunikaci s rozhraním API GitHub, stahuji a odesílám data..."}
+                  </div>
+                </div>
+              )}
 
-                <button
-                  type="button"
-                  onClick={importAllFromGithub}
-                  disabled={githubSyncStatus === "syncing" || !githubUser || !githubRepo}
-                  className="px-3 py-2 bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs disabled:opacity-50 ml-auto"
-                  title="Stáhne všechny recepty z vaší databáze db.json na GitHubu do tohoto prohlížeče"
-                >
-                  <Download className="h-3.5 w-3.5" />
-                  <span>Stáhnout z GitHubu</span>
-                </button>
+              {/* Progress and Logs Console */}
+              {(githubSyncLogs.length > 0 || githubSyncStatus === "syncing") && (
+                <div className="space-y-1.5 bg-[#FAF9F2] p-3 rounded-xl border border-[#E8E8E1]">
+                  <div className="flex items-center justify-between">
+                    <label className="block text-xs font-bold uppercase text-[#1B4332] tracking-wider flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+                      <span>Průběh a záznamy operace:</span>
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => setGithubSyncLogs([])}
+                      className="text-[10px] text-slate-400 hover:text-slate-600 font-bold underline cursor-pointer"
+                    >
+                      Vymazat záznam
+                    </button>
+                  </div>
+                  <div className="bg-slate-900 text-slate-200 p-3 rounded-xl font-mono text-[11px] leading-relaxed max-h-40 overflow-y-auto space-y-1 shadow-inner border border-slate-950">
+                    {githubSyncLogs.map((logStr, i) => (
+                      <div key={i} className="whitespace-pre-wrap">
+                        {logStr.includes("❌") ? (
+                          <span className="text-red-400">{logStr}</span>
+                        ) : logStr.includes("✓") ? (
+                          <span className="text-emerald-400 font-semibold">{logStr}</span>
+                        ) : logStr.includes("⚠️") ? (
+                          <span className="text-amber-400">{logStr}</span>
+                        ) : (
+                          <span className="text-slate-300">{logStr}</span>
+                        )}
+                      </div>
+                    ))}
+                    {githubSyncStatus === "syncing" && (
+                      <div className="flex items-center gap-1.5 text-amber-400 animate-pulse mt-1">
+                        <span className="inline-block w-1.5 h-1.5 bg-amber-400 rounded-full animate-ping" />
+                        <span>Operace probíhá... prosím vyčkejte</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
 
-                <button
-                  type="button"
-                  onClick={exportAllToGithub}
-                  disabled={githubSyncStatus === "syncing" || !githubUser || !githubRepo}
-                  className="px-3 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs disabled:opacity-50"
-                  title="Nahraje všechny aktuální recepty i db.json na GitHub"
-                >
-                  <Upload className="h-3.5 w-3.5" />
-                  <span>Nahrát na GitHub</span>
-                </button>
+              {/* Advanced Actions and Sync Operations */}
+              <div className="space-y-3.5 pt-2 border-t border-[#E8E8E1]">
+                {/* Custom Non-Blocking Confirmations */}
+                {githubPendingAction && (
+                  <div className={`p-4 rounded-xl border ${
+                    githubPendingAction === "import" 
+                      ? "bg-blue-50 border-blue-200 text-blue-900" 
+                      : "bg-amber-50 border-amber-200 text-amber-900"
+                  } space-y-3 shadow-xs`}>
+                    <div className="flex items-start gap-2.5">
+                      <AlertCircle className={`h-5 w-5 mt-0.5 shrink-0 ${
+                        githubPendingAction === "import" ? "text-blue-600" : "text-amber-600"
+                      }`} />
+                      <div className="space-y-1">
+                        <h4 className="text-xs font-bold uppercase tracking-wider font-sans">
+                          {githubPendingAction === "sync" && "Potvrdit obousměrnou synchronizaci"}
+                          {githubPendingAction === "import" && "Potvrdit stáhnutí (přepsání lokálních dat)"}
+                          {githubPendingAction === "export" && "Potvrdit odeslání (přepsání na GitHubu)"}
+                        </h4>
+                        <p className="text-xs leading-relaxed opacity-90 font-sans">
+                          {githubPendingAction === "sync" && "Sloučí se recepty z vašeho prohlížeče a z GitHubu tak, aby obě strany obsahovaly shodné recepty. Chybějící recepty se stáhnou do prohlížeče a nově vytvořené se nahrají na GitHub."}
+                          {githubPendingAction === "import" && "Opravdu chcete stáhnout recepty z GitHubu? Tato akce kompletně přepíše vaše lokální recepty v prohlížeči staženou databází z GitHubu. Vaše lokální změny mohou být ztraceny!"}
+                          {githubPendingAction === "export" && "Opravdu chcete nahrát recepty na GitHub? Tato akce přepíše vzdálený soubor db.json a jednotlivé soubory v adresáři recipes/ na vašem GitHub repozitáři."}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex justify-end gap-2 pt-1">
+                      <button
+                        type="button"
+                        onClick={() => setGithubPendingAction(null)}
+                        className={`px-3 py-1.5 bg-white border rounded-lg text-xs font-semibold hover:bg-opacity-80 transition-all cursor-pointer ${
+                          githubPendingAction === "import" ? "border-blue-300 text-blue-800" : "border-amber-300 text-amber-850"
+                        }`}
+                      >
+                        Zrušit
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const act = githubPendingAction;
+                          setGithubPendingAction(null);
+                          if (act === "sync") syncAllWithGithub();
+                          if (act === "import") importAllFromGithub();
+                          if (act === "export") exportAllToGithub();
+                        }}
+                        className={`px-3.5 py-1.5 text-white rounded-lg text-xs font-bold shadow-xs transition-all cursor-pointer ${
+                          githubPendingAction === "import" ? "bg-blue-600 hover:bg-blue-700" : "bg-amber-600 hover:bg-amber-700"
+                        }`}
+                      >
+                        Potvrdit a spustit
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                <div>
+                  <h4 className="text-xs font-extrabold uppercase text-[#1B4332] tracking-wider mb-2 flex items-center gap-1.5">
+                    <RefreshCw className="h-3.5 w-3.5 text-[#52B788]" />
+                    <span>Plná obousměrná synchronizace (Doporučeno)</span>
+                  </h4>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (!githubUser.trim() || !githubRepo.trim()) {
+                        setGithubSyncStatus("error");
+                        setGithubSyncError("Chybí jméno uživatele nebo název repozitáře.");
+                        return;
+                      }
+                      if (!githubToken.trim()) {
+                        setGithubSyncStatus("error");
+                        setGithubSyncError("Chybí přístupový token (PAT).");
+                        return;
+                      }
+                      setGithubPendingAction("sync");
+                    }}
+                    disabled={githubSyncStatus === "syncing"}
+                    className="w-full px-4 py-3 bg-gradient-to-r from-emerald-800 to-[#1B4332] hover:from-emerald-900 hover:to-[#153528] text-white text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm disabled:opacity-50"
+                    title="Sloučí lokální databázi v prohlížeči a vzdálený repozitář na GitHubu dohromady"
+                  >
+                    <RefreshCw className={`h-4 w-4 ${githubSyncStatus === "syncing" ? "animate-spin" : ""}`} />
+                    <span>Sloučit obě databáze (Obousměrná synchronizace)</span>
+                  </button>
+                  <p className="text-[10px] text-slate-400 mt-1 leading-relaxed">
+                    Stáhne chybějící recepty z GitHubu, nahraje nové místní recepty na GitHub a sjednotí obě strany na 100% shodný seznam.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 pt-1">
+                  <div>
+                    <h5 className="text-[10px] font-extrabold uppercase text-slate-500 tracking-wider mb-1.5">
+                      Jednosměrné akce
+                    </h5>
+                    <div className="flex flex-col gap-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (!githubUser.trim() || !githubRepo.trim()) {
+                            setGithubSyncStatus("error");
+                            setGithubSyncError("Pro import z GitHubu musíte nejprve vyplnit Uživatelské jméno a Název repozitáře.");
+                            return;
+                          }
+                          setGithubPendingAction("import");
+                        }}
+                        disabled={githubSyncStatus === "syncing"}
+                        className="w-full px-3 py-2.5 bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs disabled:opacity-50"
+                        title="Stáhne a přepíše místní data souborem db.json z GitHubu"
+                      >
+                        <Download className="h-3.5 w-3.5 text-blue-200" />
+                        <span>Stáhnout z GitHubu</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (!githubUser.trim() || !githubRepo.trim() || !githubToken.trim()) {
+                            setGithubSyncStatus("error");
+                            setGithubSyncError("Pro export musíte nejdříve vyplnit GitHub Uživatelské jméno, Název repozitáře a Přístupový token (PAT).");
+                            return;
+                          }
+                          setGithubPendingAction("export");
+                        }}
+                        disabled={githubSyncStatus === "syncing"}
+                        className="w-full px-3 py-2.5 bg-amber-700 hover:bg-amber-800 text-white text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs disabled:opacity-50"
+                        title="Nahraje všechny místní recepty na GitHub a kompletně přepíše vzdálená data"
+                      >
+                        <Upload className="h-3.5 w-3.5 text-amber-200" />
+                        <span>Nahrát na GitHub</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h5 className="text-[10px] font-extrabold uppercase text-slate-500 tracking-wider mb-1.5">
+                      Diagnostika
+                    </h5>
+                    <div className="flex flex-col gap-2">
+                      <button
+                        type="button"
+                        onClick={testGithubConnection}
+                        disabled={githubTestStatus === "testing"}
+                        className="w-full px-3 py-2.5 border border-[#1B4332] text-[#1B4332] hover:bg-[#1B4332]/5 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
+                      >
+                        <RefreshCw className={`h-3.5 w-3.5 text-[#52B788] ${githubTestStatus === "testing" ? "animate-spin" : ""}`} />
+                        <span>Otestovat spojení</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
