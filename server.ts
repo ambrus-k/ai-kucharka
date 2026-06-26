@@ -208,6 +208,11 @@ app.get("/api", async (req, res) => {
 
 // POST / PUT /api - Hromadná aktualizace složky recipes/ na GitHubu
 app.all("/api", async (req, res) => {
+  if (process.env.VERCEL) {
+    return res.status(403).json({
+      error: "Přístup k databázi a synchronizace jsou v produkčním exportu na Vercelu zakázány z bezpečnostních důvodů."
+    });
+  }
   if (req.method !== "POST" && req.method !== "PUT" && req.method !== "GET") {
     return res.status(405).json({ error: "Metoda nepovolena." });
   }

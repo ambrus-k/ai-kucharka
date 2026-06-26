@@ -15,6 +15,7 @@ import {
   ChefHat, 
   Check, 
   AlertCircle, 
+  AlertTriangle,
   Globe, 
   Cpu, 
   Zap, 
@@ -907,6 +908,10 @@ export default function App() {
   };
 
   const syncRecipesWithGithub = async (recipesList: Recipe[], targetRecipe?: Recipe, isDelete = false) => {
+    if (!isStudioEnv) {
+      console.log("GitHub synchronizace je v tomto webovém prostředí z bezpečnostních důvodů vypnuta.");
+      return;
+    }
     const user = githubUser.trim();
     const repo = githubRepo.trim();
     const token = githubToken.trim();
@@ -997,6 +1002,11 @@ export default function App() {
   };
 
   const exportAllToGithub = async () => {
+    if (!isStudioEnv) {
+      setGithubSyncStatus("error");
+      setGithubSyncError("Synchronizace s GitHubem je po exportu na web (Vercel) zakázána z bezpečnostních důvodů.");
+      return;
+    }
     const user = githubUser.trim();
     const repo = githubRepo.trim();
     const token = githubToken.trim();
@@ -1213,6 +1223,11 @@ export default function App() {
   };
 
   const importAllFromGithub = async () => {
+    if (!isStudioEnv) {
+      setGithubSyncStatus("error");
+      setGithubSyncError("Synchronizace s GitHubem je po exportu na web (Vercel) zakázána z bezpečnostních důvodů.");
+      return;
+    }
     const user = githubUser.trim();
     const repo = githubRepo.trim();
 
@@ -1247,6 +1262,11 @@ export default function App() {
   };
 
   const syncAllWithGithub = async () => {
+    if (!isStudioEnv) {
+      setGithubSyncStatus("error");
+      setGithubSyncError("Synchronizace s GitHubem je po exportu na web (Vercel) zakázána z bezpečnostních důvodů.");
+      return;
+    }
     const user = githubUser.trim();
     const repo = githubRepo.trim();
     const token = githubToken.trim();
@@ -2399,11 +2419,13 @@ ${separator}`;
 
   // Load admin state and recipes (dynamic remote URL with local storage fallbacks)
   useEffect(() => {
-    // Load admin state from localStorage (Enabled on both AI Studio and Vercel)
-    const savedAdminToken = localStorage.getItem("admin_password_token");
-    if (savedAdminToken) {
-      setIsAdmin(true);
-      setAdminPassword(savedAdminToken);
+    // Load admin state from localStorage (Only in AI Studio)
+    if (isStudioEnv) {
+      const savedAdminToken = localStorage.getItem("admin_password_token");
+      if (savedAdminToken) {
+        setIsAdmin(true);
+        setAdminPassword(savedAdminToken);
+      }
     }
 
     const loadRecipes = async () => {
@@ -2494,24 +2516,28 @@ ${separator}`;
     localStorage.setItem("ai_kucharka_recipes", JSON.stringify(cleaned));
 
     // Automatically replicate/save to Vercel/Local Serverless API /api
-    try {
-      const response = await fetch("/api", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ recipes: cleaned })
-      });
-      if (response.ok) {
-        console.log("Změny kuchařky byly automaticky uloženy na GitHub přes Serverless API!");
-      } else {
-        console.warn(`Serverless API vrátil kód: ${response.status}`);
+    if (isStudioEnv) {
+      try {
+        const response = await fetch("/api", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ recipes: cleaned })
+        });
+        if (response.ok) {
+          console.log("Změny kuchařky byly automaticky uloženy na GitHub přes Serverless API!");
+        } else {
+          console.warn(`Serverless API vrátil kód: ${response.status}`);
+        }
+      } catch (e) {
+        console.error("Nepodařilo se odeslat uložení na Serverless API:", e);
       }
-    } catch (e) {
-      console.error("Nepodařilo se odeslat uložení na Serverless API:", e);
-    }
 
-    syncRecipesWithGithub(cleaned, targetRecipe, isDelete);
+      syncRecipesWithGithub(cleaned, targetRecipe, isDelete);
+    } else {
+      console.log("Zápis na API a GitHub synchronizace přeskočeny v produkčním exportu na Vercelu.");
+    }
   };
 
   // Reset checkboxes when selected recipe changes
@@ -3131,6 +3157,30 @@ ${separator}`;
           
           {/* GITHUB INTEGRATION STATUS BANNER */}
           {(() => {
+            if (!isStudioEnv) {
+              return (
+                <div className="p-4 bg-slate-50 border-b border-slate-200 text-slate-700 space-y-1.5 no-print">
+                  <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-800">
+                    <Lock className="h-4 w-4 shrink-0 text-slate-500" />
+                    <span>GitHub synchronizace vypnuta</span>
+                  </div>
+                  <p className="text-[11px] leading-relaxed opacity-95">
+                    Prohlížíte bezpečný produkční web. Přístup k GitHub repozitáři a zápis dat jsou z bezpečnostních důvodů vypnuty.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsAdmin(true);
+                      setShowGithubConfig(true);
+                    }}
+                    className="font-bold underline text-slate-600 hover:text-slate-800 cursor-pointer flex items-center gap-1 text-[10px] text-left"
+                  >
+                    Zobrazit bezpečnostní informaci
+                  </button>
+                </div>
+              );
+            }
+
             const isClientGithubActive = !!(githubUser.trim() && githubRepo.trim() && githubToken.trim());
             if (isClientGithubActive) {
               return (
@@ -4922,7 +4972,7 @@ ${separator}`;
           <span>© 2026 AI Kuchařka. Všechna práva vyhrazena.</span>
 
           {/* Discrete Admin Activation Panel */}
-          {true && (
+          {isStudioEnv && (
             <div className="flex items-center gap-2">
               {isAdmin ? (
                 <div className="flex items-center gap-4 text-[#2D6A4F] font-bold flex-wrap justify-center sm:justify-end">
@@ -5094,6 +5144,21 @@ ${separator}`;
 
             {/* Content */}
             <div className="p-6 space-y-4 overflow-y-auto flex-1 text-slate-700">
+              {!isStudioEnv && (
+                <div className="bg-red-50 border border-red-200 text-red-800 rounded-xl p-4 space-y-2 text-xs">
+                  <div className="flex items-center gap-2 font-bold uppercase tracking-wider">
+                    <AlertTriangle className="h-4 w-4 text-red-600 shrink-0" />
+                    <span>Synchronizace zakázána (Produkční Vercel)</span>
+                  </div>
+                  <p className="leading-relaxed font-sans opacity-95">
+                    Tato aplikace běží v exportovaném produkčním prostředí Vercel. Z bezpečnostních důvodů a pro ochranu vaší databáze receptů před neúmyslným přepsáním či smazáním je nahrávání, stahování a synchronizace s GitHubem v tomto prostředí <strong>zcela deaktivováno</strong>.
+                  </p>
+                  <p className="leading-relaxed font-sans opacity-95">
+                    Pro bezpečné provádění synchronizací, nahrávání a stahování receptů z GitHubu prosím používejte výhradně zabezpečené vývojové prostředí <strong>Google AI Studio</strong>.
+                  </p>
+                </div>
+              )}
+
               <p className="text-xs text-[#5C5C50] leading-relaxed">
                 Propojte aplikaci s vaším GitHub repozitářem. Všechny recepty se budou jako samostatné JSON soubory ukládat do adresáře <strong>recipes/</strong> online na GitHubu!
               </p>
@@ -5108,8 +5173,9 @@ ${separator}`;
                     type="text"
                     value={githubUser}
                     onChange={(e) => setGithubUser(e.target.value)}
+                    disabled={!isStudioEnv}
                     placeholder="Např. karelaa"
-                    className="w-full text-sm p-2.5 border border-[#E8E8E1] rounded-xl bg-white text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-1 focus:ring-[#1B4332]"
+                    className="w-full text-sm p-2.5 border border-[#E8E8E1] rounded-xl bg-white text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-1 focus:ring-[#1B4332] disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed"
                   />
                 </div>
 
@@ -5121,29 +5187,33 @@ ${separator}`;
                     type="text"
                     value={githubRepo}
                     onChange={(e) => setGithubRepo(e.target.value)}
+                    disabled={!isStudioEnv}
                     placeholder="Např. ai-kucharka-data"
-                    className="w-full text-sm p-2.5 border border-[#E8E8E1] rounded-xl bg-white text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-1 focus:ring-[#1B4332]"
+                    className="w-full text-sm p-2.5 border border-[#E8E8E1] rounded-xl bg-white text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-1 focus:ring-[#1B4332] disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed"
                   />
                 </div>
 
                 <div>
                   <label className="block text-xs font-bold uppercase text-[#1B4332] tracking-wider mb-1 flex items-center justify-between">
                     <span>Osobní přístupový token (PAT) *</span>
-                    <a
-                      href="https://github.com/settings/tokens/new?description=AI_Kucharka_Sync&scopes=repo"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-[10px] text-emerald-700 underline hover:text-[#1B4332]"
-                    >
-                      Vytvořit na GitHubu
-                    </a>
+                    {isStudioEnv && (
+                      <a
+                        href="https://github.com/settings/tokens/new?description=AI_Kucharka_Sync&scopes=repo"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[10px] text-emerald-700 underline hover:text-[#1B4332]"
+                      >
+                        Vytvořit na GitHubu
+                      </a>
+                    )}
                   </label>
                   <input
                     type="password"
                     value={githubToken}
                     onChange={(e) => setGithubToken(e.target.value)}
+                    disabled={!isStudioEnv}
                     placeholder="ghp_xxxxxxxxxxxxxxxxxxxxxxxx"
-                    className="w-full text-sm p-2.5 border border-[#E8E8E1] rounded-xl bg-white text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-1 focus:ring-[#1B4332]"
+                    className="w-full text-sm p-2.5 border border-[#E8E8E1] rounded-xl bg-white text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-1 focus:ring-[#1B4332] disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed"
                   />
                   <p className="text-[10px] text-slate-400 mt-0.5 leading-relaxed">
                     Token vyžaduje oprávnění <strong>repo</strong> (r/w přístup k souborům repozitáře).
@@ -5159,8 +5229,9 @@ ${separator}`;
                       type="text"
                       value={githubBranch}
                       onChange={(e) => setGithubBranch(e.target.value)}
+                      disabled={!isStudioEnv}
                       placeholder="main"
-                      className="w-full text-sm p-2.5 border border-[#E8E8E1] rounded-xl bg-white text-slate-800 focus:outline-hidden focus:ring-1 focus:ring-[#1B4332]"
+                      className="w-full text-sm p-2.5 border border-[#E8E8E1] rounded-xl bg-white text-slate-800 focus:outline-hidden focus:ring-1 focus:ring-[#1B4332] disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed"
                     />
                   </div>
                   <div>
@@ -5362,8 +5433,8 @@ ${separator}`;
                       }
                       setGithubPendingAction("sync");
                     }}
-                    disabled={githubSyncStatus === "syncing"}
-                    className="w-full px-4 py-3 bg-gradient-to-r from-emerald-800 to-[#1B4332] hover:from-emerald-900 hover:to-[#153528] text-white text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm disabled:opacity-50"
+                    disabled={!isStudioEnv || githubSyncStatus === "syncing"}
+                    className="w-full px-4 py-3 bg-gradient-to-r from-emerald-800 to-[#1B4332] hover:from-emerald-900 hover:to-[#153528] text-white text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm disabled:opacity-50 disabled:from-slate-300 disabled:to-slate-300 disabled:text-slate-500 disabled:cursor-not-allowed"
                     title="Sloučí lokální databázi v prohlížeči a vzdálený repozitář na GitHubu dohromady"
                   >
                     <RefreshCw className={`h-4 w-4 ${githubSyncStatus === "syncing" ? "animate-spin" : ""}`} />
@@ -5390,8 +5461,8 @@ ${separator}`;
                           }
                           setGithubPendingAction("import");
                         }}
-                        disabled={githubSyncStatus === "syncing"}
-                        className="w-full px-3 py-2.5 bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs disabled:opacity-50"
+                        disabled={!isStudioEnv || githubSyncStatus === "syncing"}
+                        className="w-full px-3 py-2.5 bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs disabled:opacity-50 disabled:bg-slate-300 disabled:text-slate-500 disabled:cursor-not-allowed"
                         title="Stáhne a přepíše místní data souborem db.json z GitHubu"
                       >
                         <Download className="h-3.5 w-3.5 text-blue-200" />
@@ -5407,8 +5478,8 @@ ${separator}`;
                           }
                           setGithubPendingAction("export");
                         }}
-                        disabled={githubSyncStatus === "syncing"}
-                        className="w-full px-3 py-2.5 bg-amber-700 hover:bg-amber-800 text-white text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs disabled:opacity-50"
+                        disabled={!isStudioEnv || githubSyncStatus === "syncing"}
+                        className="w-full px-3 py-2.5 bg-amber-700 hover:bg-amber-800 text-white text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs disabled:opacity-50 disabled:bg-slate-300 disabled:text-slate-500 disabled:cursor-not-allowed"
                         title="Nahraje všechny místní recepty na GitHub a kompletně přepíše vzdálená data"
                       >
                         <Upload className="h-3.5 w-3.5 text-amber-200" />
@@ -5425,8 +5496,8 @@ ${separator}`;
                       <button
                         type="button"
                         onClick={testGithubConnection}
-                        disabled={githubTestStatus === "testing"}
-                        className="w-full px-3 py-2.5 border border-[#1B4332] text-[#1B4332] hover:bg-[#1B4332]/5 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
+                        disabled={!isStudioEnv || githubTestStatus === "testing"}
+                        className="w-full px-3 py-2.5 border border-[#1B4332] text-[#1B4332] hover:bg-[#1B4332]/5 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 disabled:border-slate-300 disabled:text-slate-400 disabled:cursor-not-allowed"
                       >
                         <RefreshCw className={`h-3.5 w-3.5 text-[#52B788] ${githubTestStatus === "testing" ? "animate-spin" : ""}`} />
                         <span>Otestovat spojení</span>
@@ -5465,7 +5536,8 @@ ${separator}`;
                   setGithubTestMessage(null);
                   alert("✓ Nastavení GitHubu bylo uloženo!");
                 }}
-                className="px-4 py-2 bg-[#1B4332] hover:bg-[#153528] text-white rounded-xl text-sm font-bold shadow-sm transition-all cursor-pointer"
+                disabled={!isStudioEnv}
+                className="px-4 py-2 bg-[#1B4332] hover:bg-[#153528] text-white rounded-xl text-sm font-bold shadow-sm transition-all cursor-pointer disabled:bg-slate-300 disabled:text-slate-500 disabled:cursor-not-allowed"
               >
                 Uložit nastavení
               </button>
