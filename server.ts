@@ -1,6 +1,5 @@
 import express from "express";
 import path from "path";
-import { createServer as createViteServer } from "vite";
 import { GoogleGenAI, Type } from "@google/genai";
 import dotenv from "dotenv";
 import { Octokit } from "@octokit/rest";
@@ -10,11 +9,11 @@ dotenv.config();
 const app = express();
 const PORT = 3000;
 
-// Nastavení parsování JSON s dostatečnými limity pro nahrávání obrázků
+// Set up JSON parsing with generous limits to support image uploads
 app.use(express.json({ limit: "15mb" }));
 app.use(express.urlencoded({ limit: "15mb", extended: true }));
 
-// Lazy inicializátor pro GoogleGenAI (Gemini API)
+// Lazy initializer for GoogleGenAI to prevent crashes if key is empty during start
 let aiClient: GoogleGenAI | null = null;
 function getAi(): GoogleGenAI {
   if (!aiClient) {
@@ -34,7 +33,7 @@ function getAi(): GoogleGenAI {
   return aiClient;
 }
 
-// Robustní wrapper pro generování obsahu s fallback moduly při chybách 503/429
+// Robust retry wrapper for Gemini Content Generation with model fallback to handle transient 503/429 errors gracefully
 async function generateContentWithRetry(ai: GoogleGenAI, options: any, maxRetries = 5, initialDelayMs = 1500) {
   const originalModel = options.model || "gemini-3.5-flash";
   const modelFallbackSequence = [originalModel];
@@ -80,7 +79,7 @@ async function generateContentWithRetry(ai: GoogleGenAI, options: any, maxRetrie
   throw lastError || new Error("Nepodařilo se vygenerovat obsah pomocí žádného z dostupných AI modelů.");
 }
 
-// Správa duálního ověření (ADMIN_PASSWORD nebo GEMINI_API_KEY)
+// Support dual authentication: ADMIN_PASSWORD or GEMINI_API_KEY
 function checkAuth(adminPassword: any): boolean {
   if (!adminPassword || typeof adminPassword !== "string" || !adminPassword.trim()) {
     return false;
@@ -103,14 +102,37 @@ app.get("/api/health", (req, res) => {
   res.json({ status: "healthy", time: new Date().toISOString() });
 });
 
-// GET /api/recipes - Rychlé a bezpečné stahování všech receptů z GitHub složky recipes/
-app.get("/api/recipes", async (req, res) => {
+// GET /api a GET /api/recipes - Načtení všech receptů ze složky recipes/ z GitHubu
+app.get(["/api", "/api/recipes", "/recipes"], async (req, res) => {
   try {
     const token = (process.env.GITHUB_DATA_TOKEN || process.env.GITHUB_TOKEN || "").trim();
-    const owner = (process.env.GITHUB_USERNAME || "ambrus-k").trim();
+    const owner = (process.env.GITHUB_USERNAME || "karelaa").trim();
     const repo = (process.env.GITHUB_REPO || "ai-kucharka-data").trim();
     const branch = "main";
 
+    // 1. Zkusíme nejprve rychlé stažení jednoho sloučeného souboru recipes.json
+    try {
+      console.log(`[GitHub API] Pokouším se o super-rychlé stažení sloučeného souboru recipes.json...`);
+      const headers: Record<string, string> = {
+        "User-Agent": "AI-Kucharka"
+      };
+      if (token) {
+        headers["Authorization"] = `token ${token}`;
+      }
+      const rawUrl = `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/recipes.json`;
+      const rawRes = await fetch(rawUrl, { headers });
+      if (rawRes.ok) {
+        const data = await rawRes.json();
+        if (Array.isArray(data) && data.length > 0) {
+          console.log(`[GitHub API] Rychlé načtení úspěšné: načteno ${data.length} receptů ze sloučeného souboru.`);
+          return res.json(data);
+        }
+      }
+    } catch (e: any) {
+      console.log(`[GitHub API] Rychlé stažení recipes.json selhalo (${e?.message || e}), padám zpět na pomalé načítání složky...`);
+    }
+
+    // 2. Pomalejší záložní načítání soubor po souboru (pokud recipes.json neexistuje)
     let dirResponse;
     if (token) {
       console.log(`[GitHub API] Načítám seznam souborů ze složky recipes/ z repozitáře ${owner}/${repo} pomocí Octokit...`);
@@ -160,7 +182,7 @@ app.get("/api/recipes", async (req, res) => {
               "User-Agent": "AI-Kucharka"
             };
             if (token) {
-              headers["Authorization"] = `token ${token}`; // Správný formát tokenu pro raw.githubusercontent.com doménu
+              headers["Authorization"] = `token ${token}`;
             }
             const fileRes = await fetch(file.download_url, { headers });
             if (fileRes.ok) {
@@ -176,28 +198,28 @@ app.get("/api/recipes", async (req, res) => {
 
     return res.json(recipes.filter(Boolean));
   } catch (error: any) {
-    console.error("Chyba při GET /api/recipes:", error);
+    console.error("Chyba při GET /api:", error);
     return res.status(500).json({
       error: `Chyba při komunikaci s GitHub API: ${error.message || error}`
     });
   }
 });
 
-// POST / PUT /api/recipes - Hromadná ULTRA RYCHLÁ synchronizace složky recipes/ (Jediný commit přes Git Data API)
-app.all("/api/recipes", async (req, res) => {
+// POST / PUT /api a /api/recipes - Hromadná aktualizace složky recipes/ na GitHubu (přes Git Data API)
+app.all(["/api", "/api/recipes", "/recipes"], async (req, res) => {
   if (req.method !== "POST" && req.method !== "PUT") {
     return res.status(405).json({ error: "Metoda nepovolena." });
   }
 
   try {
     const token = (process.env.GITHUB_DATA_TOKEN || process.env.GITHUB_TOKEN || "").trim();
-    const owner = (process.env.GITHUB_USERNAME || "ambrus-k").trim();
+    const owner = (process.env.GITHUB_USERNAME || "karelaa").trim();
     const repo = (process.env.GITHUB_REPO || "ai-kucharka-data").trim();
     const branch = "main";
 
     if (!token) {
       return res.status(401).json({
-        error: "Chybí GITHUB_DATA_TOKEN v proměnných prostředí Vercelu."
+        error: "Chybí GITHUB_DATA_TOKEN v proměnných prostředí. Nastavte jej ve Vercel panelu."
       });
     }
 
@@ -213,7 +235,7 @@ app.all("/api/recipes", async (req, res) => {
 
     const octokit = new Octokit({ auth: token });
 
-    // a) Získání SHA posledního commitu hlavní větve
+    // a) Získej SHA posledního commitu na větvi main
     console.log(`[GitHub API] Získávám SHA posledního commitu na větvi ${branch}...`);
     const refResponse = await octokit.git.getRef({
       owner,
@@ -222,6 +244,7 @@ app.all("/api/recipes", async (req, res) => {
     });
     const latestCommitSha = refResponse.data.object.sha;
 
+    // Načtení commitu k získání tree SHA
     const commitResponse = await octokit.git.getCommit({
       owner,
       repo,
@@ -229,7 +252,7 @@ app.all("/api/recipes", async (req, res) => {
     });
     const baseTreeSha = commitResponse.data.tree.sha;
 
-    // b) Načtení aktuálního obsahu stromu souborů
+    // b) Načti stávající strom souborů z recipes/
     let remoteFiles: any[] = [];
     try {
       console.log(`[GitHub API] Načítám stávající soubory z recipes/...`);
@@ -243,7 +266,9 @@ app.all("/api/recipes", async (req, res) => {
         remoteFiles = dirResponse.data;
       }
     } catch (err: any) {
-      if (err.status !== 404) throw err;
+      if (err.status !== 404) {
+        throw err;
+      }
     }
 
     const slugify = (title: string) => {
@@ -262,7 +287,7 @@ app.all("/api/recipes", async (req, res) => {
     const localFileNames = new Set<string>();
     const treeItems: any[] = [];
 
-    // Přidání nových a upravených souborů do stromu změn
+    // Nové/upravené soubory přidej s jejich obsahem
     for (const r of recipesList) {
       if (!r || !r.title) continue;
       const slug = slugify(r.title);
@@ -277,7 +302,15 @@ app.all("/api/recipes", async (req, res) => {
       });
     }
 
-    // Identifikace smazaných souborů (nastavením sha: null)
+    // Přidáme také jeden sloučený soubor recipes.json pro super-rychlé načítání celé aplikace
+    treeItems.push({
+      path: "recipes.json",
+      mode: "100644",
+      type: "blob",
+      content: JSON.stringify(recipesList, null, 2),
+    });
+
+    // Smazané/přebytečné soubory označ s parametrem sha: null
     let deletedCount = 0;
     for (const file of remoteFiles) {
       if (file.type === "file" && file.name.endsWith(".json") && !localFileNames.has(file.name)) {
@@ -292,10 +325,13 @@ app.all("/api/recipes", async (req, res) => {
     }
 
     if (treeItems.length === 0) {
-      return res.json({ success: true, message: "Žádné změny k synchronizaci." });
+      return res.json({
+        success: true,
+        message: "Žádné změny k synchronizaci."
+      });
     }
 
-    // c) Vytvoření nového Git Tree
+    // c) Vytvoř nový Git Tree s base_tree nastaveným na SHA posledního commitu.
     console.log(`[GitHub API] Vytvářím nový Git Tree s ${treeItems.length} změnami...`);
     const treeResponse = await octokit.git.createTree({
       owner,
@@ -305,8 +341,8 @@ app.all("/api/recipes", async (req, res) => {
     });
     const newTreeSha = treeResponse.data.sha;
 
-    // d) Vytvoření atomického commitu a aktualizace referenčního bodu větve
-    console.log(`[GitHub API] Vytvářím hromadný commit...`);
+    // d) Vytvoř nový commit a aktualizuj referenci větve.
+    console.log(`[GitHub API] Vytvářím nový commit...`);
     const commitMsg = `Hromadná synchronizace receptů (${recipesList.length} celkem, ${deletedCount} smazáno) [auto-sync]`;
     const newCommitResponse = await octokit.git.createCommit({
       owner,
@@ -317,7 +353,7 @@ app.all("/api/recipes", async (req, res) => {
     });
     const newCommitSha = newCommitResponse.data.sha;
 
-    console.log(`[GitHub API] Aktualizuji referenci na větev ${branch}...`);
+    console.log(`[GitHub API] Aktualizuji referenci heads/${branch} na nový commit...`);
     await octokit.git.updateRef({
       owner,
       repo,
@@ -328,10 +364,10 @@ app.all("/api/recipes", async (req, res) => {
 
     return res.json({
       success: true,
-      message: `Hromadná synchronizace úspěšně dokončena. Uloženo ${recipesList.length} receptů, smazáno ${deletedCount} přebytečných souborů.`
+      message: `Hromadná synchronizace úspěšně dokončena. Uloženo ${recipesList.length} receptů, smazáno ${deletedCount} přebytečných souborů v adresáři 'recipes/' na GitHubu!`
     });
   } catch (error: any) {
-    console.error("Chyba při POST/PUT /api/recipes:", error);
+    console.error("Chyba při POST/PUT /api:", error);
     return res.status(500).json({
       error: `Chyba při hromadném zápisu receptů do GitHubu: ${error.message || error}`
     });
@@ -339,9 +375,10 @@ app.all("/api/recipes", async (req, res) => {
 });
 
 // Endpoint to verify administrator / API key
-app.post("/api/verify-admin", (req, res) => {
+app.post(["/api/verify-admin", "/verify-admin"], (req, res) => {
   try {
     const { adminPassword } = req.body;
+
     if (checkAuth(adminPassword)) {
       return res.json({ success: true });
     }
@@ -352,12 +389,12 @@ app.post("/api/verify-admin", (req, res) => {
 });
 
 // 2. API Endpoint to enhance recipe
-app.post("/api/enhance-recipe", async (req, res) => {
+app.post(["/api/enhance-recipe", "/enhance-recipe"], async (req, res) => {
   try {
     const { rawText, fileData, fileName, mimeType, adminPassword } = req.body;
 
     if (!checkAuth(adminPassword)) {
-       return res.status(401).json({ error: "Přístup odepřen. Pro přidání a generování nového receptu se musíte přihlásit platným administrátorským kódem nebo kulinářským API klíčem." });
+       return res.status(401).json({ error: "Příšup odepřen. Pro přidání a generování nového receptu se musíte přihlásit platným administrátorským kódem nebo kulinářským API klíčem." });
     }
 
     if (!rawText && !fileData) {
@@ -455,7 +492,7 @@ ZÁSADNÍ PRAVIDLA:
 });
 
 // 3. API Endpoint to edit/modify an existing recipe based on user instructions
-app.post("/api/edit-recipe", async (req, res) => {
+app.post(["/api/edit-recipe", "/edit-recipe"], async (req, res) => {
   try {
     const { recipe, modificationPrompt, adminPassword } = req.body;
 
@@ -464,4 +501,210 @@ app.post("/api/edit-recipe", async (req, res) => {
     }
 
     if (!recipe || !modificationPrompt) {
-      return
+      return res.status(400).json({ error: "Chybí stávající recept nebo pokyny pro úpravu." });
+    }
+
+    const ai = getAi();
+    
+    const systemInstruction = `
+Jsi odborný asistent pro vaření "AI Kuchařka", pokročilý kulinářský syntezátor a technologický gastronom.
+Tvým úkolem je upravit stávající recept na základě konkrétních pokynů a modifikací od uživatele.
+
+Při úpravě receptu MUSÍŠ zachovat stávající strukturu, ale modifikovat obsah tak, aby odpovídal pokynům. Opět kombinuj pět zdrojových pilířů:
+1. Akademická literatura (Food science)
+2. Odborně posouzené zdroje (Masterclass)
+3. Online registry receptů
+4. Diskuzní kulinářská fóra
+5. Inženýrství moderních spotřebičů
+
+ZÁSADNÍ PRAVIDLA:
+- Zkracuj názvy receptů (title) na naprosté kulinářské minimum a jádro věci.
+- Shrnutí receptu (summary) musí být velmi krátké, věcné a přehledné (cca 1-2 věty).
+- Všechny texty v odpovědi MUSÍ být napsány bezchybně v ČESKÉM JAZYCE (čeština).
+- Suroviny upřesni na přesné metrické jednotky.
+- DO KAŽDÉHO JEDNOTLIVÉHO KROKU (v poli 'instructions') MUSÍŠ EXPLICITNĚ ZAPSAT PŘESNÉ VÁHY NEBO MNOŽSTVÍ VŠECH SUROVIN!
+- ODSTRANĚNÍ KONZERVANTŮ: V ŽÁDNÉM RECEPTU NESMÍ BÝT POUŽITY ŽÁDNÉ KONZERVAČNÍ LÁTKY, KONZERVANTY ANI UMĚLÁ DOCHUCOVADLA.
+`;
+
+    const userPrompt = `
+Zde je stávající recept:
+${JSON.stringify(recipe, null, 2)}
+
+A zde jsou požadavky na úpravu od uživatele:
+"${modificationPrompt}"
+
+Vytvoř kompletně aktualizovaný recept se všemi poli. Ujisti se, že pokud se jedná o polévku, neobsahuje žádné konzervační látky ani konzervanty.
+`;
+
+    const response = await generateContentWithRetry(ai, {
+      model: "gemini-3.5-flash",
+      contents: userPrompt,
+      config: {
+        systemInstruction,
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            title: { type: Type.STRING, description: "Název upraveného receptu" },
+            summary: { type: Type.STRING, description: "Strohá specifikace v 1-2 českých větách vystihující podstatu úpravy." },
+            ingredients: { type: Type.ARRAY, items: { type: Type.STRING }, description: "Přesný seznam surovin s metrickými jednotkami. Nesmí obsahovat konzervační látky." },
+            instructions: { type: Type.ARRAY, items: { type: Type.STRING }, description: "Postup přípravy krok za krokem" },
+            applianceTips: { type: Type.STRING, description: "Konkrétní tip pro moderní kuchyňské pomocníky" },
+            expertJustification: { type: Type.STRING, description: "Jasné a srozumitelné odůvodnění provedených změn" },
+            applianceType: { type: Type.STRING, description: "Název spotřebiče pro optimalizaci" },
+            cookingTime: { type: Type.STRING, description: "Celková doba přípravy" },
+            difficulty: { type: Type.STRING, description: "Náročnost receptu ('Snadné', 'Střední', 'Složité')" },
+            category: { type: Type.STRING, description: "Kategorie jídla. Vyber přesně jednu z hodnot: 'Pečivo', 'Maso', 'Polévky', 'Sladká jídla a moučníky', 'Ostatní'." }
+          },
+          required: [
+            "title", "summary", "ingredients", "instructions", "applianceTips", 
+            "expertJustification", "applianceType", "cookingTime", "difficulty", "category"
+          ]
+        }
+      }
+    });
+
+    const outputText = response.text;
+    if (!outputText) {
+      throw new Error("Model nevrátil žádný text.");
+    }
+
+    const edited = JSON.parse(outputText.trim());
+    edited.id = recipe.id || `gen-${Date.now()}`;
+    
+    res.json({ recipe: edited });
+
+  } catch (error: any) {
+    console.error("Recipe edit error:", error);
+    res.status(500).json({ 
+      error: error?.message || "Došlo k vnitřní chybě při úpravě receptu pomocí AI.",
+      details: error.stack
+    });
+  }
+});
+
+// 4. API Endpoint to audit/play through a recipe and propose a modification
+app.post(["/api/audit-recipe", "/api/check-recipe", "/audit-recipe", "/check-recipe"], async (req, res) => {
+  try {
+    const { recipe, adminPassword } = req.body;
+
+    if (!checkAuth(adminPassword)) {
+      return res.status(401).json({ error: "Přístup odepřen. Ke kontrole receptu se musíte přihlásit platným administrátorským kódem nebo kulinářským API klíčem." });
+    }
+
+    if (!recipe) {
+      return res.status(400).json({ error: "Chybí recept pro kontrolu." });
+    }
+
+    const ai = getAi();
+    
+    const systemInstruction = `
+Jsi odborný kulinářský simulátor, auditní systém a analyzátor receptů "AI Kuchařka".
+Tvým úkolem je podrobit předložený recept kompletní kulinářské simulaci ("přehrát ho" od začátku do konce), odhalit slabá místa (fyzika, chemie jídla, poměry, časy, teploty) a navrhnout jedno konkrétní významné zlepšení.
+
+Následně vrátíš strukturovanou odpověď obsahující simulationSteps, proposedChange a modifiedRecipe.
+Všechny texty musí být v bezchybné ČEŠTINĚ.
+`;
+
+    const userPrompt = `
+Zde je recept, který máš nasimulovat (přehrát) a zkontrolovat:
+${JSON.stringify(recipe, null, 2)}
+
+Spusť virtuální kulinářskou simulaci vaření, zapiš její kroky, navrhni jedno konkrétní zlepšení a vygeneruj upravený vylepšený recept.
+`;
+
+    const response = await generateContentWithRetry(ai, {
+      model: "gemini-3.5-flash",
+      contents: userPrompt,
+      config: {
+        systemInstruction,
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            simulationSteps: {
+              type: Type.ARRAY,
+              items: { type: Type.STRING },
+              description: "4-5 kroků simulovaného průběhu vaření a analýzy (česky)"
+            },
+            proposedChange: {
+              type: Type.STRING,
+              description: "Jasný a stručný popis navrhované změny (1-2 věty, česky)"
+            },
+            modifiedRecipe: {
+              type: Type.OBJECT,
+              description: "Kompletní upravený recept jako objekt",
+              properties: {
+                title: { type: Type.STRING, description: "Název upraveného receptu" },
+                summary: { type: Type.STRING, description: "Velmi krátké shrnutí upraveného receptu v 1-2 českých větách" },
+                ingredients: { type: Type.ARRAY, items: { type: Type.STRING }, description: "Suroviny s metrickými jednotkami, bez konzervantů" },
+                instructions: { type: Type.ARRAY, items: { type: Type.STRING }, description: "Postup přípravy" },
+                applianceTips: { type: Type.STRING, description: "Tip pro moderní kuchyňské pomocníky" },
+                expertJustification: { type: Type.STRING, description: "Kondenzované odůvodnění změny" },
+                applianceType: { type: Type.STRING, description: "Doporučený spotřebič" },
+                cookingTime: { type: Type.STRING, description: "Doba přípravy doložená simulací" },
+                difficulty: { type: Type.STRING, description: "Náročnost receptu ('Snadné', 'Střední', 'Složité')" },
+                category: { type: Type.STRING, description: "Kategorie jídla." }
+              },
+              required: [
+                "title", "summary", "ingredients", "instructions", "applianceTips", 
+                "expertJustification", "applianceType", "cookingTime", "difficulty", "category"
+              ]
+            }
+          },
+          required: ["simulationSteps", "proposedChange", "modifiedRecipe"]
+        }
+      }
+    });
+
+    const outputText = response.text;
+    if (!outputText) {
+      throw new Error("Simulátor nevrátil žádný text.");
+    }
+
+    const auditResult = JSON.parse(outputText.trim());
+    if (auditResult.modifiedRecipe) {
+      auditResult.modifiedRecipe.id = recipe.id;
+    }
+    
+    res.json(auditResult);
+
+  } catch (error: any) {
+    console.error("Recipe audit error:", error);
+    res.status(500).json({ 
+      error: error?.message || "Došlo k vnitřní chybě při simulaci a kontrole receptu.",
+      details: error.stack
+    });
+  }
+});
+
+// Serve frontend assets
+async function startServer() {
+  if (process.env.NODE_ENV !== "production") {
+    // Development Mode
+    const { createServer: createViteServer } = await import("vite");
+    const vite = await createViteServer({
+      server: { middlewareMode: true },
+      appType: "spa",
+    });
+    app.use(vite.middlewares);
+  } else {
+    // Production Mode
+    const distPath = path.join(process.cwd(), "dist");
+    app.use(express.static(distPath));
+    app.get("*", (req, res) => {
+      res.sendFile(path.join(distPath, "index.html"));
+    });
+  }
+
+  app.listen(PORT, "0.0.0.0", () => {
+    console.log(`AI Kuchařka Express server running on port ${PORT}`);
+  });
+}
+
+// Export app instance so it can be used by serverless platforms (like Vercel)
+export default app;
+
+if (!process.env.VERCEL) {
+  startServer();
+}

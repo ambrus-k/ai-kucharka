@@ -71,17 +71,17 @@ const REMOTE_DB_URL = (() => {
   if (storedGithubName && storedGithubName.trim() !== "") {
     const repo = localStorage.getItem("ai_kucharka_github_repo") || "ai-kucharka-data";
     const branch = localStorage.getItem("ai_kucharka_github_branch") || "main";
-    const path = localStorage.getItem("ai_kucharka_github_path") || "db.json";
+    const path = localStorage.getItem("ai_kucharka_github_path") || "recipes.json";
     return `https://raw.githubusercontent.com/${storedGithubName.trim()}/${repo.trim()}/${branch.trim()}/${path.trim()}`;
   }
 
-  // 3. Fallback when NOT in Studio (the live Vercel version): always load from ambrus-k/ai-kucharka-data
+  // 3. Fallback when NOT in Studio (the live Vercel version): always load from karelaa/ai-kucharka-data
   if (!isStudioEnv) {
-    return "https://raw.githubusercontent.com/ambrus-k/ai-kucharka-data/main/db.json";
+    return "https://raw.githubusercontent.com/karelaa/ai-kucharka-data/main/recipes.json";
   }
 
   // 4. Default template in Studio
-  return "https://raw.githubusercontent.com/ambrus-k/ai-kucharka-data/main/db.json";
+  return "https://raw.githubusercontent.com/karelaa/ai-kucharka-data/main/recipes.json";
 })();
 
 
@@ -424,7 +424,7 @@ export default function App() {
 
   // States for GitHub integration
   const [showGithubConfig, setShowGithubConfig] = useState(false);
-  const [githubUser, setGithubUser] = useState(() => localStorage.getItem("ai_kucharka_github_username") || "ambrus-k");
+  const [githubUser, setGithubUser] = useState(() => localStorage.getItem("ai_kucharka_github_username") || "karelaa");
   const [githubRepo, setGithubRepo] = useState(() => localStorage.getItem("ai_kucharka_github_repo") || "ai-kucharka-data");
   const [githubToken, setGithubToken] = useState(() => localStorage.getItem("ai_kucharka_github_token") || "");
   const [githubBranch, setGithubBranch] = useState(() => localStorage.getItem("ai_kucharka_github_branch") || "main");
@@ -1162,6 +1162,23 @@ export default function App() {
       console.log(msg);
       if (!silent) addSyncLog(msg);
     };
+
+    log(`Stahování sloučeného souboru 'recipes.json' z větve ${branch}...`);
+    try {
+      const rawUrl = `https://raw.githubusercontent.com/${user}/${repo}/${branch}/recipes.json`;
+      const res = await fetch(rawUrl, {
+        headers: token ? { "Authorization": `Bearer ${token}` } : {}
+      });
+      if (res.ok) {
+        const list = await res.json();
+        if (Array.isArray(list) && list.length > 0) {
+          log(`Úspěšně staženo a načteno ${list.length} receptů ze sloučeného souboru 'recipes.json'.`);
+          return list;
+        }
+      }
+    } catch (e: any) {
+      log(`⚠️ Rychlé stažení 'recipes.json' se nezdařilo: ${e?.message || e}. Zkouším načíst jednotlivé soubory z 'recipes/'...`);
+    }
 
     log(`Stahování seznamu receptů ze složky 'recipes/' z větve ${branch}...`);
 
@@ -5152,7 +5169,7 @@ ${separator}`;
                     value={githubUser}
                     onChange={(e) => setGithubUser(e.target.value)}
                     disabled={!isStudioEnv}
-                    placeholder="Např. ambrus-k"
+                    placeholder="Např. karelaa"
                     className="w-full text-sm p-2.5 border border-[#E8E8E1] rounded-xl bg-white text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-1 focus:ring-[#1B4332] disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed"
                   />
                 </div>
