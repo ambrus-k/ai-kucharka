@@ -434,6 +434,8 @@ export default function App() {
   const [githubSyncError, setGithubSyncError] = useState<string | null>(null);
   const [githubSyncLogs, setGithubSyncLogs] = useState<string[]>([]);
   const [githubPendingAction, setGithubPendingAction] = useState<"import" | "export" | "sync" | null>(null);
+  const [serverlessApiError, setServerlessApiError] = useState<string | null>(null);
+  const [serverlessApiSuccess, setServerlessApiSuccess] = useState<boolean>(false);
   const addSyncLog = (message: string) => {
     const time = new Date().toLocaleTimeString();
     setGithubSyncLogs(prev => [...prev, `[${time}] ${message}`]);
@@ -870,10 +872,6 @@ export default function App() {
   const [loginError, setLoginError] = useState<string | null>(null);
 
   const handleLoginWithPassword = async (passwordToVerify: string) => {
-    if (!isStudioEnv) {
-      setLoginError("Administrační přihlášení je povolené pouze v AI Google Studiu.");
-      return false;
-    }
     if (!passwordToVerify.trim()) {
       setLoginError("Zadejte prosím platný kulinářský API klíč.");
       return false;
@@ -913,7 +911,6 @@ export default function App() {
     const repo = githubRepo.trim();
     const token = githubToken.trim();
     const branch = githubBranch.trim();
-    const dbPath = githubPath.trim();
 
     if (!user || !repo || !token) {
       console.log("GitHub integration not fully configured. Skip remote synchronization.");
@@ -924,48 +921,6 @@ export default function App() {
     setGithubSyncError(null);
 
     try {
-      // 1. Sync the main db.json file
-      const dbUrl = `https://api.github.com/repos/${user}/${repo}/contents/${dbPath}`;
-      let dbSha: string | undefined;
-
-      try {
-        const getFileResponse = await fetch(`${dbUrl}?ref=${branch}`, {
-          headers: {
-            "Authorization": `Bearer ${token}`,
-            "Accept": "application/vnd.github.v3+json"
-          }
-        });
-        if (getFileResponse.status === 200) {
-          const fileData = await getFileResponse.json();
-          dbSha = fileData.sha;
-        }
-      } catch (e) {
-        console.log("Could not fetch db.json metadata, assuming file does not exist yet.", e);
-      }
-
-      // Format clean database
-      const dbContentB64 = window.btoa(unescape(encodeURIComponent(JSON.stringify(recipesList, null, 2))));
-      
-      const dbPutResponse = await fetch(dbUrl, {
-        method: "PUT",
-        headers: {
-          "Authorization": `Bearer ${token}`,
-          "Accept": "application/vnd.github.v3+json",
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          message: "Aktualizace databáze receptů db.json ze systému AI Kuchařka [auto-sync]",
-          content: dbContentB64,
-          sha: dbSha,
-          branch: branch
-        })
-      });
-
-      if (!dbPutResponse.ok) {
-        throw new Error(`Nepodařilo se nahrát db.json na GitHub (Status: ${dbPutResponse.status})`);
-      }
-
-      // 2. If a specific recipe is edited/added/deleted, upgrade its source file in the "recipes/" directory
       if (targetRecipe) {
         const slug = targetRecipe.title
           .toString()
@@ -1046,7 +1001,6 @@ export default function App() {
     const repo = githubRepo.trim();
     const token = githubToken.trim();
     const branch = githubBranch.trim();
-    const dbPath = githubPath.trim();
 
     if (!user || !repo || !token) {
       setGithubSyncStatus("error");
@@ -1063,59 +1017,33 @@ export default function App() {
     };
 
     try {
-      log("Zahájení nahrávání databáze na GitHub...");
-      
-      // 1. Sync db.json
-      const dbUrl = `https://api.github.com/repos/${user}/${repo}/contents/${dbPath}`;
-      let dbSha: string | undefined;
+      log("Zahájení nahrávání receptů na GitHub...");
 
-      log(`1. Načítání metadat souboru ${dbPath}...`);
+      // 1. Zjistit stávající soubory v adresáři recipes/ na GitHubu pro čistění sirotků
+      log("1. Zjišťuji seznam stávajících souborů ve složce 'recipes/'...");
+      let remoteFiles: any[] = [];
       try {
-        const getFileResponse = await fetch(`${dbUrl}?ref=${branch}`, {
+        const getDirRes = await fetch(`https://api.github.com/repos/${user}/${repo}/contents/recipes?ref=${branch}`, {
           headers: {
             "Authorization": `Bearer ${token}`,
             "Accept": "application/vnd.github.v3+json"
           }
         });
-        if (getFileResponse.status === 200) {
-          const fileData = await getFileResponse.json();
-          dbSha = fileData.sha;
-          log(`Nalezen stávající soubor ${dbPath} (SHA: ${dbSha?.slice(0, 7)}).`);
-        } else {
-          log(`Soubor ${dbPath} zatím neexistuje, bude vytvořen.`);
+        if (getDirRes.status === 200) {
+          const dirData = await getDirRes.json();
+          if (Array.isArray(dirData)) {
+            remoteFiles = dirData;
+          }
         }
       } catch (e) {
-        log(`Poznámka: Nepodařilo se zjistit SHA souboru ${dbPath}, předpokládám že neexistuje.`);
+        log("Poznámka: Nepodařilo se načíst obsah složky 'recipes/', pravděpodobně ještě neexistuje.");
       }
 
-      log(`Dekódování a příprava obsahu ${dbPath} (celkem ${recipes.length} receptů)...`);
-      const dbContentB64 = window.btoa(unescape(encodeURIComponent(JSON.stringify(recipes, null, 2))));
-      
-      log(`Nahrávání nového ${dbPath} na GitHub...`);
-      const dbPutResponse = await fetch(dbUrl, {
-        method: "PUT",
-        headers: {
-          "Authorization": `Bearer ${token}`,
-          "Accept": "application/vnd.github.v3+json",
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          message: `Kompletní nahrání databáze db.json (${recipes.length} receptů) přes AI Kuchařku`,
-          content: dbContentB64,
-          sha: dbSha,
-          branch: branch
-        })
-      });
-
-      if (!dbPutResponse.ok) {
-        throw new Error(`Nepodařilo se nahrát ${dbPath}. Kód: ${dbPutResponse.status}`);
-      }
-      log(`✓ Databáze ${dbPath} byla úspěšně nahrána.`);
-
-      // 2. Sync all individual recipes to recipes/ directory
-      log("2. Synchronizace jednotlivých souborů receptů v adresáři 'recipes/'...");
+      // 2. Vytvořit mapu lokálních slugů
+      const localSlugs = new Set<string>();
       let successCount = 0;
-      
+
+      log(`2. Synchronizace všech lokálních receptů (celkem ${recipes.length}) do složky 'recipes/'...`);
       for (let i = 0; i < recipes.length; i++) {
         const r = recipes[i];
         const slug = r.title
@@ -1129,24 +1057,17 @@ export default function App() {
           .replace(/^-+/, '')
           .replace(/-+$/, '');
 
-        const recipeFilePath = `recipes/${slug}.json`;
-        log(`Ukládání receptu (${i + 1}/${recipes.length}): ${r.title} -> ${recipeFilePath}`);
+        const fileName = `${slug}.json`;
+        localSlugs.add(fileName);
 
+        const recipeFilePath = `recipes/${fileName}`;
         const recipeFileUrl = `https://api.github.com/repos/${user}/${repo}/contents/${recipeFilePath}`;
-        let recipeSha: string | undefined;
+        
+        // Najít SHA pokud existuje
+        const matchingRemote = remoteFiles.find(f => f.name === fileName);
+        const recipeSha = matchingRemote ? matchingRemote.sha : undefined;
 
-        try {
-          const getRecipeResponse = await fetch(`${recipeFileUrl}?ref=${branch}`, {
-            headers: {
-              "Authorization": `Bearer ${token}`,
-              "Accept": "application/vnd.github.v3+json"
-            }
-          });
-          if (getRecipeResponse.status === 200) {
-            const fileData = await getRecipeResponse.json();
-            recipeSha = fileData.sha;
-          }
-        } catch (e) {}
+        log(`Ukládání receptu (${i + 1}/${recipes.length}): ${r.title} -> ${recipeFilePath}`);
 
         const recipeContentB64 = window.btoa(unescape(encodeURIComponent(JSON.stringify(r, null, 2))));
         const putRecipeRes = await fetch(recipeFileUrl, {
@@ -1171,8 +1092,35 @@ export default function App() {
         }
       }
 
+      // 3. Odstranit smazané/sirotčí recepty z GitHubu
+      log("3. Odstraňování přebytečných (smazaných) receptů z GitHubu...");
+      let deletedCount = 0;
+      for (const remoteFile of remoteFiles) {
+        if (remoteFile.type === "file" && remoteFile.name.endsWith(".json") && !localSlugs.has(remoteFile.name)) {
+          log(`Odstraňuji osiřelý soubor z GitHubu: recipes/${remoteFile.name}`);
+          try {
+            const delRes = await fetch(`https://api.github.com/repos/${user}/${repo}/contents/recipes/${remoteFile.name}`, {
+              method: "DELETE",
+              headers: {
+                "Authorization": `Bearer ${token}`,
+                "Accept": "application/vnd.github.v3+json",
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({
+                message: `Odstranění přebytečného receptu ${remoteFile.name}`,
+                sha: remoteFile.sha,
+                branch: branch
+              })
+            });
+            if (delRes.ok) deletedCount++;
+          } catch (delErr) {
+            console.error(delErr);
+          }
+        }
+      }
+
       setGithubSyncStatus("success");
-      log(`✓ Vše hotovo! Úspěšně uloženo ${recipes.length} receptů do databáze ${dbPath} a ${successCount} samostatných souborů do 'recipes/'.`);
+      log(`✓ Vše hotovo! Úspěšně uloženo ${successCount} receptů do složky 'recipes/' a smazáno ${deletedCount} přebytečných souborů.`);
       setTimeout(() => setGithubSyncStatus("idle"), 8000);
     } catch (err: any) {
       console.error("Export all to GitHub failed", err);
@@ -1196,7 +1144,6 @@ export default function App() {
     const repo = githubRepo.trim();
     const token = githubToken.trim();
     const branch = githubBranch.trim();
-    const dbPath = githubPath.trim();
 
     if (!silent && !skipClearLogs) {
       setGithubSyncLogs([]);
@@ -1206,10 +1153,9 @@ export default function App() {
       if (!silent) addSyncLog(msg);
     };
 
-    log(`Navazování spojení pro stažení ${dbPath} z větve ${branch}...`);
+    log(`Stahování seznamu receptů ze složky 'recipes/' z větve ${branch}...`);
 
-    // Let's try fetching via GitHub contents API first
-    const dbUrl = `https://api.github.com/repos/${user}/${repo}/contents/${dbPath}`;
+    const dirUrl = `https://api.github.com/repos/${user}/${repo}/contents/recipes?ref=${branch}`;
     const headers: Record<string, string> = {
       "Accept": "application/vnd.github.v3+json"
     };
@@ -1217,70 +1163,53 @@ export default function App() {
       headers["Authorization"] = `Bearer ${token}`;
     }
 
-    let getFileResponse: Response;
+    let getDirResponse: Response;
     try {
-      getFileResponse = await fetch(`${dbUrl}?ref=${branch}`, { headers });
+      getDirResponse = await fetch(dirUrl, { headers });
     } catch (fetchErr: any) {
-      log(`Chyba síťového požadavku: ${fetchErr?.message || fetchErr}. Zkusíme veřejnou raw URL...`);
-      // Fallback directly to public raw URL if fetch to API failed (e.g. CORS, offline)
-      const rawUrl = `https://raw.githubusercontent.com/${user}/${repo}/${branch}/${dbPath}`;
-      const rawRes = await fetch(rawUrl);
-      if (!rawRes.ok) {
-        throw new Error(`Nepodařilo se stáhnout db.json z API ani z veřejné raw URL. Kód: ${rawRes.status}`);
+      log(`Chyba síťového požadavku: ${fetchErr?.message || fetchErr}.`);
+      throw new Error(`Nepodařilo se připojit k GitHub API při stahování složky recipes/.`);
+    }
+
+    if (getDirResponse.status === 404) {
+      log(`Složka 'recipes/' nebyla v repozitáři nalezena. Vracím prázdný seznam.`);
+      return [];
+    }
+
+    if (getDirResponse.status !== 200) {
+      throw new Error(`Chyba při stahování seznamu receptů ze složky 'recipes/'. Kód: ${getDirResponse.status}`);
+    }
+
+    const files = await getDirResponse.json();
+    const jsonFiles = Array.isArray(files) ? files.filter(f => f.type === "file" && f.name.endsWith(".json")) : [];
+    
+    log(`Nalezeno ${jsonFiles.length} souborů receptů. Stahuji jejich obsah...`);
+    
+    const recipesList: Recipe[] = [];
+    let downloadedCount = 0;
+
+    for (const file of jsonFiles) {
+      try {
+        const fileRes = await fetch(file.download_url, {
+          headers: token ? { "Authorization": `Bearer ${token}` } : {}
+        });
+        if (fileRes.ok) {
+          const recipeData = await fileRes.json();
+          if (recipeData && recipeData.id) {
+            recipesList.push(recipeData);
+            downloadedCount++;
+            if (!silent && downloadedCount % 5 === 0) {
+              log(`Staženo ${downloadedCount}/${jsonFiles.length} receptů...`);
+            }
+          }
+        }
+      } catch (e: any) {
+        log(`⚠️ Nepodařilo se stáhnout recept ${file.name}: ${e?.message || e}`);
       }
-      const data = await rawRes.json();
-      const list = Array.isArray(data) ? data : (data.recipes || []);
-      return list;
     }
 
-    if (getFileResponse.status === 403) {
-      log(`Přístup odmítnut (403) - možný limit API požadavků. Zkouším veřejnou raw URL jako fallback...`);
-      const rawUrl = `https://raw.githubusercontent.com/${user}/${repo}/${branch}/${dbPath}`;
-      const rawRes = await fetch(rawUrl);
-      if (!rawRes.ok) {
-        throw new Error(`Přístup odmítnut API a nepodařilo se stáhnout ani přes veřejnou raw URL.`);
-      }
-      const data = await rawRes.json();
-      const list = Array.isArray(data) ? data : (data.recipes || []);
-      return list;
-    }
-
-    if (getFileResponse.status !== 200) {
-      log(`GitHub API vrátil kód ${getFileResponse.status}. Zkouším veřejnou raw URL jako fallback...`);
-      const rawUrl = `https://raw.githubusercontent.com/${user}/${repo}/${branch}/${dbPath}`;
-      const rawRes = await fetch(rawUrl);
-      if (!rawRes.ok) {
-        throw new Error(`Soubor db.json nebyl v repozitáři nalezen (Status API: ${getFileResponse.status}, Raw: ${rawRes.status})`);
-      }
-      const data = await rawRes.json();
-      const list = Array.isArray(data) ? data : (data.recipes || []);
-      return list;
-    }
-
-    const fileData = await getFileResponse.json();
-    let rawJsonContent = "";
-
-    if (fileData && typeof fileData === "object" && "content" in fileData && fileData.encoding === "base64") {
-      log(`Dekódování Base64 databáze z GitHub API...`);
-      // Clean up whitespace/newlines from base64 string
-      const b64 = fileData.content.replace(/\s/g, "");
-      // Decodes UTF-8 string safely
-      rawJsonContent = decodeURIComponent(
-        atob(b64)
-          .split("")
-          .map(c => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
-          .join("")
-      );
-    } else if (Array.isArray(fileData) || (fileData && fileData.recipes)) {
-      rawJsonContent = JSON.stringify(fileData);
-    } else {
-      throw new Error("Nerozpoznaný formát odpovědi z GitHubu.");
-    }
-
-    const parsedData = JSON.parse(rawJsonContent);
-    const list = Array.isArray(parsedData) ? parsedData : (parsedData.recipes || []);
-    log(`Úspěšně staženo a zparsováno ${list.length} receptů z GitHubu.`);
-    return list;
+    log(`Úspěšně staženo a načteno ${recipesList.length} receptů ze složky 'recipes/'.`);
+    return recipesList;
   };
 
   const importAllFromGithub = async () => {
@@ -1322,7 +1251,6 @@ export default function App() {
     const repo = githubRepo.trim();
     const token = githubToken.trim();
     const branch = githubBranch.trim();
-    const dbPath = githubPath.trim();
 
     if (!user || !repo) {
       setGithubSyncStatus("error");
@@ -1347,14 +1275,43 @@ export default function App() {
       log("Zahájení obousměrné synchronizace...");
 
       // 1. Download recipes from GitHub
-      log("1. Stahování aktuálních receptů z GitHubu...");
+      log("1. Stahování aktuálních receptů ze složky 'recipes/' na GitHubu...");
       let githubRecipes: Recipe[] = [];
+      let remoteFiles: any[] = [];
       try {
-        githubRecipes = await fetchRecipesFromGithub({ silent: false, skipClearLogs: true });
+        const getDirRes = await fetch(`https://api.github.com/repos/${user}/${repo}/contents/recipes?ref=${branch}`, {
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Accept": "application/vnd.github.v3+json"
+          }
+        });
+        if (getDirRes.status === 200) {
+          remoteFiles = await getDirRes.json();
+          const jsonFiles = Array.isArray(remoteFiles) ? remoteFiles.filter(f => f.type === "file" && f.name.endsWith(".json")) : [];
+          log(`Nalezeno ${jsonFiles.length} receptů na GitHubu, stahuji obsah...`);
+
+          let downloadedCount = 0;
+          for (const file of jsonFiles) {
+            try {
+              const fileRes = await fetch(file.download_url, {
+                headers: { "Authorization": `Bearer ${token}` }
+              });
+              if (fileRes.ok) {
+                const recipeData = await fileRes.json();
+                if (recipeData && recipeData.id) {
+                  githubRecipes.push(recipeData);
+                  downloadedCount++;
+                }
+              }
+            } catch (e: any) {
+              log(`⚠️ Nepodařilo se stáhnout ${file.name}: ${e?.message || e}`);
+            }
+          }
+        }
         log(`✓ Staženo ${githubRecipes.length} receptů z GitHubu.`);
       } catch (err: any) {
-        log(`Poznámka: Nepodařilo se stáhnout stávající recepty z GitHubu (${err?.message || err}).`);
-        log("Předpokládám, že repozitář je prázdný nebo db.json neexistuje. Budou nahrány pouze lokální recepty.");
+        log(`Poznámka: Nepodařilo se stáhnout stávající recepty ze složky 'recipes/' (${err?.message || err}).`);
+        log("Předpokládám, že složka neexistuje nebo je prázdná. Budou nahrány pouze lokální recepty.");
       }
 
       // 2. Fetch local recipes
@@ -1406,49 +1363,11 @@ export default function App() {
         setSelectedRecipe(finalRecipesList[0]);
       }
 
-      // 5. Upload merged list back to GitHub
-      log(`5. Nahrávání sjednocené databáze ${dbPath} zpět na GitHub...`);
-      const dbUrl = `https://api.github.com/repos/${user}/${repo}/contents/${dbPath}`;
-      let dbSha: string | undefined;
-
-      try {
-        const getFileResponse = await fetch(`${dbUrl}?ref=${branch}`, {
-          headers: {
-            "Authorization": `Bearer ${token}`,
-            "Accept": "application/vnd.github.v3+json"
-          }
-        });
-        if (getFileResponse.status === 200) {
-          const fileData = await getFileResponse.json();
-          dbSha = fileData.sha;
-        }
-      } catch (e) {}
-
-      const dbContentB64 = window.btoa(unescape(encodeURIComponent(JSON.stringify(finalRecipesList, null, 2))));
-      const dbPutResponse = await fetch(dbUrl, {
-        method: "PUT",
-        headers: {
-          "Authorization": `Bearer ${token}`,
-          "Accept": "application/vnd.github.v3+json",
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          message: `Synchronizace databáze db.json (${finalRecipesList.length} receptů) přes AI Kuchařku`,
-          content: dbContentB64,
-          sha: dbSha,
-          branch: branch
-        })
-      });
-
-      if (!dbPutResponse.ok) {
-        throw new Error(`Nepodařilo se nahrát sjednocený db.json. Kód: ${dbPutResponse.status}`);
-      }
-      log(`✓ Sjednocený soubor ${dbPath} byl nahrán na GitHub.`);
-
-      // 6. Upload individual files
-      log("6. Nahrávání/aktualizace jednotlivých souborů receptů v 'recipes/'...");
+      // 5. Upload merged list back to GitHub as individual files in recipes/
+      log("5. Nahrávání sjednocených receptů jako samostatné soubory do složky 'recipes/'...");
       let successCount = 0;
-      
+      const localSlugs = new Set<string>();
+
       for (let i = 0; i < finalRecipesList.length; i++) {
         const r = finalRecipesList[i];
         const slug = r.title
@@ -1462,22 +1381,15 @@ export default function App() {
           .replace(/^-+/, '')
           .replace(/-+$/, '');
 
-        const recipeFilePath = `recipes/${slug}.json`;
-        const recipeFileUrl = `https://api.github.com/repos/${user}/${repo}/contents/${recipeFilePath}`;
-        let recipeSha: string | undefined;
+        const fileName = `${slug}.json`;
+        localSlugs.add(fileName);
 
-        try {
-          const getRecipeResponse = await fetch(`${recipeFileUrl}?ref=${branch}`, {
-            headers: {
-              "Authorization": `Bearer ${token}`,
-              "Accept": "application/vnd.github.v3+json"
-            }
-          });
-          if (getRecipeResponse.status === 200) {
-            const fileData = await getRecipeResponse.json();
-            recipeSha = fileData.sha;
-          }
-        } catch (e) {}
+        const recipeFilePath = `recipes/${fileName}`;
+        const recipeFileUrl = `https://api.github.com/repos/${user}/${repo}/contents/${recipeFilePath}`;
+        
+        // Najít SHA z načteného seznamu souborů
+        const matchingRemote = remoteFiles.find(f => f.name === fileName);
+        const recipeSha = matchingRemote ? matchingRemote.sha : undefined;
 
         const recipeContentB64 = window.btoa(unescape(encodeURIComponent(JSON.stringify(r, null, 2))));
         const putRecipeRes = await fetch(recipeFileUrl, {
@@ -1500,8 +1412,35 @@ export default function App() {
         }
       }
 
+      // 6. Odstranit smazané/sirotčí recepty z GitHubu
+      log("6. Odstraňování přebytečných receptů z GitHubu...");
+      let deletedCount = 0;
+      for (const remoteFile of remoteFiles) {
+        if (remoteFile.type === "file" && remoteFile.name.endsWith(".json") && !localSlugs.has(remoteFile.name)) {
+          log(`Odstraňuji přebytečný soubor z GitHubu: recipes/${remoteFile.name}`);
+          try {
+            const delRes = await fetch(`https://api.github.com/repos/${user}/${repo}/contents/recipes/${remoteFile.name}`, {
+              method: "DELETE",
+              headers: {
+                "Authorization": `Bearer ${token}`,
+                "Accept": "application/vnd.github.v3+json",
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({
+                message: `Odstranění přebytečného receptu ${remoteFile.name}`,
+                sha: remoteFile.sha,
+                branch: branch
+              })
+            });
+            if (delRes.ok) deletedCount++;
+          } catch (delErr) {
+            console.error(delErr);
+          }
+        }
+      }
+
       setGithubSyncStatus("success");
-      log(`✓ SYNCHRONIZACE DOKONČENA! Obě strany mají nyní identických ${finalRecipesList.length} receptů.`);
+      log(`✓ SYNCHRONIZACE DOKONČENA! Všechny recepty sjednoceny. Načteno ${finalRecipesList.length} receptů, uloženo ${successCount} souborů a smazáno ${deletedCount} přebytečných.`);
       setTimeout(() => setGithubSyncStatus("idle"), 8000);
     } catch (err: any) {
       console.error("Bidirectional sync failed", err);
@@ -2460,15 +2399,11 @@ ${separator}`;
 
   // Load admin state and recipes (dynamic remote URL with local storage fallbacks)
   useEffect(() => {
-    // Hidden admin check (Only permitted in Google AI Studio environment)
-    if (isStudioEnv) {
-      const savedAdminToken = localStorage.getItem("admin_password_token");
-      if (savedAdminToken) {
-        setIsAdmin(true);
-        setAdminPassword(savedAdminToken);
-      }
-    } else {
-      setIsAdmin(false);
+    // Load admin state from localStorage (Enabled on both AI Studio and Vercel)
+    const savedAdminToken = localStorage.getItem("admin_password_token");
+    if (savedAdminToken) {
+      setIsAdmin(true);
+      setAdminPassword(savedAdminToken);
     }
 
     const loadRecipes = async () => {
@@ -2482,10 +2417,20 @@ ${separator}`;
           const list = Array.isArray(data) ? data : (data.recipes || []);
           if (list && list.length > 0) {
             loadedList = list;
+            setServerlessApiSuccess(true);
+            setServerlessApiError(null);
             console.log("Úspěšně načteny aktuální recepty ze Severless API /api (GitHub direct source)");
+          } else {
+            console.log("Severless API /api vrátil prázdný seznam receptů.");
           }
+        } else {
+          const errData = await serverlessResponse.json().catch(() => ({}));
+          const errMsg = errData.error || `Server vrátil status kód: ${serverlessResponse.status}`;
+          setServerlessApiError(errMsg);
+          console.error("Serverless API error:", errMsg);
         }
-      } catch (error) {
+      } catch (error: any) {
+        setServerlessApiError(error?.message || "Nelze se připojit k Serverless API.");
         console.log("Nepodařilo se stáhnout data přes /api, zkusíme další zdroje...", error);
       }
 
@@ -2505,19 +2450,17 @@ ${separator}`;
         }
       }
 
-      // 3. Fallback to dynamic remote URL (direct GitHub Raw)
+      // 3. Fallback to dynamic remote URL (direct GitHub contents/recipes listing and downloading)
       if (loadedList === null) {
         try {
-          const response = await fetch(REMOTE_DB_URL);
-          if (response.ok) {
-            const data = await response.json();
-            const list = Array.isArray(data) ? data : (data.recipes || []);
-            if (list && list.length > 0) {
-              loadedList = list;
-            }
+          console.log("Pokouším se načíst recepty přímo ze složky recipes/ na GitHubu...");
+          const list = await fetchRecipesFromGithub({ silent: true });
+          if (list && list.length > 0) {
+            loadedList = list;
+            console.log("Úspěšně načteny recepty ze složky recipes/ na GitHubu!");
           }
         } catch (error) {
-          console.log("Nepodařilo se načíst z REMOTE_DB_URL, zkusíme lokální fallback.", error);
+          console.log("Nepodařilo se načíst ze složky recipes na GitHubu, zkusíme lokální fallback.", error);
         }
       }
 
@@ -3186,6 +3129,60 @@ ${separator}`;
         {/* LEFT SIDEBAR: RECIPE LIST */}
         <aside className="no-print w-full md:w-80 lg:w-96 border-r border-[#E8E8E1] bg-white flex flex-col flex-shrink-0">
           
+          {/* GITHUB INTEGRATION STATUS BANNER */}
+          {(() => {
+            const isClientGithubActive = !!(githubUser.trim() && githubRepo.trim() && githubToken.trim());
+            if (isClientGithubActive) {
+              return (
+                <div className="p-4 bg-emerald-50 border-b border-emerald-200 text-emerald-800 space-y-1.5 no-print">
+                  <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-emerald-900">
+                    <Check className="h-4 w-4 shrink-0 text-emerald-600" />
+                    <span>GitHub propojení aktivní</span>
+                  </div>
+                  <p className="text-[11px] leading-relaxed opacity-95">
+                    Vaše kuchařka je úspěšně propojena přímo s repozitářem <strong className="font-semibold">{githubUser}/{githubRepo}</strong>. Změny se ukládají online.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsAdmin(true);
+                      setShowGithubConfig(true);
+                    }}
+                    className="font-bold underline text-emerald-700 hover:text-emerald-900 cursor-pointer flex items-center gap-1 text-[10px] text-left"
+                  >
+                    Spravovat propojení a synchronizaci
+                  </button>
+                </div>
+              );
+            } else if (serverlessApiError) {
+              return (
+                <div className="p-4 bg-red-50 border-b border-red-200 text-red-800 space-y-2 no-print">
+                  <div className="flex items-start gap-2 text-xs font-bold uppercase tracking-wider">
+                    <AlertCircle className="h-4 w-4 shrink-0 text-red-600 mt-0.5" />
+                    <span>GitHub integrace neaktivní</span>
+                  </div>
+                  <p className="text-[11px] leading-relaxed opacity-95">
+                    Při načítání databáze přes Vercel Serverless API došlo k chybě: <strong className="font-semibold">{serverlessApiError}</strong>
+                  </p>
+                  <div className="pt-1 text-[10px] space-y-1 text-red-700">
+                    <p>💡 Chcete-li nahrávat a stahovat data automaticky, nastavte v administračním panelu Vercelu proměnnou <code className="font-mono bg-red-100 px-1 py-0.5 rounded font-bold">GITHUB_TOKEN</code>.</p>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsAdmin(true);
+                        setShowGithubConfig(true);
+                      }}
+                      className="font-bold underline hover:text-red-900 cursor-pointer flex items-center gap-1 text-left"
+                    >
+                      Otevřít průvodce nastavením GitHubu
+                    </button>
+                  </div>
+                </div>
+              );
+            }
+            return null;
+          })()}
+
           {/* SEARCH & FILTER CONTROLS */}
           <div className="p-4 border-b border-[#E8E8E1] bg-[#FDFCF7]/60 flex flex-col gap-3">
             {/* Kolonka: Hlavní vyhledávání */}
@@ -4925,7 +4922,7 @@ ${separator}`;
           <span>© 2026 AI Kuchařka. Všechna práva vyhrazena.</span>
 
           {/* Discrete Admin Activation Panel */}
-          {isStudioEnv && (
+          {true && (
             <div className="flex items-center gap-2">
               {isAdmin ? (
                 <div className="flex items-center gap-4 text-[#2D6A4F] font-bold flex-wrap justify-center sm:justify-end">
@@ -5098,7 +5095,7 @@ ${separator}`;
             {/* Content */}
             <div className="p-6 space-y-4 overflow-y-auto flex-1 text-slate-700">
               <p className="text-xs text-[#5C5C50] leading-relaxed">
-                Propojte aplikaci s vaším GitHub repozitářem. Změny (přidání, úpravy nebo mazání receptů) provedené přihlášeným administrátorem se budou automaticky ukládat do <strong>db.json</strong> i samostatných souborů do adresáře <strong>recipes/</strong> online na GitHubu!
+                Propojte aplikaci s vaším GitHub repozitářem. Všechny recepty se budou jako samostatné JSON soubory ukládat do adresáře <strong>recipes/</strong> online na GitHubu!
               </p>
 
               {/* Form Fields */}
@@ -5168,14 +5165,13 @@ ${separator}`;
                   </div>
                   <div>
                     <label className="block text-xs font-bold uppercase text-[#1B4332] tracking-wider mb-1">
-                      Cesta k databázi (JSON)
+                      Složka receptů
                     </label>
                     <input
                       type="text"
-                      value={githubPath}
-                      onChange={(e) => setGithubPath(e.target.value)}
-                      placeholder="db.json"
-                      className="w-full text-sm p-2.5 border border-[#E8E8E1] rounded-xl bg-white text-slate-800 focus:outline-hidden focus:ring-1 focus:ring-[#1B4332]"
+                      value="recipes/"
+                      disabled
+                      className="w-full text-sm p-2.5 border border-[#E8E8E1] rounded-xl bg-slate-100 text-slate-500 cursor-not-allowed focus:outline-hidden"
                     />
                   </div>
                 </div>
@@ -5201,14 +5197,14 @@ ${separator}`;
                       </a>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-slate-500 font-medium font-sans">Soubor databáze ({githubPath.trim() || "db.json"}):</span>
+                      <span className="text-slate-500 font-medium font-sans">Složka receptů:</span>
                       <a
-                        href={`https://github.com/${githubUser.trim()}/${githubRepo.trim()}/blob/${githubBranch.trim() || "main"}/${githubPath.trim() || "db.json"}`}
+                        href={`https://github.com/${githubUser.trim()}/${githubRepo.trim()}/tree/${githubBranch.trim() || "main"}/recipes`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-emerald-700 hover:text-emerald-800 font-bold underline flex items-center gap-1 cursor-pointer"
                       >
-                        <span>Zobrazit soubor na GitHubu</span>
+                        <span>Zobrazit složku na GitHubu</span>
                         <ExternalLink className="h-3 w-3" />
                       </a>
                     </div>
