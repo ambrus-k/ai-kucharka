@@ -3158,27 +3158,7 @@ ${separator}`;
           {/* GITHUB INTEGRATION STATUS BANNER */}
           {(() => {
             if (!isStudioEnv) {
-              return (
-                <div className="p-4 bg-slate-50 border-b border-slate-200 text-slate-700 space-y-1.5 no-print">
-                  <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-800">
-                    <Lock className="h-4 w-4 shrink-0 text-slate-500" />
-                    <span>GitHub synchronizace vypnuta</span>
-                  </div>
-                  <p className="text-[11px] leading-relaxed opacity-95">
-                    Prohlížíte bezpečný produkční web. Přístup k GitHub repozitáři a zápis dat jsou z bezpečnostních důvodů vypnuty.
-                  </p>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsAdmin(true);
-                      setShowGithubConfig(true);
-                    }}
-                    className="font-bold underline text-slate-600 hover:text-slate-800 cursor-pointer flex items-center gap-1 text-[10px] text-left"
-                  >
-                    Zobrazit bezpečnostní informaci
-                  </button>
-                </div>
-              );
+              return null;
             }
 
             const isClientGithubActive = !!(githubUser.trim() && githubRepo.trim() && githubToken.trim());
