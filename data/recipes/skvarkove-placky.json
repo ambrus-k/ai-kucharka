@@ -1,0 +1,34 @@
+{
+  "title": "Škvarkové placky",
+  "summary": "Tradiční kynuté placky s vrstvenou strukturou vytvořenou technikou laminace sádla a škvarků. Výsledkem je křehké, nadýchané pečivo s výraznou chutí.",
+  "ingredients": [
+    "500 g pšeničné hladké mouky",
+    "230 ml vlažného mléka",
+    "20 g čerstvého droždí",
+    "5 g krystalového cukru",
+    "2 ks vejce (1 do těsta, 1 na potření)",
+    "10 g jemné soli",
+    "120 g kvalitních vepřových škvarků",
+    "180 g vepřového sádla (60 g do těsta, 120 g do náplně)",
+    "2 g mletého černého pepře",
+    "5 g drceného kmínu",
+    "Hrubozrnná sůl na posypání",
+    "Celý kmín na posypání"
+  ],
+  "instructions": [
+    "Ve vlažném mléce s cukrem rozmíchejte droždí a nechte vzejít kvásek.",
+    "Do mísy prosejte mouku, přidejte sůl, pepř, drcený kmín, jedno vejce, kvásek a 60 g rozpuštěného sádla.",
+    "Vypracujte hladké nelepivé těsto a nechte kynout 60 minut při pokojové teplotě.",
+    "Škvarky jemně nasekejte a smíchejte se 120 g změklého sádla na pastu.",
+    "Těsto rozválejte, potřete třetinou směsi, přeložte na třetiny, otočte a postup opakujte celkem 3x s 15minutovou pauzou v chladu mezi překlady.",
+    "Vyválejte na tloušťku 1,5 cm, vykrojte placky, na povrchu vyznačte mřížku a nechte na plechu kynout dalších 30 minut.",
+    "Potřete vejcem, posypte solí a kmínem, poté pečte při 190 °C po dobu 18 minut dozlatova."
+  ],
+  "applianceTips": "Při použití horkovzdušné fritézy (Air Fryer) nastavte teplotu na 180 °C a pečte 12–15 minut. Placky v koši nepřekrývejte, aby horký vzduch mohl rovnoměrně cirkulovat a vytvořit křupavou krustu.",
+  "expertJustification": "Laminace (překládání) vytvoří vrstvy tuku mezi vrstvami těsta, což při pečení způsobí separaci lepkové sítě a vznik lístkování. Dodržení 2 % soli optimalizuje fermentační aktivitu kvasinek. Chlazení těsta mezi překlady je kritické, aby sádlo zůstalo v plastickém stavu a nevsáklo se do mouky, což by vedlo k tuhosti namísto křehkosti.",
+  "applianceType": "Klasická trouba",
+  "cookingTime": "120 min",
+  "difficulty": "Střední",
+  "category": "Pečivo",
+  "id": "gen-1781778421698"
+}

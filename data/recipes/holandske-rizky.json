@@ -1,0 +1,30 @@
+{
+  "title": "Holandské řízky",
+  "summary": "Šťavnaté vepřové karbanátky se sýrem připravené metodou emulgace masa s mlékem pro maximální jemnost.",
+  "ingredients": [
+    "600 g mletého vepřového bůčku",
+    "600 g mleté vepřové plece",
+    "360 g sýra Gouda, strouhaného",
+    "150 ml plnotučného mléka (ledového)",
+    "2 ks vajec",
+    "20 g soli",
+    "5 g bílého pepře",
+    "150 g hladké mouky",
+    "4 ks vajec (na trojobal)",
+    "500 g jemné strouhanky",
+    "500 g sádla na smažení"
+  ],
+  "instructions": [
+    "V robotu smíchejte mleté maso, sůl, pepř a vejce. Postupně přilévejte ledové mléko a míchejte K-metlou 8 minut, dokud směs nevytvoří lepivou emulzi.",
+    "Do hotové masové emulze ručně vmíchejte nastrouhaný sýr a nechte směs v chladu odpočívat 45 minut.",
+    "Z vychlazené směsi tvarujte karbanátky o hmotnosti cca 150 g. Obalte je v trojobalu (mouka, vejce, strouhanka) a pečlivě uzavřete okraje.",
+    "Karbanátky nejprve krátce orestujte v sádle dozlatova a poté je dopečte v troubě při 140 °C po dobu 12-15 minut, dokud vnitřní teplota nedosáhne 72-74 °C."
+  ],
+  "applianceTips": "Pro dosažení ideální křupavosti bez přebytečného tuku využijte horkovzdušnou fritézu: karbanátky postříkejte olejem a pečte při 180 °C po dobu 12-14 minut, v polovině času otočte.",
+  "expertJustification": "Emulgace masa s ledovým mlékem vytvoří stabilní bílkovinnou síť, která po tepelné úpravě zadrží šťávu uvnitř karbanátku. Použití směsi bůčku a plece vyvažuje poměr tuku a svaloviny pro texturu bez vysušování. Dvojí tepelná úprava (smažení a dopečení v troubě) zajišťuje karamelizaci povrchu (Maillardova reakce) bez rizika, že vnitřek zůstane syrový nebo že se sýr příliš rychle vyškvaří.",
+  "applianceType": "Horkovzdušná fritéza / Trouba",
+  "cookingTime": "120 min",
+  "difficulty": "Střední",
+  "category": "Maso",
+  "id": "gen-1781776733049"
+}

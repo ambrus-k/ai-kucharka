@@ -1,0 +1,28 @@
+{
+  "title": "Tradiční preclíky",
+  "summary": "Křehké slané pečivo s vysokým obsahem tuku, které díky optimalizovanému kynutí a přesnému poměru surovin získá dokonalou texturu.",
+  "ingredients": [
+    "500 g hladké pšeničné mouky (typ 00 nebo speciál na kynuté těsto)",
+    "200 g sádla pokojové teploty",
+    "125 ml plnotučného mléka (vlažného)",
+    "42 g čerstvého droždí (půl kostky)",
+    "10 g soli (do těsta)",
+    "50 g máku, hrubozrnné soli nebo kmínu na posypání",
+    "30 ml mléka na potření"
+  ],
+  "instructions": [
+    "V misce rozdrobte droždí do vlažného mléka, přidejte lžičku cukru a nechte vzejít kvásek po dobu 10 minut.",
+    "Do mísy prosejte mouku, přidejte sůl a změklé sádlo. Přilijte kvásek a vypracujte hladké, nelepivé těsto.",
+    "Těsto nechte kynout na teplém místě pod utěrkou cca 45-60 minut, dokud nezdvojnásobí svůj objem.",
+    "Vykynuté těsto rozdělte na stejné díly, vyválejte z nich prameny a vytvarujte preclíky.",
+    "Každý preclík na jedné straně potřete mlékem a přitiskněte do směsi máku a soli.",
+    "Pečte v předehřáté troubě na 170 °C po dobu 15–18 minut dozlatova."
+  ],
+  "applianceTips": "Pokud používáte domácí pekárnu, vložte suroviny v pořadí tekutiny, sádlo, mouka, sůl a droždí. Zvolte program 'Těsto' (bez pečení), který zajistí rovnoměrné vypracování díky řízenému prohřátí surovin.",
+  "expertJustification": "Původní recept obsahoval zbytečně vysoké množství droždí, které způsobuje příliš rychlou fermentaci a následnou pachuť kvasnic. Snížením dávky droždí a úpravou teploty kynutí dosáhneme jemnější struktury střídky. Sádlo v těstě funguje jako 'shortening' (zkracovač lepkových vláken), což zajišťuje typickou křehkost, zatímco přesné dávkování soli je klíčové pro kontrolu aktivity kvasinek.",
+  "applianceType": "Domácí pekárna",
+  "cookingTime": "90 min",
+  "difficulty": "Střední",
+  "category": "Pečivo",
+  "id": "gen-1781777534961"
+}

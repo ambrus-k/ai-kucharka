@@ -1,0 +1,36 @@
+{
+  "title": "Bavorské vdolečky",
+  "summary": "Tradiční kynuté vdolečky s vláčným těstem, připravené s důrazem na správnou fermentaci a ideální teplotu smažení.",
+  "ingredients": [
+    "250 ml plnotučného mléka (vlažného)",
+    "500 g polohrubé mouky",
+    "20 g čerstvého droždí",
+    "40 g krupicového cukru",
+    "1/2 lžičky soli",
+    "30 g másla (změklého)",
+    "1 celé vejce",
+    "1 žloutek",
+    "30 ml kvalitního rumu",
+    "500 ml řepkového oleje (na smažení)",
+    "200 g švestkových povidel",
+    "200 g zakysané smetany",
+    "100 g tvrdého tvarohu na strouhání"
+  ],
+  "instructions": [
+    "V teplém mléce rozmíchejte cukr a droždí a nechte 10 minut vzejít kvásek.",
+    "V míse nebo robotu smíchejte mouku se solí, přidejte kvásek, vejce, žloutek, rum a změklé máslo.",
+    "Hněťte těsto, dokud není hladké a nelepí se na stěny nádoby. Nechte kynout na teplém místě přikryté utěrkou cca 60 minut.",
+    "Vykynuté těsto vyválejte na pomoučněném vále na plát silný 1 cm a vykrájejte kolečka o průměru 6-8 cm.",
+    "Kolečka nechte na vále dokynout dalších 20 minut.",
+    "V hlubším hrnci rozpalte olej na 170 °C. Do středu každého vdolečku vytlačte prstem nebo štamprlí důlek.",
+    "Vdolečky vkládejte do oleje důlkem dolů. Smažte dozlatova z obou stran, poté nechte okapat na papírové utěrce.",
+    "Do každého důlku vložte povidla, navrch dejte lžičku zakysané smetany a zasypte strouhaným tvarohem."
+  ],
+  "applianceTips": "Při použití domácí pekárny zvolte program 'Těsto'. Ingredience vložte v pořadí tekutiny, poté sypké suroviny. Po skončení programu nechte těsto v pekárně ještě 20 minut v teple dojít pro lepší strukturu střídky.",
+  "expertJustification": "Přidání rumu do těsta funguje jako prevence nadměrného nasáknutí olejem díky rychlému odpařování alkoholu při smažení. Udržení teploty oleje kolem 170 °C je klíčové pro denaturaci proteinů a škrobů bez přepálení povrchu. Vyvážený poměr cukru a soli zajišťuje správný osmotický tlak pro kvasinky, což vede k vzdušnější struktuře.",
+  "applianceType": "Domácí pekárna",
+  "cookingTime": "120 min",
+  "difficulty": "Střední",
+  "category": "Sladká jídla a moučníky",
+  "id": "gen-1781777265750"
+}

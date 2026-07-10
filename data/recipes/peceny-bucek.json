@@ -1,0 +1,29 @@
+{
+  "id": "bucek",
+  "title": "Pečený bůček",
+  "summary": "Šťavnatý vepřový bůček s křupavou kůrkou.",
+  "cookingTime": "55 min",
+  "difficulty": "Střední",
+  "applianceType": "Horkovzdušná fritéza",
+  "ingredients": [
+    "1 kg vepřového bůčku (s kůží, bez kosti)",
+    "2 lžičky hrubozrnné soli",
+    "1 lžička drceného kmínu",
+    "4 stroužky česneku (utřené)",
+    "1 lžíce jablečného octa",
+    "1 lžička kukuřičného škrobu"
+  ],
+  "instructions": [
+    "Kůži bůčku ostrým nožem nakrájejte do mřížky (řežte pouze do tuku, ne do masa).",
+    "Do masa ze spodní a bočních stran vetřete utřený česnek, kmín a sůl. Kůži nechte čistou.",
+    "Osušte kůži papírovou utěrkou, potřete jablečným octem a rovnoměrně posypejte tenkou vrstvou soli smíchané s kukuřičným škrobem.",
+    "Vložte bůček do koše fritézy kůží dolů a pečte na 160 °C po dobu 35 minut, aby se maso prohřálo a tuk začal pomalu odtékat.",
+    "Opatrně bůček otočte kůží nahoru. Zvyšte teplotu na 200 °C a pečte dalších 15 až 20 minut, dokud kůže nevytvoří puchýřky a nebude extrémně křupavá.",
+    "Před krájením nechte bůček 10 minut odpočinout na prkénku, aby se šťávy uvnitř stabilizovaly."
+  ],
+  "applianceTips": "V horkovzdušné fritéze cirkuluje vzduch velmi rychle. Kukuřičný škrob a ocet na kůži vytáhnou přebytečnou vlhkost z povrchových buněk, což zaručí bleskové vytvoření křupavé krusty bez vysušení celého kusu masa.",
+  "expertJustification": "Podle fyziky tepla: Dvoufázová metoda kombinuje pomalou želatinizaci kolagenu (při 160 °C, kdy maso změkne a pustí tuk) s bleskovou dehydratací kůže při vysoké teplotě (200 °C), která prudce expanduje vzduchové kapsy v kůži.",
+  "category": "Maso",
+  "isDefault": true,
+  "updatedAt": "2026-07-10T06:30:05.907Z"
+}

@@ -1,0 +1,33 @@
+{
+  "title": "Mazanec",
+  "summary": "Bohaté kynuté těsto s máslem a rozinkami, optimalizované pro dosažení vláčné střídky a stabilní kůrky.",
+  "ingredients": [
+    "250 g hladké mouky (ideálně typ 00)",
+    "250 g polohrubé mouky",
+    "210 ml plnotučného mléka (vlažné)",
+    "125 g změklého másla",
+    "100 g krupicového cukru",
+    "5 ks žloutků (pokojová teplota)",
+    "30 g čerstvého droždí",
+    "5 g jemné soli",
+    "5 g čerstvé citronové kůry",
+    "50 g rozinek namočených v 20 ml rumu",
+    "30 g mandlových plátků na ozdobu"
+  ],
+  "instructions": [
+    "Rozdrobené droždí smíchejte se lžící cukru a trochou vlažného mléka; nechte v teple vzejít kvásek.",
+    "Veškeré suroviny kromě másla a rozinek hněťte v robotu 10 minut na nízkou rychlost, dokud nevznikne kompaktní těsto.",
+    "Postupně přidávejte změklé máslo a hněťte dalších 10-12 minut, dokud se těsto nelepí na stěny mísy.",
+    "Vpracujte rozinky s rumem a nechte těsto kynout v teple 90 minut, dokud nezdvojnásobí svůj objem.",
+    "Těsto vyklopte, vytvarujte pevný bochník a nechte na plechu kynout dalších 60 minut pod utěrkou.",
+    "Povrch potřete žloutkem, posypte mandlemi a pečte dle instrukcí pro teplotu.",
+    "Pečte prvních 10 minut na 180 °C, poté snižte na 160 °C a dopečte do vnitřní teploty 92 °C."
+  ],
+  "applianceTips": "Při použití domácí pekárny zvolte program 'Těsto'. Po ukončení programu vyjměte, vytvarujte bochník a nechte dokynout v teple mimo stroj. Pokud používáte multifunkční horkovzdušnou troubu, aktivujte funkci 'Steam' nebo vložte na dno pekáč s horkou vodou pro lepší nárůst a tenčí kůrku.",
+  "expertJustification": "Prodloužení doby hnětení s tukem je klíčové pro správnou tvorbu lepkové sítě, která udrží těžké těsto bohaté na žloutky. Snížení teploty pečení po prvních 10 minutách zabrání rychlému vysušení kůrky a umožní rovnoměrný nárůst bez praskání. Vnitřní teplota 92 °C je objektivním indikátorem bezpečného propečení, kdy je škrob kompletně želatinizovaný, ale vaječné bílkoviny zůstávají ještě vláčné.",
+  "applianceType": "Klasická trouba",
+  "cookingTime": "240 min",
+  "difficulty": "Střední",
+  "category": "Pečivo",
+  "id": "gen-1781776592663"
+}

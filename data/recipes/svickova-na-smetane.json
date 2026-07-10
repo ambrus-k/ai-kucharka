@@ -1,0 +1,42 @@
+{
+  "id": "svickova",
+  "title": "Svíčková na smetaně",
+  "summary": "Tradiční svíčková na smetaně zjemněná karamelizací zeleniny v multifunkčním hrnci.",
+  "cookingTime": "90 min",
+  "difficulty": "Složité",
+  "applianceType": "Multifunkční hrnec",
+  "ingredients": [
+    "800g hovězí zadní (váleček nebo loupaná plec)",
+    "50g špeku (nakrájeného na klínky na špikováni)",
+    "200g mrkve (očištěné a nastrouhané)",
+    "150g celeru (očištěného a nastrouhaného)",
+    "100g petržele (očištěné a nastrouhané)",
+    "1 velká cibule (nadrobno nakrájená)",
+    "2 lžíce plnotučné hořčice",
+    "2 lžíce octa",
+    "3 lžíce cukru krupice",
+    "5 ks kuliček nového koření",
+    "10 ks kuliček černého pepře",
+    "4 ks bobkových listů",
+    "500ml hovězího vývaru",
+    "250ml smetany ke šlehání (33% tuku)",
+    "50g másla",
+    "Sůl a čerstvě mletý pepř",
+    "Citrónová šťáva na dochucení"
+  ],
+  "instructions": [
+    "Hovězí maso prošpikujte vychlazeným špekem, osolte a opepřete ze všech stran.",
+    "V multifunkčním hrnci (program Smažení/Saute) rozpusťte kousek másla a maso ze všech stran zprudka zatáhněte. Poté ho vyjměte.",
+    "Do výpěku přidejte nastrouhanou kořenovou zeleninu. Smažte ji do sytě zlatohnědé barvy (karamelizace cukrů v zelenině trvá asi 10 minut).",
+    "Přidejte cibuli, krátce osmahněte, přisypte cukr a nechte ho lehce zkaramelizovat. Zapracujte hořčici a zalijte octem – nechte zcela odpařit.",
+    "Vložte zpět maso, přidejte koření (nejlépe v čajovém sítku pro snadné vyjmutí) a zalijte teplým vývarem tak, aby sahal do poloviny masa.",
+    "Hrnec uzavřete a zapněte program Tlakové vaření (High Pressure) na 45 minut. Po skončení nechte tlak přirozeně klesnout (15-20 min).",
+    "Vyjměte maso a koření. Obsah hrnce přelijte do mixéru nebo přímo v hrnci rozmixujte tyčovým mixérem do hladka.",
+    "Přilijte smetanu, přidejte studené máslo na zjemnění a nechte krátce provařit bez pokličky na mírný stupeň.",
+    "Ochuťte solí, pepřem a citrónovou šťávou. Maso nakrájejte na plátky a podávejte s omáčkou a houskovým knedlíkem."
+  ],
+  "applianceTips": "Při vaření v multifunkčním nebo tlakovém hrnci nedochází k odpařování tekutiny jako v klasickém rendlíku. Proto nepoužívejte zbytečně mnoho vývaru – zelenina s masem pustí vlastní šťávu, což zesílí chuť omáčke bez nutnosti zahušťování moukou.",
+  "expertJustification": "Svíčková podle food science: Reakce zeleniny s cukrem spouští Maillardovu reakci, která dodává omáčce hlubokou sladkost. Rychlé zchlazení másla na závěr emulguje tuk s tekutinou, což vytvoří sametovou texturu bez jakékoli mouky. Zatažení masa zabrání nadměrnému úniku šťávy během tlakového vaření.",
+  "category": "Maso",
+  "isDefault": true
+}

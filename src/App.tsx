@@ -69,19 +69,19 @@ const REMOTE_DB_URL = (() => {
   // 2. Look for personal GitHub username override in localStorage for sharing
   const storedGithubName = localStorage.getItem("ai_kucharka_github_username");
   if (storedGithubName && storedGithubName.trim() !== "") {
-    const repo = localStorage.getItem("ai_kucharka_github_repo") || "ai-kucharka-data";
+    const repo = localStorage.getItem("ai_kucharka_github_repo") || "ai-kucharka";
     const branch = localStorage.getItem("ai_kucharka_github_branch") || "main";
     const path = localStorage.getItem("ai_kucharka_github_path") || "recipes.json";
     return `https://raw.githubusercontent.com/${storedGithubName.trim()}/${repo.trim()}/${branch.trim()}/${path.trim()}`;
   }
 
-  // 3. Fallback when NOT in Studio (the live Vercel version): always load from ambrus-k/ai-kucharka-data
+  // 3. Fallback when NOT in Studio (the live Vercel version): always load from main repo
   if (!isStudioEnv) {
-    return "https://raw.githubusercontent.com/ambrus-k/ai-kucharka-data/main/recipes.json";
+    return "https://raw.githubusercontent.com/ambrus-k/ai-kucharka/main/recipes.json";
   }
 
   // 4. Default template in Studio
-  return "https://raw.githubusercontent.com/ambrus-k/ai-kucharka-data/main/recipes.json";
+  return "https://raw.githubusercontent.com/ambrus-k/ai-kucharka/main/recipes.json";
 })();
 
 
@@ -426,7 +426,7 @@ export default function App() {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [activeTab, setActiveTab] = useState<"admin" | "github">("admin");
   const [githubUser, setGithubUser] = useState(() => localStorage.getItem("ai_kucharka_github_username") || "ambrus-k");
-  const [githubRepo, setGithubRepo] = useState(() => localStorage.getItem("ai_kucharka_github_repo") || "ai-kucharka-data");
+  const [githubRepo, setGithubRepo] = useState(() => localStorage.getItem("ai_kucharka_github_repo") || "ai-kucharka");
   const [githubToken, setGithubToken] = useState(() => localStorage.getItem("ai_kucharka_github_token") || "");
   const [githubBranch, setGithubBranch] = useState(() => localStorage.getItem("ai_kucharka_github_branch") || "main");
   const [githubPath, setGithubPath] = useState(() => localStorage.getItem("ai_kucharka_github_path") || "recipes.json");
@@ -1929,7 +1929,7 @@ ${separator}`;
       try {
         const headers: Record<string, string> = {};
         const storedUser = localStorage.getItem("ai_kucharka_github_username") || "ambrus-k";
-        const storedRepo = localStorage.getItem("ai_kucharka_github_repo") || "ai-kucharka-data";
+        const storedRepo = localStorage.getItem("ai_kucharka_github_repo") || "ai-kucharka";
         const storedBranch = localStorage.getItem("ai_kucharka_github_branch") || "main";
         const storedToken = localStorage.getItem("ai_kucharka_github_token") || "";
 
@@ -2012,7 +2012,7 @@ ${separator}`;
       };
 
       const storedUser = localStorage.getItem("ai_kucharka_github_username") || "ambrus-k";
-      const storedRepo = localStorage.getItem("ai_kucharka_github_repo") || "ai-kucharka-data";
+      const storedRepo = localStorage.getItem("ai_kucharka_github_repo") || "ai-kucharka";
       const storedBranch = localStorage.getItem("ai_kucharka_github_branch") || "main";
       const storedToken = localStorage.getItem("ai_kucharka_github_token") || "";
 
@@ -3010,40 +3010,6 @@ ${separator}`;
               <li>Bezpečnostní analýza kuchařských chyb</li>
               <li>Inženýrství moderních spotřebičů</li>
             </ul>
-
-            {/* GITHUB LIVE CONNECTION STATUS */}
-            <div className="mt-2 pt-2 border-t border-[#E8E8E1] flex flex-col gap-1">
-              <div className="flex items-center justify-between text-[10px]">
-                <span className="font-semibold text-[#1B4332] uppercase tracking-wider">GitHub Synchronizace:</span>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setActiveTab("github");
-                    setShowLoginModal(true);
-                  }}
-                  className="text-[9px] text-[#2D6A4F] hover:underline cursor-pointer font-bold"
-                >
-                  Nastavit
-                </button>
-              </div>
-              <div 
-                className="flex items-center gap-1.5 p-1.5 bg-white border border-[#E8E8E1] rounded-md text-[10px] cursor-pointer hover:bg-slate-50 transition-all shadow-xs"
-                onClick={() => {
-                  setActiveTab("github");
-                  setShowLoginModal(true);
-                }}
-                title="Klikněte pro zobrazení diagnostiky připojení nebo konfiguraci"
-              >
-                <div className={`h-2 w-2 rounded-full ${serverlessApiError ? "bg-red-500 animate-pulse" : serverlessApiSuccess ? "bg-emerald-500" : "bg-amber-400 animate-pulse"}`} />
-                <span className="font-medium text-slate-700 truncate max-w-[150px]">
-                  {serverlessApiError 
-                    ? "Chyba připojení" 
-                    : serverlessApiSuccess 
-                      ? `Připojeno (uživatel: ${githubUser})` 
-                      : "Probíhá připojování..."}
-                </span>
-              </div>
-            </div>
 
             {/* BACKUP & RESTORE OF RECIPES */}
             <div className="mt-2 pt-2 border-t border-[#E8E8E1] flex flex-col gap-1.5">
@@ -4570,23 +4536,21 @@ ${separator}`;
         );
       })()}
 
-      {/* ADMINISTRÁTORSKÝ PŘIHLÁŠENÍ & GITHUB CONFIG MODAL */}
+      {/* ADMINISTRÁTORSKÝ PŘIHLÁŠENÍ MODAL */}
       {showLoginModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs no-print">
           <div className="bg-[#FDFCF7] border border-[#E8E8E1] rounded-2xl shadow-xl w-full max-w-md overflow-hidden flex flex-col">
             {/* Header */}
             <div className="bg-[#1B4332] p-5 text-white flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Settings className="h-5 w-5 text-[#52B788]" />
-                <h3 className="font-bold text-lg tracking-tight">Nastavení & Připojení</h3>
+                <Lock className="h-5 w-5 text-[#52B788]" />
+                <h3 className="font-bold text-lg tracking-tight">Administrátorské přihlášení</h3>
               </div>
               <button
                 type="button"
                 onClick={() => {
                   setShowLoginModal(false);
                   setLoginError(null);
-                  setGithubStatusResult(null);
-                  setSaveGithubConfigSuccess(null);
                 }}
                 className="text-white/80 hover:text-white hover:bg-white/10 p-1.5 rounded-lg transition-all"
               >
@@ -4594,263 +4558,76 @@ ${separator}`;
               </button>
             </div>
 
-            {/* Tabs */}
-            <div className="flex border-b border-[#E8E8E1] bg-[#F5F5F0]">
-              <button
-                type="button"
-                onClick={() => setActiveTab("admin")}
-                className={`flex-1 py-3 text-center text-xs font-bold uppercase tracking-wider transition-all border-r border-[#E8E8E1] ${
-                  activeTab === "admin"
-                    ? "bg-[#FDFCF7] text-[#1B4332] border-b-2 border-b-[#1B4332]"
-                    : "text-slate-500 hover:text-slate-800 hover:bg-slate-100"
-                }`}
-              >
-                🔐 Administrace
-              </button>
-              <button
-                type="button"
-                onClick={() => setActiveTab("github")}
-                className={`flex-1 py-3 text-center text-xs font-bold uppercase tracking-wider transition-all ${
-                  activeTab === "github"
-                    ? "bg-[#FDFCF7] text-[#1B4332] border-b-2 border-b-[#1B4332]"
-                    : "text-slate-500 hover:text-slate-800 hover:bg-slate-100"
-                }`}
-              >
-                🐙 GitHub Připojení
-              </button>
-            </div>
-
             {/* Content */}
-            {activeTab === "admin" ? (
-              <form
-                onSubmit={async (e) => {
-                  e.preventDefault();
-                  const form = e.currentTarget;
-                  const passwordInput = form.elements.namedItem("adminPassword") as HTMLInputElement;
-                  const success = await handleLoginWithPassword(passwordInput.value);
-                  if (success) {
-                    setShowLoginModal(false);
-                  }
-                }}
-                className="p-6 space-y-4 text-slate-700 flex flex-col flex-1"
-              >
-                <div className="space-y-2">
-                  <label className="block text-sm font-bold text-[#1B4332]">
-                    Kulinářský API klíč (Administrační heslo)
-                  </label>
-                  <input
-                    type="password"
-                    name="adminPassword"
-                    placeholder="Zadejte heslo..."
-                    required
-                    disabled={isLoginLoading}
-                    className="w-full px-4 py-2.5 bg-white border border-[#E8E8E1] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1B4332] focus:border-transparent font-sans text-sm disabled:bg-slate-50 disabled:text-slate-400"
-                  />
-                </div>
-
-                {loginError && (
-                  <div className="p-3 bg-red-50 border border-red-200 text-red-800 rounded-xl text-xs flex items-center gap-2">
-                    <AlertCircle className="h-4 w-4 text-red-600 shrink-0" />
-                    <span>{loginError}</span>
-                  </div>
-                )}
-
-                {/* Instructions on how to set/configure it */}
-                <div className="bg-amber-50 border border-amber-200 text-amber-900 rounded-xl p-4 text-[11px] leading-relaxed space-y-1.5">
-                  <p className="font-bold uppercase tracking-wider text-amber-950 flex items-center gap-1">
-                    💡 Jak nastavit administrátorské heslo?
-                  </p>
-                  <p>
-                    Vaše administrátorské heslo je spravováno bezpečně na serveru.
-                  </p>
-                  <ol className="list-decimal pl-4 space-y-1">
-                    <li>Otevřete soubor <code className="font-mono bg-amber-100 px-1 py-0.5 rounded font-bold">.env</code> v kořenovém adresáři.</li>
-                    <li>Přidejte nebo upravte řádek s proměnnou <code className="font-mono bg-amber-100 px-1 py-0.5 rounded font-bold">ADMIN_PASSWORD=moje_super_tajne_heslo</code>.</li>
-                    <li>Po uložení souboru restartujte vývojový server nebo aplikaci znovu nasaďte.</li>
-                  </ol>
-                </div>
-
-                {/* Footer */}
-                <div className="pt-2 flex justify-end gap-3 mt-auto">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setShowLoginModal(false);
-                      setLoginError(null);
-                    }}
-                    className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-800 rounded-xl text-sm font-semibold transition-all cursor-pointer border border-slate-200"
-                  >
-                    Zavřít
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={isLoginLoading}
-                    className="px-4 py-2 bg-[#1B4332] hover:bg-[#153528] text-white rounded-xl text-sm font-bold shadow-sm transition-all cursor-pointer disabled:bg-slate-300 disabled:text-slate-500 disabled:cursor-not-allowed flex items-center gap-1.5"
-                  >
-                    {isLoginLoading ? "Ověřování..." : "Přihlásit se"}
-                  </button>
-                </div>
-              </form>
-            ) : (
-              <div className="p-6 space-y-4 text-slate-700 flex flex-col overflow-y-auto max-h-[60vh]">
-                <div className="space-y-3">
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-1">
-                      <label className="block text-xs font-bold text-[#1B4332]">
-                        GitHub Uživatel (Vlastník)
-                      </label>
-                      <input
-                        type="text"
-                        value={githubUser}
-                        onChange={(e) => setGithubUser(e.target.value)}
-                        placeholder="Např. ambrus-k"
-                        className="w-full px-3 py-2 bg-white border border-[#E8E8E1] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1B4332] text-xs font-sans"
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <label className="block text-xs font-bold text-[#1B4332]">
-                        Repozitář
-                      </label>
-                      <input
-                        type="text"
-                        value={githubRepo}
-                        onChange={(e) => setGithubRepo(e.target.value)}
-                        placeholder="Např. ai-kucharka"
-                        className="w-full px-3 py-2 bg-white border border-[#E8E8E1] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1B4332] text-xs font-sans"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-1">
-                      <label className="block text-xs font-bold text-[#1B4332]">
-                        Větev (Branch)
-                      </label>
-                      <input
-                        type="text"
-                        value={githubBranch}
-                        onChange={(e) => setGithubBranch(e.target.value)}
-                        placeholder="Např. main"
-                        className="w-full px-3 py-2 bg-white border border-[#E8E8E1] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1B4332] text-xs font-sans"
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <label className="block text-xs font-bold text-[#1B4332]">
-                        Složka s recepty
-                      </label>
-                      <input
-                        type="text"
-                        disabled
-                        value="recipes/"
-                        className="w-full px-3 py-2 bg-slate-100 border border-[#E8E8E1] rounded-xl text-xs font-sans text-slate-500 cursor-not-allowed"
-                        title="Recepty jsou ukládány do vyhrazené složky recipes/"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-1">
-                    <label className="block text-xs font-bold text-[#1B4332] flex items-center justify-between">
-                      <span>Osobní Přístupový Token (PAT)</span>
-                      <span className="text-[10px] text-slate-400 font-normal">Vyžadováno pro ukládání</span>
-                    </label>
-                    <input
-                      type="password"
-                      value={githubToken}
-                      onChange={(e) => setGithubToken(e.target.value)}
-                      placeholder="ghp_..."
-                      className="w-full px-3 py-2 bg-white border border-[#E8E8E1] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1B4332] text-xs font-sans"
-                    />
-                  </div>
-                </div>
-
-                {/* Connection Status and Diagnostic Panel */}
-                <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-2.5">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-[#1B4332] flex items-center gap-1">
-                      📡 Diagnostika připojení
-                    </span>
-                    <button
-                      type="button"
-                      disabled={isTestingConnection}
-                      onClick={() => handleTestGithubConnection(githubUser, githubRepo, githubBranch, githubToken)}
-                      className="px-2.5 py-1 bg-white hover:bg-slate-100 border border-slate-200 rounded-lg text-[10px] font-bold text-[#1B4332] flex items-center gap-1 cursor-pointer transition-all disabled:opacity-50"
-                    >
-                      <RefreshCw className={`h-2.5 w-2.5 ${isTestingConnection ? "animate-spin" : ""}`} />
-                      <span>{isTestingConnection ? "Ověřování..." : "Testovat připojení"}</span>
-                    </button>
-                  </div>
-
-                  {githubStatusResult ? (
-                    <div className="text-xs space-y-2">
-                      {githubStatusResult.connected ? (
-                        <div className="p-2.5 bg-emerald-50 border border-emerald-100 text-emerald-950 rounded-lg space-y-1.5">
-                          <p className="font-bold flex items-center gap-1 text-emerald-800">
-                            <Check className="h-3.5 w-3.5 text-emerald-600" />
-                            Připojení k GitHubu je ONLINE!
-                          </p>
-                          <ul className="list-disc pl-4 space-y-0.5 text-[11px] text-emerald-900">
-                            <li>Repozitář <strong>{githubStatusResult.owner}/{githubStatusResult.repo}</strong> nalezen.</li>
-                            <li>Zápis povolen (token nastaven): <strong>{githubStatusResult.hasToken ? "Ano" : "Ne (Pouze ke čtení)"}</strong></li>
-                            <li>Nalezený soubor <code>recipes.json</code>: <strong>{githubStatusResult.recipesJsonExists ? "Ano" : "Ne"}</strong></li>
-                            <li>Nalezená složka <code>recipes/</code>: <strong>{githubStatusResult.recipesFolderExists ? "Ano" : "Ne"}</strong></li>
-                            <li>Počet receptů online: <strong>{githubStatusResult.recipeCount}</strong></li>
-                          </ul>
-                          {githubStatusResult.recipeCount === 0 && (
-                            <p className="text-[10px] text-amber-800 italic mt-1 leading-normal">
-                              💡 Repozitář je online, ale neobsahuje recepty. Jsou načteny výchozí vestavěné recepty. Prvním uložením nebo úpravou se recepty zapíší na váš GitHub do složky <code>recipes/</code>.
-                            </p>
-                          )}
-                        </div>
-                      ) : (
-                        <div className="p-2.5 bg-red-50 border border-red-100 text-red-950 rounded-lg space-y-1">
-                          <p className="font-bold flex items-center gap-1 text-red-800">
-                            <AlertCircle className="h-3.5 w-3.5 text-red-600 shrink-0" />
-                            Chyba připojení k GitHubu
-                          </p>
-                          <p className="text-[11px] text-red-900 leading-normal">
-                            {githubStatusResult.errorMessage || "Nepodařilo se připojit k repozitáři."}
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  ) : (
-                    <p className="text-[10px] text-slate-500 italic">
-                      Klikněte na „Testovat připojení“ pro ověření stavu vašeho GitHub repozitáře.
-                    </p>
-                  )}
-                </div>
-
-                {saveGithubConfigSuccess && (
-                  <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-xs flex items-center gap-2">
-                    <Check className="h-4 w-4 text-emerald-600 shrink-0" />
-                    <span>{saveGithubConfigSuccess}</span>
-                  </div>
-                )}
-
-                {/* Footer */}
-                <div className="pt-2 flex justify-end gap-3 mt-auto">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setShowLoginModal(false);
-                      setGithubStatusResult(null);
-                      setSaveGithubConfigSuccess(null);
-                    }}
-                    className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-800 rounded-xl text-sm font-semibold transition-all cursor-pointer border border-slate-200"
-                  >
-                    Zavřít
-                  </button>
-                  <button
-                    type="button"
-                    disabled={isSavingGithubConfig}
-                    onClick={() => handleSaveGithubConfig(githubUser, githubRepo, githubBranch, githubToken)}
-                    className="px-4 py-2 bg-[#1B4332] hover:bg-[#153528] text-white rounded-xl text-sm font-bold shadow-sm transition-all cursor-pointer disabled:bg-slate-300 disabled:text-slate-500 flex items-center gap-1.5"
-                  >
-                    {isSavingGithubConfig ? "Ukládání..." : "Uložit nastavení"}
-                  </button>
-                </div>
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
+                const form = e.currentTarget;
+                const passwordInput = form.elements.namedItem("adminPassword") as HTMLInputElement;
+                const success = await handleLoginWithPassword(passwordInput.value);
+                if (success) {
+                  setShowLoginModal(false);
+                }
+              }}
+              className="p-6 space-y-4 text-slate-700 flex flex-col flex-1"
+            >
+              <div className="space-y-2">
+                <label className="block text-sm font-bold text-[#1B4332]">
+                  Kulinářský API klíč (Administrační heslo)
+                </label>
+                <input
+                  type="password"
+                  name="adminPassword"
+                  placeholder="Zadejte heslo..."
+                  required
+                  disabled={isLoginLoading}
+                  className="w-full px-4 py-2.5 bg-white border border-[#E8E8E1] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1B4332] focus:border-transparent font-sans text-sm disabled:bg-slate-50 disabled:text-slate-400"
+                />
               </div>
-            )}
+
+              {loginError && (
+                <div className="p-3 bg-red-50 border border-red-200 text-red-800 rounded-xl text-xs flex items-center gap-2">
+                  <AlertCircle className="h-4 w-4 text-red-600 shrink-0" />
+                  <span>{loginError}</span>
+                </div>
+              )}
+
+              {/* Instructions on how to set/configure it */}
+              <div className="bg-amber-50 border border-amber-200 text-amber-900 rounded-xl p-4 text-[11px] leading-relaxed space-y-1.5">
+                <p className="font-bold uppercase tracking-wider text-amber-950 flex items-center gap-1">
+                  💡 Jak nastavit administrátorské heslo?
+                </p>
+                <p>
+                  Vaše administrátorské heslo je spravováno bezpečně na serveru.
+                </p>
+                <ol className="list-decimal pl-4 space-y-1">
+                  <li>Otevřete soubor <code className="font-mono bg-amber-100 px-1 py-0.5 rounded font-bold">.env</code> v kořenovém adresáři.</li>
+                  <li>Přidejte nebo upravte řádek s proměnnou <code className="font-mono bg-amber-100 px-1 py-0.5 rounded font-bold">ADMIN_PASSWORD=moje_super_tajne_heslo</code>.</li>
+                  <li>Po uložení souboru restartujte vývojový server nebo aplikaci znovu nasaďte.</li>
+                </ol>
+              </div>
+
+              {/* Footer */}
+              <div className="pt-2 flex justify-end gap-3 mt-auto">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowLoginModal(false);
+                    setLoginError(null);
+                  }}
+                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-800 rounded-xl text-sm font-semibold transition-all cursor-pointer border border-slate-200"
+                >
+                  Zavřít
+                </button>
+                <button
+                  type="submit"
+                  disabled={isLoginLoading}
+                  className="px-4 py-2 bg-[#1B4332] hover:bg-[#153528] text-white rounded-xl text-sm font-bold shadow-sm transition-all cursor-pointer disabled:bg-slate-300 disabled:text-slate-500 disabled:cursor-not-allowed flex items-center gap-1.5"
+                >
+                  {isLoginLoading ? "Ověřování..." : "Přihlásit se"}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

@@ -1,0 +1,32 @@
+{
+  "title": "Krkonošské kyselo",
+  "summary": "Tradiční hustá polévka založená na fermentovaném žitném kvásku, vylepšená precizní technikou vaření pro dosažení vyvážené kyselosti a textury.",
+  "ingredients": [
+    "200 g aktivního žitného kvásku",
+    "1,2 l horkého zeleninového vývaru",
+    "20 g sušených hub (předem namočených)",
+    "500 g brambor (varný typ A)",
+    "4 ks čerstvých vajec",
+    "1 velká žlutá cibule",
+    "50 g másla",
+    "100 ml smetany ke šlehání 33 %",
+    "1 lžička drceného kmínu",
+    "Sůl podle chuti"
+  ],
+  "instructions": [
+    "Brambory uvařte ve slupce do měkka, nechte vychladnout, oloupejte a nakrájejte na úhledné kostky.",
+    "Do hrnce vlijte horký vývar, přidejte namočené houby i s tekutinou a kmín.",
+    "Do vývaru za stálého metličkového míchání vlijte kvásek. Začněte zahřívat a vařte na mírném ohni 20 minut, aby se aktivní látky v kvásku stabilizovaly a houby změkly.",
+    "Mezitím na pánvi na másle orestujte nadrobno nakrájenou cibuli dosklovata.",
+    "Do pánve k cibuli rozklepněte vejce a připravte vláčná míchaná vajíčka tak, aby zůstala lehce krémová.",
+    "Do polévky vmíchejte smetanu, dochuťte solí a krátce prohřejte (již nevařte prudce).",
+    "Při servírování vložte do každého talíře hrst brambor, přelijte polévkou a navrch přidejte připravená vejce s cibulkou."
+  ],
+  "applianceTips": "Při použití Thermomixu vložte vývar, houby a kmín do nádoby a vařte 10 min/100 °C/zpětný chod (rychlost 1). Přidejte kvásek a vařte dalších 15 min/90 °C/zpětný chod (rychlost 2), čímž zamezíte přichycení kvásku ke dnu.",
+  "expertJustification": "Změna postupu vaření vajec a brambor zamezuje jejich rozvaření a zakalení polévky. Přidání kvásku do horkého (ne vroucího) vývaru zajišťuje lepší želatinizaci škrobů bez rizika sražení. Separátní příprava vajec zajišťuje, že polévka zůstane čirá a vejce vytvoří v textuře žádoucí kontrastní elementy.",
+  "applianceType": "Thermomix / Kuchyňský robot",
+  "cookingTime": "40 min",
+  "difficulty": "Střední",
+  "category": "Polévky",
+  "id": "gen-1781777007027"
+}

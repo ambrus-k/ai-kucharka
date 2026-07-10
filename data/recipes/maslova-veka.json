@@ -1,0 +1,27 @@
+{
+  "title": "Máslová veka",
+  "summary": "Tradiční nadýchané pečivo s obsahem másla pro jemnou texturu a křupavou kůrku.",
+  "ingredients": [
+    "285 g vlažného plnotučného mléka",
+    "60 g změklého másla",
+    "500 g hladké pšeničné mouky (typ 00 nebo na světlé pečivo)",
+    "11 g soli",
+    "6 g instantního droždí"
+  ],
+  "instructions": [
+    "Suroviny vložte do nádoby domácí pekárny v pořadí: tekutiny, máslo, mouka, sůl a droždí navrch.",
+    "Zvolte program Těsto, který zajistí důkladné propracování lepku pro optimální strukturu střídky.",
+    "Vykynuté těsto rozdělte na dvě stejné části a nechte 10 minut odpočinout pod utěrkou.",
+    "Každý díl vytvarujte do obdélníku, srolujte do pevného válečku a důkladně uzavřete sváry prsty.",
+    "Veky přeneste na plech s pečicím papírem, zakryjte a nechte v teple kynout 45 minut.",
+    "Potřete rozšlehaným vejcem pro zlatavý vzhled a pečte v předehřáté troubě na 190 °C po dobu 25 minut do tmavě zlaté barvy.",
+    "Po upečení nechte veky zcela vychladnout na mřížce, aby se ustálila střídka."
+  ],
+  "applianceTips": "Při použití domácí pekárny využijte funkci odloženého startu tak, aby těsto bylo připraveno přesně ve chvíli, kdy máte čas na tvarování. Pokud vlastníte parní troubu, využijte krátký cyklus páry v prvních 5 minutách pečení pro dosažení tenké a křupavé kůrky.",
+  "expertJustification": "Zvýšení teploty pečení na 190 °C zajistí rychlejší nárůst těsta v troubě (tzv. oven spring) předtím, než se kůrka uzavře. Použití mléka a tuku (másla) zvyšuje plasticitu těsta a jemnost střídky díky emulgaci a inhibici tvorby velkých lepkových vazeb. Důkladné uzavření svárů zabraňuje praskání veky během pečení.",
+  "applianceType": "Domácí pekárna",
+  "cookingTime": "120 min",
+  "difficulty": "Střední",
+  "category": "Pečivo",
+  "id": "gen-1781777771572"
+}

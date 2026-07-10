@@ -1,0 +1,35 @@
+{
+  "title": "Vánočka",
+  "summary": "Nadýchaná máslová vánočka připravená metodou omládku pro optimální strukturu střídky a dlouhotrvající vláčnost.",
+  "ingredients": [
+    "250 g hladké pšeničné mouky",
+    "250 g polohrubé pšeničné mouky",
+    "200 ml plnotučného mléka",
+    "110 g změklého másla",
+    "90 g krupicového cukru",
+    "4 ks žloutků",
+    "30 g čerstvého droždí",
+    "5 g soli",
+    "5 g jemně strouhané citronové kůry",
+    "50 g rozinek",
+    "20 ml tuzemského rumu",
+    "30 g plátkových mandlí",
+    "1 ks vejce na potření"
+  ],
+  "instructions": [
+    "V teplém mléce rozmíchejte droždí, 10 g cukru a 50 g hladké mouky. Nechte 20 minut vzejít kvásek.",
+    "Do mísy kuchyňského robota dejte mouku, zbylý cukr, sůl, citronovou kůru, žloutky, rum z namočených rozinek a kvásek.",
+    "Hněťte na nízkou rychlost 10 minut. Poté postupně přidávejte změklé máslo a hněťte dalších 12 minut, dokud není těsto hladké a elastické.",
+    "Do těsta krátce zapracujte rozinky a nechte kynout v teple 90 minut, v polovině času těsto přeložte.",
+    "Těsto rozdělte na 9 stejných dílů, vyválejte prameny a upleťte vánočku ze tří pater (4, 3 a 2 prameny).",
+    "Vánočku nechte na plechu kynout dalších 60–75 minut pod utěrkou.",
+    "Potřete rozšlehaným vejcem, posypte mandlemi a pečte prvních 10 minut na 180 °C, poté snižte na 160 °C a dopečte zhruba 35–40 minut do vnitřní teploty 92 °C."
+  ],
+  "applianceTips": "Pro automatizaci hnětení využijte kuchyňský robot s hnětacím hákem. Pro kynutí je ideální parní trouba s nastavenou funkcí kynutí (30 °C, vlhkost 70 %) nebo domácí pekárna, která těsto hněte i kyne při stabilní teplotě.",
+  "expertJustification": "Změna teploty a postupu vkládání másla (postupná inkorporace) zajišťuje správnou emulgaci tuků v lepkové síti, což zabraňuje 'těžkosti' těsta. Vnitřní teplota 92 °C je kritickým bodem pro denaturaci proteinů a želatinizaci škrobů, což zaručuje, že vánočka nebude uvnitř syrová, ale zároveň zůstane vláčná a nevysušená.",
+  "applianceType": "Kuchyňský robot",
+  "cookingTime": "240 min",
+  "difficulty": "Střední",
+  "category": "Pečivo",
+  "id": "gen-1781776790684"
+}

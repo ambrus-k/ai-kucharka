@@ -1,0 +1,26 @@
+{
+  "title": "Chléb žitno-pšeničný 5:3",
+  "summary": "Vylepšený recept s oddělenou autolýzou pro silnější strukturu střídy a precizní teplotní křivkou pečení.",
+  "ingredients": [
+    "200 g aktivního žitného kvásku",
+    "400 g žitné mouky chlebové T930",
+    "300 g pšeničné mouky chlebové T650",
+    "480 g vlažné vody",
+    "16 g soli",
+    "11 g celého kmínu"
+  ],
+  "instructions": [
+    "Smíchejte 400 g žitné mouky, 300 g pšeničné mouky a 480 g vody. Nechte 60 minut odpočívat (autolýza bez kvásku).",
+    "Do autolyzovaného těsta zapracujte 200 g kvásku, sůl a kmín. Důkladně prohněťte, dokud těsto není homogenní.",
+    "Nechte kynout 3 hodiny při pokojové teplotě (překládejte každých 45 minut), poté vytvarujte a dejte kynout do chladu na 12 hodin.",
+    "Pečte prvních 15 minut na 250 °C se zapařením, poté snižte na 210 °C na 20 minut a nakonec dopékejte 20 minut na 180 °C."
+  ],
+  "applianceTips": "Při závěrečné fázi pečení nechte mírně pootevřená dvířka trouby (na 1 cm) pro odvod přebytečné vlhkosti a získání křupavé krusty.",
+  "expertJustification": "Oddělená autolýza bez kvásku zabraňuje předčasné degradaci lepku kyselinami a postupný pokles teploty pečení zajistí propečení bez připálení žitných cukrů.",
+  "applianceType": "Elektrická horkovzdušná trouba",
+  "cookingTime": "17 hodin",
+  "difficulty": "Střední",
+  "category": "Pečivo",
+  "id": "gen-1783527082168",
+  "updatedAt": "2026-07-08T16:16:46.581Z"
+}

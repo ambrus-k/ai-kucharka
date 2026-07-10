@@ -1,0 +1,29 @@
+{
+  "title": "Tvarohový koláč",
+  "summary": "Vláčný tvarohový dezert s vyváženým poměrem bílkovin a strukturovanou texturou bez zbytečného přebytku cukru.",
+  "ingredients": [
+    "3 ks vejce (velikost M)",
+    "65 g máslo, rozpuštěné a zchladlé",
+    "150 g moučkový cukr",
+    "10 g vanilkový cukr",
+    "500 g plnotučný hrudkovitý tvaroh",
+    "45 g dětská krupička",
+    "8 g kypřicí prášek do pečiva",
+    "1 g sůl"
+  ],
+  "instructions": [
+    "Troubu předehřejte na 180 °C a dortovou formu vymažte máslem a vysypte krupicí.",
+    "Vejce s moučkovým a vanilkovým cukrem vyšlehejte kuchyňským robotem do světlé husté pěny (cca 5 minut).",
+    "Do pěny postupně zašlehejte rozpuštěné máslo při nízkých otáčkách.",
+    "Tvaroh krátce prošlehejte, aby se spojil, poté vmíchejte krupičku, kypřicí prášek a špetku soli.",
+    "Tvarohovou směs jemně stěrkou zapracujte do vaječné pěny, aby zůstala nadýchaná.",
+    "Těsto vlijte do připravené formy a pečte 35–40 minut dozlatova."
+  ],
+  "applianceTips": "Pokud používáte kuchyňský robot (např. Thermomix), použijte metlu pro šlehání vajec s cukrem na rychlost 4 po dobu 5 minut; následně tvaroh s ostatními surovinami vmíchejte na rychlost 2 po dobu 30 sekund, aby nedošlo k rozbití struktury pěny.",
+  "expertJustification": "Snížení počáteční teploty na 180 °C oproti původním 200 °C zabrání prudké denaturaci proteinů, díky čemuž koláč nepopraská a zůstane uvnitř vláčný. Správným vyšleháním vajec vytvoříme emulzi, která zajistí objem bez nutnosti přidávat nadbytečné množství kypřicích látek. Použití hrudkovitého tvarohu v kombinaci s krupičkou zajišťuje správnou želatinizaci škrobu, což vytváří pevnou, ale krémovou texturu.",
+  "applianceType": "Klasická trouba",
+  "cookingTime": "50 min",
+  "difficulty": "Snadné",
+  "category": "Sladká jídla a moučníky",
+  "id": "gen-1781777341621"
+}

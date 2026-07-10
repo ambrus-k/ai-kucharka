@@ -1,0 +1,28 @@
+{
+  "title": "Chléb kváskový",
+  "summary": "Venkovský chléb s vylepšenou hydratací a řízenou fermentací pro maximální střídku a křupavou kůrku.",
+  "ingredients": [
+    "230 g žitné chlebové mouky",
+    "320 g pšeničné chlebové mouky",
+    "380 g vody (vlažné, 22 °C)",
+    "150 g aktivního žitného kvásku (100% hydratace)",
+    "13 g jemné mořské soli",
+    "7 g drceného kmínu"
+  ],
+  "instructions": [
+    "Ve velké míse nebo robotu smíchejte kvásek s vodou, přidejte obě mouky a nechte 30 minut odpočívat (autolýza).",
+    "Přidejte sůl a kmín. Hněťte v robotu 5 minut na nízkou rychlost, dokud není těsto hladké a nelepivé.",
+    "Během 2 hodin kynutí proveďte 2x překlad těsta v intervalu 45 minut pro vytvoření struktury lepku.",
+    "Těsto vytvarujte do bochníku a vložte do pomoučněné ošatky.",
+    "Nechte 1 hodinu kynout při pokojové teplotě, poté přesuňte do lednice na 8–12 hodin (retardace).",
+    "Troubu předehřejte na 250 °C s litinovým hrncem uvnitř. Chléb nařízněte, vložte do hrnce a pečte pod poklicí 20 minut.",
+    "Odstraňte poklici, snižte teplotu na 210 °C a dopečte dalších 25–30 minut do tmavě hnědé kůrky."
+  ],
+  "applianceTips": "Při pečení v domácí pekárně využijte pouze program 'Hnětení' a následně 'Kynutí', samotné pečení vždy provádějte v troubě v litinovém hrnci, který simuluje profesionální parní pec.",
+  "expertJustification": "Snížení teploty vody na 22 °C zabraňuje příliš rychlému kvašení a chrání strukturu lepku. Autolýza (odpočinek mouky s vodou) umožní enzymům lépe rozložit škroby, což vede k lepší stravitelnosti a delší trvanlivosti střídky. Litinový hrnec nahrazuje průmyslové zapařovací systémy, čímž udržuje vlhkost kolem kůrky po kritickou dobu počátečního pečení (tzv. oven spring), což je zásadní pro objem.",
+  "applianceType": "Klasická trouba",
+  "cookingTime": "14 hodin",
+  "difficulty": "Střední",
+  "category": "Pečivo",
+  "id": "gen-1781775669504"
+}

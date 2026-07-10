@@ -1,0 +1,32 @@
+{
+  "title": "Loupáky",
+  "summary": "Tradiční sladké pečivo s vylepšenou strukturou díky kombinaci másla a sádla pro maximální vláčnost.",
+  "ingredients": [
+    "500 g hladké pšeničné mouky (ideálně typ 00)",
+    "250 ml plnotučného mléka (vlažného)",
+    "40 g másla (změklého)",
+    "40 g vepřového sádla (změklého)",
+    "70 g cukru krupice",
+    "8 g soli",
+    "2 žloutky",
+    "21 g čerstvého droždí",
+    "Kůra z 1/2 bio citronu",
+    "1 vejce na potření",
+    "Mák na posyp"
+  ],
+  "instructions": [
+    "Vložte suroviny do nádoby domácí pekárny v pořadí tekutiny, tuky, cukr a mouka, sůl do rohu a droždí do důlku v mouce.",
+    "Zvolte program Těsto (cca 110 minut), který zajistí optimální vypracování lepkové sítě.",
+    "Vykynuté těsto rozdělte na 12 stejných částí a vyválejte do podoby úzkého trojúhelníku.",
+    "Trojúhelníky srolujte od základny ke špičce a vytvarujte do podkovy.",
+    "Přeneste na plech s pečicím papírem a nechte kynout na teplém místě 35 minut pod utěrkou.",
+    "Potřete rozšlehaným vejcem, posypte mákem a pečte v předehřáté troubě na 180 °C 15 minut do zlatavé barvy."
+  ],
+  "applianceTips": "Při použití domácí pekárny zajistěte, aby mléko mělo max. 30 °C, jinak hrozí inaktivace kvasinek. Pro pečení v parní troubě využijte funkci páry po dobu prvních 5 minut pro dosažení lesklé a křupavé kůrky.",
+  "expertJustification": "Kombinace másla a sádla je klíčová: sádlo zajišťuje křehkost a vláčnost střídky díky svým bodům tání, zatímco máslo dodává požadovanou chuť. Žloutky fungují jako přírodní emulgátor, který propojí tuky s moukou a vytvoří jemnější texturu. Správné pořadí surovin v pekárně chrání droždí před přímým kontaktem se solí, která by jinak zpomalila fermentační proces.",
+  "applianceType": "Domácí pekárna",
+  "cookingTime": "160 min",
+  "difficulty": "Střední",
+  "category": "Pečivo",
+  "id": "gen-1781776531747"
+}

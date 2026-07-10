@@ -1,0 +1,27 @@
+{
+  "title": "Pizza se sladěnkou",
+  "summary": "Optimalizované těsto s využitím čerstvého droždí a sladěnky pro hlubší chuťový profil a vynikající barvu kůrky.",
+  "ingredients": [
+    "500 g pšeničné mouky typ 00",
+    "325 g vlažné vody",
+    "15 g čerstvého droždí",
+    "7 g ječné sladěnky",
+    "15 g extra panenského olivového oleje",
+    "12 g mořské soli"
+  ],
+  "instructions": [
+    "Rozpusťte čerstvé droždí a sladěnku ve vlažné vodě a nechte 5 minut aktivovat.",
+    "Do mísy robota nasypte mouku, přilijte směs s droždím a hněťte 3 minuty na nízkou rychlost.",
+    "Přidejte sůl a olivový olej a hněťte dalších 7 minut, dokud těsto není hladké a elastické.",
+    "Těsto nechte v teple kynout 60 minut pod zakrytou utěrkou.",
+    "Rozdělte těsto na 3 bochníky, vytvarujte je a nechte dalších 60 minut odpočívat při pokojové teplotě.",
+    "Těsto vytvarujte do kruhu, naneste suroviny a pečte v rozpálené troubě na maximální výkon po dobu 5-7 minut."
+  ],
+  "applianceTips": "Při použití kuchyňského robota s hákem nastavte nízké otáčky, aby nedocházelo k nadměrnému zahřívání lepkové sítě, což udržuje těsto vláčné a snadno tvarovatelné.",
+  "expertJustification": "Sladěnka obsahuje přírodní enzymy a komplexní cukry, které podporují aktivitu čerstvého droždí a přispívají k lepší karamelizaci (Maillardova reakce) během pečení, což dává pizze typickou zlatavou barvu a bohatší chuť oproti rafinovanému cukru.",
+  "applianceType": "Kuchyňský robot",
+  "cookingTime": "135 min",
+  "difficulty": "Střední",
+  "category": "Ostatní",
+  "id": "gen-1781777082731"
+}

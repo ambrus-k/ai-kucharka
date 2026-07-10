@@ -1,0 +1,35 @@
+{
+  "title": "Hovězí guláš",
+  "summary": "Tradiční guláš připravený pomalým pečením v troubě, který využívá vysokého obsahu kolagenu v kližce pro dosažení bohaté, přirozeně zahuštěné textury a hluboké chuti.",
+  "ingredients": [
+    "5,0 kg hovězí kližky (nakrájené na 4 cm kostky)",
+    "5,0 kg žluté cibule (jemně nakrájené)",
+    "0,9 kg vepřového sádla",
+    "170 g sladké mleté papriky",
+    "25 g pálivé mleté papriky",
+    "350 g rajského protlaku",
+    "150 g česneku (prolisovaného)",
+    "30 g celého kmínu",
+    "45 g sušené majoránky",
+    "90 g soli",
+    "20 g čerstvě mletého černého pepře",
+    "4,5 l horkého hovězího vývaru",
+    "600 g střídky staršího chleba (nastrouhané)"
+  ],
+  "instructions": [
+    "Předehřejte troubu na 145 °C (horní a dolní ohřev). Ve velkém hrnci vhodném do trouby rozpusťte 0,9 kg sádla, přidejte 5,0 kg cibule a restujte za stálého míchání dozlatova až tmavě hněda (cca 40 minut).",
+    "K základu přidejte 30 g kmínu, 75 g česneku (polovina dávky) a 350 g rajského protlaku. Restujte další 3 minuty, dokud směs neztmavne a neztratí syrovou kyselost.",
+    "Hrnec stáhněte z ohně, vmíchejte 170 g sladké a 25 g pálivé papriky. Míchejte 30 sekund, dokud se paprika v tuku nerozpustí a neuvolní barvivo.",
+    "Přidejte 5,0 kg kližky, 90 g soli a 20 g pepře. Maso restujte na plotně, dokud se nezatáhne a šťáva se téměř nevyvaří. Přilijte 4,5 l vroucího vývaru, přikryjte poklicí a vložte do trouby na 120 minut.",
+    "Po 120 minutách vyjměte hrnec z trouby, vmíchejte 600 g strouhaného chleba a vraťte do trouby bez poklice na dalších 40 minut, aby se omáčka zredukovala a zahustila.",
+    "Nakonec hrnec vyjměte z trouby, vmíchejte zbývajících 75 g česneku a 45 g promnuté majoránky. Nechte na mírném ohni krátce provařit a dochuťte dle potřeby."
+  ],
+  "applianceTips": "Při použití pomalého hrnce (Slow Cooker) nastavte program na 'Low' po dobu 8 hodin. Sádlo není nutné používat v tak velkém množství jako u klasického pečení, stačí 200 g, protože v pomalém hrnci nedochází k tak intenzivnímu odparu a tuku se vyškvaří dostatek z kližky.",
+  "expertJustification": "Změna techniky z prudkého smažení na pozvolnou karamelizaci cibule (Maillardova reakce) zajišťuje hlubokou chuť bez hořkosti. Použití trouby namísto přímého zdroje tepla zespodu eliminuje riziko připalování při velkém objemu. Chléb jako přírodní zahušťovadlo poskytuje komplexní texturu a díky obsahu organických kyselin v kvásku lépe vyvažuje tučnost kližky než mouka.",
+  "applianceType": "Klasická trouba",
+  "cookingTime": "3,5 hodiny",
+  "difficulty": "Střední",
+  "category": "Maso",
+  "id": "gen-1782448905657",
+  "updatedAt": "2026-07-10T07:38:53.310Z"
+}
