@@ -44,7 +44,6 @@ import {
   Scale
 } from "lucide-react";
 import { Recipe } from "./types";
-import { DEFAULT_RECIPES as LOCAL_FALLBACK } from "./defaultRecipes";
 
 // Check if running inside Google AI Studio environment
 export const isStudioEnv = (() => {
@@ -1977,10 +1976,10 @@ ${separator}`;
         }
       }
 
-      // 3. Fallback to local default recipes
+      // 3. Fallback to empty list
       if (loadedList === null) {
-        loadedList = LOCAL_FALLBACK;
-        console.log("Použity výchozí vestavěné recepty.");
+        loadedList = [];
+        console.log("Seznam receptů je prázdný.");
       }
 
       // Save and set

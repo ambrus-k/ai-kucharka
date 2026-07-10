@@ -4,7 +4,6 @@ import fs from "fs";
 import { exec } from "child_process";
 import { GoogleGenAI, Type } from "@google/genai";
 import dotenv from "dotenv";
-import { DEFAULT_RECIPES } from "../src/defaultRecipes";
 
 dotenv.config();
 
@@ -58,26 +57,13 @@ function isPlaceholderToken(t: string): boolean {
   );
 }
 
-// Ensures the /data/recipes folder exists and is seeded with starting recipes
+// Ensures the /data/recipes folder exists
 function ensureDataDirAndSeed() {
   if (!fs.existsSync(DATA_DIR)) {
-    fs.mkdirSync(DATA_DIR, { recursive: true });
-  }
-  const files = fs.readdirSync(DATA_DIR).filter(f => f.endsWith(".json"));
-  if (files.length === 0) {
-    console.log("[Data Seed] Složka s recepty je prázdná. Provádím import ze základní databáze (DEFAULT_RECIPES)...");
     try {
-      for (const r of DEFAULT_RECIPES) {
-        const slug = slugify(r.title);
-        fs.writeFileSync(
-          path.join(DATA_DIR, `${slug}.json`),
-          JSON.stringify(r, null, 2),
-          "utf8"
-        );
-      }
-      console.log(`[Data Seed] Úspěšně naimportováno ${DEFAULT_RECIPES.length} receptů.`);
-    } catch (err) {
-      console.error("[Data Seed Error] Chyba při seedování dat:", err);
+      fs.mkdirSync(DATA_DIR, { recursive: true });
+    } catch (e) {
+      console.warn("[Recipes DB] Nelze vytvořit složku DATA_DIR:", e);
     }
   }
 }
