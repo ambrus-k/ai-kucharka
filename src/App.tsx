@@ -69,19 +69,19 @@ const REMOTE_DB_URL = (() => {
   // 2. Look for personal GitHub username override in localStorage for sharing
   const storedGithubName = localStorage.getItem("ai_kucharka_github_username");
   if (storedGithubName && storedGithubName.trim() !== "") {
-    const repo = localStorage.getItem("ai_kucharka_github_repo") || "ai-kucharka-data";
+    const repo = localStorage.getItem("ai_kucharka_github_repo") || "ai-kucharka";
     const branch = localStorage.getItem("ai_kucharka_github_branch") || "main";
     const path = localStorage.getItem("ai_kucharka_github_path") || "recipes.json";
     return `https://raw.githubusercontent.com/${storedGithubName.trim()}/${repo.trim()}/${branch.trim()}/${path.trim()}`;
   }
 
-  // 3. Fallback when NOT in Studio (the live Vercel version): always load from karelaa/ai-kucharka-data
+  // 3. Fallback when NOT in Studio (the live Vercel version): always load from ambrus-k/ai-kucharka
   if (!isStudioEnv) {
-    return "https://raw.githubusercontent.com/karelaa/ai-kucharka-data/main/recipes.json";
+    return "https://raw.githubusercontent.com/ambrus-k/ai-kucharka/main/recipes.json";
   }
 
   // 4. Default template in Studio
-  return "https://raw.githubusercontent.com/karelaa/ai-kucharka-data/main/recipes.json";
+  return "https://raw.githubusercontent.com/ambrus-k/ai-kucharka/main/recipes.json";
 })();
 
 
@@ -424,8 +424,8 @@ export default function App() {
 
   // States for Admin Login & Server-side recipes database
   const [showLoginModal, setShowLoginModal] = useState(false);
-  const [githubUser, setGithubUser] = useState(() => localStorage.getItem("ai_kucharka_github_username") || "karelaa");
-  const [githubRepo, setGithubRepo] = useState(() => localStorage.getItem("ai_kucharka_github_repo") || "ai-kucharka-data");
+  const [githubUser, setGithubUser] = useState(() => localStorage.getItem("ai_kucharka_github_username") || "ambrus-k");
+  const [githubRepo, setGithubRepo] = useState(() => localStorage.getItem("ai_kucharka_github_repo") || "ai-kucharka");
   const [githubToken, setGithubToken] = useState(() => localStorage.getItem("ai_kucharka_github_token") || "");
   const [githubBranch, setGithubBranch] = useState(() => localStorage.getItem("ai_kucharka_github_branch") || "main");
   const [githubPath, setGithubPath] = useState(() => localStorage.getItem("ai_kucharka_github_path") || "recipes.json");

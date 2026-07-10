@@ -169,8 +169,8 @@ app.get(["/api", "/api/recipes", "/recipes"], async (req, res) => {
   try {
     const savedConfig = loadGithubConfig();
     const token = ((req.headers["x-github-token"] as string) || savedConfig.token || process.env.GITHUB_DATA_TOKEN || process.env.GITHUB_TOKEN || "").trim();
-    const owner = ((req.headers["x-github-username"] as string) || savedConfig.username || process.env.GITHUB_USERNAME || "karelaa").trim();
-    const repo = ((req.headers["x-github-repo"] as string) || savedConfig.repo || process.env.GITHUB_REPO || "ai-kucharka-data").trim();
+    const owner = ((req.headers["x-github-username"] as string) || savedConfig.username || process.env.GITHUB_USERNAME || "ambrus-k").trim();
+    const repo = ((req.headers["x-github-repo"] as string) || savedConfig.repo || process.env.GITHUB_REPO || "ai-kucharka").trim();
     const branch = ((req.headers["x-github-branch"] as string) || savedConfig.branch || "main").trim();
 
     // Auto-save incoming headers if they exist to keep server sync updated
@@ -306,8 +306,8 @@ app.all(["/api", "/api/recipes", "/recipes"], async (req, res) => {
 
     const savedConfig = loadGithubConfig();
     const token = ((req.headers["x-github-token"] as string) || savedConfig.token || process.env.GITHUB_DATA_TOKEN || process.env.GITHUB_TOKEN || "").trim();
-    const owner = ((req.headers["x-github-username"] as string) || savedConfig.username || process.env.GITHUB_USERNAME || "karelaa").trim();
-    const repo = ((req.headers["x-github-repo"] as string) || savedConfig.repo || process.env.GITHUB_REPO || "ai-kucharka-data").trim();
+    const owner = ((req.headers["x-github-username"] as string) || savedConfig.username || process.env.GITHUB_USERNAME || "ambrus-k").trim();
+    const repo = ((req.headers["x-github-repo"] as string) || savedConfig.repo || process.env.GITHUB_REPO || "ai-kucharka").trim();
     const branch = ((req.headers["x-github-branch"] as string) || savedConfig.branch || "main").trim();
 
     // Auto-save incoming headers if they exist to keep server sync updated
