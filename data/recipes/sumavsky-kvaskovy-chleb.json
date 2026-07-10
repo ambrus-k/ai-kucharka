@@ -1,0 +1,32 @@
+{
+  "title": "Šumavský kváskový chléb",
+  "summary": "Tradiční řemeslný chléb s vyšším podílem pšeničné složky a delší fermentací pro dosažení optimální struktury střídy.",
+  "ingredients": [
+    "450 g pšeničné chlebové mouky (T650)",
+    "150 g žitné chlebové mouky (T930)",
+    "200 g aktivního žitného kvásku (100% hydratace)",
+    "250 g vlažné vody (25 °C) na autolýzu",
+    "100 g vlažné vody (25 °C) na kvásek",
+    "14 g jemné mořské soli",
+    "10 g celého kmínu",
+    "10 g tekuté Sladěnky",
+    "50 g rýžové mouky na vysypání ošatky"
+  ],
+  "instructions": [
+    "Smíchejte pšeničné chlebové mouky s vlažné vody (25 °C) a nechte 40 minut provádět autolýzu.",
+    "V samostatné nádobě rozmíchejte aktivní žitný kvásek, vlažné vody (25 °C) a tekutou Sladěnku.",
+    "K autolyzovanému těstu přidejte připravenou kváskovou směs, žitné mouky, mořské soli a kmínu. Hněťte 8 minut při nízkých otáčkách.",
+    "Těsto obsahující pšeničné mouky, žitné mouky, kvásku, celkové vody, soli, kmínu a Sladěnky nechte 2 hodiny kynout v teple, po první hodině jednou přeložte.",
+    "Vytvarujte bochník z těsta, vložte do ošatky vysypané rýžové mouky a fermentujte 14 hodin při 4 °C.",
+    "Bochník z těsta vyklopte a pečte se studeným startem v parní troubě.",
+    "Upečený chléb nechte na mřížce 3 hodiny chladnout."
+  ],
+  "applianceTips": "Při pečení se studeným startem využijte první fázi ohřevu na 200 °C s maximálním napařením, poté páru snižte pro vybudování křupavé kůrky.",
+  "expertJustification": "Zvýšení poměru pšeničné mouky a úprava hydratace v rámci autolýzy lépe stabilizuje lepkovou síť, což kompenzuje vyšší podíl žitné složky a zlepšuje celkový objem peřeného výrobku bez použití aditiv.",
+  "applianceType": "Parní trouba s funkcí studeného startu",
+  "cookingTime": "18 hodin",
+  "difficulty": "Střední",
+  "category": "Pečivo",
+  "id": "gen-1783540977144",
+  "updatedAt": "2026-07-10T11:35:51.494Z"
+}

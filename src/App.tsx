@@ -449,6 +449,10 @@ export default function App() {
   const [isSavingGithubConfig, setIsSavingGithubConfig] = useState(false);
   const [saveGithubConfigSuccess, setSaveGithubConfigSuccess] = useState<string | null>(null);
 
+  // Manual GitHub sync states
+  const [isManualSyncing, setIsManualSyncing] = useState(false);
+  const [manualSyncResult, setManualSyncResult] = useState<{ success: boolean; message: string } | null>(null);
+
   // Load GitHub config from server when modal is opened
   useEffect(() => {
     if (showLoginModal) {
@@ -544,6 +548,54 @@ export default function App() {
       });
     } finally {
       setIsSavingGithubConfig(false);
+    }
+  };
+
+  const handleManualGithubSync = async () => {
+    setIsManualSyncing(true);
+    setManualSyncResult(null);
+    try {
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json"
+      };
+
+      const storedUser = localStorage.getItem("ai_kucharka_github_username") || "ambrus-k";
+      const storedRepo = localStorage.getItem("ai_kucharka_github_repo") || "ai-kucharka";
+      const storedBranch = localStorage.getItem("ai_kucharka_github_branch") || "main";
+      const storedToken = localStorage.getItem("ai_kucharka_github_token") || "";
+
+      if (storedUser) headers["x-github-username"] = storedUser;
+      if (storedRepo) headers["x-github-repo"] = storedRepo;
+      if (storedBranch) headers["x-github-branch"] = storedBranch;
+      if (storedToken) headers["x-github-token"] = storedToken;
+      if (adminPassword) headers["x-admin-password"] = adminPassword;
+
+      const response = await fetch("/api/sync-github", {
+        method: "POST",
+        headers,
+        body: JSON.stringify({ adminPassword })
+      });
+
+      const data = await response.json();
+      if (response.ok && data.success) {
+        setManualSyncResult({ success: true, message: data.message });
+        // Refresh recipes locally to make sure we've updated local list
+        const freshRes = await fetch("/api/recipes", { headers });
+        if (freshRes.ok) {
+          const freshData = await freshRes.json();
+          const list = Array.isArray(freshData) ? freshData : (freshData.recipes || []);
+          if (list && list.length > 0) {
+            setRecipes(list);
+            localStorage.setItem("ai_kucharka_recipes", JSON.stringify(list));
+          }
+        }
+      } else {
+        setManualSyncResult({ success: false, message: data.error || "Synchronizace selhala." });
+      }
+    } catch (err: any) {
+      setManualSyncResult({ success: false, message: `Chyba spojení: ${err.message || err}` });
+    } finally {
+      setIsManualSyncing(false);
     }
   };
 
@@ -2552,23 +2604,73 @@ ${separator}`;
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-emerald-900">
                       <Check className="h-4 w-4 shrink-0 text-emerald-600" />
-                      <span>Režim Administrace</span>
+                      <span>Administrace</span>
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setIsAdmin(false);
-                        setAdminPassword("");
-                        localStorage.removeItem("admin_password_token");
-                      }}
-                      className="text-[10px] bg-emerald-100 hover:bg-emerald-200 text-emerald-800 px-2 py-0.5 rounded-md font-bold transition-all cursor-pointer"
-                    >
-                      Odhlásit se
-                    </button>
+                    <div className="flex gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setActiveTab("github");
+                          setShowLoginModal(true);
+                        }}
+                        className="text-[10px] bg-indigo-100 hover:bg-indigo-200 text-indigo-800 px-2 py-0.5 rounded-md font-bold transition-all cursor-pointer"
+                        title="Nastavení připojení k GitHubu"
+                      >
+                        ⚙️ GitHub
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsAdmin(false);
+                          setAdminPassword("");
+                          localStorage.removeItem("admin_password_token");
+                        }}
+                        className="text-[10px] bg-emerald-100 hover:bg-emerald-200 text-emerald-800 px-2 py-0.5 rounded-md font-bold transition-all cursor-pointer"
+                      >
+                        Odhlásit se
+                      </button>
+                    </div>
                   </div>
                   <p className="text-[11px] leading-relaxed opacity-95">
                     Máte plný přístup ke správě receptů. Změny se ukládají automaticky online.
                   </p>
+
+                  {/* RUČNÍ SYNCHRONIZACE S GITHUBEM */}
+                  <div className="pt-2 border-t border-emerald-200/60 mt-1 space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-bold text-emerald-950 uppercase tracking-wider flex items-center gap-1">
+                        🐙 GitHub Synchronizace
+                      </span>
+                      <button
+                        type="button"
+                        onClick={handleManualGithubSync}
+                        disabled={isManualSyncing}
+                        className="text-[10px] bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-300 text-white font-bold py-1 px-2.5 rounded-md transition-all cursor-pointer flex items-center gap-1 shrink-0"
+                      >
+                        {isManualSyncing ? (
+                          <>
+                            <RefreshCw className="h-2.5 w-2.5 animate-spin" />
+                            <span>Synchronizuji...</span>
+                          </>
+                        ) : (
+                          <>
+                            <GitBranch className="h-2.5 w-2.5" />
+                            <span>Synchronizovat teď</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+
+                    {manualSyncResult && (
+                      <div className={`p-2 rounded-lg text-[10px] border ${
+                        manualSyncResult.success 
+                          ? "bg-emerald-100 border-emerald-200 text-emerald-900" 
+                          : "bg-red-100 border-red-200 text-red-950"
+                      }`}>
+                        <p className="font-semibold leading-normal">{manualSyncResult.message}</p>
+                      </div>
+                    )}
+                  </div>
 
                   {/* DIAGNOSTIC PANEL FOR ADMIN */}
                   <div className="pt-2 border-t border-emerald-200/60 mt-2 space-y-2">
@@ -4628,7 +4730,7 @@ ${separator}`;
         );
       })()}
 
-      {/* ADMINISTRÁTORSKÝ PŘIHLÁŠENÍ MODAL */}
+      {/* ADMINISTRÁTORSKÝ PŘIHLÁŠENÍ / CONFIG MODAL */}
       {showLoginModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs no-print">
           <div className="bg-[#FDFCF7] border border-[#E8E8E1] rounded-2xl shadow-xl w-full max-w-md overflow-hidden flex flex-col">
@@ -4636,13 +4738,17 @@ ${separator}`;
             <div className="bg-[#1B4332] p-5 text-white flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Lock className="h-5 w-5 text-[#52B788]" />
-                <h3 className="font-bold text-lg tracking-tight">Administrátorské přihlášení</h3>
+                <h3 className="font-bold text-lg tracking-tight">
+                  {activeTab === "admin" ? "Administrátorské přihlášení" : "Propojení s GitHubem"}
+                </h3>
               </div>
               <button
                 type="button"
                 onClick={() => {
                   setShowLoginModal(false);
                   setLoginError(null);
+                  setGithubStatusResult(null);
+                  setSaveGithubConfigSuccess(null);
                 }}
                 className="text-white/80 hover:text-white hover:bg-white/10 p-1.5 rounded-lg transition-all"
               >
@@ -4650,76 +4756,253 @@ ${separator}`;
               </button>
             </div>
 
-            {/* Content */}
-            <form
-              onSubmit={async (e) => {
-                e.preventDefault();
-                const form = e.currentTarget;
-                const passwordInput = form.elements.namedItem("adminPassword") as HTMLInputElement;
-                const success = await handleLoginWithPassword(passwordInput.value);
-                if (success) {
-                  setShowLoginModal(false);
-                }
-              }}
-              className="p-6 space-y-4 text-slate-700 flex flex-col flex-1"
-            >
-              <div className="space-y-2">
-                <label className="block text-sm font-bold text-[#1B4332]">
-                  Kulinářský API klíč (Administrační heslo)
-                </label>
-                <input
-                  type="password"
-                  name="adminPassword"
-                  placeholder="Zadejte heslo..."
-                  required
-                  disabled={isLoginLoading}
-                  className="w-full px-4 py-2.5 bg-white border border-[#E8E8E1] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1B4332] focus:border-transparent font-sans text-sm disabled:bg-slate-50 disabled:text-slate-400"
-                />
-              </div>
+            {/* Navigation Tabs */}
+            <div className="flex border-b border-[#E8E8E1] bg-[#F4F3EA] px-2 pt-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveTab("admin");
+                  setGithubStatusResult(null);
+                  setSaveGithubConfigSuccess(null);
+                }}
+                className={`px-4 py-2 text-xs font-bold rounded-t-xl transition-all ${
+                  activeTab === "admin"
+                    ? "bg-[#FDFCF7] text-[#1B4332] border-t border-x border-[#E8E8E1] -mb-[1px]"
+                    : "text-slate-500 hover:text-slate-800"
+                }`}
+              >
+                🔒 Správa hesla
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveTab("github");
+                }}
+                className={`px-4 py-2 text-xs font-bold rounded-t-xl transition-all ${
+                  activeTab === "github"
+                    ? "bg-[#FDFCF7] text-[#1B4332] border-t border-x border-[#E8E8E1] -mb-[1px]"
+                    : "text-slate-500 hover:text-slate-800"
+                }`}
+              >
+                🐙 GitHub Připojení
+              </button>
+            </div>
 
-              {loginError && (
-                <div className="p-3 bg-red-50 border border-red-200 text-red-800 rounded-xl text-xs flex items-center gap-2">
-                  <AlertCircle className="h-4 w-4 text-red-600 shrink-0" />
-                  <span>{loginError}</span>
-                </div>
-              )}
-
-              {/* Instructions on how to set/configure it */}
-              <div className="bg-amber-50 border border-amber-200 text-amber-900 rounded-xl p-4 text-[11px] leading-relaxed space-y-1.5">
-                <p className="font-bold uppercase tracking-wider text-amber-950 flex items-center gap-1">
-                  💡 Jak nastavit administrátorské heslo?
-                </p>
-                <p>
-                  Vaše administrátorské heslo je spravováno bezpečně na serveru.
-                </p>
-                <ol className="list-decimal pl-4 space-y-1">
-                  <li>Otevřete soubor <code className="font-mono bg-amber-100 px-1 py-0.5 rounded font-bold">.env</code> v kořenovém adresáři.</li>
-                  <li>Přidejte nebo upravte řádek s proměnnou <code className="font-mono bg-amber-100 px-1 py-0.5 rounded font-bold">ADMIN_PASSWORD=moje_super_tajne_heslo</code>.</li>
-                  <li>Po uložení souboru restartujte vývojový server nebo aplikaci znovu nasaďte.</li>
-                </ol>
-              </div>
-
-              {/* Footer */}
-              <div className="pt-2 flex justify-end gap-3 mt-auto">
-                <button
-                  type="button"
-                  onClick={() => {
+            {/* Content Tab 1: Admin Password */}
+            {activeTab === "admin" && (
+              <form
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  const form = e.currentTarget;
+                  const passwordInput = form.elements.namedItem("adminPassword") as HTMLInputElement;
+                  const success = await handleLoginWithPassword(passwordInput.value);
+                  if (success) {
                     setShowLoginModal(false);
-                    setLoginError(null);
-                  }}
-                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-800 rounded-xl text-sm font-semibold transition-all cursor-pointer border border-slate-200"
-                >
-                  Zavřít
-                </button>
-                <button
-                  type="submit"
-                  disabled={isLoginLoading}
-                  className="px-4 py-2 bg-[#1B4332] hover:bg-[#153528] text-white rounded-xl text-sm font-bold shadow-sm transition-all cursor-pointer disabled:bg-slate-300 disabled:text-slate-500 disabled:cursor-not-allowed flex items-center gap-1.5"
-                >
-                  {isLoginLoading ? "Ověřování..." : "Přihlásit se"}
-                </button>
+                  }
+                }}
+                className="p-6 space-y-4 text-slate-700 flex flex-col flex-1"
+              >
+                <div className="space-y-2">
+                  <label className="block text-sm font-bold text-[#1B4332]">
+                    Kulinářský API klíč (Administrační heslo)
+                  </label>
+                  <input
+                    type="password"
+                    name="adminPassword"
+                    placeholder="Zadejte heslo..."
+                    required
+                    disabled={isLoginLoading}
+                    className="w-full px-4 py-2.5 bg-white border border-[#E8E8E1] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1B4332] focus:border-transparent font-sans text-sm disabled:bg-slate-50 disabled:text-slate-400"
+                  />
+                </div>
+
+                {loginError && (
+                  <div className="p-3 bg-red-50 border border-red-200 text-red-800 rounded-xl text-xs flex items-center gap-2">
+                    <AlertCircle className="h-4 w-4 text-red-600 shrink-0" />
+                    <span>{loginError}</span>
+                  </div>
+                )}
+
+                {/* Instructions on how to set/configure it */}
+                <div className="bg-amber-50 border border-amber-200 text-amber-900 rounded-xl p-4 text-[11px] leading-relaxed space-y-1.5">
+                  <p className="font-bold uppercase tracking-wider text-amber-950 flex items-center gap-1">
+                    💡 Jak nastavit administrátorské heslo?
+                  </p>
+                  <p>
+                    Vaše administrátorské heslo je spravováno bezpečně na serveru.
+                  </p>
+                  <ol className="list-decimal pl-4 space-y-1">
+                    <li>Otevřete soubor <code className="font-mono bg-amber-100 px-1 py-0.5 rounded font-bold">.env</code> v kořenovém adresáři.</li>
+                    <li>Přidejte nebo upravte řádek s proměnnou <code className="font-mono bg-amber-100 px-1 py-0.5 rounded font-bold">ADMIN_PASSWORD=moje_super_tajne_heslo</code>.</li>
+                    <li>Po uložení souboru restartujte vývojový server nebo aplikaci znovu nasaďte.</li>
+                  </ol>
+                </div>
+
+                {/* Footer */}
+                <div className="pt-2 flex justify-end gap-3 mt-auto">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowLoginModal(false);
+                      setLoginError(null);
+                    }}
+                    className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-800 rounded-xl text-sm font-semibold transition-all cursor-pointer border border-slate-200"
+                  >
+                    Zavřít
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isLoginLoading}
+                    className="px-4 py-2 bg-[#1B4332] hover:bg-[#153528] text-white rounded-xl text-sm font-bold shadow-sm transition-all cursor-pointer disabled:bg-slate-300 disabled:text-slate-500 disabled:cursor-not-allowed flex items-center gap-1.5"
+                  >
+                    {isLoginLoading ? "Ověřování..." : "Přihlásit se"}
+                  </button>
+                </div>
+              </form>
+            )}
+
+            {/* Content Tab 2: GitHub Config */}
+            {activeTab === "github" && (
+              <div className="p-6 space-y-4 text-slate-700 flex flex-col flex-1 overflow-y-auto max-h-[70vh]">
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1.5">
+                    <label className="block text-xs font-bold text-[#1B4332]">
+                      Uživatel / Vlastník
+                    </label>
+                    <input
+                      type="text"
+                      value={githubUser}
+                      onChange={(e) => setGithubUser(e.target.value)}
+                      placeholder="ambrus-k"
+                      className="w-full px-3 py-2 bg-white border border-[#E8E8E1] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1B4332] focus:border-transparent font-sans text-xs"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="block text-xs font-bold text-[#1B4332]">
+                      Repozitář
+                    </label>
+                    <input
+                      type="text"
+                      value={githubRepo}
+                      onChange={(e) => setGithubRepo(e.target.value)}
+                      placeholder="ai-kucharka"
+                      className="w-full px-3 py-2 bg-white border border-[#E8E8E1] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1B4332] focus:border-transparent font-sans text-xs"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-bold text-[#1B4332]">
+                    Větev repozitáře
+                  </label>
+                  <input
+                    type="text"
+                    value={githubBranch}
+                    onChange={(e) => setGithubBranch(e.target.value)}
+                    placeholder="main"
+                    className="w-full px-3 py-2 bg-white border border-[#E8E8E1] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1B4332] focus:border-transparent font-sans text-xs"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-bold text-[#1B4332]">
+                    GitHub Personal Access Token (PAT)
+                  </label>
+                  <input
+                    type="password"
+                    value={githubToken}
+                    onChange={(e) => setGithubToken(e.target.value)}
+                    placeholder={githubToken ? "PONECHAT_STÁVAJÍCÍ" : "ghp_..."}
+                    className="w-full px-3 py-2 bg-white border border-[#E8E8E1] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1B4332] focus:border-transparent font-sans text-xs"
+                  />
+                </div>
+
+                {githubStatusResult && (
+                  <div className={`p-3 rounded-xl text-xs flex items-start gap-2 border ${
+                    githubStatusResult.connected 
+                      ? "bg-emerald-50 border-emerald-200 text-emerald-800" 
+                      : "bg-red-50 border-red-200 text-red-800"
+                  }`}>
+                    <AlertCircle className={`h-4 w-4 shrink-0 ${githubStatusResult.connected ? "text-emerald-600" : "text-red-600"}`} />
+                    <div className="space-y-0.5">
+                      <p className="font-bold">{githubStatusResult.connected ? "Úspěšně propojeno" : "Chyba připojení"}</p>
+                      <p className="opacity-90">{githubStatusResult.message || githubStatusResult.errorMessage}</p>
+                    </div>
+                  </div>
+                )}
+
+                {saveGithubConfigSuccess && (
+                  <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-xs flex items-center gap-2">
+                    <Check className="h-4 w-4 text-emerald-600 shrink-0" />
+                    <span>{saveGithubConfigSuccess}</span>
+                  </div>
+                )}
+
+                {manualSyncResult && (
+                  <div className={`p-3 rounded-xl text-xs flex items-start gap-2 border ${
+                    manualSyncResult.success 
+                      ? "bg-indigo-50 border-indigo-200 text-indigo-900" 
+                      : "bg-red-50 border-red-200 text-red-800"
+                  }`}>
+                    <Check className={`h-4 w-4 shrink-0 ${manualSyncResult.success ? "text-indigo-600" : "text-red-600"}`} />
+                    <div className="space-y-0.5">
+                      <p className="font-bold">{manualSyncResult.success ? "Synchronizace úspěšná" : "Chyba synchronizace"}</p>
+                      <p className="opacity-95">{manualSyncResult.message}</p>
+                    </div>
+                  </div>
+                )}
+
+                <div className="bg-blue-50 border border-blue-200 text-blue-900 rounded-xl p-3.5 text-[10px] leading-relaxed space-y-1">
+                  <p className="font-bold uppercase tracking-wider text-blue-950 flex items-center gap-1">
+                    ℹ️ Proč propojit s GitHubem?
+                  </p>
+                  <p>
+                    Propojení umožňuje ukládat a synchronizovat všechny recepty přímo do vašeho vlastního repozitáře. 
+                    Recepty jsou na GitHubu ukládány jako jednotlivé JSON soubory ve složce <code className="font-mono bg-blue-100 px-1 rounded">data/recipes/</code>.
+                  </p>
+                </div>
+
+                <div className="pt-2 flex justify-between items-center border-t border-[#E8E8E1] mt-auto">
+                  <button
+                    type="button"
+                    onClick={handleManualGithubSync}
+                    disabled={isManualSyncing}
+                    className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-300 text-white rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer"
+                  >
+                    {isManualSyncing ? (
+                      <>
+                        <RefreshCw className="h-3 w-3 animate-spin" />
+                        <span>Synchronizuji...</span>
+                      </>
+                    ) : (
+                      <>
+                        <GitBranch className="h-3.5 w-3.5" />
+                        <span>Synchronizovat teď</span>
+                      </>
+                    )}
+                  </button>
+
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => handleTestGithubConnection(githubUser, githubRepo, githubBranch, githubToken)}
+                      disabled={isTestingConnection}
+                      className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-800 border border-slate-200 rounded-lg text-xs font-semibold transition-all cursor-pointer disabled:opacity-50"
+                    >
+                      {isTestingConnection ? "Testuji..." : "Otestovat spojení"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleSaveGithubConfig(githubUser, githubRepo, githubBranch, githubToken)}
+                      disabled={isSavingGithubConfig}
+                      className="px-3 py-1.5 bg-[#1B4332] hover:bg-[#153528] text-white rounded-lg text-xs font-bold shadow-sm transition-all cursor-pointer disabled:opacity-50"
+                    >
+                      {isSavingGithubConfig ? "Ukládám..." : "Uložit nastavení"}
+                    </button>
+                  </div>
+                </div>
               </div>
-            </form>
+            )}
           </div>
         </div>
       )}

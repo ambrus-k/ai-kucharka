@@ -54,7 +54,8 @@ function isPlaceholderToken(t: string): boolean {
     upper.includes("REPLACE_ME") ||
     upper.includes("DEMO") ||
     upper.includes("VASOSOBNIGITHUBTOKEN") ||
-    upper.includes("OSOBNI_TOKEN")
+    upper.includes("OSOBNI_TOKEN") ||
+    upper.includes("PRESENT_")
   );
 }
 
@@ -119,11 +120,11 @@ function isAuthorized(req: express.Request): boolean {
 }
 
 // Run git commit & push directly on this single repository to persist updates
-async function runGitSync(req: express.Request, recipesList: any[], deletedCount: number) {
+async function runGitSync(req: express.Request, recipesList: any[], deletedCount: number): Promise<void> {
   const { githubToken, githubUsername, githubRepo, githubBranch } = getAuthDetails(req);
 
   // If client provided custom credentials (Option B), use them; otherwise fall back to server env variables (Option A)
-  const gitToken = (githubToken && !isPlaceholderToken(githubToken))
+  const gitToken = (githubToken && githubToken !== "PRESENT_***" && !isPlaceholderToken(githubToken))
     ? githubToken
     : (process.env.GITHUB_TOKEN || "").trim();
 
@@ -241,10 +242,19 @@ async function runGitSync(req: express.Request, recipesList: any[], deletedCount
       }
     } catch (apiError: any) {
       console.error("[Git Sync API Error] GitHub API synchronizace selhala, zkusím lokální git příkazy:", apiError.message || apiError);
+      
+      // If we don't have a local git repo, we can't fall back to local commands!
+      if (!fs.existsSync(path.join(process.cwd(), ".git"))) {
+        throw new Error(`Chyba GitHub API: ${apiError.message || apiError}`);
+      }
     }
   }
 
   // Fallback to local git execution (AI Studio / VM environment with workspace access)
+  if (!fs.existsSync(path.join(process.cwd(), ".git"))) {
+    throw new Error("Propojení s GitHubem není správně nakonfigurováno (chybí token a lokální git repozitář neexistuje).");
+  }
+
   let pushTarget = "origin " + gitBranch;
   if (gitToken && !isPlaceholderToken(gitToken)) {
     pushTarget = `https://${gitToken}@github.com/${gitUsername}/${gitRepo}.git ${gitBranch}`;
@@ -261,12 +271,16 @@ async function runGitSync(req: express.Request, recipesList: any[], deletedCount
   const fullCmd = commands.join(" && ");
   console.log(`[Git Sync Fallback] Synchronizace přes lokální git v ${gitUsername}/${gitRepo} (${gitBranch})...`);
 
-  exec(fullCmd, (error, stdout, stderr) => {
-    if (error) {
-      console.warn(`[Git Sync Warning] Git push se nezdařil (v bezserverovém Vercel prostředí je to běžné):`, error.message);
-      return;
-    }
-    console.log(`[Git Sync Success] Git synchronizace hlavního repozitáře dokončena:\n${stdout}`);
+  return new Promise<void>((resolve, reject) => {
+    exec(fullCmd, (error, stdout, stderr) => {
+      if (error) {
+        console.warn(`[Git Sync Warning] Git push se nezdařil:`, error.message);
+        reject(new Error(`Git push selhal: ${error.message}`));
+        return;
+      }
+      console.log(`[Git Sync Success] Git synchronizace hlavního repozitáře dokončena:\n${stdout}`);
+      resolve();
+    });
   });
 }
 
@@ -341,7 +355,9 @@ app.get(["/api", "/api/recipes", "/api/recipes/", "/recipes", "/recipes/"], asyn
     ensureDataDirAndSeed();
     const { githubToken, githubUsername, githubRepo, githubBranch } = getAuthDetails(req);
 
-    const gitToken = githubToken || process.env.GITHUB_TOKEN;
+    const gitToken = (githubToken && githubToken !== "PRESENT_***" && !isPlaceholderToken(githubToken))
+      ? githubToken
+      : (process.env.GITHUB_TOKEN || "").trim();
     const gitUsername = githubUsername || process.env.GITHUB_USERNAME;
     const gitRepo = githubRepo || process.env.GITHUB_REPO;
     const gitBranch = githubBranch || process.env.GITHUB_BRANCH || "main";
@@ -505,7 +521,9 @@ app.all(["/api", "/api/recipes", "/api/recipes/", "/recipes", "/recipes/"], asyn
     }
 
     const { githubToken, githubUsername, githubRepo } = getAuthDetails(req);
-    const gitToken = githubToken || process.env.GITHUB_TOKEN;
+    const gitToken = (githubToken && githubToken !== "PRESENT_***" && !isPlaceholderToken(githubToken))
+      ? githubToken
+      : (process.env.GITHUB_TOKEN || "").trim();
     const hasGit = gitToken && !isPlaceholderToken(gitToken) && (githubUsername || process.env.GITHUB_USERNAME) && (githubRepo || process.env.GITHUB_REPO);
 
     if (!localWriteOk && !hasGit) {
@@ -517,13 +535,20 @@ app.all(["/api", "/api/recipes", "/api/recipes/", "/recipes", "/recipes/"], asyn
     console.log(`[Local DB] Zápis dokončen. Lokálně úspěšný: ${localWriteOk}, celkem uloženo ${recipesList.length} receptů do hlavního repozitáře, smazáno ${deletedCount} souborů.`);
 
     // Push changes back directly to the single main repository
+    let gitSyncMessage = "";
     if (hasGit) {
-      runGitSync(req, recipesList, deletedCount);
+      try {
+        await runGitSync(req, recipesList, deletedCount);
+        gitSyncMessage = " Synchronizace s GitHubem proběhla úspěšně.";
+      } catch (gitErr: any) {
+        gitSyncMessage = " Varování: Synchronizace s GitHubem selhala: " + (gitErr.message || gitErr);
+        console.error("[Git Sync API Error]:", gitErr);
+      }
     }
 
     return res.json({
       success: true,
-      message: `Změny uloženy! Celkem ${recipesList.length} receptů, smazáno ${deletedCount}.`
+      message: `Změny uloženy! Celkem ${recipesList.length} receptů, smazáno ${deletedCount}.${gitSyncMessage}`
     });
   } catch (error: any) {
     console.error("Chyba při hromadném zápisu receptů:", error);
@@ -545,27 +570,140 @@ app.post(["/api/verify-admin", "/api/verify-admin/", "/verify-admin", "/verify-a
   }
 });
 
+// Explicit endpoint for manual GitHub synchronization
+app.post("/api/sync-github", async (req, res) => {
+  try {
+    if (!isAuthorized(req)) {
+      return res.status(401).json({ error: "Neplatný administrační kód nebo GitHub Token." });
+    }
+
+    ensureDataDirAndSeed();
+
+    // 1. Load local recipes
+    const recipesList: any[] = [];
+    try {
+      const files = fs.readdirSync(DATA_DIR).filter(f => f.endsWith(".json"));
+      for (const file of files) {
+        try {
+          const content = fs.readFileSync(path.join(DATA_DIR, file), "utf8");
+          const parsed = JSON.parse(content);
+          if (parsed && parsed.title) {
+            recipesList.push(parsed);
+          }
+        } catch (e: any) {
+          console.warn(`[Sync Warning] Nepodařilo se načíst lokální soubor ${file}:`, e.message);
+        }
+      }
+    } catch (readErr: any) {
+      return res.status(500).json({ error: `Chyba čtení lokální databáze: ${readErr.message}` });
+    }
+
+    const { githubToken, githubUsername, githubRepo } = getAuthDetails(req);
+    const gitToken = (githubToken && githubToken !== "PRESENT_***" && !isPlaceholderToken(githubToken))
+      ? githubToken
+      : (process.env.GITHUB_TOKEN || "").trim();
+    const hasGit = gitToken && !isPlaceholderToken(gitToken) && (githubUsername || process.env.GITHUB_USERNAME) && (githubRepo || process.env.GITHUB_REPO);
+
+    if (!hasGit) {
+      return res.status(400).json({
+        error: "Není nakonfigurováno žádné platné propojení s GitHubem (chybí platný token nebo repozitář)."
+      });
+    }
+
+    await runGitSync(req, recipesList, 0);
+
+    return res.json({
+      success: true,
+      message: `Úspěšně synchronizováno! Celkem ${recipesList.length} receptů odesláno do repozitáře.`
+    });
+  } catch (error: any) {
+    console.error("Chyba při synchronizaci s GitHubem:", error);
+    return res.status(500).json({
+      error: `Chyba při synchronizaci s GitHubem: ${error.message || error}`
+    });
+  }
+});
+
 // Config endpoints updated to use "ai-kucharka" as default single repository
 app.get("/api/github-config", (req, res) => {
+  const { githubToken, githubUsername, githubRepo, githubBranch } = getAuthDetails(req);
   res.json({
-    username: process.env.GITHUB_USERNAME || "ambrus-k",
-    repo: process.env.GITHUB_REPO || "ai-kucharka",
-    token: process.env.GITHUB_TOKEN ? "PRESENT_***" : "",
-    branch: process.env.GITHUB_BRANCH || "main"
+    username: githubUsername || process.env.GITHUB_USERNAME || "ambrus-k",
+    repo: githubRepo || process.env.GITHUB_REPO || "ai-kucharka",
+    token: (githubToken || process.env.GITHUB_TOKEN) ? "PRESENT_***" : "",
+    branch: githubBranch || process.env.GITHUB_BRANCH || "main"
   });
 });
 
 app.post("/api/github-config", (req, res) => {
+  // Configured statelessly via localStorage and custom request headers
   res.json({ status: "success", message: "Konfigurace uložena a sjednocena v hlavním repozitáři." });
 });
 
-app.get("/api/github-status", (req, res) => {
-  res.json({
-    hasToken: !!process.env.GITHUB_TOKEN,
-    repositoryFound: true,
-    branchFound: true,
-    recipesCount: 32
-  });
+app.get("/api/github-status", async (req, res) => {
+  try {
+    const { githubToken, githubUsername, githubRepo, githubBranch } = getAuthDetails(req);
+    const gitToken = (githubToken && githubToken !== "PRESENT_***" && !isPlaceholderToken(githubToken))
+      ? githubToken
+      : (process.env.GITHUB_TOKEN || "").trim();
+    const gitUsername = githubUsername || process.env.GITHUB_USERNAME || "ambrus-k";
+    const gitRepo = githubRepo || process.env.GITHUB_REPO || "ai-kucharka";
+    const gitBranch = githubBranch || process.env.GITHUB_BRANCH || "main";
+
+    if (!gitToken || isPlaceholderToken(gitToken)) {
+      return res.json({
+        connected: false,
+        hasToken: false,
+        errorMessage: "Nebylo nalezeno žádné aktivní propojení s GitHubem. Zadejte platný GitHub Token."
+      });
+    }
+
+    const octokit = new Octokit({ auth: gitToken });
+    
+    // 1. Get reference (Read Verification)
+    const { data: refData } = await octokit.git.getRef({
+      owner: gitUsername,
+      repo: gitRepo,
+      ref: `heads/${gitBranch}`,
+    });
+    
+    // 2. Count recipes
+    let recipesCount = 0;
+    try {
+      const { data: commitData } = await octokit.git.getCommit({
+        owner: gitUsername,
+        repo: gitRepo,
+        commit_sha: refData.object.sha,
+      });
+      const { data: treeData } = await octokit.git.getTree({
+        owner: gitUsername,
+        repo: gitRepo,
+        tree_sha: commitData.tree.sha,
+        recursive: "true",
+      });
+      const recipeFiles = treeData.tree.filter(
+        item => item.path?.startsWith("data/recipes/") && item.path.endsWith(".json")
+      );
+      recipesCount = recipeFiles.length;
+    } catch (e: any) {
+      console.warn("[Status Check Warning] Nepodařilo se spočítat recepty:", e.message);
+    }
+
+    return res.json({
+      connected: true,
+      hasToken: true,
+      repositoryFound: true,
+      branchFound: true,
+      recipesCount,
+      message: `Úspěšně propojeno! Repozitář: ${gitUsername}/${gitRepo}, Větev: ${gitBranch}. Nalezeno ${recipesCount} receptů.`
+    });
+  } catch (err: any) {
+    return res.json({
+      connected: false,
+      hasToken: true,
+      errorMessage: `Propojení selhalo: ${err.message || err}`
+    });
+  }
 });
 
 // Endpoint for admin diagnostic testing of AI and folder write permissions
@@ -620,7 +758,9 @@ app.post("/api/test-diagnostics", async (req, res) => {
     // 3. Test GitHub connection (bidirectional read & write verification)
     try {
       const { githubToken, githubUsername, githubRepo, githubBranch } = getAuthDetails(req);
-      const gitToken = githubToken || process.env.GITHUB_TOKEN;
+      const gitToken = (githubToken && githubToken !== "PRESENT_***" && !isPlaceholderToken(githubToken))
+        ? githubToken
+        : (process.env.GITHUB_TOKEN || "").trim();
       const gitUsername = githubUsername || process.env.GITHUB_USERNAME || "ambrus-k";
       const gitRepo = githubRepo || process.env.GITHUB_REPO || "ai-kucharka";
       const gitBranch = githubBranch || process.env.GITHUB_BRANCH || "main";
@@ -712,7 +852,7 @@ ZÁSADNÍ PRAVIDLA:
 - Shrnutí receptu (summary) musí být velmi krátké, věcné a přehledné (cca 1-2 věty), žádné plané vycpávky ani přemíra marketingu.
 - Suroviny upřesni na přesné metrické jednotky vhodné pro domácnost.
 - Krok za krokem postup (instructions) rozepiš do velmi podrobných, detailních a popsaných vět. Popiš přesné kulinářské nebo mechanické úkony s kuchyňským náčiním.
-- DO KAŽDÉHO JEDNOTLIVÉHO KROKU (v poli 'instructions') MUSÍŠ EXPLICITNĚ ZAPSAT PŘESNÉ VÁHY NEBO MNOŽSTVÍ VŠECH SUROVIN, KTERÉ SE V DANÉM KROKU PŘIDÁVAJÍ NEBO ZPRACOVÁVAJÍ! (Např. místo 'přidejte mouku, máslo a cukr' musíte napsat 'do mísy přidejte 250 g hladké mouky, 120 g změklého másla a 50 g moučkového cukru'). Toto je kritické, aby měl kuchař váhy přímo před sebou v aktuálním kroku!
+- NEOPAKUJ ani nevkládej gramy, mililitry, kusy či jiné konkrétní váhy a množství surovin přímo do kroků postupu (v poli 'instructions')! Suroviny s přesným množstvím jsou již uvedeny v samostatném poli 'ingredients'. Postup přípravy má být čitelný, plynulý a přirozený jako v tradiční tištěné kuchařce (např. 'Změklé máslo utřete s cukrem a žloutky', nikoliv 'Utřete 120 g změklého másla s 50 g cukru a 2 ks žloutků'). Popisuj techniky a děje bez otravného plevelení číselnými údaji.
 - Časovače jako samostatné odpočítávače u kroků zruš, vůbec na nich netrvej, důležité jsou detailní popisy děje a kulinářské kroky.
 - Tipy pro moderní kuchyni musí konkrétně popsat využití Air Fryeru (horkovzdušné fritézy), kuchyňských robotů (Thermomix), pomalých hrnců, domácích pekáren nebo podobných přístrojů pro tento recept.
 - V odůvodnění 'expertJustification' podrobně vysvětli laickým jazykem, PROČ jsi změnil teploty, časy, postupy nebo poměry na základě zmíněných 5 pilířů (zejména food science a kuchařské chemie).
@@ -815,7 +955,7 @@ ZÁSADNÍ PRAVIDLA:
 - Zkracuj názvy receptů (title) na naprosté kulinářské minimum a jádru věci.
 - Shrnutí receptu (summary) musí být velmi krátké, věcné a přehledné (cca 1-2 věty).
 - Suroviny upřesni na přesné metrické jednotky.
-- DO KAŽDÉHO JEDNOTLIVÉHO KROKU (v poli 'instructions') MUSÍŠ EXPLICITNĚ ZAPSAT PŘESNÉ VÁHY NEBO MNOŽSTVÍ VŠECH SUROVIN!
+- NEOPAKUJ ani nevkládej gramy, mililitry, kusy či jiné konkrétní váhy a množství surovin přímo do kroků postupu (v poli 'instructions')! Postup přípravy má být čitelný, plynulý a přirozený jako v tradiční tištěné kuchařce bez opakování číselných hodnot surovin u každého kroku.
 - ODSTRANĚNÍ KONZERVANTŮ: V ŽÁDNÉM RECEPTU NESMÍ BÝT POUŽITY ŽÁDNÉ KONZERVAČNÍ LÁTKY, KONZERVANTY ANI UMĚLÁ DOCHUCOVADLA.
 `;
 
@@ -895,6 +1035,9 @@ app.post(["/api/audit-recipe", "/api/audit-recipe/", "/api/check-recipe", "/api/
     const systemInstruction = `
 Jsi odborný kulinářský simulátor, auditní systém a analyzátor receptů "AI Kuchařka".
 Tvým úkolem je podrobit předložený recept kompletní kulinářské simulaci ("přehrát ho" od začátku do konce), odhalit slabá místa (fyzika, chemie jídla, poměry, časy, teploty) a navrhnout jedno konkrétní významné zlepšení.
+
+ZÁSADNÍ PRAVIDLO PRO NOVÝ RECEPT (modifiedRecipe):
+- V krocích postupu (instructions) v modifiedRecipe NEOPAKUJ ani nevkládej gramy, mililitry, kusy či jiné konkrétní váhy a množství surovin! Postup přípravy má být čitelný, plynulý a přirozený jako v tradiční tištěné kuchařce bez opakování číselných hodnot surovin u každého kroku.
 `;
 
     const userPrompt = `
