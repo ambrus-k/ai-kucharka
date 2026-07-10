@@ -41,7 +41,8 @@ import {
   Settings,
   RefreshCw,
   Database,
-  Scale
+  Scale,
+  Square
 } from "lucide-react";
 import { Recipe } from "./types";
 
@@ -375,6 +376,24 @@ export default function App() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [adminPassword, setAdminPassword] = useState("");
 
+  // States for diagnostic test panel
+  const [isDiagnosing, setIsDiagnosing] = useState(false);
+  const [diagnosticsResult, setDiagnosticsResult] = useState<{
+    timestamp: string;
+    writePermissionOk: boolean;
+    writePermissionMessage: string;
+    geminiOk: boolean;
+    geminiMessage: string;
+    recipesCount: number;
+  } | null>(null);
+  const [diagnosticsError, setDiagnosticsError] = useState<string | null>(null);
+  const [diagnosticsProgressText, setDiagnosticsProgressText] = useState("");
+  const [diagnosticsProgressPercent, setDiagnosticsProgressPercent] = useState(0);
+  const [diagnosticsStepIndex, setDiagnosticsStepIndex] = useState(-1);
+
+  const diagnosticsAbortRef = useRef<AbortController | null>(null);
+  const auditAbortRef = useRef<AbortController | null>(null);
+
   // States for Hands-free / Cooking Mode with Wake Lock
   const [isHandsFree, setIsHandsFree] = useState(false);
   const [currentHandsFreeStep, setCurrentHandsFreeStep] = useState(0);
@@ -536,8 +555,23 @@ export default function App() {
     }
   };
 
+  const handleStopAudit = () => {
+    if (auditAbortRef.current) {
+      auditAbortRef.current.abort();
+      auditAbortRef.current = null;
+    }
+    setIsAuditing(false);
+    setAuditError("Kontrola receptu byla zastavena uživatelem.");
+  };
+
   const handleAuditRecipe = async () => {
     if (!selectedRecipe) return;
+
+    if (auditAbortRef.current) {
+      auditAbortRef.current.abort();
+    }
+    const controller = new AbortController();
+    auditAbortRef.current = controller;
 
     setIsAuditing(true);
     setAuditError(null);
@@ -556,6 +590,7 @@ export default function App() {
           recipe: selectedRecipe,
           adminPassword,
         }),
+        signal: controller.signal,
       });
 
       if (!response.ok) {
@@ -574,14 +609,31 @@ export default function App() {
 
       // Animate displaying steps one by one
       for (let i = 0; i < data.simulationSteps.length; i++) {
+        if (controller.signal.aborted) {
+          throw new DOMException("Aborted", "AbortError");
+        }
         setActiveStepIndex(i);
-        await new Promise(resolve => setTimeout(resolve, i === 0 ? 0 : 700));
+        await new Promise((resolve, reject) => {
+          const t = setTimeout(resolve, i === 0 ? 0 : 700);
+          controller.signal.addEventListener("abort", () => {
+            clearTimeout(t);
+            reject(new DOMException("Aborted", "AbortError"));
+          });
+        });
       }
 
     } catch (err: any) {
-      console.error(err);
-      setAuditError(err.message || "Nepodařilo se spojit se serverem pro kontrolu.");
+      if (err.name === "AbortError") {
+        console.log("Audit aborted");
+        setAuditError("Kontrola receptu byla zastavena uživatelem.");
+      } else {
+        console.error(err);
+        setAuditError(err.message || "Nepodařilo se spojit se serverem pro kontrolu.");
+      }
     } finally {
+      if (auditAbortRef.current === controller) {
+        auditAbortRef.current = null;
+      }
       setIsAuditing(false);
     }
   };
@@ -1000,6 +1052,90 @@ export default function App() {
       return false;
     } finally {
       setIsLoginLoading(false);
+    }
+  };
+
+  const handleStopDiagnostics = () => {
+    if (diagnosticsAbortRef.current) {
+      diagnosticsAbortRef.current.abort();
+      diagnosticsAbortRef.current = null;
+    }
+    setIsDiagnosing(false);
+    setDiagnosticsProgressText("Diagnostika byla zastavena uživatelem.");
+    setDiagnosticsProgressPercent(0);
+    setDiagnosticsStepIndex(-1);
+    setDiagnosticsError("Diagnostika byla zastavena uživatelem.");
+  };
+
+  const handleRunDiagnostics = async () => {
+    if (diagnosticsAbortRef.current) {
+      diagnosticsAbortRef.current.abort();
+    }
+    const controller = new AbortController();
+    diagnosticsAbortRef.current = controller;
+
+    setIsDiagnosing(true);
+    setDiagnosticsResult(null);
+    setDiagnosticsError(null);
+    setDiagnosticsProgressPercent(0);
+    setDiagnosticsStepIndex(0);
+
+    const sleep = (ms: number) => new Promise((resolve, reject) => {
+      const timeout = setTimeout(resolve, ms);
+      controller.signal.addEventListener("abort", () => {
+        clearTimeout(timeout);
+        reject(new DOMException("Aborted", "AbortError"));
+      });
+    });
+
+    try {
+      setDiagnosticsProgressText("Inicializace systému a ověřování práv...");
+      setDiagnosticsProgressPercent(15);
+      await sleep(600);
+
+      setDiagnosticsProgressText("Ověřování přístupových práv k souborovému systému...");
+      setDiagnosticsProgressPercent(35);
+      setDiagnosticsStepIndex(1);
+      await sleep(700);
+
+      setDiagnosticsProgressText("Navazování spojení s Google Gemini AI (gemini-3.5-flash)...");
+      setDiagnosticsProgressPercent(60);
+      setDiagnosticsStepIndex(2);
+
+      const response = await fetch("/api/test-diagnostics", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ adminPassword }),
+        signal: controller.signal,
+      });
+
+      if (!response.ok) {
+        const errData = await response.json();
+        throw new Error(errData.error || "Nepodařilo se spustit diagnostiku.");
+      }
+      const data = await response.json();
+
+      setDiagnosticsProgressText("Sestavování závěrečného diagnostického reportu...");
+      setDiagnosticsProgressPercent(90);
+      setDiagnosticsStepIndex(3);
+      await sleep(600);
+
+      setDiagnosticsProgressPercent(100);
+      setDiagnosticsProgressText("Diagnostika dokončena úspěšně.");
+      setDiagnosticsResult(data);
+    } catch (err: any) {
+      if (err.name === "AbortError") {
+        console.log("Diagnostics aborted");
+        setDiagnosticsError("Diagnostika byla zastavena uživatelem.");
+      } else {
+        console.error("[Diagnostics Error]:", err);
+        setDiagnosticsError(err.message || "Během diagnostiky došlo k chybě.");
+      }
+    } finally {
+      if (diagnosticsAbortRef.current === controller) {
+        diagnosticsAbortRef.current = null;
+      }
+      setIsDiagnosing(false);
     }
   };
 
@@ -2615,20 +2751,34 @@ ${separator}`;
 
       {/* HEADER */}
       <header className="no-print bg-white border-b border-[#E8E8E1] py-4 px-6 sticky top-0 z-40 shadow-xs flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="bg-[#1B4332] text-white p-2 rounded-xl shadow-md">
+        <button
+          onClick={() => {
+            setSelectedRecipe(null);
+            setIsEditing(false);
+            setSearchQuery("");
+            setShowExportView(false);
+            setAuditSteps(null);
+            setProposedChange(null);
+            setAuditModifiedRecipe(null);
+            setActiveStepIndex(-1);
+            setErrorMessage(null);
+          }}
+          className="flex items-center gap-3 hover:opacity-90 active:scale-98 transition-all text-left bg-transparent border-0 p-0 m-0 cursor-pointer group"
+          title="Přejít na hlavní stránku"
+        >
+          <div className="bg-[#1B4332] text-white p-2 rounded-xl shadow-md group-hover:bg-[#2D6A4F] transition-colors">
             <ChefHat className="h-6 w-6" />
           </div>
           <div>
-            <h1 className="font-serif italic font-semibold text-2xl text-[#1B4332] flex items-center gap-2">
+            <h1 className="font-serif italic font-semibold text-2xl text-[#1B4332] flex items-center gap-2 group-hover:text-[#2D6A4F] transition-colors">
               AI Kuchařka
-              <span className="text-[10px] bg-[#F0F4F1] text-[#2D6A4F] border border-[#2D6A4F]/20 font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+              <span className="text-[10px] bg-[#F0F4F1] text-[#2D6A4F] border border-[#2D6A4F]/20 font-bold px-2 py-0.5 rounded-full uppercase tracking-wider font-sans normal-case">
                 5x Pilířová Syntéza
               </span>
             </h1>
             <p className="text-xs text-[#5C5C50] hidden sm:block font-medium">Vědecky podložená a technologicky vyladěná gastronomie</p>
           </div>
-        </div>
+        </button>
 
         <div className="flex items-center gap-3">
           {isAdmin && (
@@ -2658,7 +2808,7 @@ ${separator}`;
           {(() => {
             if (isAdmin) {
               return (
-                <div className="p-4 bg-emerald-50 border-b border-emerald-200 text-emerald-800 space-y-1.5 no-print animate-fade-in">
+                <div className="p-4 bg-emerald-50 border-b border-emerald-200 text-emerald-800 space-y-3 no-print animate-fade-in">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-emerald-900">
                       <Check className="h-4 w-4 shrink-0 text-emerald-600" />
@@ -2679,6 +2829,168 @@ ${separator}`;
                   <p className="text-[11px] leading-relaxed opacity-95">
                     Máte plný přístup ke správě receptů. Změny se ukládají automaticky online.
                   </p>
+
+                  {/* DIAGNOSTIC PANEL FOR ADMIN */}
+                  <div className="pt-2 border-t border-emerald-200/60 mt-2 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-bold text-emerald-900 uppercase tracking-wider flex items-center gap-1">
+                        🛠 Diagnostika systému
+                      </span>
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          type="button"
+                          onClick={handleRunDiagnostics}
+                          disabled={isDiagnosing}
+                          className="text-[10px] bg-emerald-600 hover:bg-emerald-700 disabled:bg-[#A3E635]/15 disabled:text-[#1B4332]/60 text-white font-bold py-1 px-2.5 rounded-md transition-all cursor-pointer flex items-center gap-1 shrink-0"
+                        >
+                          {isDiagnosing ? (
+                            <>
+                              <RefreshCw className="h-2.5 w-2.5 animate-spin" />
+                              <span>Testuji...</span>
+                            </>
+                          ) : (
+                            <>
+                              <RefreshCw className="h-2.5 w-2.5" />
+                              <span>Otestovat</span>
+                            </>
+                          )}
+                        </button>
+                        {isDiagnosing && (
+                          <button
+                            type="button"
+                            onClick={handleStopDiagnostics}
+                            className="text-[10px] bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-2 rounded-md transition-all cursor-pointer flex items-center gap-1 shrink-0 shadow-xs hover:scale-105 active:scale-95"
+                            title="Zastavit diagnostiku"
+                          >
+                            <Square className="h-2.5 w-2.5 fill-current" />
+                            <span>Stop</span>
+                          </button>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* PROGRESS WINDOW FOR DIAGNOSTICS */}
+                    {isDiagnosing && (
+                      <div className="p-2.5 bg-white border border-emerald-100 rounded-lg space-y-2 text-[#2c2c2c] shadow-xs animate-pulse-slow">
+                        <div className="flex items-center justify-between text-[9px] font-bold text-slate-700">
+                          <span className="truncate pr-1 text-slate-600">{diagnosticsProgressText}</span>
+                          <span className="font-mono text-emerald-700 shrink-0">{diagnosticsProgressPercent}%</span>
+                        </div>
+                        {/* Progress Bar */}
+                        <div className="w-full bg-slate-100 h-1 rounded-full overflow-hidden">
+                          <div
+                            className="bg-emerald-500 h-full transition-all duration-300"
+                            style={{ width: `${diagnosticsProgressPercent}%` }}
+                          />
+                        </div>
+                        {/* Step checklist */}
+                        <div className="space-y-0.5 text-[8.5px] font-medium text-slate-500 pt-1 border-t border-slate-50">
+                          <div className={`flex items-center gap-1.5 ${diagnosticsStepIndex >= 0 ? 'text-emerald-800' : ''}`}>
+                            {diagnosticsStepIndex > 0 ? (
+                              <Check className="h-2.5 w-2.5 text-emerald-600 shrink-0" />
+                            ) : diagnosticsStepIndex === 0 ? (
+                              <RefreshCw className="h-2.5 w-2.5 text-emerald-600 animate-spin shrink-0" />
+                            ) : (
+                              <div className="h-1 w-1 rounded-full bg-slate-300 mx-0.75 shrink-0" />
+                            )}
+                            <span className={diagnosticsStepIndex === 0 ? 'font-bold' : ''}>1. Inicializace a ověření přístupu</span>
+                          </div>
+                          <div className={`flex items-center gap-1.5 ${diagnosticsStepIndex >= 1 ? 'text-emerald-800' : ''}`}>
+                            {diagnosticsStepIndex > 1 ? (
+                              <Check className="h-2.5 w-2.5 text-emerald-600 shrink-0" />
+                            ) : diagnosticsStepIndex === 1 ? (
+                              <RefreshCw className="h-2.5 w-2.5 text-emerald-600 animate-spin shrink-0" />
+                            ) : (
+                              <div className="h-1 w-1 rounded-full bg-slate-300 mx-0.75 shrink-0" />
+                            )}
+                            <span className={diagnosticsStepIndex === 1 ? 'font-bold' : ''}>2. Test zápisu do souborového systému</span>
+                          </div>
+                          <div className={`flex items-center gap-1.5 ${diagnosticsStepIndex >= 2 ? 'text-emerald-800' : ''}`}>
+                            {diagnosticsStepIndex > 2 ? (
+                              <Check className="h-2.5 w-2.5 text-emerald-600 shrink-0" />
+                            ) : diagnosticsStepIndex === 2 ? (
+                              <RefreshCw className="h-2.5 w-2.5 text-emerald-600 animate-spin shrink-0" />
+                            ) : (
+                              <div className="h-1 w-1 rounded-full bg-slate-300 mx-0.75 shrink-0" />
+                            )}
+                            <span className={diagnosticsStepIndex === 2 ? 'font-bold' : ''}>3. Spojení s Google Gemini AI</span>
+                          </div>
+                          <div className={`flex items-center gap-1.5 ${diagnosticsStepIndex >= 3 ? 'text-emerald-800' : ''}`}>
+                            {diagnosticsStepIndex > 3 ? (
+                              <Check className="h-2.5 w-2.5 text-emerald-600 shrink-0" />
+                            ) : diagnosticsStepIndex === 3 ? (
+                              <RefreshCw className="h-2.5 w-2.5 text-emerald-600 animate-spin shrink-0" />
+                            ) : (
+                              <div className="h-1 w-1 rounded-full bg-slate-300 mx-0.75 shrink-0" />
+                            )}
+                            <span className={diagnosticsStepIndex === 3 ? 'font-bold' : ''}>4. Sestavení diagnostického reportu</span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {diagnosticsError && (
+                      <div className="p-2 bg-red-100/80 border border-red-200 rounded-lg text-[10px] text-red-800 space-y-1">
+                        <p className="font-bold">Chyba diagnostiky:</p>
+                        <p className="opacity-95 leading-normal">{diagnosticsError}</p>
+                      </div>
+                    )}
+
+                    {diagnosticsResult && (
+                      <div className="space-y-2 text-[10px] animate-scale-up">
+                        {/* 1. WRITE PERMISSION */}
+                        <div className="p-2 bg-white border border-emerald-100 rounded-lg space-y-1 text-[#2c2c2c] shadow-xs">
+                          <div className="flex items-center justify-between font-bold">
+                            <span className="flex items-center gap-1 text-emerald-900">
+                              <Database className="h-3 w-3 text-emerald-600 shrink-0" />
+                              Zápis a správa receptů
+                            </span>
+                            {diagnosticsResult.writePermissionOk ? (
+                              <span className="text-[8px] bg-emerald-100 text-emerald-800 px-1 py-0.2 rounded font-black uppercase">
+                                OK
+                              </span>
+                            ) : (
+                              <span className="text-[8px] bg-red-100 text-red-800 px-1 py-0.2 rounded font-black uppercase">
+                                CHYBA
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-slate-600 leading-normal">
+                            {diagnosticsResult.writePermissionMessage}
+                          </p>
+                          <p className="text-slate-500 font-semibold text-[9px]">
+                            Celkem receptů v databázi: <strong className="text-slate-700">{diagnosticsResult.recipesCount}</strong>
+                          </p>
+                        </div>
+
+                        {/* 2. GEMINI AI */}
+                        <div className="p-2 bg-white border border-emerald-100 rounded-lg space-y-1 text-[#2c2c2c] shadow-xs">
+                          <div className="flex items-center justify-between font-bold">
+                            <span className="flex items-center gap-1 text-emerald-900">
+                              <Sparkles className="h-3 w-3 text-amber-500 shrink-0" />
+                              Spolupráce Gemini AI
+                            </span>
+                            {diagnosticsResult.geminiOk ? (
+                              <span className="text-[8px] bg-emerald-100 text-emerald-800 px-1 py-0.2 rounded font-black uppercase">
+                                OK
+                              </span>
+                            ) : (
+                              <span className="text-[8px] bg-red-100 text-red-800 px-1 py-0.2 rounded font-black uppercase">
+                                CHYBA
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-slate-600 leading-normal">
+                            {diagnosticsResult.geminiMessage}
+                          </p>
+                        </div>
+
+                        <div className="text-[9px] text-[#2D6A4F]/80 text-right italic font-medium">
+                          Ověřeno: {new Date(diagnosticsResult.timestamp).toLocaleTimeString("cs-CZ")}
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
               );
             } else {
@@ -3647,7 +3959,16 @@ ${separator}`;
                               </div>
                             </div>
 
-                            {!isAuditing && (
+                            {isAuditing ? (
+                              <button
+                                onClick={handleStopAudit}
+                                className="text-red-400 hover:text-red-300 px-3 py-1.5 bg-red-950/45 hover:bg-red-950/80 border border-red-900/60 rounded-xl transition-all cursor-pointer flex items-center gap-1.5 text-xs font-bold shadow-xs active:scale-95"
+                                title="Zastavit audit"
+                              >
+                                <Square className="h-2.5 w-2.5 fill-current" />
+                                <span>Zastavit</span>
+                              </button>
+                            ) : (
                               <button
                                 onClick={handleRejectAuditChange}
                                 className="text-slate-400 hover:text-slate-200 p-1 bg-slate-800/50 hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
@@ -3667,13 +3988,21 @@ ${separator}`;
                                   <Zap className="h-5 w-5 text-emerald-400" />
                                 </div>
                               </div>
-                              <div className="text-center space-y-1">
+                              <div className="text-center space-y-3">
                                 <p className="text-sm font-bold text-emerald-400">
                                   Spouštím kulinářský simulátor...
                                 </p>
                                 <p className="text-xs text-slate-400 max-w-md mx-auto leading-relaxed">
                                   Program podrobuje složení a postup receptu kulinářské simulaci, kontroluje chemii jídla a reakce.
                                 </p>
+                                <button
+                                  type="button"
+                                  onClick={handleStopAudit}
+                                  className="mx-auto text-xs bg-red-950/80 hover:bg-red-900 text-red-200 font-bold py-1.5 px-4 rounded-xl border border-red-900/60 transition-all flex items-center gap-1.5 cursor-pointer hover:scale-105 active:scale-95 shadow-sm"
+                                >
+                                  <Square className="h-2.5 w-2.5 fill-red-400" />
+                                  <span>Zastavit kontrolu</span>
+                                </button>
                               </div>
                             </div>
                           )}

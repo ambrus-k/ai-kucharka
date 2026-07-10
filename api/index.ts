@@ -4,6 +4,7 @@ import fs from "fs";
 import { exec } from "child_process";
 import { GoogleGenAI, Type } from "@google/genai";
 import dotenv from "dotenv";
+import { Octokit } from "@octokit/rest";
 
 dotenv.config();
 
@@ -118,7 +119,7 @@ function isAuthorized(req: express.Request): boolean {
 }
 
 // Run git commit & push directly on this single repository to persist updates
-function runGitSync(req: express.Request, savedCount: number, deletedCount: number) {
+async function runGitSync(req: express.Request, savedCount: number, deletedCount: number) {
   const { githubToken, githubUsername, githubRepo, githubBranch } = getAuthDetails(req);
 
   // If client provided custom credentials (Option B), use them; otherwise fall back to server env variables (Option A)
@@ -138,6 +139,112 @@ function runGitSync(req: express.Request, savedCount: number, deletedCount: numb
     ? githubBranch
     : (process.env.GITHUB_BRANCH || "main").trim();
 
+  // If we have a valid GitHub token, use the GitHub REST API (highly reliable, works in Serverless/Vercel)
+  if (gitToken && !isPlaceholderToken(gitToken)) {
+    console.log(`[Git Sync] Spouštím synchronizaci přes GitHub API pro repozitář ${gitUsername}/${gitRepo} (větev: ${gitBranch})...`);
+    try {
+      const octokit = new Octokit({ auth: gitToken });
+
+      // 1. Get current reference SHA
+      const { data: refData } = await octokit.git.getRef({
+        owner: gitUsername,
+        repo: gitRepo,
+        ref: `heads/${gitBranch}`,
+      });
+      const currentCommitSha = refData.object.sha;
+
+      // 2. Get tree SHA
+      const { data: commitData } = await octokit.git.getCommit({
+        owner: gitUsername,
+        repo: gitRepo,
+        commit_sha: currentCommitSha,
+      });
+      const currentTreeSha = commitData.tree.sha;
+
+      // 3. Prepare tree entries
+      let remoteFiles: string[] = [];
+      try {
+        const { data: remoteTreeData } = await octokit.git.getTree({
+          owner: gitUsername,
+          repo: gitRepo,
+          tree_sha: currentTreeSha,
+          recursive: "true",
+        });
+        remoteFiles = remoteTreeData.tree
+          .filter(item => item.path?.startsWith("data/recipes/") && item.path.endsWith(".json"))
+          .map(item => item.path!);
+      } catch (e: any) {
+        console.warn("[Git Sync API Warning] Nepodařilo se stáhnout vzdálený strom:", e.message);
+      }
+
+      const localFiles = fs.readdirSync(DATA_DIR).filter(f => f.endsWith(".json"));
+      const localPaths = localFiles.map(f => `data/recipes/${f}`);
+
+      const treeEntries: any[] = [];
+
+      // Add/update files
+      for (const file of localFiles) {
+        const localPath = `data/recipes/${file}`;
+        const content = fs.readFileSync(path.join(DATA_DIR, file), "utf8");
+        treeEntries.push({
+          path: localPath,
+          mode: "100644",
+          type: "blob",
+          content: content,
+        });
+      }
+
+      // Mark deleted files
+      for (const remotePath of remoteFiles) {
+        if (!localPaths.includes(remotePath)) {
+          treeEntries.push({
+            path: remotePath,
+            mode: "100644",
+            type: "blob",
+            sha: null,
+          });
+        }
+      }
+
+      if (treeEntries.length > 0) {
+        // Create tree
+        const { data: newTree } = await octokit.git.createTree({
+          owner: gitUsername,
+          repo: gitRepo,
+          base_tree: currentTreeSha,
+          tree: treeEntries,
+        });
+
+        // Create commit
+        const { data: newCommit } = await octokit.git.createCommit({
+          owner: gitUsername,
+          repo: gitRepo,
+          message: `Admin: Obousměrná synchronizace receptů (${savedCount} uloženo, ${deletedCount} smazáno)`,
+          tree: newTree.sha,
+          parents: [currentCommitSha],
+        });
+
+        // Update ref
+        await octokit.git.updateRef({
+          owner: gitUsername,
+          repo: gitRepo,
+          ref: `heads/${gitBranch}`,
+          sha: newCommit.sha,
+          force: true,
+        });
+
+        console.log(`[Git Sync API Success] Úspěšně synchronizováno přes GitHub API!`);
+        return;
+      } else {
+        console.log("[Git Sync API] Žádné změny k uložení na GitHub.");
+        return;
+      }
+    } catch (apiError: any) {
+      console.error("[Git Sync API Error] GitHub API synchronizace selhala, zkusím lokální git příkazy:", apiError.message || apiError);
+    }
+  }
+
+  // Fallback to local git execution (AI Studio / VM environment with workspace access)
   let pushTarget = "origin " + gitBranch;
   if (gitToken && !isPlaceholderToken(gitToken)) {
     pushTarget = `https://${gitToken}@github.com/${gitUsername}/${gitRepo}.git ${gitBranch}`;
@@ -152,11 +259,11 @@ function runGitSync(req: express.Request, savedCount: number, deletedCount: numb
   ];
 
   const fullCmd = commands.join(" && ");
-  console.log(`[Git Sync] Synchronizace přímo v hlavním repozitáři ${gitUsername}/${gitRepo} (${gitBranch})...`);
-  
+  console.log(`[Git Sync Fallback] Synchronizace přes lokální git v ${gitUsername}/${gitRepo} (${gitBranch})...`);
+
   exec(fullCmd, (error, stdout, stderr) => {
     if (error) {
-      console.warn(`[Git Sync Warning] Git push se nezdařil (v bezserverovém Vercel prostředí je to běžné, pokud chybí práva nebo se jedná o read-only FS):`, error.message);
+      console.warn(`[Git Sync Warning] Git push se nezdařil (v bezserverovém Vercel prostředí je to běžné):`, error.message);
       return;
     }
     console.log(`[Git Sync Success] Git synchronizace hlavního repozitáře dokončena:\n${stdout}`);
@@ -348,6 +455,82 @@ app.get("/api/github-status", (req, res) => {
     branchFound: true,
     recipesCount: 32
   });
+});
+
+// Endpoint for admin diagnostic testing of AI and folder write permissions
+app.post("/api/test-diagnostics", async (req, res) => {
+  try {
+    if (!isAuthorized(req)) {
+      return res.status(401).json({ error: "Přístup odepřen. Neautorizovaný přístup." });
+    }
+
+    const diagnosticsResult: any = {
+      timestamp: new Date().toISOString(),
+      writePermissionOk: false,
+      writePermissionMessage: "",
+      geminiOk: false,
+      geminiMessage: "",
+      recipesCount: 0,
+    };
+
+    // 1. Test local recipes directory write permission
+    try {
+      const testFilePath = path.join(DATA_DIR, "test-write-canary.json");
+      const testContent = { test: true, time: Date.now() };
+      fs.writeFileSync(testFilePath, JSON.stringify(testContent, null, 2), "utf8");
+      
+      // Verify read
+      const readBack = fs.readFileSync(testFilePath, "utf8");
+      const readObj = JSON.parse(readBack);
+      if (readObj.test === true) {
+        diagnosticsResult.writePermissionOk = true;
+        diagnosticsResult.writePermissionMessage = "Složka receptů je plně zapisovatelná. Ukládání receptů i vytváření nových bude bezproblémově fungovat.";
+      } else {
+        diagnosticsResult.writePermissionMessage = "Nepodařilo se správně ověřit zapsaná zkušební data.";
+      }
+      // Delete
+      fs.unlinkSync(testFilePath);
+    } catch (e: any) {
+      diagnosticsResult.writePermissionMessage = `Složka receptů není zapisovatelná: ${e.message || e}`;
+    }
+
+    // 2. Count recipes in DATA_DIR
+    try {
+      if (fs.existsSync(DATA_DIR)) {
+        const files = fs.readdirSync(DATA_DIR).filter(f => f.endsWith(".json"));
+        diagnosticsResult.recipesCount = files.length;
+      }
+    } catch (e: any) {
+      console.error("[Diagnostics] Chyba při čtení počtu receptů:", e);
+    }
+
+    // 3. Test Gemini API connection
+    try {
+      const apiKey = process.env.GEMINI_API_KEY;
+      if (!apiKey) {
+        diagnosticsResult.geminiMessage = "Chybí klíč GEMINI_API_KEY v konfiguraci serveru. AI funkce nebudou dostupné.";
+      } else {
+        const ai = getAi();
+        const response = await generateContentWithRetry(ai, {
+          model: "gemini-3.5-flash",
+          contents: "Ahoj, odpověz jedním slovem: 'Ano'.",
+        });
+        if (response && response.text) {
+          diagnosticsResult.geminiOk = true;
+          diagnosticsResult.geminiMessage = `AI reaguje správně a je plně připraveno spolupracovat. Odezva: "${response.text.trim()}"`;
+        } else {
+          diagnosticsResult.geminiMessage = "AI neodpovědělo správně.";
+        }
+      }
+    } catch (e: any) {
+      diagnosticsResult.geminiMessage = `Připojení k AI selhalo: ${e.message || e}`;
+    }
+
+    return res.json(diagnosticsResult);
+  } catch (error: any) {
+    console.error("Diagnostics endpoint error:", error);
+    return res.status(500).json({ error: error.message || "Vnitřní chyba diagnostiky." });
+  }
 });
 
 // 5. POST /api/enhance-recipe - Enhance/create recipe with AI (ONLY authenticated admin via Option A or B)
