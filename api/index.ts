@@ -16,7 +16,19 @@ app.use(express.json({ limit: "15mb" }));
 app.use(express.urlencoded({ limit: "15mb", extended: true }));
 
 // Data directory where individual recipe JSON files are stored
-const DATA_DIR = path.join(process.cwd(), "data", "recipes");
+let DATA_DIR = path.join(process.cwd(), "data", "recipes");
+if (!fs.existsSync(DATA_DIR)) {
+  const altDir = path.join(__dirname, "../data/recipes");
+  if (fs.existsSync(altDir)) {
+    DATA_DIR = altDir;
+  } else {
+    const altDir2 = path.join(__dirname, "data", "recipes");
+    if (fs.existsSync(altDir2)) {
+      DATA_DIR = altDir2;
+    }
+  }
+}
+console.log(`[Recipes DB] Aktivní složka pro recepty: ${DATA_DIR} (Existuje: ${fs.existsSync(DATA_DIR)})`);
 
 const slugify = (title: string) => {
   return title
