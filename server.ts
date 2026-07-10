@@ -54,6 +54,45 @@ function loadGithubConfig(): GithubConfig {
   return {};
 }
 
+function isPlaceholderToken(t: string): boolean {
+  if (!t) return true;
+  const upper = t.toUpperCase();
+  return (
+    upper === "GHP_..." ||
+    upper.includes("VASE_TAJNE") ||
+    upper.includes("PLACEHOLDER") ||
+    upper.includes("REPLACE_ME") ||
+    upper.includes("DEMO") ||
+    upper.includes("VASOSOBNIGITHUBTOKEN") ||
+    t === "ghp_VASE_TAJNE_GHP_PROSTREDNI_TOKEN_NASTAVTE_VE_VERCELU" ||
+    t === "ghp_VasOsobniGitHubTokenZacinajiciNaGhp"
+  );
+}
+
+function resolveGithubToken(req: express.Request, savedConfig: GithubConfig): string {
+  const headerToken = (req.headers["x-github-token"] as string || "").trim();
+  if (headerToken && !isPlaceholderToken(headerToken)) {
+    return headerToken;
+  }
+  
+  const configToken = (savedConfig.token || "").trim();
+  if (configToken && !isPlaceholderToken(configToken)) {
+    return configToken;
+  }
+  
+  const envDataToken = (process.env.GITHUB_DATA_TOKEN || "").trim();
+  if (envDataToken && !isPlaceholderToken(envDataToken)) {
+    return envDataToken;
+  }
+
+  const envToken = (process.env.GITHUB_TOKEN || "").trim();
+  if (envToken && !isPlaceholderToken(envToken)) {
+    return envToken;
+  }
+
+  return "";
+}
+
 // Set up JSON parsing with generous limits to support image uploads
 app.use(express.json({ limit: "15mb" }));
 app.use(express.urlencoded({ limit: "15mb", extended: true }));
@@ -124,19 +163,34 @@ async function generateContentWithRetry(ai: GoogleGenAI, options: any, maxRetrie
   throw lastError || new Error("Nepodařilo se vygenerovat obsah pomocí žádného z dostupných AI modelů.");
 }
 
-// Support dual authentication: ADMIN_PASSWORD or GEMINI_API_KEY
+// Extract admin password from request body, headers, or authorization header
+function getAdminPasswordFromRequest(req: express.Request): string {
+  if (req.body?.adminPassword) {
+    return req.body.adminPassword.toString().trim();
+  }
+  if (req.headers["x-admin-password"]) {
+    return req.headers["x-admin-password"].toString().trim();
+  }
+  if (req.headers.authorization) {
+    const authHeader = req.headers.authorization.toString().trim();
+    if (authHeader.startsWith("Bearer ")) {
+      return authHeader.substring(7).trim();
+    }
+    return authHeader;
+  }
+  return "";
+}
+
+// Strictly authenticate using only ADMIN_PASSWORD
 function checkAuth(adminPassword: any): boolean {
   if (!adminPassword || typeof adminPassword !== "string" || !adminPassword.trim()) {
     return false;
   }
   const password = adminPassword.trim();
-  const apiKey = (process.env.GEMINI_API_KEY || "").trim();
   const envAdminPassword = (process.env.ADMIN_PASSWORD || "").trim();
 
+  // Strictly check against ADMIN_PASSWORD env variable
   if (envAdminPassword && password === envAdminPassword) {
-    return true;
-  }
-  if (apiKey && password === apiKey) {
     return true;
   }
   return false;
@@ -161,9 +215,9 @@ app.get("/api/github-config", (req, res) => {
 app.get("/api/github-status", async (req, res) => {
   try {
     const savedConfig = loadGithubConfig();
-    const token = ((req.headers["x-github-token"] as string) || savedConfig.token || process.env.GITHUB_DATA_TOKEN || process.env.GITHUB_TOKEN || "").trim();
+    const token = resolveGithubToken(req, savedConfig);
     const owner = ((req.headers["x-github-username"] as string) || savedConfig.username || process.env.GITHUB_USERNAME || "ambrus-k").trim();
-    const repo = ((req.headers["x-github-repo"] as string) || savedConfig.repo || process.env.GITHUB_REPO || "ai-kucharka").trim();
+    const repo = ((req.headers["x-github-repo"] as string) || savedConfig.repo || process.env.GITHUB_REPO || "ai-kucharka-data").trim();
     const branch = ((req.headers["x-github-branch"] as string) || savedConfig.branch || "main").trim();
 
     const result = {
@@ -252,9 +306,9 @@ app.post("/api/github-config", (req, res) => {
 app.get(["/api", "/api/recipes", "/api/recipes/", "/recipes", "/recipes/"], async (req, res) => {
   try {
     const savedConfig = loadGithubConfig();
-    const token = ((req.headers["x-github-token"] as string) || savedConfig.token || process.env.GITHUB_DATA_TOKEN || process.env.GITHUB_TOKEN || "").trim();
+    const token = resolveGithubToken(req, savedConfig);
     const owner = ((req.headers["x-github-username"] as string) || savedConfig.username || process.env.GITHUB_USERNAME || "ambrus-k").trim();
-    const repo = ((req.headers["x-github-repo"] as string) || savedConfig.repo || process.env.GITHUB_REPO || "ai-kucharka").trim();
+    const repo = ((req.headers["x-github-repo"] as string) || savedConfig.repo || process.env.GITHUB_REPO || "ai-kucharka-data").trim();
     const branch = ((req.headers["x-github-branch"] as string) || savedConfig.branch || "main").trim();
 
     // Auto-save incoming headers if they exist to keep server sync updated
@@ -383,15 +437,15 @@ app.all(["/api", "/api/recipes", "/api/recipes/", "/recipes", "/recipes/"], asyn
   }
 
   try {
-    const adminPassword = (req.body?.adminPassword || req.headers["x-admin-password"] || "").toString();
+    const adminPassword = getAdminPasswordFromRequest(req);
     if (!checkAuth(adminPassword)) {
       return res.status(401).json({ error: "Přístup odepřen. Pro ukládání změn se musíte přihlásit platným administračním heslem." });
     }
 
     const savedConfig = loadGithubConfig();
-    const token = ((req.headers["x-github-token"] as string) || savedConfig.token || process.env.GITHUB_DATA_TOKEN || process.env.GITHUB_TOKEN || "").trim();
+    const token = resolveGithubToken(req, savedConfig);
     const owner = ((req.headers["x-github-username"] as string) || savedConfig.username || process.env.GITHUB_USERNAME || "ambrus-k").trim();
-    const repo = ((req.headers["x-github-repo"] as string) || savedConfig.repo || process.env.GITHUB_REPO || "ai-kucharka").trim();
+    const repo = ((req.headers["x-github-repo"] as string) || savedConfig.repo || process.env.GITHUB_REPO || "ai-kucharka-data").trim();
     const branch = ((req.headers["x-github-branch"] as string) || savedConfig.branch || "main").trim();
 
     // Auto-save incoming headers if they exist to keep server sync updated
@@ -561,15 +615,15 @@ app.all(["/api", "/api/recipes", "/api/recipes/", "/recipes", "/recipes/"], asyn
   }
 });
 
-// Endpoint to verify administrator / API key
+// Endpoint to verify administrator
 app.post(["/api/verify-admin", "/api/verify-admin/", "/verify-admin", "/verify-admin/"], (req, res) => {
   try {
-    const { adminPassword } = req.body;
+    const adminPassword = getAdminPasswordFromRequest(req);
 
     if (checkAuth(adminPassword)) {
       return res.json({ success: true });
     }
-    return res.status(401).json({ error: "Neplatný klíč. Pro přístup jako administrátor zadejte buď platný administrátorský kód (ADMIN_PASSWORD) nebo Gemini API klíč." });
+    return res.status(401).json({ error: "Neplatný administrátorský kód (ADMIN_PASSWORD)." });
   } catch (error) {
     return res.status(500).json({ error: "Chyba při ověřování klíče." });
   }
@@ -578,11 +632,13 @@ app.post(["/api/verify-admin", "/api/verify-admin/", "/verify-admin", "/verify-a
 // 2. API Endpoint to enhance recipe
 app.post(["/api/enhance-recipe", "/api/enhance-recipe/", "/enhance-recipe", "/enhance-recipe/"], async (req, res) => {
   try {
-    const { rawText, fileData, fileName, mimeType, adminPassword } = req.body;
+    const adminPassword = getAdminPasswordFromRequest(req);
 
     if (!checkAuth(adminPassword)) {
-       return res.status(401).json({ error: "Příšup odepřen. Pro přidání a generování nového receptu se musíte přihlásit platným administrátorským kódem nebo kulinářským API klíčem." });
+       return res.status(401).json({ error: "Přístup odepřen. Pro přidání a generování nového receptu se musíte přihlásit platným administrátorským heslem (ADMIN_PASSWORD)." });
     }
+
+    const { rawText, fileData, fileName, mimeType } = req.body;
 
     if (!rawText && !fileData) {
       return res.status(400).json({ error: "Musíte poskytnout buď text receptu nebo nahrát soubor." });
@@ -681,11 +737,13 @@ ZÁSADNÍ PRAVIDLA:
 // 3. API Endpoint to edit/modify an existing recipe based on user instructions
 app.post(["/api/edit-recipe", "/api/edit-recipe/", "/edit-recipe", "/edit-recipe/"], async (req, res) => {
   try {
-    const { recipe, modificationPrompt, adminPassword } = req.body;
+    const adminPassword = getAdminPasswordFromRequest(req);
 
     if (!checkAuth(adminPassword)) {
-      return res.status(401).json({ error: "Přístup odepřen. K úpravě receptu se musíte přihlásit platným administrátorským kódem nebo kulinářským API klíčem." });
+      return res.status(401).json({ error: "Přístup odepřen. K úpravě receptu se musíte přihlásit platným administrátorským heslem (ADMIN_PASSWORD)." });
     }
+
+    const { recipe, modificationPrompt } = req.body;
 
     if (!recipe || !modificationPrompt) {
       return res.status(400).json({ error: "Chybí stávající recept nebo pokyny pro úpravu." });
@@ -773,11 +831,13 @@ Vytvoř kompletně aktualizovaný recept se všemi poli. Ujisti se, že pokud se
 // 4. API Endpoint to audit/play through a recipe and propose a modification
 app.post(["/api/audit-recipe", "/api/audit-recipe/", "/api/check-recipe", "/api/check-recipe/", "/audit-recipe", "/audit-recipe/", "/check-recipe", "/check-recipe/"], async (req, res) => {
   try {
-    const { recipe, adminPassword } = req.body;
+    const adminPassword = getAdminPasswordFromRequest(req);
 
     if (!checkAuth(adminPassword)) {
-      return res.status(401).json({ error: "Přístup odepřen. Ke kontrole receptu se musíte přihlásit platným administrátorským kódem nebo kulinářským API klíčem." });
+      return res.status(401).json({ error: "Přístup odepřen. Ke kontrole receptu se musíte přihlásit platným administrátorským heslem (ADMIN_PASSWORD)." });
     }
+
+    const { recipe } = req.body;
 
     if (!recipe) {
       return res.status(400).json({ error: "Chybí recept pro kontrolu." });

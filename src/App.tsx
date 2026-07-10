@@ -69,19 +69,19 @@ const REMOTE_DB_URL = (() => {
   // 2. Look for personal GitHub username override in localStorage for sharing
   const storedGithubName = localStorage.getItem("ai_kucharka_github_username");
   if (storedGithubName && storedGithubName.trim() !== "") {
-    const repo = localStorage.getItem("ai_kucharka_github_repo") || "ai-kucharka";
+    const repo = localStorage.getItem("ai_kucharka_github_repo") || "ai-kucharka-data";
     const branch = localStorage.getItem("ai_kucharka_github_branch") || "main";
     const path = localStorage.getItem("ai_kucharka_github_path") || "recipes.json";
     return `https://raw.githubusercontent.com/${storedGithubName.trim()}/${repo.trim()}/${branch.trim()}/${path.trim()}`;
   }
 
-  // 3. Fallback when NOT in Studio (the live Vercel version): always load from ambrus-k/ai-kucharka
+  // 3. Fallback when NOT in Studio (the live Vercel version): always load from ambrus-k/ai-kucharka-data
   if (!isStudioEnv) {
-    return "https://raw.githubusercontent.com/ambrus-k/ai-kucharka/main/recipes.json";
+    return "https://raw.githubusercontent.com/ambrus-k/ai-kucharka-data/main/recipes.json";
   }
 
   // 4. Default template in Studio
-  return "https://raw.githubusercontent.com/ambrus-k/ai-kucharka/main/recipes.json";
+  return "https://raw.githubusercontent.com/ambrus-k/ai-kucharka-data/main/recipes.json";
 })();
 
 
@@ -426,7 +426,7 @@ export default function App() {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [activeTab, setActiveTab] = useState<"admin" | "github">("admin");
   const [githubUser, setGithubUser] = useState(() => localStorage.getItem("ai_kucharka_github_username") || "ambrus-k");
-  const [githubRepo, setGithubRepo] = useState(() => localStorage.getItem("ai_kucharka_github_repo") || "ai-kucharka");
+  const [githubRepo, setGithubRepo] = useState(() => localStorage.getItem("ai_kucharka_github_repo") || "ai-kucharka-data");
   const [githubToken, setGithubToken] = useState(() => localStorage.getItem("ai_kucharka_github_token") || "");
   const [githubBranch, setGithubBranch] = useState(() => localStorage.getItem("ai_kucharka_github_branch") || "main");
   const [githubPath, setGithubPath] = useState(() => localStorage.getItem("ai_kucharka_github_path") || "recipes.json");
@@ -1925,9 +1925,20 @@ ${separator}`;
     const loadRecipes = async () => {
       let loadedList: Recipe[] | null = null;
 
-      // 1. Prioritize loading from Serverless API /api/recipes
+      // 1. Prioritize loading from Serverless API /api/recipes (using custom GitHub headers if available)
       try {
-        const serverlessResponse = await fetch("/api/recipes");
+        const headers: Record<string, string> = {};
+        const storedUser = localStorage.getItem("ai_kucharka_github_username") || "ambrus-k";
+        const storedRepo = localStorage.getItem("ai_kucharka_github_repo") || "ai-kucharka-data";
+        const storedBranch = localStorage.getItem("ai_kucharka_github_branch") || "main";
+        const storedToken = localStorage.getItem("ai_kucharka_github_token") || "";
+
+        if (storedUser) headers["x-github-username"] = storedUser;
+        if (storedRepo) headers["x-github-repo"] = storedRepo;
+        if (storedBranch) headers["x-github-branch"] = storedBranch;
+        if (storedToken) headers["x-github-token"] = storedToken;
+
+        const serverlessResponse = await fetch("/api/recipes", { headers });
         if (serverlessResponse.ok) {
           const data = await serverlessResponse.json();
           const list = Array.isArray(data) ? data : (data.recipes || []);
@@ -1999,6 +2010,16 @@ ${separator}`;
       const headers: Record<string, string> = {
         "Content-Type": "application/json"
       };
+
+      const storedUser = localStorage.getItem("ai_kucharka_github_username") || "ambrus-k";
+      const storedRepo = localStorage.getItem("ai_kucharka_github_repo") || "ai-kucharka-data";
+      const storedBranch = localStorage.getItem("ai_kucharka_github_branch") || "main";
+      const storedToken = localStorage.getItem("ai_kucharka_github_token") || "";
+
+      if (storedUser) headers["x-github-username"] = storedUser;
+      if (storedRepo) headers["x-github-repo"] = storedRepo;
+      if (storedBranch) headers["x-github-branch"] = storedBranch;
+      if (storedToken) headers["x-github-token"] = storedToken;
 
       const response = await fetch("/api/recipes", {
         method: "POST",
