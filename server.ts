@@ -158,6 +158,90 @@ app.get("/api/github-config", (req, res) => {
   });
 });
 
+app.get("/api/github-status", async (req, res) => {
+  try {
+    const savedConfig = loadGithubConfig();
+    const token = ((req.headers["x-github-token"] as string) || savedConfig.token || process.env.GITHUB_DATA_TOKEN || process.env.GITHUB_TOKEN || "").trim();
+    const owner = ((req.headers["x-github-username"] as string) || savedConfig.username || process.env.GITHUB_USERNAME || "ambrus-k").trim();
+    const repo = ((req.headers["x-github-repo"] as string) || savedConfig.repo || process.env.GITHUB_REPO || "ai-kucharka").trim();
+    const branch = ((req.headers["x-github-branch"] as string) || savedConfig.branch || "main").trim();
+
+    const result = {
+      connected: false,
+      owner,
+      repo,
+      branch,
+      hasToken: !!token,
+      repoExists: false,
+      recipesFolderExists: false,
+      recipesJsonExists: false,
+      recipeCount: 0,
+      errorMessage: null as string | null,
+    };
+
+    const headers: Record<string, string> = {
+      "User-Agent": "AI-Kucharka"
+    };
+    if (token) {
+      headers["Authorization"] = `token ${token}`;
+    }
+
+    // 1. Zkontrolujeme, zda repozitář existuje
+    try {
+      const repoRes = await fetch(`https://api.github.com/repos/${owner}/${repo}`, { headers });
+      if (repoRes.status === 200) {
+        result.repoExists = true;
+        result.connected = true;
+      } else if (repoRes.status === 404) {
+        result.errorMessage = `Repozitář '${owner}/${repo}' nebyl nalezen (404). Zkontrolujte uživatelské jméno, název repozitáře nebo platnost tokenu (pokud je repozitář soukromý).`;
+        return res.json(result);
+      } else if (repoRes.status === 401) {
+        result.errorMessage = `Neplatný nebo neautorizovaný GitHub Token (401).`;
+        return res.json(result);
+      } else {
+        result.errorMessage = `GitHub API vrátilo status ${repoRes.status} při ověřování repozitáře.`;
+        return res.json(result);
+      }
+    } catch (err: any) {
+      result.errorMessage = `Chyba připojení k GitHub API: ${err.message || err}`;
+      return res.json(result);
+    }
+
+    // 2. Zkontrolujeme, zda existuje sločený soubor recipes.json
+    try {
+      const rawUrl = `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/recipes.json`;
+      const rawRes = await fetch(rawUrl, { headers });
+      if (rawRes.ok) {
+        result.recipesJsonExists = true;
+        const data = await rawRes.json().catch(() => null);
+        if (Array.isArray(data)) {
+          result.recipeCount = data.length;
+        }
+      }
+    } catch (e) {}
+
+    // 3. Zkontrolujeme, zda existuje složka recipes/
+    try {
+      const folderUrl = `https://api.github.com/repos/${owner}/${repo}/contents/recipes?ref=${branch}`;
+      const folderRes = await fetch(folderUrl, { headers });
+      if (folderRes.ok) {
+        result.recipesFolderExists = true;
+        const files = await folderRes.json().catch(() => []);
+        if (Array.isArray(files)) {
+          const jsonFilesCount = files.filter((f: any) => f.type === "file" && f.name.endsWith(".json")).length;
+          if (result.recipeCount === 0) {
+            result.recipeCount = jsonFilesCount;
+          }
+        }
+      }
+    } catch (e) {}
+
+    return res.json(result);
+  } catch (error: any) {
+    return res.status(500).json({ error: error.message || error });
+  }
+});
+
 app.post("/api/github-config", (req, res) => {
   const { username, repo, token, branch } = req.body;
   saveGithubConfig({ username, repo, token, branch });
@@ -165,7 +249,7 @@ app.post("/api/github-config", (req, res) => {
 });
 
 // GET /api a GET /api/recipes - Načtení všech receptů ze složky recipes/ z GitHubu
-app.get(["/api", "/api/recipes", "/recipes"], async (req, res) => {
+app.get(["/api", "/api/recipes", "/api/recipes/", "/recipes", "/recipes/"], async (req, res) => {
   try {
     const savedConfig = loadGithubConfig();
     const token = ((req.headers["x-github-token"] as string) || savedConfig.token || process.env.GITHUB_DATA_TOKEN || process.env.GITHUB_TOKEN || "").trim();
@@ -293,7 +377,7 @@ app.get(["/api", "/api/recipes", "/recipes"], async (req, res) => {
 });
 
 // POST / PUT /api a /api/recipes - Hromadná aktualizace složky recipes/ na GitHubu (přes Git Data API)
-app.all(["/api", "/api/recipes", "/recipes"], async (req, res) => {
+app.all(["/api", "/api/recipes", "/api/recipes/", "/recipes", "/recipes/"], async (req, res) => {
   if (req.method !== "POST" && req.method !== "PUT") {
     return res.status(405).json({ error: "Metoda nepovolena." });
   }
@@ -478,7 +562,7 @@ app.all(["/api", "/api/recipes", "/recipes"], async (req, res) => {
 });
 
 // Endpoint to verify administrator / API key
-app.post(["/api/verify-admin", "/verify-admin"], (req, res) => {
+app.post(["/api/verify-admin", "/api/verify-admin/", "/verify-admin", "/verify-admin/"], (req, res) => {
   try {
     const { adminPassword } = req.body;
 
@@ -492,7 +576,7 @@ app.post(["/api/verify-admin", "/verify-admin"], (req, res) => {
 });
 
 // 2. API Endpoint to enhance recipe
-app.post(["/api/enhance-recipe", "/enhance-recipe"], async (req, res) => {
+app.post(["/api/enhance-recipe", "/api/enhance-recipe/", "/enhance-recipe", "/enhance-recipe/"], async (req, res) => {
   try {
     const { rawText, fileData, fileName, mimeType, adminPassword } = req.body;
 
@@ -595,7 +679,7 @@ ZÁSADNÍ PRAVIDLA:
 });
 
 // 3. API Endpoint to edit/modify an existing recipe based on user instructions
-app.post(["/api/edit-recipe", "/edit-recipe"], async (req, res) => {
+app.post(["/api/edit-recipe", "/api/edit-recipe/", "/edit-recipe", "/edit-recipe/"], async (req, res) => {
   try {
     const { recipe, modificationPrompt, adminPassword } = req.body;
 
@@ -687,7 +771,7 @@ Vytvoř kompletně aktualizovaný recept se všemi poli. Ujisti se, že pokud se
 });
 
 // 4. API Endpoint to audit/play through a recipe and propose a modification
-app.post(["/api/audit-recipe", "/api/check-recipe", "/audit-recipe", "/check-recipe"], async (req, res) => {
+app.post(["/api/audit-recipe", "/api/audit-recipe/", "/api/check-recipe", "/api/check-recipe/", "/audit-recipe", "/audit-recipe/", "/check-recipe", "/check-recipe/"], async (req, res) => {
   try {
     const { recipe, adminPassword } = req.body;
 
@@ -779,6 +863,11 @@ Spusť virtuální kulinářskou simulaci vaření, zapiš její kroky, navrhni 
       details: error.stack
     });
   }
+});
+
+// Catch-all for any other unhandled /api/* routes to prevent them from falling through to Vite SPA html serving
+app.all("/api/*", (req, res) => {
+  res.status(404).json({ error: `API endpoint '${req.originalUrl}' not found with method ${req.method}` });
 });
 
 // Serve frontend assets
