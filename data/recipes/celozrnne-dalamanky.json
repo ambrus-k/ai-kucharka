@@ -1,30 +1,31 @@
 {
   "title": "Celozrnné dalamánky",
-  "summary": "Tradiční řemeslné dalamánky s optimalizovaným poměrem mouk a řízenou fermentací pro maximální střídku a křupavou krustu.",
+  "summary": "Křupavé dalamánky s vysokým obsahem vlákniny a vyváženou fermentací, připravené s využitím moderní techniky zapařování.",
   "ingredients": [
     "350 g pšeničné chlebové mouky",
     "150 g žitné chlebové mouky",
-    "325 ml vlažné vody (30 °C)",
+    "325 ml vlažné vody",
     "12 g čerstvého droždí",
-    "7 g ječného sladu (sladěnky)",
+    "7 g ječného sladu (Sladěnka)",
     "10 ml jablečného octa",
-    "12 g jemné soli",
+    "12 g jemné mořské soli",
     "5 g celého kmínu"
   ],
   "instructions": [
-    "Do vlažné vody o teplotě 30 °C přidejte čerstvé droždí a ječný slad. Promíchejte a nechte 8 minut aktivovat, dokud se nevytvoří stabilní kvásková pěna.",
-    "V míse kuchyňského robota smíchejte pšeničnou chlebovou mouku, žitnou chlebovou mouku, jemnou sůl a celý kmín.",
-    "Do suché směsi přilijte vzešlý kvásek a jablečný ocet. Hněťte při nízkých otáčkách po dobu 4 minut.",
-    "Těsto nechte v míse přikryté utěrkou kynout 50 minut při pokojové teplotě, dokud nezdvojnásobí svůj objem.",
-    "Vykynuté těsto rozdělte na stejné bochánky, jemně je vytvarujte do tvaru dalamánků a položte na plech s pečicím papírem. Nechte je kynout 25 minut pod utěrkou.",
-    "Nařízněte povrch dalamánků do hloubky 0,5 cm, vložte do trouby předehřáté na 240 °C, do spodní části vlijte horkou vodu pro záparu a pečte 10 minut. Poté vyjměte plech s vodou, snižte teplotu na 190 °C a dopečte dalších 15 minut."
+    "Rozpusťte čerstvé droždí spolu s ječným sladem ve vlažné vodě a nechte krátce odstát, dokud se na hladině nevytvoří aktivní pěna.",
+    "V míse kuchyňského robota smíchejte oba druhy mouky, sůl a kmín. Přidejte připravený kvásek a jablečný ocet.",
+    "Pomocí hnětacího háku vypracujte hladké a nelepivé těsto. Hnětení udržujte na nízké rychlosti, aby nedošlo k poškození struktury lepku obsaženého v žitné mouce.",
+    "Zakryté těsto nechte v teple kynout, dokud viditelně nezdvojnásobí svůj původní objem.",
+    "Vykynuté těsto přeneste na vál, jemně jej prohněťte a rozdělte na stejně velké díly. Vytvarujte oválné bochánky.",
+    "Dalamánky vyskládejte na plech s pečicím papírem, lehce zaprašte moukou a nechte pod utěrkou finálně nakynout. Před vložením do pece je na povrchu podélně nařízněte.",
+    "Pečte v předehřáté troubě se zapařením pomocí horké vody na spodním plechu. Po prvotní fázi v páře odvětrejte vlhkost a dopečte dozlatova při nižší teplotě."
   ],
-  "applianceTips": "Při pečení v domácí pekárně využijte pouze program 'Těsto'. Pro dosažení profesionální krusty v horkovzdušné fritéze (Air Fryer) pečte při 200 °C po dobu 12-14 minut, přičemž v prvních 3 minutách zajistěte vlhkost rozprašovačem vody.",
-  "expertJustification": "Změna postupu reflektuje vědecké poznatky o viskoelasticitě žitného lepku. Kratší hnětení zabraňuje degradaci pentosanů v žitné mouce, což by jinak vedlo k 'lepkavé' střídce. Jablečný ocet upravuje pH těsta, což zpomaluje enzymatickou aktivitu amyláz a prodlužuje čerstvost pečiva. Injekce páry (zapaření) v počáteční fázi pečení je klíčová pro dosažení maximálního objemu a lesklé krusty díky procesu želatinizace škrobů na povrchu.",
-  "applianceType": "Kuchyňský robot s hnětacím hákem",
+  "applianceTips": "Pro dokonalý výsledek můžete využít program pro kynutí v domácí pekárně a následné pečení v horkovzdušné fritéze (při 180 °C po dobu cca 12 minut), která zajistí extrémně křupavou kůrku díky efektivní cirkulaci vzduchu.",
+  "expertJustification": "Kombinace jablečného octa a ječného sladu upravuje pH těsta, což zpomaluje degradaci žitného škrobu a zlepšuje barvu kůrky prostřednictvím Maillardovy reakce. Omezení času hnětení je klíčové, neboť žitná mouka neobsahuje glutenin a gliadin v poměru vhodném pro tvorbu silné lepkové sítě, proto by přílišné mechanické namáhání vedlo k degradaci těsta na lepivou hmotu.",
+  "applianceType": "Domácí pekárna nebo kuchyňský robot",
   "cookingTime": "110 min",
   "difficulty": "Střední",
   "category": "Pečivo",
-  "id": "gen-1783689768347",
-  "updatedAt": "2026-07-10T13:22:49.242Z"
+  "id": "gen-1783722072636",
+  "updatedAt": "2026-07-10T22:21:13.316Z"
 }
