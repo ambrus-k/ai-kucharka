@@ -1,0 +1,32 @@
+{
+  "title": "Šumava",
+  "summary": "Tradiční pšenično-žitný chléb s vysokým podílem žitného kvasu a teplou fermentací pro plný chuťový profil.",
+  "ingredients": [
+    "420 g pšeničné chlebové mouky (T650)",
+    "160 g žitné chlebové mouky (T930)",
+    "240 g aktivního žitného kvasu (100% hydratace)",
+    "335 g vlažné vody (28–30 °C)",
+    "15 g soli",
+    "9 g celého kmínu",
+    "žitná chlebová mouka na vysypání ošatky"
+  ],
+  "instructions": [
+    "V mísicí nádobě důkladně smíchejte aktivní žitný kvas, vlažnou vodu, pšeničnou i žitnou chlebovou mouku, sůl a celý kmín.",
+    "Těsto hněťte mechanicky hákem nejprve na nízkou rychlost pro spojení ingrediencí a následně rychlost zvyšte, dokud nevznikne hladké, mírně lepkavé těsto s dobrou elasticitou.",
+    "Těsto nechte zrát v zakryté nádobě při teplotě 26–28 °C, dokud viditelně nezdvojnásobí svůj objem.",
+    "Vykynuté těsto vyklopte na pomoučený vál, vytvarujte z něj pevný bochník a vložte jej spojem nahoru do ošatky důkladně vysypané žitnou moukou.",
+    "Bochník nechte kynout při stabilní teplotě 26–28 °C do dosažení optimálního objemu.",
+    "Vykynutý bochník vyklopte a vložte do trouby předehřáté na vysokou teplotu.",
+    "Ihned po vložení aplikujte dávku páry a pečte, dokud chléb plně nenaskočí.",
+    "Následně vyvětrejte přebytečnou páru, snižte teplotu a dopékejte dozlatova s pevnou kůrkou.",
+    "Upečený chléb nechte zchladnout na mřížce."
+  ],
+  "applianceTips": "Využijte počáteční zapaření v prvních minutách pečení pro maximalizaci objemu bochníku. Pro zbývající fázi pečení páru zcela odvětrejte a dokončete pečení na klasický statický ohřev pro docílení pevné kůrky.",
+  "expertJustification": "Celková bilance mouky odpovídá poměru 60:40. Hydratace nastavená na 65 % zajišťuje optimální viskoelastické vlastnosti těsta při daném zastoupení žitných pentosanů a pšeničného lepku. Fermentace za tepla produkuje dominantně kyselinu mléčnou, která definuje typický chuťový profil.",
+  "applianceType": "Trouba s funkcí páry a statickým ohřevem",
+  "cookingTime": "4 hodiny",
+  "difficulty": "Střední",
+  "category": "Pečivo",
+  "id": "gen-1783540977144",
+  "updatedAt": "2026-07-10T22:11:45.385Z"
+}
