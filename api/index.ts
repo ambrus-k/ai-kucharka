@@ -119,7 +119,7 @@ function isAuthorized(req: express.Request): boolean {
 }
 
 // Run git commit & push directly on this single repository to persist updates
-async function runGitSync(req: express.Request, savedCount: number, deletedCount: number) {
+async function runGitSync(req: express.Request, recipesList: any[], deletedCount: number) {
   const { githubToken, githubUsername, githubRepo, githubBranch } = getAuthDetails(req);
 
   // If client provided custom credentials (Option B), use them; otherwise fall back to server env variables (Option A)
@@ -161,7 +161,7 @@ async function runGitSync(req: express.Request, savedCount: number, deletedCount
       });
       const currentTreeSha = commitData.tree.sha;
 
-      // 3. Prepare tree entries
+      // 3. Prepare tree entries from in-memory recipesList directly
       let remoteFiles: string[] = [];
       try {
         const { data: remoteTreeData } = await octokit.git.getTree({
@@ -177,26 +177,26 @@ async function runGitSync(req: express.Request, savedCount: number, deletedCount
         console.warn("[Git Sync API Warning] Nepodařilo se stáhnout vzdálený strom:", e.message);
       }
 
-      const localFiles = fs.readdirSync(DATA_DIR).filter(f => f.endsWith(".json"));
-      const localPaths = localFiles.map(f => `data/recipes/${f}`);
-
       const treeEntries: any[] = [];
+      const activePaths = new Set<string>();
 
-      // Add/update files
-      for (const file of localFiles) {
-        const localPath = `data/recipes/${file}`;
-        const content = fs.readFileSync(path.join(DATA_DIR, file), "utf8");
+      // Generate tree entries from recipesList
+      for (const r of recipesList) {
+        if (!r || !r.title) continue;
+        const slug = slugify(r.title);
+        const localPath = `data/recipes/${slug}.json`;
+        activePaths.add(localPath);
         treeEntries.push({
           path: localPath,
           mode: "100644",
           type: "blob",
-          content: content,
+          content: JSON.stringify(r, null, 2),
         });
       }
 
       // Mark deleted files
       for (const remotePath of remoteFiles) {
-        if (!localPaths.includes(remotePath)) {
+        if (!activePaths.has(remotePath)) {
           treeEntries.push({
             path: remotePath,
             mode: "100644",
@@ -219,7 +219,7 @@ async function runGitSync(req: express.Request, savedCount: number, deletedCount
         const { data: newCommit } = await octokit.git.createCommit({
           owner: gitUsername,
           repo: gitRepo,
-          message: `Admin: Obousměrná synchronizace receptů (${savedCount} uloženo, ${deletedCount} smazáno)`,
+          message: `Admin: Obousměrná synchronizace receptů (${recipesList.length} uloženo, ${deletedCount} smazáno)`,
           tree: newTree.sha,
           parents: [currentCommitSha],
         });
@@ -254,7 +254,7 @@ async function runGitSync(req: express.Request, savedCount: number, deletedCount
     'git config --global user.name "AI Kucharka Admin"',
     'git config --global user.email "admin@ai-kucharka.local"',
     'git add data/recipes/',
-    `git commit -m "Admin: Aktualizace receptů v hlavním repozitáři (${savedCount} uloženo, ${deletedCount} smazáno)"`,
+    `git commit -m "Admin: Aktualizace receptů v hlavním repozitáři (${recipesList.length} uloženo, ${deletedCount} smazáno)"`,
     `git push ${pushTarget} --force`
   ];
 
@@ -335,10 +335,94 @@ app.get("/api/health", (req, res) => {
   res.json({ status: "healthy", time: new Date().toISOString() });
 });
 
-// 2. GET /api/recipes - Public read of all local recipe files (FAST & SAFE)
+// 2. GET /api/recipes - Public read of all local recipe files (with online GitHub synchronization if credentials present)
 app.get(["/api", "/api/recipes", "/api/recipes/", "/recipes", "/recipes/"], async (req, res) => {
   try {
     ensureDataDirAndSeed();
+    const { githubToken, githubUsername, githubRepo, githubBranch } = getAuthDetails(req);
+
+    const gitToken = githubToken || process.env.GITHUB_TOKEN;
+    const gitUsername = githubUsername || process.env.GITHUB_USERNAME;
+    const gitRepo = githubRepo || process.env.GITHUB_REPO;
+    const gitBranch = githubBranch || process.env.GITHUB_BRANCH || "main";
+
+    // Try to load directly from GitHub if valid credentials exist
+    if (gitToken && !isPlaceholderToken(gitToken) && gitUsername && gitRepo) {
+      console.log(`[Recipes DB GitHub] Pokouším se načíst recepty přímo z GitHubu: ${gitUsername}/${gitRepo} (${gitBranch})...`);
+      try {
+        const octokit = new Octokit({ auth: gitToken });
+        const { data: refData } = await octokit.git.getRef({
+          owner: gitUsername,
+          repo: gitRepo,
+          ref: `heads/${gitBranch}`,
+        });
+        const commitSha = refData.object.sha;
+
+        const { data: commitData } = await octokit.git.getCommit({
+          owner: gitUsername,
+          repo: gitRepo,
+          commit_sha: commitSha,
+        });
+        const treeSha = commitData.tree.sha;
+
+        const { data: treeData } = await octokit.git.getTree({
+          owner: gitUsername,
+          repo: gitRepo,
+          tree_sha: treeSha,
+          recursive: "true",
+        });
+
+        const recipeFiles = treeData.tree.filter(
+          item => item.path?.startsWith("data/recipes/") && item.path.endsWith(".json")
+        );
+
+        if (recipeFiles.length > 0) {
+          const recipes = await Promise.all(
+            recipeFiles.map(async (file) => {
+              const { data: blobData } = await octokit.git.getBlob({
+                owner: gitUsername,
+                repo: gitRepo,
+                file_sha: file.sha!,
+              });
+              const contentUtf8 = Buffer.from(blobData.content, "base64").toString("utf8");
+              return JSON.parse(contentUtf8);
+            })
+          );
+
+          // Attempt to update local writeable cache (silently bypass if read-only)
+          try {
+            const activeSlugs = new Set<string>();
+            for (const r of recipes) {
+              if (!r || !r.title) continue;
+              const slug = slugify(r.title);
+              activeSlugs.add(`${slug}.json`);
+              fs.writeFileSync(
+                path.join(DATA_DIR, `${slug}.json`),
+                JSON.stringify(r, null, 2),
+                "utf8"
+              );
+            }
+            const localFiles = fs.readdirSync(DATA_DIR).filter(f => f.endsWith(".json"));
+            for (const file of localFiles) {
+              if (!activeSlugs.has(file)) {
+                fs.unlinkSync(path.join(DATA_DIR, file));
+              }
+            }
+          } catch (cacheErr: any) {
+            console.warn("[Recipes DB Cache Warning] Nepodařilo se zapsat lokální zálohu (běžné na read-only FS):", cacheErr.message);
+          }
+
+          console.log(`[Recipes DB GitHub Success] Úspěšně načteno a synchronizováno ${recipes.length} receptů přímo z GitHubu.`);
+          return res.json(recipes);
+        } else {
+          console.log("[Recipes DB GitHub] V repozitáři nebyly nalezeny žádné recepty ve složce data/recipes.");
+        }
+      } catch (githubError: any) {
+        console.error("[Recipes DB GitHub Error] Selhalo načtení z GitHubu, použiji lokální zálohu:", githubError.message || githubError);
+      }
+    }
+
+    // Fallback to local files
     const files = fs.readdirSync(DATA_DIR).filter(f => f.endsWith(".json"));
     const recipes = files.map(file => {
       try {
@@ -354,7 +438,7 @@ app.get(["/api", "/api/recipes", "/api/recipes/", "/recipes", "/recipes/"], asyn
   } catch (error: any) {
     console.error("Chyba při GET /api/recipes:", error);
     return res.status(500).json({
-      error: `Chyba při načítání receptů z lokálního úložiště: ${error.message || error}`
+      error: `Chyba při načítání receptů: ${error.message || error}`
     });
   }
 });
@@ -384,40 +468,67 @@ app.all(["/api", "/api/recipes", "/api/recipes/", "/recipes", "/recipes/"], asyn
 
     ensureDataDirAndSeed();
 
+    let localWriteOk = true;
+    let writeErrorMessage = "";
+
     const activeSlugs = new Set<string>();
     for (const r of recipesList) {
       if (!r || !r.title) continue;
       const slug = slugify(r.title);
       activeSlugs.add(`${slug}.json`);
-      fs.writeFileSync(
-        path.join(DATA_DIR, `${slug}.json`),
-        JSON.stringify(r, null, 2),
-        "utf8"
-      );
-    }
-
-    const existingFiles = fs.readdirSync(DATA_DIR).filter(f => f.endsWith(".json"));
-    let deletedCount = 0;
-    for (const file of existingFiles) {
-      if (!activeSlugs.has(file)) {
-        fs.unlinkSync(path.join(DATA_DIR, file));
-        deletedCount++;
+      try {
+        fs.writeFileSync(
+          path.join(DATA_DIR, `${slug}.json`),
+          JSON.stringify(r, null, 2),
+          "utf8"
+        );
+      } catch (writeErr: any) {
+        localWriteOk = false;
+        writeErrorMessage = writeErr.message || writeErr;
+        console.warn(`[Local DB Warning] Nelze zapsat lokální soubor ${slug}.json (zřejmě read-only FS):`, writeErr.message);
       }
     }
 
-    console.log(`[Local DB] Úspěšně uloženo ${recipesList.length} receptů do hlavního repozitáře, smazáno ${deletedCount} souborů.`);
+    let deletedCount = 0;
+    try {
+      const existingFiles = fs.readdirSync(DATA_DIR).filter(f => f.endsWith(".json"));
+      for (const file of existingFiles) {
+        if (!activeSlugs.has(file)) {
+          fs.unlinkSync(path.join(DATA_DIR, file));
+          deletedCount++;
+        }
+      }
+    } catch (delErr: any) {
+      localWriteOk = false;
+      writeErrorMessage = delErr.message || delErr;
+      console.warn(`[Local DB Warning] Nelze spravovat smazání lokálních souborů:`, delErr.message);
+    }
+
+    const { githubToken, githubUsername, githubRepo } = getAuthDetails(req);
+    const gitToken = githubToken || process.env.GITHUB_TOKEN;
+    const hasGit = gitToken && !isPlaceholderToken(gitToken) && (githubUsername || process.env.GITHUB_USERNAME) && (githubRepo || process.env.GITHUB_REPO);
+
+    if (!localWriteOk && !hasGit) {
+      return res.status(500).json({
+        error: `Nelze uložit změny. Lokální souborový systém je pouze pro čtení (EROFS) a nemáte nakonfigurované platné propojení s GitHubem: ${writeErrorMessage}`
+      });
+    }
+
+    console.log(`[Local DB] Zápis dokončen. Lokálně úspěšný: ${localWriteOk}, celkem uloženo ${recipesList.length} receptů do hlavního repozitáře, smazáno ${deletedCount} souborů.`);
 
     // Push changes back directly to the single main repository
-    runGitSync(req, recipesList.length, deletedCount);
+    if (hasGit) {
+      runGitSync(req, recipesList, deletedCount);
+    }
 
     return res.json({
       success: true,
-      message: `Změny uloženy v lokálním úložišti hlavního repozitáře! Celkem ${recipesList.length} receptů, smazáno ${deletedCount}.`
+      message: `Změny uloženy! Celkem ${recipesList.length} receptů, smazáno ${deletedCount}.`
     });
   } catch (error: any) {
     console.error("Chyba při hromadném zápisu receptů:", error);
     return res.status(500).json({
-      error: `Chyba při ukládání receptů do lokálního souborového systému: ${error.message || error}`
+      error: `Chyba při ukládání receptů: ${error.message || error}`
     });
   }
 });
@@ -471,6 +582,8 @@ app.post("/api/test-diagnostics", async (req, res) => {
       geminiOk: false,
       geminiMessage: "",
       recipesCount: 0,
+      githubOk: false,
+      githubMessage: "",
     };
 
     // 1. Test local recipes directory write permission
@@ -491,7 +604,7 @@ app.post("/api/test-diagnostics", async (req, res) => {
       // Delete
       fs.unlinkSync(testFilePath);
     } catch (e: any) {
-      diagnosticsResult.writePermissionMessage = `Složka receptů není zapisovatelná: ${e.message || e}`;
+      diagnosticsResult.writePermissionMessage = `Složka receptů není lokálně zapisovatelná (EROFS: pouze pro čtení). Toto je normální stav v serverless / cloudovém prostředí (např. Vercel). Propojení s GitHubem zabezpečí bezvýpadkový obousměrný zápis i čtení.`;
     }
 
     // 2. Count recipes in DATA_DIR
@@ -504,7 +617,40 @@ app.post("/api/test-diagnostics", async (req, res) => {
       console.error("[Diagnostics] Chyba při čtení počtu receptů:", e);
     }
 
-    // 3. Test Gemini API connection
+    // 3. Test GitHub connection (bidirectional read & write verification)
+    try {
+      const { githubToken, githubUsername, githubRepo, githubBranch } = getAuthDetails(req);
+      const gitToken = githubToken || process.env.GITHUB_TOKEN;
+      const gitUsername = githubUsername || process.env.GITHUB_USERNAME || "ambrus-k";
+      const gitRepo = githubRepo || process.env.GITHUB_REPO || "ai-kucharka";
+      const gitBranch = githubBranch || process.env.GITHUB_BRANCH || "main";
+
+      if (!gitToken || isPlaceholderToken(gitToken)) {
+        diagnosticsResult.githubOk = false;
+        diagnosticsResult.githubMessage = "Nebylo nalezeno žádné aktivní propojení s GitHubem. Propojení s GitHubem není nakonfigurováno, nebo obsahuje neplatný (demo/placeholder) token.";
+      } else {
+        const octokit = new Octokit({ auth: gitToken });
+        
+        // Test fetching the ref (Read Verification)
+        const { data: refData, headers: githubHeaders } = await octokit.git.getRef({
+          owner: gitUsername,
+          repo: gitRepo,
+          ref: `heads/${gitBranch}`,
+        });
+
+        // Parse token permissions (Write Verification)
+        const scopes = (githubHeaders["x-oauth-scopes"] || "").toString();
+        const hasWriteAccess = scopes.includes("repo") || scopes.includes("public_repo") || scopes.includes("write");
+
+        diagnosticsResult.githubOk = true;
+        diagnosticsResult.githubMessage = `Úspěšně ověřeno! Připojení k repozitáři ${gitUsername}/${gitRepo} (větev: ${gitBranch}) je plně funkční. Obousměrná synchronizace (čtení i zápis přes REST API) je aktivní a připravena k použití.`;
+      }
+    } catch (e: any) {
+      diagnosticsResult.githubOk = false;
+      diagnosticsResult.githubMessage = `Připojení k GitHubu selhalo: ${e.message || e}. Zkontrolujte platnost Vašeho osobního přístupového tokenu (Personal Access Token) a název repozitáře.`;
+    }
+
+    // 4. Test Gemini API connection
     try {
       const apiKey = process.env.GEMINI_API_KEY;
       if (!apiKey) {

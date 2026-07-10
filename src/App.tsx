@@ -7,6 +7,7 @@ import {
   BookOpen, 
   Sparkles, 
   Plus, 
+  Minus, 
   FileText, 
   FileImage, 
   Trash2, 
@@ -42,7 +43,8 @@ import {
   RefreshCw,
   Database,
   Scale,
-  Square
+  Square,
+  GitBranch
 } from "lucide-react";
 import { Recipe } from "./types";
 
@@ -385,6 +387,8 @@ export default function App() {
     geminiOk: boolean;
     geminiMessage: string;
     recipesCount: number;
+    githubOk?: boolean;
+    githubMessage?: string;
   } | null>(null);
   const [diagnosticsError, setDiagnosticsError] = useState<string | null>(null);
   const [diagnosticsProgressText, setDiagnosticsProgressText] = useState("");
@@ -394,22 +398,10 @@ export default function App() {
   const diagnosticsAbortRef = useRef<AbortController | null>(null);
   const auditAbortRef = useRef<AbortController | null>(null);
 
-  // States for Hands-free / Cooking Mode with Wake Lock
-  const [isHandsFree, setIsHandsFree] = useState(false);
-  const [currentHandsFreeStep, setCurrentHandsFreeStep] = useState(0);
-  const [showAllIngredientsInStep, setShowAllIngredientsInStep] = useState(false);
-  const [wakeLock, setWakeLock] = useState<any>(null);
-  const [wakeLockSupported, setWakeLockSupported] = useState(false);
-  const [wakeLockError, setWakeLockError] = useState<string | null>(null);
+  // States for Paper Cookbook View
+  const [showPaperView, setShowPaperView] = useState(false);
+  const [paperFontSize, setPaperFontSize] = useState<"normal" | "large" | "extra-large">("large");
   const [printNotice, setPrintNotice] = useState<string | null>(null);
-
-  // States for countdown timers in Cooking Mode per instruction index
-  const [timers, setTimers] = useState<Record<number, {
-    secondsLeft: number;
-    isRunning: boolean;
-    totalSeconds: number;
-    beeped?: boolean;
-  }>>({});
 
   // States for search and filter
   const [searchQuery, setSearchQuery] = useState("");
@@ -662,185 +654,7 @@ export default function App() {
     setActiveStepIndex(-1);
   };
 
-  // Hands-free cooking mode methods
-  const startHandsFree = async () => {
-    setIsHandsFree(true);
-    setCurrentHandsFreeStep(0);
-    setWakeLockError(null);
-    setTimers({}); // Reset timers for this cooking session
-    
-    if ('wakeLock' in navigator) {
-      setWakeLockSupported(true);
-      try {
-        const lock = await (navigator as any).wakeLock.request('screen');
-        setWakeLock(lock);
-        console.log("Cooking mode: Screen Wake Lock acquired!");
-      } catch (err: any) {
-        console.warn("Wake Lock request failed (disallowed or iframe context):", err);
-        const errMsg = err.message || "";
-        if (errMsg.includes("permissions policy") || errMsg.includes("disallowed")) {
-          setWakeLockError("Blokováno v režimu náhledu (iframe). Spusťte v samostatné záložce pro plnou funkčnost.");
-        } else {
-          setWakeLockError(errMsg || "Nepodařilo se aktivovat Wake Lock");
-        }
-      }
-    } else {
-      setWakeLockSupported(false);
-    }
-  };
-
-  const stopHandsFree = async () => {
-    setIsHandsFree(false);
-    if (wakeLock) {
-      try {
-        await wakeLock.release();
-        setWakeLock(null);
-        console.log("Cooking mode: Screen Wake Lock released!");
-      } catch (err) {
-        console.warn("Wake Lock release failed:", err);
-      }
-    }
-  };
-
-  useEffect(() => {
-    const handleVisibilityChange = async () => {
-      if (isHandsFree && wakeLock !== null && document.visibilityState === 'visible') {
-        if ('wakeLock' in navigator) {
-          try {
-            const lock = await (navigator as any).wakeLock.request('screen');
-            setWakeLock(lock);
-          } catch (err) {
-            console.warn("Re-requesting wake lock failed:", err);
-          }
-        }
-      }
-    };
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    };
-  }, [isHandsFree, wakeLock]);
-
-  // Real-time ticking for all running timers
-  useEffect(() => {
-    let intervalId: any;
-    if (isHandsFree) {
-      intervalId = setInterval(() => {
-        setTimers(prev => {
-          let changed = false;
-          const next = { ...prev };
-          
-          Object.keys(next).forEach(key => {
-            const stepIndex = Number(key);
-            const t = next[stepIndex];
-            if (t && t.isRunning && t.secondsLeft > 0) {
-              const newSecs = t.secondsLeft - 1;
-              const completed = newSecs === 0;
-              
-              next[stepIndex] = {
-                ...t,
-                secondsLeft: newSecs,
-                isRunning: !completed, // Stop automatically when reaching 0
-                beeped: completed ? true : t.beeped
-              };
-              changed = true;
-              
-              if (completed) {
-                // Play double beep notification
-                playBeep();
-                setTimeout(playBeep, 400);
-              }
-            }
-          });
-          
-          return changed ? next : prev;
-        });
-      }, 1000);
-    }
-    return () => {
-      if (intervalId) clearInterval(intervalId);
-    };
-  }, [isHandsFree]);
-
-  // Handle active step automatic step duration parsing
-  useEffect(() => {
-    if (isHandsFree && selectedRecipe) {
-      const text = selectedRecipe.instructions[currentHandsFreeStep] || "";
-      if (timers[currentHandsFreeStep] === undefined) {
-        const parsedSecs = parseStepDuration(text);
-        setTimers(prev => ({
-          ...prev,
-          [currentHandsFreeStep]: {
-            secondsLeft: parsedSecs || 0,
-            isRunning: false,
-            totalSeconds: parsedSecs || 0,
-            beeped: false
-          }
-        }));
-      }
-    }
-  }, [currentHandsFreeStep, isHandsFree, selectedRecipe]);
-
-  const toggleTimer = (stepIndex: number) => {
-    setTimers(prev => {
-      const next = { ...prev };
-      const t = next[stepIndex] || { secondsLeft: 0, isRunning: false, totalSeconds: 0, beeped: false };
-      if (t.secondsLeft === 0 && !t.isRunning) return prev; // Cannot start 0-second timer
-      
-      next[stepIndex] = {
-        ...t,
-        isRunning: !t.isRunning,
-        beeped: t.secondsLeft > 0 ? false : t.beeped
-      };
-      return next;
-    });
-  };
-
-  const adjustTimer = (stepIndex: number, amountSeconds: number) => {
-    setTimers(prev => {
-      const next = { ...prev };
-      const t = next[stepIndex] || { secondsLeft: 0, isRunning: false, totalSeconds: 0, beeped: false };
-      
-      const newSecs = Math.max(0, t.secondsLeft + amountSeconds);
-      const newTotal = newSecs === 0 ? 0 : Math.max(newSecs, t.totalSeconds);
-      
-      next[stepIndex] = {
-        ...t,
-        secondsLeft: newSecs,
-        totalSeconds: newTotal,
-        beeped: false
-      };
-      return next;
-    });
-  };
-
-  const resetTimer = (stepIndex: number) => {
-    setTimers(prev => {
-      const next = { ...prev };
-      const t = next[stepIndex] || { secondsLeft: 0, isRunning: false, totalSeconds: 0, beeped: false };
-      
-      next[stepIndex] = {
-        ...t,
-        secondsLeft: t.totalSeconds,
-        isRunning: false,
-        beeped: false
-      };
-      return next;
-    });
-  };
-
-  const nextHandsFreeStep = () => {
-    if (!selectedRecipe) return;
-    if (currentHandsFreeStep < selectedRecipe.instructions.length - 1) {
-      setCurrentHandsFreeStep(prev => prev + 1);
-    }
-  };
-
-  const prevHandsFreeStep = () => {
-    if (currentHandsFreeStep > 0) {
-      setCurrentHandsFreeStep(prev => prev - 1);
-    }
-  };
+  // Hands-free cooking mode methods have been removed as requested.
 
   // States for Editing recipe
   const [isEditing, setIsEditing] = useState(false);
@@ -1102,9 +916,22 @@ export default function App() {
       setDiagnosticsProgressPercent(60);
       setDiagnosticsStepIndex(2);
 
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json"
+      };
+      const storedUser = localStorage.getItem("ai_kucharka_github_username") || "ambrus-k";
+      const storedRepo = localStorage.getItem("ai_kucharka_github_repo") || "ai-kucharka";
+      const storedBranch = localStorage.getItem("ai_kucharka_github_branch") || "main";
+      const storedToken = localStorage.getItem("ai_kucharka_github_token") || "";
+
+      if (storedUser) headers["x-github-username"] = storedUser;
+      if (storedRepo) headers["x-github-repo"] = storedRepo;
+      if (storedBranch) headers["x-github-branch"] = storedBranch;
+      if (storedToken) headers["x-github-token"] = storedToken;
+
       const response = await fetch("/api/test-diagnostics", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify({ adminPassword }),
         signal: controller.signal,
       });
@@ -2431,319 +2258,232 @@ ${separator}`;
         )}
       </AnimatePresence>
 
-      {/* HANDS-FREE COOKING MODE OVERLAY */}
+      {/* PAPER COOKBOOK VIEW OVERLAY */}
       <AnimatePresence>
-        {isHandsFree && selectedRecipe && (
+        {showPaperView && selectedRecipe && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-slate-950 text-slate-100 flex flex-col font-sans overflow-hidden select-none"
+            className="fixed inset-0 z-50 bg-[#FDFBF7] text-[#2C2A29] flex flex-col font-serif overflow-y-auto selection:bg-[#E8F5E9]"
           >
-            {/* Header section */}
-            <div className="bg-slate-900 border-b border-slate-800 py-4 px-6 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="bg-amber-600 text-white p-2 rounded-xl">
-                  <ChefHat className="h-5 w-5 animate-pulse" />
-                </div>
-                <div>
-                  <h2 className="font-serif italic font-bold text-lg md:text-xl text-amber-500">
-                    {selectedRecipe.title}
-                  </h2>
-                  <p className="text-[10px] uppercase text-slate-400 tracking-wider font-semibold">
-                    Režim vaření (Hands-free)
-                  </p>
-                </div>
-              </div>
+            {/* Top Action Bar (Sticky, glassmorphism-paper-blend) */}
+            <div className="sticky top-0 bg-[#FDFBF7]/95 backdrop-blur-md border-b border-[#E8E4DB] z-50 px-4 py-3.5 flex flex-wrap items-center justify-between gap-4 select-none no-print shadow-xs">
+              
+              {/* Back Button */}
+              <button
+                onClick={() => setShowPaperView(false)}
+                className="flex items-center gap-1.5 text-[#1B4332] hover:text-[#2D6A4F] font-sans font-bold text-sm transition-all cursor-pointer bg-white px-3 py-1.5 rounded-xl border border-[#E8E4DB] hover:border-[#1B4332]"
+              >
+                <ChevronLeft className="h-4 w-4" />
+                <span>Zpět na detail</span>
+              </button>
 
-              {/* Wake Lock Status Indicator */}
-              <div className="hidden md:flex items-center gap-4 bg-slate-950/80 px-4 py-2 rounded-xl border border-slate-800 relative">
-                <div className="flex items-center gap-2 text-xs font-semibold">
-                  {wakeLockSupported && wakeLock && !wakeLockError ? (
-                    <>
-                      <div className="h-2.5 w-2.5 rounded-full bg-emerald-500 animate-ping" />
-                      <div className="h-2.5 w-2.5 rounded-full bg-emerald-500 absolute" />
-                      <span className="text-emerald-400 ml-1">✓ Displej nezhasne (Aktivní)</span>
-                    </>
-                  ) : wakeLockError ? (
-                    <>
-                      <div className="h-2.5 w-2.5 rounded-full bg-amber-500 animate-pulse" />
-                      <span className="text-amber-400">Displej se může vypnout (Preview omezení)</span>
-                    </>
-                  ) : (
-                    <>
-                      <div className="h-2.5 w-2.5 rounded-full bg-amber-450" />
-                      <span className="text-amber-400">Automatické zhasínání displeje nelze zablokovat</span>
-                    </>
+              {/* Adjusters Group */}
+              <div className="flex items-center gap-4 flex-wrap">
+                
+                {/* Servings scale controller */}
+                <div className="flex items-center gap-1.5 bg-white border border-[#E8E4DB] rounded-xl p-1 font-sans text-xs shadow-2xs">
+                  <span className="px-2 font-bold text-[#555] flex items-center gap-1">
+                    Porce:
+                  </span>
+                  <button
+                    onClick={() => setScaleFactor(prev => Math.max(0.25, Number((prev - 0.25).toFixed(2))))}
+                    className="h-7 w-7 rounded-lg bg-[#FDFBF7] text-[#1B4332] hover:bg-[#E8F5E9] font-bold flex items-center justify-center transition-all cursor-pointer border border-[#E8E4DB]"
+                    title="Méně porcí"
+                  >
+                    <Minus className="h-3.5 w-3.5" />
+                  </button>
+                  <span className="w-10 text-center font-bold font-mono text-[#1B4332] text-sm">
+                    {formatCzechNumber(scaleFactor)}x
+                  </span>
+                  <button
+                    onClick={() => setScaleFactor(prev => Number((prev + 0.25).toFixed(2)))}
+                    className="h-7 w-7 rounded-lg bg-[#FDFBF7] text-[#1B4332] hover:bg-[#E8F5E9] font-bold flex items-center justify-center transition-all cursor-pointer border border-[#E8E4DB]"
+                    title="Více porcí"
+                  >
+                    <Plus className="h-3.5 w-3.5" />
+                  </button>
+                  {scaleFactor !== 1 && (
+                    <button
+                      onClick={() => setScaleFactor(1)}
+                      className="px-2 text-[10px] font-black text-amber-750 hover:text-amber-900 cursor-pointer uppercase underline"
+                      title="Obnovit výchozí porce"
+                    >
+                      Původní
+                    </button>
                   )}
                 </div>
-                {wakeLockError && (
-                  <span className="text-[10px] text-amber-300 border-l border-slate-800 pl-3 max-w-[320px] truncate" title={wakeLockError}>
-                    {wakeLockError}
-                  </span>
-                )}
-              </div>
 
-              {/* Close Button */}
-              <button
-                onClick={stopHandsFree}
-                className="bg-slate-800 hover:bg-red-950 hover:text-red-300 text-slate-400 p-2.5 rounded-xl transition-all border border-slate-700 hover:border-red-900 cursor-pointer"
-                title="Zavřít režim vaření"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-
-            {/* Mobile-only Wake Lock Status bar */}
-            <div className="md:hidden bg-slate-900/60 border-b border-slate-800/40 px-6 py-2 flex items-center justify-center gap-2 text-center text-[11px] font-semibold">
-              {wakeLockSupported && wakeLock && !wakeLockError ? (
-                <>
-                  <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                  <span className="text-emerald-400">Předcházím zhasnutí displeje (Aktivní)</span>
-                </>
-              ) : wakeLockError ? (
-                <>
-                  <div className="h-2 w-2 rounded-full bg-amber-500" />
-                  <span className="text-amber-400">Dočasně vypnuto (Blokováno v náhledu iframe)</span>
-                </>
-              ) : (
-                <>
-                  <div className="h-2 w-2 rounded-full bg-amber-500" />
-                  <span className="text-amber-400">Displej se může automaticky vypnout</span>
-                </>
-              )}
-            </div>
-
-            {/* Instruction content card */}
-            <div className="flex-1 overflow-y-auto px-6 py-8 md:p-12 flex flex-col justify-center items-center">
-              <div className="max-w-4xl w-full space-y-6 md:space-y-8 flex flex-col items-center">
-                
-                {/* Step Indicator */}
-                <div className="text-center space-y-1">
-                  <span className="text-xs uppercase tracking-[0.2em] font-extrabold text-amber-500">
-                    KROK {currentHandsFreeStep + 1} Z {selectedRecipe.instructions.length}
-                  </span>
-                  
-                  {/* Visual Steps Dots */}
-                  <div className="flex items-center gap-1.5 mt-3 justify-center">
-                    {selectedRecipe.instructions.map((_, idx) => (
+                {/* Font Size Selector */}
+                <div className="flex items-center gap-1 bg-white border border-[#E8E4DB] rounded-xl p-1 font-sans text-xs shadow-2xs">
+                  <span className="px-2 font-bold text-[#555]">Velikost textu:</span>
+                  <div className="flex items-center gap-0.5">
+                    {(["normal", "large", "extra-large"] as const).map((size) => (
                       <button
-                        key={idx}
-                        onClick={() => setCurrentHandsFreeStep(idx)}
-                        className={`h-2 rounded-full transition-all cursor-pointer ${
-                          idx === currentHandsFreeStep 
-                            ? "w-8 bg-amber-500" 
-                            : !!checkedInstructions[idx] 
-                              ? "w-2 bg-emerald-500" 
-                              : "w-2 bg-slate-800 hover:bg-slate-700"
+                        key={size}
+                        onClick={() => setPaperFontSize(size)}
+                        className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                          paperFontSize === size
+                            ? "bg-[#2D6A4F] text-white shadow-3xs"
+                            : "bg-[#FDFBF7] text-slate-600 hover:bg-slate-100"
                         }`}
-                      />
+                      >
+                        {size === "normal" ? "Standardní" : size === "large" ? "Větší" : "Největší"}
+                      </button>
                     ))}
                   </div>
                 </div>
 
-                {/* Subtitle / Tip fallback */}
-                <div className="w-full bg-slate-900/40 border border-slate-850 rounded-2xl p-6 shadow-inner text-center">
-                  <motion.p
-                    key={currentHandsFreeStep}
-                    initial={{ opacity: 0, scale: 0.98 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.98 }}
-                    transition={{ duration: 0.2 }}
-                    className="text-2xl md:text-3xl lg:text-4xl font-serif text-slate-100 font-medium leading-relaxed md:leading-relaxed tracking-wide"
-                  >
-                    {selectedRecipe.instructions[currentHandsFreeStep]}
-                  </motion.p>
+                {/* Print Button */}
+                <button
+                  onClick={() => window.print()}
+                  className="flex items-center gap-1.5 bg-white border border-[#E8E4DB] hover:border-[#1B4332] text-slate-700 hover:text-[#1B4332] px-3 py-1.5 rounded-xl font-sans font-bold text-sm transition-all cursor-pointer shadow-2xs"
+                  title="Vytisknout recept"
+                >
+                  <Printer className="h-4 w-4" />
+                  <span className="hidden sm:inline">Tisk</span>
+                </button>
+              </div>
+
+              {/* Close Button */}
+              <button
+                onClick={() => setShowPaperView(false)}
+                className="bg-white border border-[#E8E4DB] hover:bg-red-50 hover:border-red-200 text-slate-400 hover:text-red-600 p-1.5 rounded-xl transition-all cursor-pointer"
+                title="Zavřít"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            {/* Paper Sheet Content Area */}
+            <div className="flex-1 px-4 py-8 md:py-14 bg-[#F5F2EA] flex justify-center items-start overflow-y-auto">
+              <div className="max-w-3xl w-full bg-[#FDFBF7] border border-[#E3DFD5] rounded-3xl p-6 md:p-14 shadow-xl space-y-10 relative">
+                
+                {/* Visual top border accent */}
+                <div className="absolute top-0 left-0 right-0 h-2 bg-[#2D6A4F] rounded-t-3xl" />
+                
+                {/* Header section */}
+                <div className="text-center space-y-4">
+                  {selectedRecipe.category && (
+                    <span className="text-xs uppercase tracking-[0.25em] font-extrabold text-[#2D6A4F] bg-[#E8F5E9] px-4 py-1.5 rounded-full font-sans inline-block">
+                      {selectedRecipe.category}
+                    </span>
+                  )}
+                  <h1 className="font-serif font-black text-3xl md:text-5xl text-[#1B4332] leading-tight tracking-tight">
+                    {selectedRecipe.title}
+                  </h1>
+                  
+                  {selectedRecipe.summary && (
+                    <p className="text-slate-600 font-serif italic max-w-xl mx-auto leading-relaxed text-base md:text-lg">
+                      {selectedRecipe.summary}
+                    </p>
+                  )}
+
+                  {/* Metadata grid */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 py-5 border-y border-[#E8E4DB] text-center font-sans text-xs uppercase tracking-wider text-slate-500 font-bold mt-6">
+                    <div>
+                      <span className="block text-[#1B4332] font-extrabold text-base md:text-lg normal-case font-serif mb-0.5">
+                        {selectedRecipe.cookingTime || "Není uvedeno"}
+                      </span>
+                      Doba přípravy
+                    </div>
+                    <div>
+                      <span className="block text-[#1B4332] font-extrabold text-base md:text-lg normal-case font-serif mb-0.5">
+                        {selectedRecipe.difficulty || "Střední"}
+                      </span>
+                      Náročnost
+                    </div>
+                    <div>
+                      <span className="block text-[#1B4332] font-extrabold text-base md:text-lg normal-case font-serif mb-0.5">
+                        {selectedRecipe.applianceType || "Trouba / Pánev"}
+                      </span>
+                      Hlavní zařízení
+                    </div>
+                    <div>
+                      <span className="block text-[#1B4332] font-extrabold text-base md:text-lg normal-case font-serif mb-0.5">
+                        {scaleFactor === 1 ? "Výchozí" : `${formatCzechNumber(scaleFactor)}x`}
+                      </span>
+                      Měřítko porcí
+                    </div>
+                  </div>
                 </div>
 
-                {/* Real-time Step Ingredients and Weights Checklist */}
-                {(() => {
-                  const allIngs = getStepIngredients(
-                    selectedRecipe.instructions[currentHandsFreeStep] || "",
-                    selectedRecipe.ingredients || [],
-                    scaleFactor
-                  );
-                  const matchedIngs = allIngs.filter(i => i.isMatched);
-
-                  return (
-                    <div className="w-full max-w-2xl bg-slate-900/60 border border-slate-800/80 rounded-2xl p-5 shadow-lg space-y-4 animate-fade-in" id="step-ingredients-box">
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800/80 pb-3">
-                        <div className="flex items-center gap-2.5">
-                          <Scale className="h-5 w-5 text-amber-500 shrink-0" />
-                          <div>
-                            <h3 className="font-bold text-sm text-slate-200">Suroviny a váhy pro tento krok</h3>
-                            <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Metrické váhy jsou automaticky přepočítané</p>
-                          </div>
+                {/* Suroviny (Ingredients) */}
+                <div className="space-y-4">
+                  <h2 className="font-serif font-bold text-xl md:text-2xl italic border-b border-[#E8E4DB] pb-2 text-[#2D6A4F]">
+                    Suroviny a váhy
+                  </h2>
+                  <div className={`grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3 font-sans ${
+                    paperFontSize === "normal" ? "text-sm md:text-base" :
+                    paperFontSize === "large" ? "text-base md:text-lg font-medium" :
+                    "text-lg md:text-xl font-semibold"
+                  }`}>
+                    {selectedRecipe.ingredients && selectedRecipe.ingredients.map((ing, i) => {
+                      const parsed = parseIngredientString(ing);
+                      const displayIng = scaleIngredient(parsed, scaleFactor);
+                      return (
+                        <div key={i} className="flex items-start gap-2 text-[#2C2A29] leading-relaxed py-1.5 border-b border-[#F7F5F0]">
+                          <span className="text-[#2D6A4F] mt-1 shrink-0 font-bold">•</span>
+                          <span>{displayIng}</span>
                         </div>
-                        {scaleFactor !== 1 && (
-                          <span className="bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[10px] font-bold px-2.5 py-1 rounded-full shrink-0">
-                            Koeficient: {scaleFactor}x
-                          </span>
-                        )}
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Postup přípravy (Instructions) */}
+                <div className="space-y-6 pt-2">
+                  <h2 className="font-serif font-bold text-xl md:text-2xl italic border-b border-[#E8E4DB] pb-2 text-[#2D6A4F]">
+                    Postup přípravy
+                  </h2>
+                  <div className="space-y-6">
+                    {selectedRecipe.instructions && selectedRecipe.instructions.map((step, idx) => (
+                      <div key={idx} className="flex items-start gap-4">
+                        <span className="text-2xl md:text-3xl font-serif font-black italic text-[#2D6A4F]/80 select-none shrink-0 w-8 text-right mt-1">
+                          {idx + 1}.
+                        </span>
+                        <p className={`font-serif leading-relaxed text-[#2C2A29] flex-1 ${
+                          paperFontSize === "normal" ? "text-sm md:text-base" :
+                          paperFontSize === "large" ? "text-base md:text-xl md:leading-relaxed" :
+                          "text-lg md:text-2xl md:leading-relaxed"
+                        }`}>
+                          {step}
+                        </p>
                       </div>
+                    ))}
+                  </div>
+                </div>
 
-                      {matchedIngs.length > 0 ? (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                          {matchedIngs.map((ing, i) => {
-                            const isChecked = !!checkedIngredients[ing.original];
-                            return (
-                              <div
-                                key={i}
-                                onClick={() => toggleIngredient(ing.original)}
-                                className={`flex items-start gap-3 p-3 rounded-xl border transition-all cursor-pointer select-none ${
-                                  isChecked
-                                    ? "bg-emerald-950/20 border-emerald-500/30 text-emerald-300"
-                                    : "bg-slate-950/40 border-slate-850 text-slate-350 hover:bg-slate-950/60 hover:border-slate-800"
-                                }`}
-                              >
-                                <div className={`mt-0.5 h-4.5 w-4.5 rounded border flex items-center justify-center shrink-0 transition-all ${
-                                  isChecked
-                                    ? "bg-emerald-500 border-emerald-400 text-slate-950"
-                                    : "border-slate-700"
-                                }`}>
-                                  {isChecked && <Check className="h-3 w-3 stroke-[3]" />}
-                                </div>
-                                <span className={`text-sm leading-tight ${isChecked ? "line-through text-slate-500 font-medium" : "font-semibold"}`}>
-                                  {ing.display}
-                                </span>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      ) : (
-                        <div className="text-center py-5 bg-slate-950/20 rounded-xl border border-dashed border-slate-800/60">
-                          <p className="text-xs text-slate-400 font-medium font-serif italic">
-                            V popisu tohoto kroku nebyly nalezeny žádné konkrétní suroviny.
-                          </p>
-                          <p className="text-[10px] text-slate-500 mt-1">
-                            Všechny suroviny a jejich váhy si můžete zobrazit rozkliknutím seznamu níže.
-                          </p>
-                        </div>
-                      )}
-
-                      {/* Collapsible section for all ingredients in the recipe */}
-                      <div className="pt-2 border-t border-slate-800/40">
-                        <button
-                          onClick={() => setShowAllIngredientsInStep(prev => !prev)}
-                          className="w-full flex items-center justify-between text-xs font-bold text-slate-400 hover:text-slate-200 py-1.5 transition-all focus:outline-none cursor-pointer"
-                        >
-                          <span className="flex items-center gap-2">
-                            <span>{showAllIngredientsInStep ? "Skrýt" : "Zobrazit"} kompletní suroviny receptu</span>
-                            <span className="bg-slate-800 text-[10px] text-slate-350 px-1.5 py-0.5 rounded font-mono">
-                              {selectedRecipe.ingredients ? selectedRecipe.ingredients.length : 0}
-                            </span>
-                          </span>
-                          <span className={`transform transition-transform duration-200 ${showAllIngredientsInStep ? "rotate-180" : ""}`}>
-                            ▼
-                          </span>
-                        </button>
-                        
-                        {showAllIngredientsInStep && (
-                          <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-1 animate-fade-in">
-                            {allIngs.map((ing, i) => {
-                              const isChecked = !!checkedIngredients[ing.original];
-                              return (
-                                <div
-                                  key={i}
-                                  onClick={() => toggleIngredient(ing.original)}
-                                  className={`flex items-start gap-2.5 p-2 rounded-lg border text-xs cursor-pointer transition-all select-none ${
-                                    isChecked
-                                      ? "bg-emerald-950/10 border-emerald-500/20 text-emerald-400/90"
-                                      : ing.isMatched
-                                      ? "bg-[#D97706]/5 border-[#D97706]/20 text-amber-200/95 font-semibold"
-                                      : "bg-slate-950/35 border-slate-850/80 text-slate-400 hover:bg-slate-950/50"
-                                  }`}
-                                >
-                                  <div className={`mt-0.5 h-3.5 w-3.5 rounded border flex items-center justify-center shrink-0 transition-all ${
-                                    isChecked
-                                      ? "bg-emerald-500 border-emerald-400 text-slate-950"
-                                      : "border-slate-800"
-                                  }`}>
-                                    {isChecked && <Check className="h-2 w-2 stroke-[3]" />}
-                                  </div>
-                                  <span className={`leading-tight flex-1 ${isChecked ? "line-through text-slate-500" : ""}`}>
-                                    {ing.display} {ing.isMatched && !isChecked && <span className="text-[9px] uppercase tracking-wider text-amber-500 font-extrabold ml-1">(Tento krok)</span>}
-                                  </span>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        )}
+                {/* Additional Tips & Culinary Expert block */}
+                {(selectedRecipe.applianceTips || selectedRecipe.expertJustification) && (
+                  <div className="pt-8 border-t border-[#E8E4DB] space-y-4 font-sans text-xs md:text-sm">
+                    {selectedRecipe.applianceTips && (
+                      <div className="bg-[#FFFBEB] border border-[#FDE68A] p-5 rounded-2xl text-[#B45309]">
+                        <span className="font-bold block uppercase tracking-wider text-[10px] mb-1">Rady pro spotřebiče</span>
+                        <p className="leading-relaxed italic">{selectedRecipe.applianceTips}</p>
                       </div>
-                    </div>
-                  );
-                })()}
-
-                {/* Step Completed Button in Center */}
-                <button
-                  onClick={() => toggleInstruction(currentHandsFreeStep)}
-                  className={`mt-4 flex items-center gap-2.5 px-6 py-3.5 rounded-full border text-sm font-extrabold transition-all cursor-pointer shadow-md ${
-                    !!checkedInstructions[currentHandsFreeStep]
-                      ? "bg-emerald-950/40 border-emerald-500/40 text-emerald-400 hover:bg-emerald-950/60"
-                      : "bg-slate-900 border-slate-800 text-slate-300 hover:bg-slate-850 hover:text-white"
-                  }`}
-                >
-                  <Check className={`h-4.5 w-4.5 stroke-[2.5] ${!!checkedInstructions[currentHandsFreeStep] ? "text-emerald-400" : "text-slate-500"}`} />
-                  <span>
-                    {!!checkedInstructions[currentHandsFreeStep] 
-                      ? "Splněno" 
-                      : "Označit jako hotové"
-                    }
-                  </span>
-                </button>
-
+                    )}
+                    {selectedRecipe.expertJustification && (
+                      <div className="bg-[#F0FDF4] border border-[#DCFCE7] p-5 rounded-2xl text-[#166534]">
+                        <span className="font-bold block uppercase tracking-wider text-[10px] mb-1">Kulinářské odůvodnění expertů</span>
+                        <p className="leading-relaxed italic">{selectedRecipe.expertJustification}</p>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
 
-            {/* Tactile Bottom Navigation Buttons */}
-            <div className="bg-slate-900 border-t border-slate-800 py-4 px-6 flex items-center justify-between">
-              
-              {/* Prev Button */}
+            {/* Bottom Footer Go Back Controls */}
+            <div className="bg-[#F5F2EA] pb-10 flex justify-center no-print">
               <button
-                onClick={prevHandsFreeStep}
-                disabled={currentHandsFreeStep === 0}
-                className={`py-3 px-5 rounded-2xl font-bold flex items-center gap-1.5 transition-all text-sm border cursor-pointer ${
-                  currentHandsFreeStep === 0
-                    ? "bg-slate-950 border-slate-900 text-slate-700 cursor-not-allowed"
-                    : "bg-slate-850 hover:bg-slate-850/80 text-slate-200 border-slate-750"
-                }`}
+                onClick={() => setShowPaperView(false)}
+                className="bg-[#2D6A4F] hover:bg-[#1B4332] text-white font-bold py-3.5 px-8 rounded-2xl shadow-lg transition-all flex items-center gap-2 cursor-pointer text-base"
               >
-                <ChevronLeft className="h-5 w-5" />
-                <span className="hidden sm:inline">Předchozí krok</span>
+                <BookOpen className="h-5 w-5" />
+                <span>Zavřít knihu a zpět</span>
               </button>
-
-              {/* Summary progress bar */}
-              <div className="text-center flex flex-col items-center justify-center">
-                <span className="text-xs font-mono text-slate-400 font-bold">
-                  {Math.round(((currentHandsFreeStep + 1)/selectedRecipe.instructions.length) * 100)} % HOTOVO
-                </span>
-                <div className="w-24 bg-slate-800 h-1.5 rounded-full overflow-hidden mt-1 max-w-[120px]">
-                  <div 
-                    className="bg-amber-500 h-full transition-all duration-300"
-                    style={{ width: `${((currentHandsFreeStep + 1)/selectedRecipe.instructions.length) * 100}%` }}
-                  />
-                </div>
-              </div>
-
-              {/* Next/Finish Button */}
-              {currentHandsFreeStep === selectedRecipe.instructions.length - 1 ? (
-                <button
-                  onClick={stopHandsFree}
-                  className="bg-emerald-600 hover:bg-emerald-500 py-3 px-6 rounded-2xl font-extrabold flex items-center gap-1.5 text-sm transition-all shadow-lg hover:shadow-emerald-950/30 text-white cursor-pointer"
-                >
-                  <Check className="h-5 w-5 stroke-[2.5]" />
-                  <span>Dokončit vaření</span>
-                </button>
-              ) : (
-                <button
-                  onClick={nextHandsFreeStep}
-                  className="bg-amber-600 hover:bg-amber-500 py-3 px-5 rounded-2xl font-bold flex items-center gap-1.5 text-sm transition-all text-white shadow-md cursor-pointer"
-                >
-                  <span className="hidden sm:inline">Další krok</span>
-                  <ChevronRight className="h-5 w-5" />
-                </button>
-              )}
-
             </div>
           </motion.div>
         )}
@@ -2962,6 +2702,30 @@ ${separator}`;
                             Celkem receptů v databázi: <strong className="text-slate-700">{diagnosticsResult.recipesCount}</strong>
                           </p>
                         </div>
+
+                        {/* 3. GITHUB SYNC */}
+                        {diagnosticsResult.githubOk !== undefined && (
+                          <div className="p-2 bg-white border border-emerald-100 rounded-lg space-y-1 text-[#2c2c2c] shadow-xs animate-scale-up">
+                            <div className="flex items-center justify-between font-bold">
+                              <span className="flex items-center gap-1 text-emerald-900">
+                                <GitBranch className="h-3 w-3 text-indigo-500 shrink-0" />
+                                Propojení s GitHubem (Obousměrné)
+                              </span>
+                              {diagnosticsResult.githubOk ? (
+                                <span className="text-[8px] bg-emerald-100 text-emerald-800 px-1 py-0.2 rounded font-black uppercase">
+                                  OK
+                                </span>
+                              ) : (
+                                <span className="text-[8px] bg-amber-100 text-amber-800 px-1 py-0.2 rounded font-black uppercase">
+                                  BEZ PROPOJENÍ
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-slate-600 leading-normal">
+                              {diagnosticsResult.githubMessage}
+                            </p>
+                          </div>
+                        )}
 
                         {/* 2. GEMINI AI */}
                         <div className="p-2 bg-white border border-emerald-100 rounded-lg space-y-1 text-[#2c2c2c] shadow-xs">
@@ -3458,11 +3222,11 @@ ${separator}`;
                     )}
 
                     <button
-                      onClick={startHandsFree}
-                      className="bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 px-4 rounded-xl shadow-xs hover:shadow-md transition-all flex items-center gap-2 text-sm cursor-pointer"
+                      onClick={() => setShowPaperView(true)}
+                      className="bg-[#2D6A4F] hover:bg-[#1B4332] text-white font-bold py-2 px-4 rounded-xl shadow-xs hover:shadow-md transition-all flex items-center gap-2 text-sm cursor-pointer"
                     >
-                      <ChefHat className="h-4 w-4" />
-                      <span>Režim vaření (Hands-free)</span>
+                      <BookOpen className="h-4 w-4" />
+                      <span>Zobrazit recept</span>
                     </button>
 
                     <button
