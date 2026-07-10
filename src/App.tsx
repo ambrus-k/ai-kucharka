@@ -51,7 +51,7 @@ export const isStudioEnv = (() => {
   if (typeof window === "undefined") return false;
   const host = window.location.hostname;
   return (
-    host.includes("europe-west2.run.app") ||
+    host.includes("run.app") ||
     host.includes("google") ||
     host.includes("localhost") ||
     host.includes("127.0.0.1")
@@ -422,25 +422,15 @@ export default function App() {
   const [auditError, setAuditError] = useState<string | null>(null);
   const [activeStepIndex, setActiveStepIndex] = useState(-1);
 
-  // States for GitHub integration
-  const [showGithubConfig, setShowGithubConfig] = useState(false);
+  // States for Admin Login & Server-side recipes database
+  const [showLoginModal, setShowLoginModal] = useState(false);
   const [githubUser, setGithubUser] = useState(() => localStorage.getItem("ai_kucharka_github_username") || "karelaa");
   const [githubRepo, setGithubRepo] = useState(() => localStorage.getItem("ai_kucharka_github_repo") || "ai-kucharka-data");
   const [githubToken, setGithubToken] = useState(() => localStorage.getItem("ai_kucharka_github_token") || "");
   const [githubBranch, setGithubBranch] = useState(() => localStorage.getItem("ai_kucharka_github_branch") || "main");
-  const [githubPath, setGithubPath] = useState(() => localStorage.getItem("ai_kucharka_github_path") || "db.json");
-  const [githubTestStatus, setGithubTestStatus] = useState<"idle" | "testing" | "success" | "error">("idle");
-  const [githubTestMessage, setGithubTestMessage] = useState<string | null>(null);
-  const [githubSyncStatus, setGithubSyncStatus] = useState<"idle" | "syncing" | "success" | "error">("idle");
-  const [githubSyncError, setGithubSyncError] = useState<string | null>(null);
-  const [githubSyncLogs, setGithubSyncLogs] = useState<string[]>([]);
-  const [githubPendingAction, setGithubPendingAction] = useState<"import" | "export" | "sync" | null>(null);
+  const [githubPath, setGithubPath] = useState(() => localStorage.getItem("ai_kucharka_github_path") || "recipes.json");
   const [serverlessApiError, setServerlessApiError] = useState<string | null>(null);
   const [serverlessApiSuccess, setServerlessApiSuccess] = useState<boolean>(false);
-  const addSyncLog = (message: string) => {
-    const time = new Date().toLocaleTimeString();
-    setGithubSyncLogs(prev => [...prev, `[${time}] ${message}`]);
-  };
 
   const handleAuditRecipe = async () => {
     if (!selectedRecipe) return;
@@ -495,10 +485,11 @@ export default function App() {
   const handleAcceptAuditChange = () => {
     if (!selectedRecipe || !auditModifiedRecipe) return;
     
+    const stampedRecipe = { ...auditModifiedRecipe, updatedAt: new Date().toISOString() };
     // Replace recipe with the modified one
-    const updatedRecipesList = recipes.map(r => r.id === selectedRecipe.id ? auditModifiedRecipe : r);
-    saveRecipesToStorage(updatedRecipesList, auditModifiedRecipe);
-    setSelectedRecipe(auditModifiedRecipe);
+    const updatedRecipesList = recipes.map(r => r.id === selectedRecipe.id ? stampedRecipe : r);
+    saveRecipesToStorage(updatedRecipesList, stampedRecipe);
+    setSelectedRecipe(stampedRecipe);
     
     // Clear audit panel state after accepting
     setAuditSteps(null);
@@ -746,7 +737,8 @@ export default function App() {
       applianceType: editApplianceType,
       cookingTime: editCookingTime,
       difficulty: editDifficulty as "Snadné" | "Střední" | "Složité",
-      category: editCategory
+      category: editCategory,
+      updatedAt: new Date().toISOString()
     };
 
     const updatedRecipesList = recipes.map(r => r.id === selectedRecipe.id ? updatedRecipe : r);
@@ -907,627 +899,9 @@ export default function App() {
     }
   };
 
-  const syncRecipesWithGithub = async (recipesList: Recipe[], targetRecipe?: Recipe, isDelete = false) => {
-    if (!isStudioEnv) {
-      console.log("GitHub synchronizace je v tomto webovém prostředí z bezpečnostních důvodů vypnuta.");
-      return;
-    }
-    const user = githubUser.trim();
-    const repo = githubRepo.trim();
-    const token = githubToken.trim();
-    const branch = githubBranch.trim();
-
-    if (!user || !repo || !token) {
-      console.log("GitHub integration not fully configured. Skip remote synchronization.");
-      return;
-    }
-
-    setGithubSyncStatus("syncing");
-    setGithubSyncError(null);
-
-    try {
-      if (targetRecipe) {
-        const slug = targetRecipe.title
-          .toString()
-          .toLowerCase()
-          .normalize('NFD') // remove accents
-          .replace(/[\u0300-\u036f]/g, '')
-          .replace(/\s+/g, '-')
-          .replace(/[^\w\-]+/g, '')
-          .replace(/\-\-+/g, '-')
-          .replace(/^-+/, '')
-          .replace(/-+$/, '');
-        
-        const recipeFilePath = `recipes/${slug}.json`;
-        const recipeFileUrl = `https://api.github.com/repos/${user}/${repo}/contents/${recipeFilePath}`;
-        let recipeSha: string | undefined;
-
-        try {
-          const getRecipeResponse = await fetch(`${recipeFileUrl}?ref=${branch}`, {
-            headers: {
-              "Authorization": `Bearer ${token}`,
-              "Accept": "application/vnd.github.v3+json"
-            }
-          });
-          if (getRecipeResponse.status === 200) {
-            const fileData = await getRecipeResponse.json();
-            recipeSha = fileData.sha;
-          }
-        } catch (e) {
-          console.log("Could not fetch recipe file sha", e);
-        }
-
-        if (isDelete) {
-          if (recipeSha) {
-            await fetch(recipeFileUrl, {
-              method: "DELETE",
-              headers: {
-                "Authorization": `Bearer ${token}`,
-                "Accept": "application/vnd.github.v3+json",
-                "Content-Type": "application/json"
-              },
-              body: JSON.stringify({
-                message: `Odstranění receptu ${targetRecipe.title} z kulinářských zdrojů`,
-                sha: recipeSha,
-                branch: branch
-              })
-            });
-          }
-        } else {
-          const recipeContentB64 = window.btoa(unescape(encodeURIComponent(JSON.stringify(targetRecipe, null, 2))));
-          await fetch(recipeFileUrl, {
-            method: "PUT",
-            headers: {
-              "Authorization": `Bearer ${token}`,
-              "Accept": "application/vnd.github.v3+json",
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-              message: `Aktualizace kulinářského zdroje pro recept: ${targetRecipe.title}`,
-              content: recipeContentB64,
-              sha: recipeSha,
-              branch: branch
-            })
-          });
-        }
-      }
-
-      setGithubSyncStatus("success");
-      setTimeout(() => setGithubSyncStatus("idle"), 5000);
-    } catch (error: any) {
-      console.error("GitHub Synchronization error:", error);
-      setGithubSyncStatus("error");
-      setGithubSyncError(error?.message || "Neznámá chyba při synchronizaci.");
-    }
-  };
-
-  const exportAllToGithub = async () => {
-    if (!isStudioEnv) {
-      setGithubSyncStatus("error");
-      setGithubSyncError("Synchronizace s GitHubem je po exportu na web (Vercel) zakázána z bezpečnostních důvodů.");
-      return;
-    }
-    const user = githubUser.trim();
-    const repo = githubRepo.trim();
-    const token = githubToken.trim();
-    const branch = githubBranch.trim();
-
-    if (!user || !repo || !token) {
-      setGithubSyncStatus("error");
-      setGithubSyncError("Pro export musíte nejdříve vyplnit GitHub Uživatelské jméno, Název repozitáře a Přístupový token (PAT).");
-      return;
-    }
-
-    setGithubSyncStatus("syncing");
-    setGithubSyncError(null);
-    setGithubSyncLogs([]);
-    const log = (msg: string) => {
-      console.log(msg);
-      addSyncLog(msg);
-    };
-
-    try {
-      log("Zahájení nahrávání receptů na GitHub...");
-
-      // 1. Zjistit stávající soubory v adresáři recipes/ na GitHubu pro čistění sirotků
-      log("1. Zjišťuji seznam stávajících souborů ve složce 'recipes/'...");
-      let remoteFiles: any[] = [];
-      try {
-        const getDirRes = await fetch(`https://api.github.com/repos/${user}/${repo}/contents/recipes?ref=${branch}`, {
-          headers: {
-            "Authorization": `Bearer ${token}`,
-            "Accept": "application/vnd.github.v3+json"
-          }
-        });
-        if (getDirRes.status === 200) {
-          const dirData = await getDirRes.json();
-          if (Array.isArray(dirData)) {
-            remoteFiles = dirData;
-          }
-        }
-      } catch (e) {
-        log("Poznámka: Nepodařilo se načíst obsah složky 'recipes/', pravděpodobně ještě neexistuje.");
-      }
-
-      // 2. Vytvořit mapu lokálních slugů
-      const localSlugs = new Set<string>();
-      let successCount = 0;
-
-      log(`2. Synchronizace všech lokálních receptů (celkem ${recipes.length}) do složky 'recipes/'...`);
-      for (let i = 0; i < recipes.length; i++) {
-        const r = recipes[i];
-        const slug = r.title
-          .toString()
-          .toLowerCase()
-          .normalize('NFD')
-          .replace(/[\u0300-\u036f]/g, '')
-          .replace(/\s+/g, '-')
-          .replace(/[^\w\-]+/g, '')
-          .replace(/\-\-+/g, '-')
-          .replace(/^-+/, '')
-          .replace(/-+$/, '');
-
-        const fileName = `${slug}.json`;
-        localSlugs.add(fileName);
-
-        const recipeFilePath = `recipes/${fileName}`;
-        const recipeFileUrl = `https://api.github.com/repos/${user}/${repo}/contents/${recipeFilePath}`;
-        
-        // Najít SHA pokud existuje
-        const matchingRemote = remoteFiles.find(f => f.name === fileName);
-        const recipeSha = matchingRemote ? matchingRemote.sha : undefined;
-
-        log(`Ukládání receptu (${i + 1}/${recipes.length}): ${r.title} -> ${recipeFilePath}`);
-
-        const recipeContentB64 = window.btoa(unescape(encodeURIComponent(JSON.stringify(r, null, 2))));
-        const putRecipeRes = await fetch(recipeFileUrl, {
-          method: "PUT",
-          headers: {
-            "Authorization": `Bearer ${token}`,
-            "Accept": "application/vnd.github.v3+json",
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            message: `Nahrání kulinářského zdroje pro: ${r.title}`,
-            content: recipeContentB64,
-            sha: recipeSha,
-            branch: branch
-          })
-        });
-
-        if (putRecipeRes.ok) {
-          successCount++;
-        } else {
-          log(`⚠️ Chyba při nahrávání souboru receptu ${r.title} (Kód: ${putRecipeRes.status})`);
-        }
-      }
-
-      // 3. Odstranit smazané/sirotčí recepty z GitHubu
-      log("3. Odstraňování přebytečných (smazaných) receptů z GitHubu...");
-      let deletedCount = 0;
-      for (const remoteFile of remoteFiles) {
-        if (remoteFile.type === "file" && remoteFile.name.endsWith(".json") && !localSlugs.has(remoteFile.name)) {
-          log(`Odstraňuji osiřelý soubor z GitHubu: recipes/${remoteFile.name}`);
-          try {
-            const delRes = await fetch(`https://api.github.com/repos/${user}/${repo}/contents/recipes/${remoteFile.name}`, {
-              method: "DELETE",
-              headers: {
-                "Authorization": `Bearer ${token}`,
-                "Accept": "application/vnd.github.v3+json",
-                "Content-Type": "application/json"
-              },
-              body: JSON.stringify({
-                message: `Odstranění přebytečného receptu ${remoteFile.name}`,
-                sha: remoteFile.sha,
-                branch: branch
-              })
-            });
-            if (delRes.ok) deletedCount++;
-          } catch (delErr) {
-            console.error(delErr);
-          }
-        }
-      }
-
-      setGithubSyncStatus("success");
-      log(`✓ Vše hotovo! Úspěšně uloženo ${successCount} receptů do složky 'recipes/' a smazáno ${deletedCount} přebytečných souborů.`);
-      setTimeout(() => setGithubSyncStatus("idle"), 8000);
-    } catch (err: any) {
-      console.error("Export all to GitHub failed", err);
-      setGithubSyncStatus("error");
-      setGithubSyncError(err?.message || "Neznáma chyba při exportu.");
-      log(`❌ Chyba exportu: ${err?.message || "Neznámá chyba"}`);
-    }
-  };
-
-  const fetchRecipesFromGithub = async (silentOrOptions?: boolean | { silent?: boolean; skipClearLogs?: boolean }): Promise<Recipe[]> => {
-    let silent = false;
-    let skipClearLogs = false;
-    if (typeof silentOrOptions === "boolean") {
-      silent = silentOrOptions;
-    } else if (silentOrOptions) {
-      silent = silentOrOptions.silent ?? false;
-      skipClearLogs = silentOrOptions.skipClearLogs ?? false;
-    }
-
-    const user = githubUser.trim();
-    const repo = githubRepo.trim();
-    const token = githubToken.trim();
-    const branch = githubBranch.trim();
-
-    if (!silent && !skipClearLogs) {
-      setGithubSyncLogs([]);
-    }
-    const log = (msg: string) => {
-      console.log(msg);
-      if (!silent) addSyncLog(msg);
-    };
-
-    log(`Stahování sloučeného souboru 'recipes.json' z větve ${branch}...`);
-    try {
-      const rawUrl = `https://raw.githubusercontent.com/${user}/${repo}/${branch}/recipes.json`;
-      const res = await fetch(rawUrl, {
-        headers: token ? { "Authorization": `Bearer ${token}` } : {}
-      });
-      if (res.ok) {
-        const list = await res.json();
-        if (Array.isArray(list) && list.length > 0) {
-          log(`Úspěšně staženo a načteno ${list.length} receptů ze sloučeného souboru 'recipes.json'.`);
-          return list;
-        }
-      }
-    } catch (e: any) {
-      log(`⚠️ Rychlé stažení 'recipes.json' se nezdařilo: ${e?.message || e}. Zkouším načíst jednotlivé soubory z 'recipes/'...`);
-    }
-
-    log(`Stahování seznamu receptů ze složky 'recipes/' z větve ${branch}...`);
-
-    const dirUrl = `https://api.github.com/repos/${user}/${repo}/contents/recipes?ref=${branch}`;
-    const headers: Record<string, string> = {
-      "Accept": "application/vnd.github.v3+json"
-    };
-    if (token) {
-      headers["Authorization"] = `Bearer ${token}`;
-    }
-
-    let getDirResponse: Response;
-    try {
-      getDirResponse = await fetch(dirUrl, { headers });
-    } catch (fetchErr: any) {
-      log(`Chyba síťového požadavku: ${fetchErr?.message || fetchErr}.`);
-      throw new Error(`Nepodařilo se připojit k GitHub API při stahování složky recipes/.`);
-    }
-
-    if (getDirResponse.status === 404) {
-      log(`Složka 'recipes/' nebyla v repozitáři nalezena. Vracím prázdný seznam.`);
-      return [];
-    }
-
-    if (getDirResponse.status !== 200) {
-      throw new Error(`Chyba při stahování seznamu receptů ze složky 'recipes/'. Kód: ${getDirResponse.status}`);
-    }
-
-    const files = await getDirResponse.json();
-    const jsonFiles = Array.isArray(files) ? files.filter(f => f.type === "file" && f.name.endsWith(".json")) : [];
-    
-    log(`Nalezeno ${jsonFiles.length} souborů receptů. Stahuji jejich obsah...`);
-    
-    const recipesList: Recipe[] = [];
-    let downloadedCount = 0;
-
-    for (const file of jsonFiles) {
-      try {
-        const fileRes = await fetch(file.download_url, {
-          headers: token ? { "Authorization": `Bearer ${token}` } : {}
-        });
-        if (fileRes.ok) {
-          const recipeData = await fileRes.json();
-          if (recipeData && recipeData.id) {
-            recipesList.push(recipeData);
-            downloadedCount++;
-            if (!silent && downloadedCount % 5 === 0) {
-              log(`Staženo ${downloadedCount}/${jsonFiles.length} receptů...`);
-            }
-          }
-        }
-      } catch (e: any) {
-        log(`⚠️ Nepodařilo se stáhnout recept ${file.name}: ${e?.message || e}`);
-      }
-    }
-
-    log(`Úspěšně staženo a načteno ${recipesList.length} receptů ze složky 'recipes/'.`);
-    return recipesList;
-  };
-
-  const importAllFromGithub = async () => {
-    if (!isStudioEnv) {
-      setGithubSyncStatus("error");
-      setGithubSyncError("Synchronizace s GitHubem je po exportu na web (Vercel) zakázána z bezpečnostních důvodů.");
-      return;
-    }
-    const user = githubUser.trim();
-    const repo = githubRepo.trim();
-
-    if (!user || !repo) {
-      setGithubSyncStatus("error");
-      setGithubSyncError("Pro import z GitHubu musíte nejprve vyplnit Uživatelské jméno a Název repozitáře.");
-      return;
-    }
-
-    setGithubSyncStatus("syncing");
-    setGithubSyncError(null);
-    setGithubSyncLogs([]);
-
-    try {
-      const list = await fetchRecipesFromGithub(false);
-      const cleaned = list.map(removePreservativesFromSoup);
-      setRecipes(cleaned);
-      localStorage.setItem("ai_kucharka_recipes", JSON.stringify(cleaned));
-      if (cleaned.length > 0) {
-        setSelectedRecipe(cleaned[0]);
-      }
-
-      setGithubSyncStatus("success");
-      addSyncLog(`✓ Úspěšně staženo a naimportováno ${cleaned.length} receptů!`);
-      setTimeout(() => setGithubSyncStatus("idle"), 8000);
-    } catch (err: any) {
-      console.error("Import from GitHub failed", err);
-      setGithubSyncStatus("error");
-      setGithubSyncError(err?.message || "Neznámá chyba při stahování.");
-      addSyncLog(`❌ Chyba při importu: ${err?.message || "Neznámá chyba"}`);
-    }
-  };
-
-  const syncAllWithGithub = async () => {
-    if (!isStudioEnv) {
-      setGithubSyncStatus("error");
-      setGithubSyncError("Synchronizace s GitHubem je po exportu na web (Vercel) zakázána z bezpečnostních důvodů.");
-      return;
-    }
-    const user = githubUser.trim();
-    const repo = githubRepo.trim();
-    const token = githubToken.trim();
-    const branch = githubBranch.trim();
-
-    if (!user || !repo) {
-      setGithubSyncStatus("error");
-      setGithubSyncError("Pro synchronizaci musíte nejprve vyplnit Uživatelské jméno a Název repozitáře.");
-      return;
-    }
-    if (!token) {
-      setGithubSyncStatus("error");
-      setGithubSyncError("Pro obousměrnou synchronizaci musíte vyplnit Osobní přístupový token (PAT).");
-      return;
-    }
-
-    setGithubSyncStatus("syncing");
-    setGithubSyncError(null);
-    setGithubSyncLogs([]);
-    const log = (msg: string) => {
-      console.log(msg);
-      addSyncLog(msg);
-    };
-
-    try {
-      log("Zahájení obousměrné synchronizace...");
-
-      // 1. Download recipes from GitHub
-      log("1. Stahování aktuálních receptů ze složky 'recipes/' na GitHubu...");
-      let githubRecipes: Recipe[] = [];
-      let remoteFiles: any[] = [];
-      try {
-        const getDirRes = await fetch(`https://api.github.com/repos/${user}/${repo}/contents/recipes?ref=${branch}`, {
-          headers: {
-            "Authorization": `Bearer ${token}`,
-            "Accept": "application/vnd.github.v3+json"
-          }
-        });
-        if (getDirRes.status === 200) {
-          remoteFiles = await getDirRes.json();
-          const jsonFiles = Array.isArray(remoteFiles) ? remoteFiles.filter(f => f.type === "file" && f.name.endsWith(".json")) : [];
-          log(`Nalezeno ${jsonFiles.length} receptů na GitHubu, stahuji obsah...`);
-
-          let downloadedCount = 0;
-          for (const file of jsonFiles) {
-            try {
-              const fileRes = await fetch(file.download_url, {
-                headers: { "Authorization": `Bearer ${token}` }
-              });
-              if (fileRes.ok) {
-                const recipeData = await fileRes.json();
-                if (recipeData && recipeData.id) {
-                  githubRecipes.push(recipeData);
-                  downloadedCount++;
-                }
-              }
-            } catch (e: any) {
-              log(`⚠️ Nepodařilo se stáhnout ${file.name}: ${e?.message || e}`);
-            }
-          }
-        }
-        log(`✓ Staženo ${githubRecipes.length} receptů z GitHubu.`);
-      } catch (err: any) {
-        log(`Poznámka: Nepodařilo se stáhnout stávající recepty ze složky 'recipes/' (${err?.message || err}).`);
-        log("Předpokládám, že složka neexistuje nebo je prázdná. Budou nahrány pouze lokální recepty.");
-      }
-
-      // 2. Fetch local recipes
-      log(`2. Načítání lokálních receptů (aktuálně ${recipes.length} receptů)...`);
-      
-      // 3. Merging algorithm
-      log("3. Sloučení databází (spojení seznamů a vyřešení duplicit)...");
-      const mergedMap = new Map<string, Recipe>();
-
-      // First, add all GitHub recipes to the map
-      githubRecipes.forEach((r) => {
-        if (r && r.id) {
-          mergedMap.set(r.id, r);
-        }
-      });
-
-      // Second, add all local recipes (which will overwrite any matching GitHub recipes with the local version)
-      let addedLocallyCount = 0;
-      let updatedLocallyCount = 0;
-      
-      recipes.forEach((r) => {
-        if (r && r.id) {
-          if (!mergedMap.has(r.id)) {
-            addedLocallyCount++;
-          } else {
-            // Check if local is different
-            const githubVer = mergedMap.get(r.id);
-            if (JSON.stringify(githubVer) !== JSON.stringify(r)) {
-              updatedLocallyCount++;
-            }
-          }
-          mergedMap.set(r.id, r);
-        }
-      });
-
-      const finalRecipesList = Array.from(mergedMap.values()).map(removePreservativesFromSoup);
-      log(`Sloučení dokončeno. Celkem: ${finalRecipesList.length} receptů.`);
-      log(`- Nově staženo z GitHubu: ${finalRecipesList.length - recipes.length} receptů.`);
-      log(`- Lokálně přidaných receptů k nahrání: ${addedLocallyCount}`);
-      if (updatedLocallyCount > 0) {
-        log(`- Lokálně aktualizovaných receptů k přepsání: ${updatedLocallyCount}`);
-      }
-
-      // 4. Save merged list locally
-      log("4. Ukládání sloučeného seznamu do paměti prohlížeče...");
-      setRecipes(finalRecipesList);
-      localStorage.setItem("ai_kucharka_recipes", JSON.stringify(finalRecipesList));
-      if (finalRecipesList.length > 0) {
-        setSelectedRecipe(finalRecipesList[0]);
-      }
-
-      // 5. Upload merged list back to GitHub as individual files in recipes/
-      log("5. Nahrávání sjednocených receptů jako samostatné soubory do složky 'recipes/'...");
-      let successCount = 0;
-      const localSlugs = new Set<string>();
-
-      for (let i = 0; i < finalRecipesList.length; i++) {
-        const r = finalRecipesList[i];
-        const slug = r.title
-          .toString()
-          .toLowerCase()
-          .normalize('NFD')
-          .replace(/[\u0300-\u036f]/g, '')
-          .replace(/\s+/g, '-')
-          .replace(/[^\w\-]+/g, '')
-          .replace(/\-\-+/g, '-')
-          .replace(/^-+/, '')
-          .replace(/-+$/, '');
-
-        const fileName = `${slug}.json`;
-        localSlugs.add(fileName);
-
-        const recipeFilePath = `recipes/${fileName}`;
-        const recipeFileUrl = `https://api.github.com/repos/${user}/${repo}/contents/${recipeFilePath}`;
-        
-        // Najít SHA z načteného seznamu souborů
-        const matchingRemote = remoteFiles.find(f => f.name === fileName);
-        const recipeSha = matchingRemote ? matchingRemote.sha : undefined;
-
-        const recipeContentB64 = window.btoa(unescape(encodeURIComponent(JSON.stringify(r, null, 2))));
-        const putRecipeRes = await fetch(recipeFileUrl, {
-          method: "PUT",
-          headers: {
-            "Authorization": `Bearer ${token}`,
-            "Accept": "application/vnd.github.v3+json",
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            message: `Synchronizace receptu: ${r.title}`,
-            content: recipeContentB64,
-            sha: recipeSha,
-            branch: branch
-          })
-        });
-
-        if (putRecipeRes.ok) {
-          successCount++;
-        }
-      }
-
-      // 6. Odstranit smazané/sirotčí recepty z GitHubu
-      log("6. Odstraňování přebytečných receptů z GitHubu...");
-      let deletedCount = 0;
-      for (const remoteFile of remoteFiles) {
-        if (remoteFile.type === "file" && remoteFile.name.endsWith(".json") && !localSlugs.has(remoteFile.name)) {
-          log(`Odstraňuji přebytečný soubor z GitHubu: recipes/${remoteFile.name}`);
-          try {
-            const delRes = await fetch(`https://api.github.com/repos/${user}/${repo}/contents/recipes/${remoteFile.name}`, {
-              method: "DELETE",
-              headers: {
-                "Authorization": `Bearer ${token}`,
-                "Accept": "application/vnd.github.v3+json",
-                "Content-Type": "application/json"
-              },
-              body: JSON.stringify({
-                message: `Odstranění přebytečného receptu ${remoteFile.name}`,
-                sha: remoteFile.sha,
-                branch: branch
-              })
-            });
-            if (delRes.ok) deletedCount++;
-          } catch (delErr) {
-            console.error(delErr);
-          }
-        }
-      }
-
-      setGithubSyncStatus("success");
-      log(`✓ SYNCHRONIZACE DOKONČENA! Všechny recepty sjednoceny. Načteno ${finalRecipesList.length} receptů, uloženo ${successCount} souborů a smazáno ${deletedCount} přebytečných.`);
-      setTimeout(() => setGithubSyncStatus("idle"), 8000);
-    } catch (err: any) {
-      console.error("Bidirectional sync failed", err);
-      setGithubSyncStatus("error");
-      setGithubSyncError(err?.message || "Neznámá chyba při synchronizaci.");
-      log(`❌ Chyba synchronizace: ${err?.message || "Neznámá chyba"}`);
-    }
-  };
-
-  const testGithubConnection = async () => {
-    const user = githubUser.trim();
-    const repo = githubRepo.trim();
-    const token = githubToken.trim();
-
-    if (!user || !repo) {
-      setGithubTestStatus("error");
-      setGithubTestMessage("Vyplňte uživatelské jméno a název repozitáře.");
-      return;
-    }
-
-    setGithubTestStatus("testing");
-    setGithubTestMessage("Navazuji spojení s GitHub API...");
-
-    try {
-      const headers: Record<string, string> = {
-        "Accept": "application/vnd.github.v3+json"
-      };
-      if (token) {
-        headers["Authorization"] = `Bearer ${token}`;
-      }
-
-      const res = await fetch(`https://api.github.com/repos/${user}/${repo}`, { headers });
-      if (res.status === 200) {
-        setGithubTestStatus("success");
-        setGithubTestMessage("✓ Spojení úspěšné! Repozitář byl nalezen a ověřen.");
-      } else {
-        const errData = await res.json().catch(() => ({}));
-        setGithubTestStatus("error");
-        setGithubTestMessage(`Chyba: ${res.status} (${errData.message || "Nepodařilo se připojit k repozitáři"})`);
-      }
-    } catch (e: any) {
-      setGithubTestStatus("error");
-      setGithubTestMessage(`Chyba sítě: ${e?.message || "Nelze se spojit s API"}`);
-    }
-  };
-
   const handleConfigureGithub = () => {
-    setShowGithubConfig(true);
+    setShowLoginModal(true);
   };
-
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -2446,7 +1820,7 @@ ${separator}`;
     const loadRecipes = async () => {
       let loadedList: Recipe[] | null = null;
 
-      // 1. Prioritize loading from Serverless API /api/recipes (safely connected to custom GitHub repo)
+      // 1. Prioritize loading from Serverless API /api/recipes
       try {
         const serverlessResponse = await fetch("/api/recipes");
         if (serverlessResponse.ok) {
@@ -2456,9 +1830,9 @@ ${separator}`;
             loadedList = list;
             setServerlessApiSuccess(true);
             setServerlessApiError(null);
-            console.log("Úspěšně načteny aktuální recepty ze Severless API /api/recipes (GitHub direct source)");
+            console.log("Úspěšně načteny aktuální recepty ze Serverless API /api/recipes");
           } else {
-            console.log("Severless API /api/recipes vrátil prázdný seznam receptů.");
+            console.log("Serverless API /api/recipes vrátil prázdný seznam receptů.");
           }
         } else {
           const errData = await serverlessResponse.json().catch(() => ({}));
@@ -2471,7 +1845,7 @@ ${separator}`;
         console.log("Nepodařilo se stáhnout data přes /api/recipes, zkusíme další zdroje...", error);
       }
 
-      // 2. Fallback to localStorage (if already stored and initialized)
+      // 2. Fallback to localStorage (only if online retrieval failed due to network / error)
       if (loadedList === null) {
         const stored = localStorage.getItem("ai_kucharka_recipes");
         if (stored) {
@@ -2479,7 +1853,7 @@ ${separator}`;
             const parsed = JSON.parse(stored);
             if (Array.isArray(parsed) && parsed.length > 0) {
               loadedList = parsed;
-              console.log("Načteny uložené recepty z lokálního úložiště prohlížeče.");
+              console.log("Načteny uložené recepty z lokálního úložiště prohlížeče (offline režim).");
             }
           } catch (e) {
             console.error("Chyba při čtení receptů z lokálního úložiště", e);
@@ -2487,21 +1861,7 @@ ${separator}`;
         }
       }
 
-      // 3. Fallback to dynamic remote URL (direct GitHub contents/recipes listing and downloading)
-      if (loadedList === null) {
-        try {
-          console.log("Pokouším se načíst recepty přímo ze složky recipes/ na GitHubu...");
-          const list = await fetchRecipesFromGithub({ silent: true });
-          if (list && list.length > 0) {
-            loadedList = list;
-            console.log("Úspěšně načteny recepty ze složky recipes/ na GitHubu!");
-          }
-        } catch (error) {
-          console.log("Nepodařilo se načíst ze složky recipes na GitHubu, zkusíme lokální fallback.", error);
-        }
-      }
-
-      // 4. Fallback to local default recipes
+      // 3. Fallback to local default recipes
       if (loadedList === null) {
         loadedList = LOCAL_FALLBACK;
         console.log("Použity výchozí vestavěné recepty.");
@@ -2530,28 +1890,24 @@ ${separator}`;
     setRecipes(cleaned);
     localStorage.setItem("ai_kucharka_recipes", JSON.stringify(cleaned));
 
-    // Automatically replicate/save to Vercel/Local Serverless API /api/recipes
     try {
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json"
+      };
+
       const response = await fetch("/api/recipes", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ recipes: cleaned })
+        headers,
+        body: JSON.stringify({ recipes: cleaned, adminPassword })
       });
       if (response.ok) {
-        console.log("Změny kuchařky byly automaticky uloženy na GitHub přes Serverless API!");
+        console.log("Změny kuchařky byly automaticky uloženy online!");
       } else {
-        console.warn(`Serverless API vrátil kód: ${response.status}`);
+        const errData = await response.json().catch(() => ({}));
+        console.warn(`Chyba ukládání online (Status: ${response.status}):`, errData.error || "");
       }
     } catch (e) {
-      console.error("Nepodařilo se odeslat uložení na Serverless API:", e);
-    }
-
-    if (isStudioEnv) {
-      syncRecipesWithGithub(cleaned, targetRecipe, isDelete);
-    } else {
-      console.log("Zápis na direct GitHub přeskočen na Vercelu (synchronizace probíhá bezpečně server-side přes /api/recipes).");
+      console.error("Nepodařilo se odeslat uložení online:", e);
     }
   };
 
@@ -2679,7 +2035,10 @@ ${separator}`;
       }
 
       // Add to recipes list & select it
-      const newRecipe: Recipe = data.recipe;
+      const newRecipe: Recipe = {
+        ...data.recipe,
+        updatedAt: new Date().toISOString()
+      };
       const updatedRecipes = [newRecipe, ...recipes];
       saveRecipesToStorage(updatedRecipes, newRecipe);
       setSelectedRecipe(newRecipe);
@@ -3170,62 +2529,55 @@ ${separator}`;
         {/* LEFT SIDEBAR: RECIPE LIST */}
         <aside className="no-print w-full md:w-80 lg:w-96 border-r border-[#E8E8E1] bg-white flex flex-col flex-shrink-0">
           
-          {/* GITHUB INTEGRATION STATUS BANNER */}
+          {/* ADMINISTRÁTORSKÝ STATUS BANNER */}
           {(() => {
-            if (!isStudioEnv) {
-              return null;
-            }
-
-            const isClientGithubActive = !!(githubUser.trim() && githubRepo.trim() && githubToken.trim());
-            if (isClientGithubActive) {
+            if (isAdmin) {
               return (
-                <div className="p-4 bg-emerald-50 border-b border-emerald-200 text-emerald-800 space-y-1.5 no-print">
-                  <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-emerald-900">
-                    <Check className="h-4 w-4 shrink-0 text-emerald-600" />
-                    <span>GitHub propojení aktivní</span>
-                  </div>
-                  <p className="text-[11px] leading-relaxed opacity-95">
-                    Vaše kuchařka je úspěšně propojena přímo s repozitářem <strong className="font-semibold">{githubUser}/{githubRepo}</strong>. Změny se ukládají online.
-                  </p>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsAdmin(true);
-                      setShowGithubConfig(true);
-                    }}
-                    className="font-bold underline text-emerald-700 hover:text-emerald-900 cursor-pointer flex items-center gap-1 text-[10px] text-left"
-                  >
-                    Spravovat propojení a synchronizaci
-                  </button>
-                </div>
-              );
-            } else if (serverlessApiError) {
-              return (
-                <div className="p-4 bg-red-50 border-b border-red-200 text-red-800 space-y-2 no-print">
-                  <div className="flex items-start gap-2 text-xs font-bold uppercase tracking-wider">
-                    <AlertCircle className="h-4 w-4 shrink-0 text-red-600 mt-0.5" />
-                    <span>GitHub integrace neaktivní</span>
-                  </div>
-                  <p className="text-[11px] leading-relaxed opacity-95">
-                    Při načítání databáze přes Vercel Serverless API došlo k chybě: <strong className="font-semibold">{serverlessApiError}</strong>
-                  </p>
-                  <div className="pt-1 text-[10px] space-y-1 text-red-700">
-                    <p>💡 Chcete-li nahrávat a stahovat data automaticky, nastavte v administračním panelu Vercelu proměnnou <code className="font-mono bg-red-100 px-1 py-0.5 rounded font-bold">GITHUB_TOKEN</code>.</p>
+                <div className="p-4 bg-emerald-50 border-b border-emerald-200 text-emerald-800 space-y-1.5 no-print animate-fade-in">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-emerald-900">
+                      <Check className="h-4 w-4 shrink-0 text-emerald-600" />
+                      <span>Režim Administrace</span>
+                    </div>
                     <button
                       type="button"
                       onClick={() => {
-                        setIsAdmin(true);
-                        setShowGithubConfig(true);
+                        setIsAdmin(false);
+                        setAdminPassword("");
+                        localStorage.removeItem("admin_password_token");
                       }}
-                      className="font-bold underline hover:text-red-900 cursor-pointer flex items-center gap-1 text-left"
+                      className="text-[10px] bg-emerald-100 hover:bg-emerald-200 text-emerald-800 px-2 py-0.5 rounded-md font-bold transition-all cursor-pointer"
                     >
-                      Otevřít průvodce nastavením GitHubu
+                      Odhlásit se
                     </button>
                   </div>
+                  <p className="text-[11px] leading-relaxed opacity-95">
+                    Máte plný přístup ke správě receptů. Změny se ukládají automaticky online.
+                  </p>
+                </div>
+              );
+            } else {
+              return (
+                <div className="p-4 bg-[#FDFCF7] border-b border-[#E8E8E1] text-[#4A4A40] space-y-2 no-print animate-fade-in">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-start gap-1.5 text-xs font-bold uppercase tracking-wider text-[#1B4332]">
+                      <Info className="h-4 w-4 shrink-0 text-[#2D6A4F] mt-0.5" />
+                      <span>Prohlížecí režim</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setShowLoginModal(true)}
+                      className="text-[10px] bg-amber-100 hover:bg-amber-200 text-amber-800 px-2 py-0.5 rounded-md font-bold transition-all cursor-pointer"
+                    >
+                      Přihlásit se
+                    </button>
+                  </div>
+                  <p className="text-[11px] leading-relaxed opacity-95 text-slate-500">
+                    Recepty jsou pouze pro čtení. Pro editaci, mazání nebo tvorbu nových se přihlaste jako administrátor.
+                  </p>
                 </div>
               );
             }
-            return null;
           })()}
 
           {/* SEARCH & FILTER CONTROLS */}
@@ -4967,88 +4319,32 @@ ${separator}`;
           <span>© 2026 AI Kuchařka. Všechna práva vyhrazena.</span>
 
           {/* Discrete Admin Activation Panel */}
-          {isStudioEnv && (
-            <div className="flex items-center gap-2">
-              {isAdmin ? (
-                <div className="flex items-center gap-4 text-[#2D6A4F] font-bold flex-wrap justify-center sm:justify-end">
-                  <span className="flex items-center gap-1">✓ Administrátor</span>
-                  <button
-                    type="button"
-                    onClick={handleConfigureGithub}
-                    className="text-xs text-[#2D6A4F] hover:underline hover:text-[#1B4332] cursor-pointer font-bold flex items-center gap-1"
-                    title="Klikněte pro nastavení GitHub repozitáře"
-                  >
-                    🗄️ Nastavit GitHub
-                  </button>
-                  {githubUser && (
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold flex items-center gap-1 border border-solid ${
-                      githubSyncStatus === "syncing" 
-                        ? "bg-amber-100 text-amber-800 border-amber-200 animate-pulse"
-                        : githubSyncStatus === "error"
-                        ? "bg-red-100 text-red-800 border-red-200"
-                        : githubSyncStatus === "success"
-                        ? "bg-emerald-100 text-emerald-800 border-emerald-200"
-                        : "bg-teal-50 text-teal-800 border-teal-100"
-                    }`} title={githubSyncStatus === "error" ? githubSyncError || "Chyba" : "Stav propojení s repozitářem GitHub"}>
-                      <span className={`w-1.5 h-1.5 rounded-full ${
-                        githubSyncStatus === "syncing" 
-                          ? "bg-amber-500 animate-ping" 
-                          : githubSyncStatus === "error" 
-                          ? "bg-red-500" 
-                          : githubSyncStatus === "success"
-                          ? "bg-emerald-500 animate-bounce"
-                          : "bg-teal-500"
-                      }`} />
-                      <span>
-                        {githubSyncStatus === "syncing" 
-                          ? "Nahrávám..." 
-                          : githubSyncStatus === "error" 
-                          ? "Chyba synchronizace" 
-                          : githubSyncStatus === "success"
-                          ? "Synchronizováno!"
-                          : `GitHub: ${githubUser}/${githubRepo}`}
-                      </span>
-                    </span>
-                  )}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsAdmin(false);
-                      setAdminPassword("");
-                      localStorage.removeItem("admin_password_token");
-                    }}
-                    className="text-xs text-red-600 hover:underline hover:text-red-700 cursor-pointer font-bold"
-                  >
-                    Odhlásit se
-                  </button>
-                </div>
-              ) : (
-                <form
-                  onSubmit={async (e) => {
-                    e.preventDefault();
-                    await handleLoginWithPassword(adminPassword);
+          <div className="flex items-center gap-2">
+            {isAdmin ? (
+              <div className="flex items-center gap-4 text-[#2D6A4F] font-bold flex-wrap justify-center sm:justify-end">
+                <span className="flex items-center gap-1">✓ Administrátor (Přihlášen)</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsAdmin(false);
+                    setAdminPassword("");
+                    localStorage.removeItem("admin_password_token");
                   }}
-                  className="flex items-center gap-2"
+                  className="text-xs text-red-600 hover:underline hover:text-red-700 cursor-pointer font-bold"
                 >
-                  <input
-                    type="password"
-                    placeholder="Administrační klíč..."
-                    value={adminPassword}
-                    onChange={(e) => setAdminPassword(e.target.value)}
-                    disabled={isLoginLoading}
-                    className="px-2.5 py-1 text-xs border border-[#E8E8E1] rounded-lg focus:outline-hidden focus:border-[#2D6A4F] bg-[#FDFCF7]/60 text-slate-800 w-32"
-                  />
-                  <button
-                    type="submit"
-                    disabled={isLoginLoading}
-                    className="px-3 py-1 bg-[#2D6A4F] hover:bg-[#1B4332] text-white rounded-lg text-xs transition-all font-bold cursor-pointer shadow-xs disabled:bg-slate-400"
-                  >
-                    {isLoginLoading ? "..." : "Přihlásit se"}
-                  </button>
-                </form>
-              )}
-            </div>
-          )}
+                  Odhlásit se
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setShowLoginModal(true)}
+                className="text-xs text-[#2D6A4F] hover:underline hover:text-[#1B4332] cursor-pointer font-bold flex items-center gap-1"
+              >
+                🔐 Administrátorské přihlášení
+              </button>
+            )}
+          </div>
 
           <div className="flex items-center gap-4">
             <span className="text-[#E8E8E1]">|</span>
@@ -5114,22 +4410,21 @@ ${separator}`;
         );
       })()}
 
-      {/* GITHUB INTEGRATION CONFIGURATION MODAL */}
-      {showGithubConfig && (
+      {/* ADMINISTRÁTORSKÝ PŘIHLÁŠENÍ MODAL */}
+      {showLoginModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs no-print">
-          <div className="bg-[#FDFCF7] border border-[#E8E8E1] rounded-2xl shadow-xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
+          <div className="bg-[#FDFCF7] border border-[#E8E8E1] rounded-2xl shadow-xl w-full max-w-md overflow-hidden flex flex-col">
             {/* Header */}
             <div className="bg-[#1B4332] p-5 text-white flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Database className="h-5 w-5 text-[#52B788]" />
-                <h3 className="font-bold text-lg tracking-tight">Nastavení integrace GitHub</h3>
+                <Lock className="h-5 w-5 text-[#52B788]" />
+                <h3 className="font-bold text-lg tracking-tight">Administrátorské přihlášení</h3>
               </div>
               <button
                 type="button"
                 onClick={() => {
-                  setShowGithubConfig(false);
-                  setGithubTestStatus("idle");
-                  setGithubTestMessage(null);
+                  setShowLoginModal(false);
+                  setLoginError(null);
                 }}
                 className="text-white/80 hover:text-white hover:bg-white/10 p-1.5 rounded-lg transition-all"
               >
@@ -5138,405 +4433,75 @@ ${separator}`;
             </div>
 
             {/* Content */}
-            <div className="p-6 space-y-4 overflow-y-auto flex-1 text-slate-700">
-              {!isStudioEnv && (
-                <div className="bg-red-50 border border-red-200 text-red-800 rounded-xl p-4 space-y-2 text-xs">
-                  <div className="flex items-center gap-2 font-bold uppercase tracking-wider">
-                    <AlertTriangle className="h-4 w-4 text-red-600 shrink-0" />
-                    <span>Synchronizace zakázána (Produkční Vercel)</span>
-                  </div>
-                  <p className="leading-relaxed font-sans opacity-95">
-                    Tato aplikace běží v exportovaném produkčním prostředí Vercel. Z bezpečnostních důvodů a pro ochranu vaší databáze receptů před neúmyslným přepsáním či smazáním je nahrávání, stahování a synchronizace s GitHubem v tomto prostředí <strong>zcela deaktivováno</strong>.
-                  </p>
-                  <p className="leading-relaxed font-sans opacity-95">
-                    Pro bezpečné provádění synchronizací, nahrávání a stahování receptů z GitHubu prosím používejte výhradně zabezpečené vývojové prostředí <strong>Google AI Studio</strong>.
-                  </p>
-                </div>
-              )}
-
-              <p className="text-xs text-[#5C5C50] leading-relaxed">
-                Propojte aplikaci s vaším GitHub repozitářem. Všechny recepty se budou jako samostatné JSON soubory ukládat do adresáře <strong>recipes/</strong> online na GitHubu!
-              </p>
-
-              {/* Form Fields */}
-              <div className="space-y-3">
-                <div>
-                  <label className="block text-xs font-bold uppercase text-[#1B4332] tracking-wider mb-1">
-                    Uživatelské jméno na GitHubu *
-                  </label>
-                  <input
-                    type="text"
-                    value={githubUser}
-                    onChange={(e) => setGithubUser(e.target.value)}
-                    disabled={!isStudioEnv}
-                    placeholder="Např. karelaa"
-                    className="w-full text-sm p-2.5 border border-[#E8E8E1] rounded-xl bg-white text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-1 focus:ring-[#1B4332] disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold uppercase text-[#1B4332] tracking-wider mb-1">
-                    Název repozitáře *
-                  </label>
-                  <input
-                    type="text"
-                    value={githubRepo}
-                    onChange={(e) => setGithubRepo(e.target.value)}
-                    disabled={!isStudioEnv}
-                    placeholder="Např. ai-kucharka-data"
-                    className="w-full text-sm p-2.5 border border-[#E8E8E1] rounded-xl bg-white text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-1 focus:ring-[#1B4332] disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold uppercase text-[#1B4332] tracking-wider mb-1 flex items-center justify-between">
-                    <span>Osobní přístupový token (PAT) *</span>
-                    {isStudioEnv && (
-                      <a
-                        href="https://github.com/settings/tokens/new?description=AI_Kucharka_Sync&scopes=repo"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-[10px] text-emerald-700 underline hover:text-[#1B4332]"
-                      >
-                        Vytvořit na GitHubu
-                      </a>
-                    )}
-                  </label>
-                  <input
-                    type="password"
-                    value={githubToken}
-                    onChange={(e) => setGithubToken(e.target.value)}
-                    disabled={!isStudioEnv}
-                    placeholder="ghp_xxxxxxxxxxxxxxxxxxxxxxxx"
-                    className="w-full text-sm p-2.5 border border-[#E8E8E1] rounded-xl bg-white text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-1 focus:ring-[#1B4332] disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed"
-                  />
-                  <p className="text-[10px] text-slate-400 mt-0.5 leading-relaxed">
-                    Token vyžaduje oprávnění <strong>repo</strong> (r/w přístup k souborům repozitáře).
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-xs font-bold uppercase text-[#1B4332] tracking-wider mb-1">
-                      Větev (Branch)
-                    </label>
-                    <input
-                      type="text"
-                      value={githubBranch}
-                      onChange={(e) => setGithubBranch(e.target.value)}
-                      disabled={!isStudioEnv}
-                      placeholder="main"
-                      className="w-full text-sm p-2.5 border border-[#E8E8E1] rounded-xl bg-white text-slate-800 focus:outline-hidden focus:ring-1 focus:ring-[#1B4332] disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold uppercase text-[#1B4332] tracking-wider mb-1">
-                      Složka receptů
-                    </label>
-                    <input
-                      type="text"
-                      value="recipes/"
-                      disabled
-                      className="w-full text-sm p-2.5 border border-[#E8E8E1] rounded-xl bg-slate-100 text-slate-500 cursor-not-allowed focus:outline-hidden"
-                    />
-                  </div>
-                </div>
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
+                const form = e.currentTarget;
+                const passwordInput = form.elements.namedItem("adminPassword") as HTMLInputElement;
+                const success = await handleLoginWithPassword(passwordInput.value);
+                if (success) {
+                  setShowLoginModal(false);
+                }
+              }}
+              className="p-6 space-y-4 text-slate-700"
+            >
+              <div className="space-y-2">
+                <label className="block text-sm font-bold text-[#1B4332]">
+                  Kulinářský API klíč (Administrační heslo)
+                </label>
+                <input
+                  type="password"
+                  name="adminPassword"
+                  placeholder="Zadejte heslo..."
+                  required
+                  disabled={isLoginLoading}
+                  className="w-full px-4 py-2.5 bg-white border border-[#E8E8E1] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1B4332] focus:border-transparent font-sans text-sm disabled:bg-slate-50 disabled:text-slate-400"
+                />
               </div>
 
-              {/* Direct links to GitHub */}
-              {githubUser.trim() && githubRepo.trim() && (
-                <div className="bg-[#FAF9F2] p-3 rounded-xl border border-[#E8E8E1] space-y-2">
-                  <span className="block text-xs font-bold uppercase text-[#1B4332] tracking-wider">
-                    Přímé odkazy na GitHub:
-                  </span>
-                  <div className="space-y-1.5 text-xs">
-                    <div className="flex items-center justify-between">
-                      <span className="text-slate-500 font-medium font-sans">Repozitář:</span>
-                      <a
-                        href={`https://github.com/${githubUser.trim()}/${githubRepo.trim()}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-emerald-700 hover:text-emerald-800 font-bold underline flex items-center gap-1 cursor-pointer"
-                      >
-                        <span>{githubUser.trim()}/{githubRepo.trim()}</span>
-                        <ExternalLink className="h-3 w-3" />
-                      </a>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-slate-500 font-medium font-sans">Složka receptů:</span>
-                      <a
-                        href={`https://github.com/${githubUser.trim()}/${githubRepo.trim()}/tree/${githubBranch.trim() || "main"}/recipes`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-emerald-700 hover:text-emerald-800 font-bold underline flex items-center gap-1 cursor-pointer"
-                      >
-                        <span>Zobrazit složku na GitHubu</span>
-                        <ExternalLink className="h-3 w-3" />
-                      </a>
-                    </div>
-                  </div>
+              {loginError && (
+                <div className="p-3 bg-red-50 border border-red-200 text-red-800 rounded-xl text-xs flex items-center gap-2">
+                  <AlertCircle className="h-4 w-4 text-red-600 shrink-0" />
+                  <span>{loginError}</span>
                 </div>
               )}
 
-              {/* Status Message */}
-              {githubTestMessage && (
-                <div className={`p-3 rounded-lg text-xs font-semibold leading-relaxed border ${
-                  githubTestStatus === "success" 
-                    ? "bg-emerald-50 border-emerald-200 text-emerald-800" 
-                    : githubTestStatus === "error" 
-                    ? "bg-red-50 border-red-200 text-red-800"
-                    : "bg-amber-50 border-amber-200 text-amber-850 animate-pulse"
-                }`}>
-                  {githubTestMessage}
-                </div>
-              )}
-
-              {/* Sync Status Banner */}
-              {githubSyncStatus !== "idle" && (
-                <div className={`p-3 rounded-lg text-xs font-semibold leading-relaxed border ${
-                  githubSyncStatus === "success" 
-                    ? "bg-emerald-50 border-emerald-200 text-emerald-800" 
-                    : githubSyncStatus === "error" 
-                    ? "bg-red-50 border-red-200 text-red-800"
-                    : "bg-amber-50 border-amber-200 text-amber-850 animate-pulse"
-                }`}>
-                  <div className="flex items-center gap-1.5 font-bold uppercase tracking-wider mb-1">
-                    {githubSyncStatus === "success" && "✓ Operace dokončena"}
-                    {githubSyncStatus === "error" && "❌ Chyba operace"}
-                    {githubSyncStatus === "syncing" && "⏳ Operace probíhá..."}
-                  </div>
-                  <div>
-                    {githubSyncStatus === "success" && "Všechny kroky synchronizace proběhly úspěšně. Detaily naleznete v logu níže."}
-                    {githubSyncStatus === "error" && (githubSyncError || "Při provádění operace s GitHubem došlo k chybě.")}
-                    {githubSyncStatus === "syncing" && "Provádím komunikaci s rozhraním API GitHub, stahuji a odesílám data..."}
-                  </div>
-                </div>
-              )}
-
-              {/* Progress and Logs Console */}
-              {(githubSyncLogs.length > 0 || githubSyncStatus === "syncing") && (
-                <div className="space-y-1.5 bg-[#FAF9F2] p-3 rounded-xl border border-[#E8E8E1]">
-                  <div className="flex items-center justify-between">
-                    <label className="block text-xs font-bold uppercase text-[#1B4332] tracking-wider flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
-                      <span>Průběh a záznamy operace:</span>
-                    </label>
-                    <button
-                      type="button"
-                      onClick={() => setGithubSyncLogs([])}
-                      className="text-[10px] text-slate-400 hover:text-slate-600 font-bold underline cursor-pointer"
-                    >
-                      Vymazat záznam
-                    </button>
-                  </div>
-                  <div className="bg-slate-900 text-slate-200 p-3 rounded-xl font-mono text-[11px] leading-relaxed max-h-40 overflow-y-auto space-y-1 shadow-inner border border-slate-950">
-                    {githubSyncLogs.map((logStr, i) => (
-                      <div key={i} className="whitespace-pre-wrap">
-                        {logStr.includes("❌") ? (
-                          <span className="text-red-400">{logStr}</span>
-                        ) : logStr.includes("✓") ? (
-                          <span className="text-emerald-400 font-semibold">{logStr}</span>
-                        ) : logStr.includes("⚠️") ? (
-                          <span className="text-amber-400">{logStr}</span>
-                        ) : (
-                          <span className="text-slate-300">{logStr}</span>
-                        )}
-                      </div>
-                    ))}
-                    {githubSyncStatus === "syncing" && (
-                      <div className="flex items-center gap-1.5 text-amber-400 animate-pulse mt-1">
-                        <span className="inline-block w-1.5 h-1.5 bg-amber-400 rounded-full animate-ping" />
-                        <span>Operace probíhá... prosím vyčkejte</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* Advanced Actions and Sync Operations */}
-              <div className="space-y-3.5 pt-2 border-t border-[#E8E8E1]">
-                {/* Custom Non-Blocking Confirmations */}
-                {githubPendingAction && (
-                  <div className={`p-4 rounded-xl border ${
-                    githubPendingAction === "import" 
-                      ? "bg-blue-50 border-blue-200 text-blue-900" 
-                      : "bg-amber-50 border-amber-200 text-amber-900"
-                  } space-y-3 shadow-xs`}>
-                    <div className="flex items-start gap-2.5">
-                      <AlertCircle className={`h-5 w-5 mt-0.5 shrink-0 ${
-                        githubPendingAction === "import" ? "text-blue-600" : "text-amber-600"
-                      }`} />
-                      <div className="space-y-1">
-                        <h4 className="text-xs font-bold uppercase tracking-wider font-sans">
-                          {githubPendingAction === "sync" && "Potvrdit obousměrnou synchronizaci"}
-                          {githubPendingAction === "import" && "Potvrdit stáhnutí (přepsání lokálních dat)"}
-                          {githubPendingAction === "export" && "Potvrdit odeslání (přepsání na GitHubu)"}
-                        </h4>
-                        <p className="text-xs leading-relaxed opacity-90 font-sans">
-                          {githubPendingAction === "sync" && "Sloučí se recepty z vašeho prohlížeče a z GitHubu tak, aby obě strany obsahovaly shodné recepty. Chybějící recepty se stáhnou do prohlížeče a nově vytvořené se nahrají na GitHub."}
-                          {githubPendingAction === "import" && "Opravdu chcete stáhnout recepty z GitHubu? Tato akce kompletně přepíše vaše lokální recepty v prohlížeči staženou databází z GitHubu. Vaše lokální změny mohou být ztraceny!"}
-                          {githubPendingAction === "export" && "Opravdu chcete nahrát recepty na GitHub? Tato akce přepíše vzdálený soubor db.json a jednotlivé soubory v adresáři recipes/ na vašem GitHub repozitáři."}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex justify-end gap-2 pt-1">
-                      <button
-                        type="button"
-                        onClick={() => setGithubPendingAction(null)}
-                        className={`px-3 py-1.5 bg-white border rounded-lg text-xs font-semibold hover:bg-opacity-80 transition-all cursor-pointer ${
-                          githubPendingAction === "import" ? "border-blue-300 text-blue-800" : "border-amber-300 text-amber-850"
-                        }`}
-                      >
-                        Zrušit
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const act = githubPendingAction;
-                          setGithubPendingAction(null);
-                          if (act === "sync") syncAllWithGithub();
-                          if (act === "import") importAllFromGithub();
-                          if (act === "export") exportAllToGithub();
-                        }}
-                        className={`px-3.5 py-1.5 text-white rounded-lg text-xs font-bold shadow-xs transition-all cursor-pointer ${
-                          githubPendingAction === "import" ? "bg-blue-600 hover:bg-blue-700" : "bg-amber-600 hover:bg-amber-700"
-                        }`}
-                      >
-                        Potvrdit a spustit
-                      </button>
-                    </div>
-                  </div>
-                )}
-
-                <div>
-                  <h4 className="text-xs font-extrabold uppercase text-[#1B4332] tracking-wider mb-2 flex items-center gap-1.5">
-                    <RefreshCw className="h-3.5 w-3.5 text-[#52B788]" />
-                    <span>Plná obousměrná synchronizace (Doporučeno)</span>
-                  </h4>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (!githubUser.trim() || !githubRepo.trim()) {
-                        setGithubSyncStatus("error");
-                        setGithubSyncError("Chybí jméno uživatele nebo název repozitáře.");
-                        return;
-                      }
-                      if (!githubToken.trim()) {
-                        setGithubSyncStatus("error");
-                        setGithubSyncError("Chybí přístupový token (PAT).");
-                        return;
-                      }
-                      setGithubPendingAction("sync");
-                    }}
-                    disabled={!isStudioEnv || githubSyncStatus === "syncing"}
-                    className="w-full px-4 py-3 bg-gradient-to-r from-emerald-800 to-[#1B4332] hover:from-emerald-900 hover:to-[#153528] text-white text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm disabled:opacity-50 disabled:from-slate-300 disabled:to-slate-300 disabled:text-slate-500 disabled:cursor-not-allowed"
-                    title="Sloučí lokální databázi v prohlížeči a vzdálený repozitář na GitHubu dohromady"
-                  >
-                    <RefreshCw className={`h-4 w-4 ${githubSyncStatus === "syncing" ? "animate-spin" : ""}`} />
-                    <span>Sloučit obě databáze (Obousměrná synchronizace)</span>
-                  </button>
-                  <p className="text-[10px] text-slate-400 mt-1 leading-relaxed">
-                    Stáhne chybějící recepty z GitHubu, nahraje nové místní recepty na GitHub a sjednotí obě strany na 100% shodný seznam.
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3 pt-1">
-                  <div>
-                    <h5 className="text-[10px] font-extrabold uppercase text-slate-500 tracking-wider mb-1.5">
-                      Jednosměrné akce
-                    </h5>
-                    <div className="flex flex-col gap-2">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if (!githubUser.trim() || !githubRepo.trim()) {
-                            setGithubSyncStatus("error");
-                            setGithubSyncError("Pro import z GitHubu musíte nejprve vyplnit Uživatelské jméno a Název repozitáře.");
-                            return;
-                          }
-                          setGithubPendingAction("import");
-                        }}
-                        disabled={!isStudioEnv || githubSyncStatus === "syncing"}
-                        className="w-full px-3 py-2.5 bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs disabled:opacity-50 disabled:bg-slate-300 disabled:text-slate-500 disabled:cursor-not-allowed"
-                        title="Stáhne a přepíše místní data souborem db.json z GitHubu"
-                      >
-                        <Download className="h-3.5 w-3.5 text-blue-200" />
-                        <span>Stáhnout z GitHubu</span>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if (!githubUser.trim() || !githubRepo.trim() || !githubToken.trim()) {
-                            setGithubSyncStatus("error");
-                            setGithubSyncError("Pro export musíte nejdříve vyplnit GitHub Uživatelské jméno, Název repozitáře a Přístupový token (PAT).");
-                            return;
-                          }
-                          setGithubPendingAction("export");
-                        }}
-                        disabled={!isStudioEnv || githubSyncStatus === "syncing"}
-                        className="w-full px-3 py-2.5 bg-amber-700 hover:bg-amber-800 text-white text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs disabled:opacity-50 disabled:bg-slate-300 disabled:text-slate-500 disabled:cursor-not-allowed"
-                        title="Nahraje všechny místní recepty na GitHub a kompletně přepíše vzdálená data"
-                      >
-                        <Upload className="h-3.5 w-3.5 text-amber-200" />
-                        <span>Nahrát na GitHub</span>
-                      </button>
-                    </div>
-                  </div>
-
-                  <div>
-                    <h5 className="text-[10px] font-extrabold uppercase text-slate-500 tracking-wider mb-1.5">
-                      Diagnostika
-                    </h5>
-                    <div className="flex flex-col gap-2">
-                      <button
-                        type="button"
-                        onClick={testGithubConnection}
-                        disabled={!isStudioEnv || githubTestStatus === "testing"}
-                        className="w-full px-3 py-2.5 border border-[#1B4332] text-[#1B4332] hover:bg-[#1B4332]/5 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 disabled:border-slate-300 disabled:text-slate-400 disabled:cursor-not-allowed"
-                      >
-                        <RefreshCw className={`h-3.5 w-3.5 text-[#52B788] ${githubTestStatus === "testing" ? "animate-spin" : ""}`} />
-                        <span>Otestovat spojení</span>
-                      </button>
-                    </div>
-                  </div>
-                </div>
+              {/* Instructions on how to set/configure it */}
+              <div className="bg-amber-50 border border-amber-200 text-amber-900 rounded-xl p-4 text-[11px] leading-relaxed space-y-1.5">
+                <p className="font-bold uppercase tracking-wider text-amber-950 flex items-center gap-1">
+                  💡 Jak nastavit administrátorské heslo?
+                </p>
+                <p>
+                  Vaše administrátorské heslo je spravováno bezpečně na serveru.
+                </p>
+                <ol className="list-decimal pl-4 space-y-1">
+                  <li>Otevřete soubor <code className="font-mono bg-amber-100 px-1 py-0.5 rounded font-bold">.env</code> v kořenovém adresáři.</li>
+                  <li>Přidejte nebo upravte řádek s proměnnou <code className="font-mono bg-amber-100 px-1 py-0.5 rounded font-bold">ADMIN_PASSWORD=moje_super_tajne_heslo</code>.</li>
+                  <li>Po uložení souboru restartujte vývojový server nebo aplikaci znovu nasaďte.</li>
+                </ol>
               </div>
-            </div>
 
-            {/* Footer */}
-            <div className="p-5 border-t border-[#E8E8E1] bg-slate-50 flex justify-end gap-3 shrink-0">
-              <button
-                type="button"
-                onClick={() => {
-                  setShowGithubConfig(false);
-                  setGithubTestStatus("idle");
-                  setGithubTestMessage(null);
-                }}
-                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-800 rounded-xl text-sm font-semibold transition-all cursor-pointer border border-slate-200"
-              >
-                Zrušit
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  // Save all setup parameter states to localStorage
-                  localStorage.setItem("ai_kucharka_github_username", githubUser.trim());
-                  localStorage.setItem("ai_kucharka_github_repo", githubRepo.trim());
-                  localStorage.setItem("ai_kucharka_github_token", githubToken.trim());
-                  localStorage.setItem("ai_kucharka_github_branch", githubBranch.trim());
-                  localStorage.setItem("ai_kucharka_github_path", githubPath.trim());
-                  
-                  setShowGithubConfig(false);
-                  setGithubTestStatus("idle");
-                  setGithubTestMessage(null);
-                  alert("✓ Nastavení GitHubu bylo uloženo!");
-                }}
-                disabled={!isStudioEnv}
-                className="px-4 py-2 bg-[#1B4332] hover:bg-[#153528] text-white rounded-xl text-sm font-bold shadow-sm transition-all cursor-pointer disabled:bg-slate-300 disabled:text-slate-500 disabled:cursor-not-allowed"
-              >
-                Uložit nastavení
-              </button>
-            </div>
+              {/* Footer */}
+              <div className="pt-2 flex justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowLoginModal(false);
+                    setLoginError(null);
+                  }}
+                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-800 rounded-xl text-sm font-semibold transition-all cursor-pointer border border-slate-200"
+                >
+                  Zavřít
+                </button>
+                <button
+                  type="submit"
+                  disabled={isLoginLoading}
+                  className="px-4 py-2 bg-[#1B4332] hover:bg-[#153528] text-white rounded-xl text-sm font-bold shadow-sm transition-all cursor-pointer disabled:bg-slate-300 disabled:text-slate-500 disabled:cursor-not-allowed flex items-center gap-1.5"
+                >
+                  {isLoginLoading ? "Ověřování..." : "Přihlásit se"}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

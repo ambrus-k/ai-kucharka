@@ -3,11 +3,56 @@ import path from "path";
 import { GoogleGenAI, Type } from "@google/genai";
 import dotenv from "dotenv";
 import { Octokit } from "@octokit/rest";
+import fs from "fs";
 
 dotenv.config();
 
 const app = express();
 const PORT = 3000;
+
+// Persistent configuration for GitHub to enable automatic multi-device/mobile sync
+const CONFIG_PATH = path.join(process.cwd(), "github-config.json");
+
+interface GithubConfig {
+  username?: string;
+  repo?: string;
+  token?: string;
+  branch?: string;
+}
+
+function saveGithubConfig(config: GithubConfig) {
+  try {
+    let existing: GithubConfig = {};
+    if (fs.existsSync(CONFIG_PATH)) {
+      try {
+        existing = JSON.parse(fs.readFileSync(CONFIG_PATH, "utf-8"));
+      } catch (e) {
+        // ignore malformed json
+      }
+    }
+    const updated = { ...existing };
+    if (config.username !== undefined) updated.username = config.username;
+    if (config.repo !== undefined) updated.repo = config.repo;
+    if (config.token !== undefined) updated.token = config.token;
+    if (config.branch !== undefined) updated.branch = config.branch;
+    
+    fs.writeFileSync(CONFIG_PATH, JSON.stringify(updated, null, 2), "utf-8");
+    console.log("[Config] Saved GitHub config to", CONFIG_PATH);
+  } catch (err) {
+    console.error("[Config] Failed to save GitHub config:", err);
+  }
+}
+
+function loadGithubConfig(): GithubConfig {
+  try {
+    if (fs.existsSync(CONFIG_PATH)) {
+      return JSON.parse(fs.readFileSync(CONFIG_PATH, "utf-8"));
+    }
+  } catch (err) {
+    console.error("[Config] Failed to load GitHub config:", err);
+  }
+  return {};
+}
 
 // Set up JSON parsing with generous limits to support image uploads
 app.use(express.json({ limit: "15mb" }));
@@ -102,13 +147,41 @@ app.get("/api/health", (req, res) => {
   res.json({ status: "healthy", time: new Date().toISOString() });
 });
 
+// API Endpoint to manage persistent GitHub configuration for multi-device sync
+app.get("/api/github-config", (req, res) => {
+  const config = loadGithubConfig();
+  res.json({
+    username: config.username || "",
+    repo: config.repo || "",
+    token: config.token || "",
+    branch: config.branch || "main"
+  });
+});
+
+app.post("/api/github-config", (req, res) => {
+  const { username, repo, token, branch } = req.body;
+  saveGithubConfig({ username, repo, token, branch });
+  res.json({ status: "success", message: "GitHub konfigurace uložena na serveru." });
+});
+
 // GET /api a GET /api/recipes - Načtení všech receptů ze složky recipes/ z GitHubu
 app.get(["/api", "/api/recipes", "/recipes"], async (req, res) => {
   try {
-    const token = (process.env.GITHUB_DATA_TOKEN || process.env.GITHUB_TOKEN || "").trim();
-    const owner = (process.env.GITHUB_USERNAME || "karelaa").trim();
-    const repo = (process.env.GITHUB_REPO || "ai-kucharka-data").trim();
-    const branch = "main";
+    const savedConfig = loadGithubConfig();
+    const token = ((req.headers["x-github-token"] as string) || savedConfig.token || process.env.GITHUB_DATA_TOKEN || process.env.GITHUB_TOKEN || "").trim();
+    const owner = ((req.headers["x-github-username"] as string) || savedConfig.username || process.env.GITHUB_USERNAME || "karelaa").trim();
+    const repo = ((req.headers["x-github-repo"] as string) || savedConfig.repo || process.env.GITHUB_REPO || "ai-kucharka-data").trim();
+    const branch = ((req.headers["x-github-branch"] as string) || savedConfig.branch || "main").trim();
+
+    // Auto-save incoming headers if they exist to keep server sync updated
+    if (req.headers["x-github-username"] || req.headers["x-github-repo"] || req.headers["x-github-token"]) {
+      saveGithubConfig({
+        username: (req.headers["x-github-username"] as string) || undefined,
+        repo: (req.headers["x-github-repo"] as string) || undefined,
+        token: (req.headers["x-github-token"] as string) || undefined,
+        branch: (req.headers["x-github-branch"] as string) || undefined,
+      });
+    }
 
     // 1. Zkusíme nejprve rychlé stažení jednoho sloučeného souboru recipes.json
     try {
@@ -150,7 +223,21 @@ app.get(["/api", "/api/recipes", "/recipes"], async (req, res) => {
           console.log("[GitHub API] Složka recipes/ nebyla nalezena, vracím prázdný seznam.");
           return res.json([]);
         }
-        throw err;
+        console.warn(`[GitHub API] Octokit selhal (kód ${err.status}): ${err.message}. Zkouším veřejný fallback...`);
+        // Try public fetch as fallback
+        try {
+          const publicUrl = `https://api.github.com/repos/${owner}/${repo}/contents/recipes?ref=${branch}`;
+          const response = await fetch(publicUrl, {
+            headers: { "User-Agent": "AI-Kucharka" }
+          });
+          if (response.ok) {
+            dirResponse = { data: await response.json() };
+          } else {
+            throw err;
+          }
+        } catch (fallbackErr) {
+          throw err;
+        }
       }
     } else {
       console.log(`[GitHub API] Token chybí, zkouším veřejné stažení seznamu z api.github.com/repos/${owner}/${repo}/contents/recipes...`);
@@ -212,10 +299,26 @@ app.all(["/api", "/api/recipes", "/recipes"], async (req, res) => {
   }
 
   try {
-    const token = (process.env.GITHUB_DATA_TOKEN || process.env.GITHUB_TOKEN || "").trim();
-    const owner = (process.env.GITHUB_USERNAME || "karelaa").trim();
-    const repo = (process.env.GITHUB_REPO || "ai-kucharka-data").trim();
-    const branch = "main";
+    const adminPassword = (req.body?.adminPassword || req.headers["x-admin-password"] || "").toString();
+    if (!checkAuth(adminPassword)) {
+      return res.status(401).json({ error: "Přístup odepřen. Pro ukládání změn se musíte přihlásit platným administračním heslem." });
+    }
+
+    const savedConfig = loadGithubConfig();
+    const token = ((req.headers["x-github-token"] as string) || savedConfig.token || process.env.GITHUB_DATA_TOKEN || process.env.GITHUB_TOKEN || "").trim();
+    const owner = ((req.headers["x-github-username"] as string) || savedConfig.username || process.env.GITHUB_USERNAME || "karelaa").trim();
+    const repo = ((req.headers["x-github-repo"] as string) || savedConfig.repo || process.env.GITHUB_REPO || "ai-kucharka-data").trim();
+    const branch = ((req.headers["x-github-branch"] as string) || savedConfig.branch || "main").trim();
+
+    // Auto-save incoming headers if they exist to keep server sync updated
+    if (req.headers["x-github-username"] || req.headers["x-github-repo"] || req.headers["x-github-token"]) {
+      saveGithubConfig({
+        username: (req.headers["x-github-username"] as string) || undefined,
+        repo: (req.headers["x-github-repo"] as string) || undefined,
+        token: (req.headers["x-github-token"] as string) || undefined,
+        branch: (req.headers["x-github-branch"] as string) || undefined,
+      });
+    }
 
     if (!token) {
       return res.status(401).json({

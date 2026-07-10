@@ -11,4 +11,5 @@ export interface Recipe {
   difficulty: "Snadné" | "Střední" | "Složité";
   category?: string;
   isDefault?: boolean;
+  updatedAt?: string; // ISO timestamp to track modifications and resolve merge conflicts
 }
