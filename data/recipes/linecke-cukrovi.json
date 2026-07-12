@@ -1,34 +1,35 @@
 {
   "title": "Linecké cukroví",
-  "summary": "Křehké linecké těsto postavené na zlatém poměru surovin, které dokonale drží tvar a díky správné technice se rozplývá na jazyku.",
+  "summary": "Tradiční křehké cukroví s jemným přídavkem kypřicího prášku pro nadýchanější strukturu, spojené kyselkavým džemem.",
   "ingredients": [
-    "210 g hladké mouky (ideálně pšeničné dortové)",
-    "140 g studeného nesoleného másla (obsah tuku min. 82 %)",
+    "210 g hladké pšeničné mouky",
+    "140 g studeného nesoleného másla (min. 82 % tuku)",
     "70 g moučkového cukru",
-    "2 žloutky z čerstvých vajec",
-    "1 lžička jemně nastrouhané citronové kůry z chemicky neošetřeného citronu",
+    "2 žloutky",
+    "3 g kypřicího prášku do pečiva (bez fosfátů)",
+    "1 lžička nastrouhané bio citronové kůry",
     "1 špetka soli",
-    "150 g kvalitního rybízového nebo malinového džemu s vysokým podílem ovoce"
+    "150 g rybízového džemu s vysokým podílem ovoce"
   ],
   "instructions": [
-    "Do mísy prosejte hladkou mouku s moučkovým cukrem a přidejte špetku soli.",
-    "Přidejte na malé kostičky nakrájené studené máslo přímo z chladničky a jemně nastrouhanou citronovou kůru.",
-    "Prsty nebo plochým šlehačem rychle vypracujte jemnou drobenku tak, aby se tuk spojil s moukou, ale nezačal se teplem rukou zahřívat.",
-    "K drobence přidejte žloutky a bleskově, ale důkladně vypracujte v hladké, jednolité těsto.",
-    "Hotové těsto zformujte do plochého disku, pevně zabalte do potravinářské fólie a nechte v chladničce odpočívat několik hodin, nejlépe přes noc.",
-    "Vychlazené těsto nechte krátce povolit a na mírně pomoučeném vále ho rozválejte na rovnoměrný tenký plát.",
-    "Vykrajujte požadované tvary, přičemž u poloviny z nich nezapomeňte vykrojit středový otvor pro džem.",
-    "Jednotlivé vykrojené tvary skládejte s mírnými rozestupy na plech vyložený pečicím papírem.",
-    "Pečte v předehřáté troubě na horkovzdušný režim dozlatova, těsto však nesmí ztmavnout.",
-    "Upečené korpusy nechte po vytažení z trouby zcela vychladnout na mřížce.",
-    "Spodní plné tvary potřete vrstvou džemu, vrchní díly s otvorem zlehka pocukrujte a opatrně k sobě slepte."
+    "V míse prosejte hladkou mouku s moučkovým cukrem, kypřicím práškem a špetkou soli.",
+    "Přidejte na malé kostičky nakrájené studené máslo a jemně nastrouhanou citronovou kůru.",
+    "Rychle vypracujte jemnou drobenku, aby se máslo nezačalo tavit teplem rukou.",
+    "Přidejte žloutky a bleskově zpracujte v jednolité a hladké těsto.",
+    "Zabalte těsto do fólie a nechte ho v chladničce odležet nejlépe přes noc.",
+    "Těsto rozválejte na pomoučeném vále na stejnoměrně tenký plát.",
+    "Vykrajujte požadované tvary a u poloviny z nich vyřízněte středový otvor.",
+    "Kousky rozložte na plech s pečicím papírem.",
+    "Pečte v předehřáté horkovzdušné troubě dozlatova, těsto však nesmí ztmavnout.",
+    "Po upečení nechte korpusy zcela vychladnout na kovové mřížce.",
+    "Plné tvary potřete ovocným džemem, vrchní díly lehce pocukrujte a opatrně spojte."
   ],
-  "applianceTips": "Pro dokonalé zpracování těsta bez nežádoucího zahřátí použijte kuchyňský robot s míchací metlou typu 'K' nebo Thermomix. Krátké sekání studeného másla s moukou zabrání tavení tuku a uvolňování lepku, což je klíč k dokonalé křehkosti.",
-  "expertJustification": "Vyloučením kypřicího prášku zabráníme deformaci tvarů během pečení. Linecké těsto musí držet ostré hrany, což zajišťuje přesný poměr surovin a absence chemických kypřidel. Použití pravého másla místo rostlinných tuků s obsahem vody brání rozvoji lepkové sítě (tzv. shortening effect), takže těsto zůstane křehké a po slepení přirozeně změkne pouze díky vlhkosti z poctivého ovocného džemu.",
+  "applianceTips": "Kuchyňský robot s míchací metlou typu K zajistí bleskové zapracování studeného másla s kypřidlem a moukou. Tím zabráníte nežádoucímu rozpuštění tuku a aktivaci lepku, což by těsto znehodnotilo.",
+  "expertJustification": "Přidáním malého množství kypřicího prášku bez fosfátů docílíme lehčí, křehčí a nadýchanější textury těsta. Aby si cukroví i přes mírné vyběhnutí zachovalo ostré rysy, je nutné těsto před pečením důkladně vychladit a pracovat s ním rychle.",
   "applianceType": "Kuchyňský robot",
   "cookingTime": "45 min",
   "difficulty": "Střední",
   "category": "Sladká jídla a moučníky",
   "id": "gen-1783883769608",
-  "updatedAt": "2026-07-12T19:16:10.038Z"
+  "updatedAt": "2026-07-12T19:18:24.964Z"
 }
