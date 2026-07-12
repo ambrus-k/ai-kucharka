@@ -1,32 +1,30 @@
 {
   "title": "Chléb Šumava",
-  "summary": "Tradiční pšenično-žitný chléb s vysokým podílem žitného kvasu a teplou fermentací pro plný chuťový profil.",
+  "summary": "Tradiční pšenično-žitný chléb s dvoufázovým vedením, využívající metodu čisté pšeničné autolýzy pro maximální rozvoj lepku a pečení od studeného startu.",
   "ingredients": [
-    "420 g pšeničné chlebové mouky (T650)",
-    "160 g žitné chlebové mouky (T930)",
-    "240 g aktivního žitného kvasu (100% hydratace)",
-    "335 g vlažné vody (28–30 °C)",
-    "15 g soli",
-    "9 g celého kmínu",
+    "20 g mateřského žitného kvásku",
+    "200 g žitné chlebové mouky (T930)",
+    "500 g pšeničné chlebové mouky (T650)",
+    "450 g vlažné vody",
+    "14 g jemné mořské soli",
+    "10 g celého kmínu",
     "žitná chlebová mouka na vysypání ošatky"
   ],
   "instructions": [
-    "V mísicí nádobě důkladně smíchejte aktivní žitný kvas, vlažnou vodu, pšeničnou i žitnou chlebovou mouku, sůl a celý kmín.",
-    "Těsto hněťte mechanicky hákem nejprve na nízkou rychlost pro spojení ingrediencí a následně rychlost zvyšte, dokud nevznikne hladké, mírně lepkavé těsto s dobrou elasticitou.",
-    "Těsto nechte zrát v zakryté nádobě při teplotě 26–28 °C, dokud viditelně nezdvojnásobí svůj objem.",
-    "Vykynuté těsto vyklopte na pomoučený vál, vytvarujte z něj pevný bochník a vložte jej spojem nahoru do ošatky důkladně vysypané žitnou moukou.",
-    "Bochník nechte kynout při stabilní teplotě 26–28 °C do dosažení optimálního objemu.",
-    "Vykynutý bochník vyklopte a vložte do trouby předehřáté na vysokou teplotu.",
-    "Ihned po vložení aplikujte dávku páry a pečte, dokud chléb plně nenaskočí.",
-    "Následně vyvětrejte přebytečnou páru, snižte teplotu a dopékejte dozlatova s pevnou kůrkou.",
-    "Upečený chléb nechte zchladnout na mřížce."
+    "V míse důkladně smíchejte žitnou moukovou složku, část vlažné vody a mateřský kvásek. Směs přikryjte a nechte fermentovat při pokojové teplotě do ztrojnásobení objemu.",
+    "V samostatné míse promíchejte pšeničnou mouku se zbylou vlažnou vodou a nechte těsto odpočívat, čímž zahájíte proces autolýzy pro přirozené rozvinutí lepkové struktury.",
+    "K autolyzovanému pšeničnému těstu přidejte vyběhlý žitný rozkvas, jemnou mořskou sůl a celý kmín.",
+    "Těsto zpracujte v kuchyňském robotu s hnětacím hákem, dokud se suroviny plně nespojí v hladké, elastické a nelepivé těsto.",
+    "Připravené těsto nechte zrát v přikryté míse při pokojové teplotě a v polovině této doby jej jednou přeložte pro zpevnění struktury.",
+    "Těsto stočte do ošatky vysypané žitnou moukou a nechte v teple kynout, dokud bochník nedosáhne optimálního objemu s pružným polštářovým efektem na dotek.",
+    "Vykynutý bochník vyklopte, vložte do studené trouby a upečte pomocí automatického programu kombinujícího počáteční zapaření a následný horkovzduch."
   ],
-  "applianceTips": "Využijte počáteční zapaření v prvních minutách pečení pro maximalizaci objemu bochníku. Pro zbývající fázi pečení páru zcela odvětrejte a dokončete pečení na klasický statický ohřev pro docílení pevné kůrky.",
-  "expertJustification": "Celková bilance mouky odpovídá poměru 60:40. Hydratace nastavená na 65 % zajišťuje optimální viskoelastické vlastnosti těsta při daném zastoupení žitných pentosanů a pšeničného lepku. Fermentace za tepla produkuje dominantně kyselinu mléčnou, která definuje typický chuťový profil.",
-  "applianceType": "Trouba s funkcí páry a statickým ohřevem",
-  "cookingTime": "4 hodiny",
+  "applianceTips": "Využitím pečení od studeného startu v parní troubě umožníte těstu plynulý nárůst objemu během pozvolného zahřívání. Automatický program s řízeným dávkováním páry v první fázi zajistí dokonale křupavou kůrku.",
+  "expertJustification": "Izolovaná pšeničná autolýza bez přítomnosti soli a kyselého rozkvasu umožňuje dokonalou hydrataci pšeničných bílkovin a tvorbu silné lepkové sítě. Ta následně spolehlivě unese žitný podíl a plyn vzniklý fermentací, což při celkové hydrataci 64,3 % vede k mimořádně nadýchané střídě.",
+  "applianceType": "Parní trouba s funkcí studeného startu a automatickým programem",
+  "cookingTime": "14 hodin",
   "difficulty": "Střední",
   "category": "Pečivo",
   "id": "gen-1783540977144",
-  "updatedAt": "2026-07-10T22:12:20.614Z"
+  "updatedAt": "2026-07-12T15:27:23.174Z"
 }
