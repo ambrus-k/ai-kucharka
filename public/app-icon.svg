@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Background -->
+  <rect width="512" height="512" rx="112" fill="#1B4332"/>
+  
+  <!-- Elegant subtle inner border -->
+  <rect x="24" y="24" width="464" height="464" rx="88" fill="none" stroke="#2D6A4F" stroke-width="8" opacity="0.5"/>
+  
+  <!-- Main Icon Graphic (A beautiful modern cooking pot & spark) -->
+  <g transform="translate(106, 126)" stroke="#F59E0B" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <!-- Steam Lines -->
+    <path d="M 110 -20 Q 120 -50 110 -70" stroke="#F59E0B" stroke-width="12" opacity="0.8"/>
+    <path d="M 150 -20 Q 160 -50 150 -70" stroke="#F59E0B" stroke-width="12" opacity="0.8"/>
+    <path d="M 190 -20 Q 200 -50 190 -70" stroke="#F59E0B" stroke-width="12" opacity="0.8"/>
+    
+    <!-- Pot Lid Handle -->
+    <path d="M 120 10 L 120 0 A 30 30 0 0 1 180 0 L 180 10" fill="none"/>
+    <!-- Pot Lid -->
+    <path d="M 40 30 L 260 30 C 260 30 250 10 210 10 L 90 10 C 50 10 40 30 40 30 Z" fill="#F59E0B"/>
+    
+    <!-- Pot Body -->
+    <path d="M 50 50 L 50 170 C 50 210 80 240 120 240 L 180 240 C 220 240 250 210 250 170 L 250 50" fill="none"/>
+    <!-- Pot Handles -->
+    <path d="M 50 90 L 20 90 C 10 90 10 120 20 120 L 50 120" />
+    <path d="M 250 90 L 280 90 C 290 90 290 120 280 120 L 250 120" />
+  </g>
+  
+  <!-- AI Sparkle / Stars of intelligence (Chef's golden touch) -->
+  <path d="M 370 150 Q 390 150 390 130 Q 390 150 410 150 Q 390 150 390 170 Q 390 150 370 150 Z" fill="#FDE68A" />
+  <path d="M 110 360 Q 125 360 125 345 Q 125 360 140 360 Q 125 360 125 375 Q 125 360 110 360 Z" fill="#FDE68A" />
+</svg>

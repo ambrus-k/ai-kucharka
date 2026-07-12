@@ -1,10 +1,11 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { 
   motion, 
   AnimatePresence 
 } from "motion/react";
 import { 
   BookOpen, 
+  FolderOpen,
   Sparkles, 
   Plus, 
   Minus, 
@@ -44,7 +45,8 @@ import {
   Database,
   Scale,
   Square,
-  GitBranch
+  GitBranch,
+  ShoppingBag
 } from "lucide-react";
 import { Recipe } from "./types";
 
@@ -173,18 +175,29 @@ export function getRecipeCategory(recipe: Recipe): string {
   }
   
   const title = (recipe.title || "").toLowerCase();
+  let autoCat = "Ostatní";
   
   if (title.includes("chléb") || title.includes("chlieb") || title.includes("housk") || title.includes("rohlík") || title.includes("pečivo") || title.includes("briošk") || title.includes("koláč") || title.includes("moučník") || title.includes("buchta") || title.includes("sladk") || title.includes("knedlí")) {
-    return "Pečivo";
-  }
-  if (title.includes("polévka") || title.includes("polievka") || title.includes("vývar") || title.includes("bramboračka") || title.includes("kulajda")) {
-    return "Polévky";
-  }
-  if (title.includes("maso") || title.includes("vepřov") || title.includes("hověz") || title.includes("kuřec") || title.includes("bůček") || title.includes("buček") || title.includes("kachn") || title.includes("řízek") || title.includes("plátek") || title.includes("sekan") || title.includes("karban") || title.includes("steak") || title.includes("křídl") || title.includes("svíčková") || title.includes("svickova")) {
-    return "Maso";
+    autoCat = "Pečivo";
+  } else if (title.includes("polévka") || title.includes("polievka") || title.includes("vývar") || title.includes("bramboračka") || title.includes("kulajda")) {
+    autoCat = "Polévky";
+  } else if (title.includes("maso") || title.includes("vepřov") || title.includes("hověz") || title.includes("kuřec") || title.includes("bůček") || title.includes("buček") || title.includes("kachn") || title.includes("řízek") || title.includes("plátek") || title.includes("sekan") || title.includes("karban") || title.includes("steak") || title.includes("křídl") || title.includes("svíčková") || title.includes("svickova")) {
+    autoCat = "Maso";
   }
   
-  return "Ostatní";
+  try {
+    const savedDeleted = localStorage.getItem("ai_kucharka_deleted_default_categories");
+    if (savedDeleted) {
+      const deletedList = JSON.parse(savedDeleted);
+      if (Array.isArray(deletedList) && deletedList.includes(autoCat)) {
+        return "Ostatní";
+      }
+    }
+  } catch (e) {
+    // ignore
+  }
+
+  return autoCat;
 }
 
 export function removePreservativesFromSoup(recipe: Recipe): Recipe {
@@ -347,6 +360,52 @@ export default function App() {
   const [editingIngredientIndex, setEditingIngredientIndex] = useState<number | null>(null);
   const [editingValue, setEditingValue] = useState<string>("");
 
+  // Shopping Cart states
+  const [cartItems, setCartItems] = useState<{ id: string; name: string; checked: boolean }[]>(() => {
+    try {
+      const saved = localStorage.getItem("ai_kucharka_cart");
+      return saved ? JSON.parse(saved) : [];
+    } catch (e) {
+      return [];
+    }
+  });
+  const [isCartOpen, setIsCartOpen] = useState<boolean>(false);
+  const [customCartItem, setCustomCartItem] = useState<string>("");
+  const [confirmClearCart, setConfirmClearCart] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (!isCartOpen) {
+      setConfirmClearCart(false);
+    }
+  }, [isCartOpen]);
+
+  useEffect(() => {
+    localStorage.setItem("ai_kucharka_cart", JSON.stringify(cartItems));
+  }, [cartItems]);
+
+  const handleAddRecipeToCart = () => {
+    if (!selectedRecipe) return;
+    
+    const scaledIngredients = selectedRecipe.ingredients.map(ing => {
+      const parsed = parseIngredientString(ing);
+      return scaleIngredient(parsed, scaleFactor);
+    });
+
+    const newItems = scaledIngredients.map((displayIng, index) => ({
+      id: `${selectedRecipe.id}-${index}-${Date.now()}`,
+      name: displayIng,
+      checked: false
+    }));
+
+    setCartItems(prev => {
+      const existingNames = new Set(prev.map(item => item.name));
+      const filteredNew = newItems.filter(item => !existingNames.has(item.name));
+      return [...prev, ...filteredNew];
+    });
+    
+    setIsCartOpen(true);
+  };
+
   // Automatically reset the recipe scale factor back to 1 when switching to another recipe as requested
   useEffect(() => {
     setScaleFactor(1);
@@ -403,6 +462,18 @@ export default function App() {
   const [paperFontSize, setPaperFontSize] = useState<"normal" | "large" | "extra-large">("large");
   const [printNotice, setPrintNotice] = useState<string | null>(null);
 
+  // Toggle body class when Paper View is active so printing styles target it correctly
+  useEffect(() => {
+    if (showPaperView) {
+      document.body.classList.add("paper-view-active");
+    } else {
+      document.body.classList.remove("paper-view-active");
+    }
+    return () => {
+      document.body.classList.remove("paper-view-active");
+    };
+  }, [showPaperView]);
+
   // States for search and filter
   const [searchQuery, setSearchQuery] = useState("");
   const [collapsedCategories, setCollapsedCategories] = useState<Record<string, boolean>>({});
@@ -452,6 +523,159 @@ export default function App() {
   // Manual GitHub sync states
   const [isManualSyncing, setIsManualSyncing] = useState(false);
   const [manualSyncResult, setManualSyncResult] = useState<{ success: boolean; message: string } | null>(null);
+
+  // Category Editor states
+  const [showCategoryEditorModal, setShowCategoryEditorModal] = useState(false);
+  const [categoryEditorTab, setCategoryEditorTab] = useState<"by-category" | "all-recipes">("by-category");
+  const [newCustomCategoryName, setNewCustomCategoryName] = useState("");
+  const [categorySearchQuery, setCategorySearchQuery] = useState("");
+  
+  const [localCustomCategories, setLocalCustomCategories] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem("ai_kucharka_custom_categories");
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  const [deletedDefaultCategories, setDeletedDefaultCategories] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem("ai_kucharka_deleted_default_categories");
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  useEffect(() => {
+    localStorage.setItem("ai_kucharka_custom_categories", JSON.stringify(localCustomCategories));
+  }, [localCustomCategories]);
+
+  useEffect(() => {
+    localStorage.setItem("ai_kucharka_deleted_default_categories", JSON.stringify(deletedDefaultCategories));
+  }, [deletedDefaultCategories]);
+
+  // Rename and inline editing states
+  const [editingCategoryName, setEditingCategoryName] = useState<string | null>(null);
+  const [editingCategoryValue, setEditingCategoryValue] = useState("");
+
+  const defaultCategories = useMemo(() => ["Maso", "Pečivo", "Polévky", "Sladká jídla a moučníky", "Ostatní"], []);
+
+  const allUsedCategories = useMemo(() => {
+    const categoriesSet = new Set<string>();
+    
+    // Add default categories except deleted ones
+    defaultCategories.forEach(c => {
+      if (!deletedDefaultCategories.includes(c)) {
+        categoriesSet.add(c);
+      }
+    });
+
+    // Add manual override categories from recipes (only if they are not explicitly deleted)
+    recipes.forEach(r => {
+      if (r.category && !deletedDefaultCategories.includes(r.category)) {
+        categoriesSet.add(r.category);
+      }
+    });
+
+    // Add custom categories except deleted ones
+    localCustomCategories.forEach(c => {
+      if (c.trim() && !deletedDefaultCategories.includes(c.trim())) {
+        categoriesSet.add(c.trim());
+      }
+    });
+
+    return Array.from(categoriesSet).sort((a: string, b: string) => a.localeCompare(b, "cs"));
+  }, [recipes, localCustomCategories, defaultCategories, deletedDefaultCategories]);
+
+  const handleRenameCategory = (oldName: string, newName: string) => {
+    const trimmedNewName = newName.trim();
+    if (!trimmedNewName) return;
+    if (trimmedNewName === oldName) return;
+    
+    if (allUsedCategories.includes(trimmedNewName)) {
+      alert(`Kategorie "${trimmedNewName}" již existuje.`);
+      return;
+    }
+
+    // If we are renaming a deleted default category (or if newName is in deletedDefaultCategories), restore it
+    if (deletedDefaultCategories.includes(trimmedNewName)) {
+      setDeletedDefaultCategories(prev => prev.filter(c => c !== trimmedNewName));
+    }
+
+    // 1. Update custom categories and deleted default categories
+    if (localCustomCategories.includes(oldName)) {
+      setLocalCustomCategories(prev => prev.map(c => c === oldName ? trimmedNewName : c));
+    } else {
+      // It's a default category being renamed!
+      // Add the new name to custom categories
+      setLocalCustomCategories(prev => [...prev, trimmedNewName]);
+      // Mark old default category as deleted
+      if (defaultCategories.includes(oldName)) {
+        setDeletedDefaultCategories(prev => [...prev, oldName]);
+      }
+    }
+
+    // 2. Update recipes
+    const updatedRecipesList = recipes.map(recipe => {
+      if (recipe.category === oldName) {
+        return { ...recipe, category: trimmedNewName, updatedAt: new Date().toISOString() };
+      }
+      if (!recipe.category && getRecipeCategory(recipe) === oldName) {
+        return { ...recipe, category: trimmedNewName, updatedAt: new Date().toISOString() };
+      }
+      return recipe;
+    });
+
+    saveRecipesToStorage(updatedRecipesList);
+  };
+
+  const handleDeleteCategory = (categoryName: string) => {
+    const assignedRecipes = recipes.filter(r => (r.category || getRecipeCategory(r)) === categoryName);
+    
+    let confirmMessage = `Opravdu chcete smazat kategorii "${categoryName}"?`;
+    if (assignedRecipes.length > 0) {
+      confirmMessage = `Kategorie "${categoryName}" obsahuje ${assignedRecipes.length} receptů. Pokud ji smažete, tyto recepty se vrátí k automatickému řazení nebo do kategorie "Ostatní".\n\nOpravdu chcete kategorii smazat?`;
+    }
+
+    if (!confirm(confirmMessage)) return;
+
+    // 1. Remove from localCustomCategories
+    setLocalCustomCategories(prev => prev.filter(c => c !== categoryName));
+
+    // 2. If it's a default category, add to deleted default categories
+    if (defaultCategories.includes(categoryName)) {
+      setDeletedDefaultCategories(prev => [...prev, categoryName]);
+    }
+
+    // 3. Reset category override for recipes that had this category
+    const updatedRecipesList = recipes.map(recipe => {
+      if (recipe.category === categoryName) {
+        const updated = { ...recipe, updatedAt: new Date().toISOString() };
+        delete updated.category;
+        return updated;
+      }
+      return recipe;
+    });
+
+    saveRecipesToStorage(updatedRecipesList);
+  };
+
+  const getCategoryEmoji = (category: string) => {
+    switch (category) {
+      case "Maso": return "🥩";
+      case "Pečivo": return "🍞";
+      case "Polévky": return "🥣";
+      case "Sladká jídla a moučníky": return "🍰";
+      case "Ostatní": return "🍽️";
+      case "Saláty": return "🥗";
+      case "Přílohy": return "🍟";
+      case "Nápoje": return "🍹";
+      case "Snídaně": return "🍳";
+      default: return "🍽️";
+    }
+  };
 
   // Load GitHub config from server when modal is opened
   useEffect(() => {
@@ -1497,6 +1721,84 @@ ${separator}`;
     }
   };
 
+  const triggerPaperPrint = () => {
+    if (!selectedRecipe) return;
+
+    // Grab the beautifully rendered paper cookbook sheet container
+    const element = document.querySelector(".paper-cookbook-sheet");
+    if (!element) {
+      window.print();
+      return;
+    }
+
+    // Capture all style and stylesheet link elements from the parent document
+    const styles = Array.from(document.querySelectorAll("style, link[rel='stylesheet']"))
+      .map(el => el.outerHTML)
+      .join("\n");
+
+    const printWindow = window.open("", "_blank");
+    if (printWindow) {
+      const title = selectedRecipe.title;
+      printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <title>${title} - Tisk receptu</title>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            ${styles}
+            <style>
+              body {
+                background-color: #FDFBF7 !important;
+                color: #2C2A29 !important;
+                margin: 0 !important;
+                padding: 40px !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+              }
+              .paper-cookbook-sheet {
+                max-width: 820px !important;
+                margin: 0 auto !important;
+                background: #FDFBF7 !important;
+                border: none !important;
+                box-shadow: none !important;
+                padding: 0 !important;
+              }
+              /* Ensure absolute elements like top accent line are printed */
+              .absolute {
+                position: absolute !important;
+              }
+              @media print {
+                body {
+                  padding: 20px !important;
+                  background-color: #FDFBF7 !important;
+                }
+                .no-print {
+                  display: none !important;
+                }
+              }
+            </style>
+          </head>
+          <body class="font-serif paper-view-active">
+            <div class="paper-cookbook-sheet space-y-10 relative">
+              ${element.innerHTML}
+            </div>
+            <script>
+              setTimeout(function() {
+                window.print();
+                window.close();
+              }, 300);
+            </script>
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
+    } else {
+      // Fallback if popup is blocked
+      window.print();
+    }
+  };
+
   const unused_code_wrapper = () => {
     if (!selectedRecipe) return;
 
@@ -2005,7 +2307,7 @@ ${separator}`;
           const matching = cleaned.find(r => r.id === prev.id);
           if (matching) return matching;
         }
-        return cleaned[0] || null;
+        return null; // Force Home Screen on start!
       });
       localStorage.setItem("ai_kucharka_recipes", JSON.stringify(cleaned));
       localStorage.setItem("ai_kucharka_initialized", "true");
@@ -2317,7 +2619,7 @@ ${separator}`;
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-[#FDFBF7] text-[#2C2A29] flex flex-col font-serif overflow-y-auto selection:bg-[#E8F5E9]"
+            className="fixed inset-0 z-50 bg-[#FDFBF7] text-[#2C2A29] flex flex-col font-serif overflow-y-auto selection:bg-[#E8F5E9] paper-cookbook-overlay"
           >
             {/* Top Action Bar (Sticky, glassmorphism-paper-blend) */}
             <div className="sticky top-0 bg-[#FDFBF7]/95 backdrop-blur-md border-b border-[#E8E4DB] z-50 px-4 py-3.5 flex flex-wrap items-center justify-between gap-4 select-none no-print shadow-xs">
@@ -2389,7 +2691,7 @@ ${separator}`;
 
                 {/* Print Button */}
                 <button
-                  onClick={() => window.print()}
+                  onClick={triggerPaperPrint}
                   className="flex items-center gap-1.5 bg-white border border-[#E8E4DB] hover:border-[#1B4332] text-slate-700 hover:text-[#1B4332] px-3 py-1.5 rounded-xl font-sans font-bold text-sm transition-all cursor-pointer shadow-2xs"
                   title="Vytisknout recept"
                 >
@@ -2409,8 +2711,8 @@ ${separator}`;
             </div>
 
             {/* Paper Sheet Content Area */}
-            <div className="flex-1 px-4 py-8 md:py-14 bg-[#F5F2EA] flex justify-center items-start overflow-y-auto">
-              <div className="max-w-3xl w-full bg-[#FDFBF7] border border-[#E3DFD5] rounded-3xl p-6 md:p-14 shadow-xl space-y-10 relative">
+            <div className="flex-1 px-4 py-8 md:py-14 bg-[#F5F2EA] flex justify-center items-start overflow-y-auto paper-cookbook-sheet-container">
+              <div className="max-w-3xl w-full bg-[#FDFBF7] border border-[#E3DFD5] rounded-3xl p-6 md:p-14 shadow-xl space-y-10 relative paper-cookbook-sheet">
                 
                 {/* Visual top border accent */}
                 <div className="absolute top-0 left-0 right-0 h-2 bg-[#2D6A4F] rounded-t-3xl" />
@@ -2572,7 +2874,83 @@ ${separator}`;
           </div>
         </button>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+          {/* 1. RECIPE SPECIFIC HEADER CONTROLS */}
+          {selectedRecipe && !isEditing && (
+            <>
+              {isAdmin && (
+                <>
+                  {/* Kontrola receptu */}
+                  <button
+                    onClick={handleAuditRecipe}
+                    disabled={isAuditing}
+                    className={`font-bold py-2 px-2.5 sm:px-4 rounded-xl shadow-xs transition-all flex items-center gap-1.5 text-xs sm:text-sm cursor-pointer ${
+                      isAuditing
+                        ? "bg-amber-100 text-amber-800 border border-amber-200 cursor-not-allowed"
+                        : "bg-[#2D6A4F] hover:bg-[#1B4332] text-white"
+                    }`}
+                    title="Spustit vědeckou kontrolu a audit receptu"
+                  >
+                    <Cpu className={`h-4 w-4 ${isAuditing ? "animate-spin" : ""}`} />
+                    <span className="hidden md:inline">{isAuditing ? "Simuluji..." : "Kontrola receptu"}</span>
+                    <span className="md:hidden inline-block">{isAuditing ? "..." : "Kontrola"}</span>
+                  </button>
+
+                  {/* Úprava receptu */}
+                  <button
+                    onClick={startEditingRecipe}
+                    className="bg-white border border-[#1B4332] text-[#1B4332] hover:bg-emerald-50 font-bold py-2 px-2.5 sm:px-4 rounded-xl shadow-xs transition-all flex items-center gap-1.5 text-xs sm:text-sm cursor-pointer"
+                    title="Upravit a doladit kulinářské parametry receptu"
+                  >
+                    <Sparkles className="h-4 w-4" />
+                    <span className="hidden md:inline">Upravit recept</span>
+                    <span className="md:hidden inline-block">Upravit</span>
+                  </button>
+                </>
+              )}
+
+              {/* Zobrazení receptu */}
+              <button
+                onClick={() => setShowPaperView(true)}
+                className="bg-[#2D6A4F] hover:bg-[#1B4332] text-white font-bold py-2 px-2.5 sm:px-4 rounded-xl shadow-xs hover:shadow-md transition-all flex items-center gap-1.5 text-xs sm:text-sm cursor-pointer"
+                title="Zobrazit recept jako tištěnou knihu / kuchařku"
+              >
+                <BookOpen className="h-4 w-4" />
+                <span className="hidden md:inline">Zobrazit recept</span>
+                <span className="md:hidden inline-block">Zobrazit</span>
+              </button>
+
+              {/* Export receptu */}
+              <button
+                onClick={() => setShowExportView(true)}
+                className="bg-[#FFFBEB] hover:bg-[#FEF3C7] text-[#B45309] border border-[#FDE68A] font-bold py-2 px-2.5 sm:px-4 rounded-xl shadow-xs transition-all flex items-center gap-1.5 text-xs sm:text-sm cursor-pointer"
+                title="Export kuchařského receptu pro tisk, kopírování, TXT nebo PDF archivaci"
+              >
+                <FileText className="h-4 w-4 text-[#D97706]" />
+                <span className="hidden md:inline">Export receptu</span>
+                <span className="md:hidden inline-block">Export</span>
+              </button>
+            </>
+          )}
+
+          {/* 2. TLAČÍTKO KOŠÍK */}
+          <button
+            onClick={() => setIsCartOpen(true)}
+            className="bg-emerald-50 hover:bg-emerald-100 text-[#1B4332] border border-emerald-200/60 font-bold py-2 px-2.5 sm:px-4 rounded-xl shadow-xs transition-all flex items-center gap-1.5 text-xs sm:text-sm cursor-pointer relative"
+            title="Zobrazit nákupní lístek / košík surovin"
+          >
+            <div className="relative">
+              <ShoppingBag className="h-4 w-4 text-emerald-700" />
+              {cartItems.length > 0 && (
+                <span className="absolute -top-2.5 -right-2.5 bg-red-500 text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center animate-pulse shadow-xs">
+                  {cartItems.length}
+                </span>
+              )}
+            </div>
+            <span className="hidden sm:inline">Košík</span>
+          </button>
+
+          {/* 3. NOVÝ RECEPT (Admin) */}
           {isAdmin && (
             <button
               onClick={() => {
@@ -2595,293 +2973,6 @@ ${separator}`;
         
         {/* LEFT SIDEBAR: RECIPE LIST */}
         <aside className="no-print w-full md:w-80 lg:w-96 border-r border-[#E8E8E1] bg-white flex flex-col flex-shrink-0">
-          
-          {/* ADMINISTRÁTORSKÝ STATUS BANNER */}
-          {(() => {
-            if (isAdmin) {
-              return (
-                <div className="p-4 bg-emerald-50 border-b border-emerald-200 text-emerald-800 space-y-3 no-print animate-fade-in">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-emerald-900">
-                      <Check className="h-4 w-4 shrink-0 text-emerald-600" />
-                      <span>Administrace</span>
-                    </div>
-                    <div className="flex gap-1.5">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setActiveTab("github");
-                          setShowLoginModal(true);
-                        }}
-                        className="text-[10px] bg-indigo-100 hover:bg-indigo-200 text-indigo-800 px-2 py-0.5 rounded-md font-bold transition-all cursor-pointer"
-                        title="Nastavení připojení k GitHubu"
-                      >
-                        ⚙️ GitHub
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setIsAdmin(false);
-                          setAdminPassword("");
-                          localStorage.removeItem("admin_password_token");
-                        }}
-                        className="text-[10px] bg-emerald-100 hover:bg-emerald-200 text-emerald-800 px-2 py-0.5 rounded-md font-bold transition-all cursor-pointer"
-                      >
-                        Odhlásit se
-                      </button>
-                    </div>
-                  </div>
-                  <p className="text-[11px] leading-relaxed opacity-95">
-                    Máte plný přístup ke správě receptů. Změny se ukládají automaticky online.
-                  </p>
-
-                  {/* RUČNÍ SYNCHRONIZACE S GITHUBEM */}
-                  <div className="pt-2 border-t border-emerald-200/60 mt-1 space-y-1.5">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-bold text-emerald-950 uppercase tracking-wider flex items-center gap-1">
-                        🐙 GitHub Synchronizace
-                      </span>
-                      <button
-                        type="button"
-                        onClick={handleManualGithubSync}
-                        disabled={isManualSyncing}
-                        className="text-[10px] bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-300 text-white font-bold py-1 px-2.5 rounded-md transition-all cursor-pointer flex items-center gap-1 shrink-0"
-                      >
-                        {isManualSyncing ? (
-                          <>
-                            <RefreshCw className="h-2.5 w-2.5 animate-spin" />
-                            <span>Synchronizuji...</span>
-                          </>
-                        ) : (
-                          <>
-                            <GitBranch className="h-2.5 w-2.5" />
-                            <span>Synchronizovat teď</span>
-                          </>
-                        )}
-                      </button>
-                    </div>
-
-                    {manualSyncResult && (
-                      <div className={`p-2 rounded-lg text-[10px] border ${
-                        manualSyncResult.success 
-                          ? "bg-emerald-100 border-emerald-200 text-emerald-900" 
-                          : "bg-red-100 border-red-200 text-red-950"
-                      }`}>
-                        <p className="font-semibold leading-normal">{manualSyncResult.message}</p>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* DIAGNOSTIC PANEL FOR ADMIN */}
-                  <div className="pt-2 border-t border-emerald-200/60 mt-2 space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-bold text-emerald-900 uppercase tracking-wider flex items-center gap-1">
-                        🛠 Diagnostika systému
-                      </span>
-                      <div className="flex items-center gap-1.5">
-                        <button
-                          type="button"
-                          onClick={handleRunDiagnostics}
-                          disabled={isDiagnosing}
-                          className="text-[10px] bg-emerald-600 hover:bg-emerald-700 disabled:bg-[#A3E635]/15 disabled:text-[#1B4332]/60 text-white font-bold py-1 px-2.5 rounded-md transition-all cursor-pointer flex items-center gap-1 shrink-0"
-                        >
-                          {isDiagnosing ? (
-                            <>
-                              <RefreshCw className="h-2.5 w-2.5 animate-spin" />
-                              <span>Testuji...</span>
-                            </>
-                          ) : (
-                            <>
-                              <RefreshCw className="h-2.5 w-2.5" />
-                              <span>Otestovat</span>
-                            </>
-                          )}
-                        </button>
-                        {isDiagnosing && (
-                          <button
-                            type="button"
-                            onClick={handleStopDiagnostics}
-                            className="text-[10px] bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-2 rounded-md transition-all cursor-pointer flex items-center gap-1 shrink-0 shadow-xs hover:scale-105 active:scale-95"
-                            title="Zastavit diagnostiku"
-                          >
-                            <Square className="h-2.5 w-2.5 fill-current" />
-                            <span>Stop</span>
-                          </button>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* PROGRESS WINDOW FOR DIAGNOSTICS */}
-                    {isDiagnosing && (
-                      <div className="p-2.5 bg-white border border-emerald-100 rounded-lg space-y-2 text-[#2c2c2c] shadow-xs animate-pulse-slow">
-                        <div className="flex items-center justify-between text-[9px] font-bold text-slate-700">
-                          <span className="truncate pr-1 text-slate-600">{diagnosticsProgressText}</span>
-                          <span className="font-mono text-emerald-700 shrink-0">{diagnosticsProgressPercent}%</span>
-                        </div>
-                        {/* Progress Bar */}
-                        <div className="w-full bg-slate-100 h-1 rounded-full overflow-hidden">
-                          <div
-                            className="bg-emerald-500 h-full transition-all duration-300"
-                            style={{ width: `${diagnosticsProgressPercent}%` }}
-                          />
-                        </div>
-                        {/* Step checklist */}
-                        <div className="space-y-0.5 text-[8.5px] font-medium text-slate-500 pt-1 border-t border-slate-50">
-                          <div className={`flex items-center gap-1.5 ${diagnosticsStepIndex >= 0 ? 'text-emerald-800' : ''}`}>
-                            {diagnosticsStepIndex > 0 ? (
-                              <Check className="h-2.5 w-2.5 text-emerald-600 shrink-0" />
-                            ) : diagnosticsStepIndex === 0 ? (
-                              <RefreshCw className="h-2.5 w-2.5 text-emerald-600 animate-spin shrink-0" />
-                            ) : (
-                              <div className="h-1 w-1 rounded-full bg-slate-300 mx-0.75 shrink-0" />
-                            )}
-                            <span className={diagnosticsStepIndex === 0 ? 'font-bold' : ''}>1. Inicializace a ověření přístupu</span>
-                          </div>
-                          <div className={`flex items-center gap-1.5 ${diagnosticsStepIndex >= 1 ? 'text-emerald-800' : ''}`}>
-                            {diagnosticsStepIndex > 1 ? (
-                              <Check className="h-2.5 w-2.5 text-emerald-600 shrink-0" />
-                            ) : diagnosticsStepIndex === 1 ? (
-                              <RefreshCw className="h-2.5 w-2.5 text-emerald-600 animate-spin shrink-0" />
-                            ) : (
-                              <div className="h-1 w-1 rounded-full bg-slate-300 mx-0.75 shrink-0" />
-                            )}
-                            <span className={diagnosticsStepIndex === 1 ? 'font-bold' : ''}>2. Test zápisu do souborového systému</span>
-                          </div>
-                          <div className={`flex items-center gap-1.5 ${diagnosticsStepIndex >= 2 ? 'text-emerald-800' : ''}`}>
-                            {diagnosticsStepIndex > 2 ? (
-                              <Check className="h-2.5 w-2.5 text-emerald-600 shrink-0" />
-                            ) : diagnosticsStepIndex === 2 ? (
-                              <RefreshCw className="h-2.5 w-2.5 text-emerald-600 animate-spin shrink-0" />
-                            ) : (
-                              <div className="h-1 w-1 rounded-full bg-slate-300 mx-0.75 shrink-0" />
-                            )}
-                            <span className={diagnosticsStepIndex === 2 ? 'font-bold' : ''}>3. Spojení s Google Gemini AI</span>
-                          </div>
-                          <div className={`flex items-center gap-1.5 ${diagnosticsStepIndex >= 3 ? 'text-emerald-800' : ''}`}>
-                            {diagnosticsStepIndex > 3 ? (
-                              <Check className="h-2.5 w-2.5 text-emerald-600 shrink-0" />
-                            ) : diagnosticsStepIndex === 3 ? (
-                              <RefreshCw className="h-2.5 w-2.5 text-emerald-600 animate-spin shrink-0" />
-                            ) : (
-                              <div className="h-1 w-1 rounded-full bg-slate-300 mx-0.75 shrink-0" />
-                            )}
-                            <span className={diagnosticsStepIndex === 3 ? 'font-bold' : ''}>4. Sestavení diagnostického reportu</span>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {diagnosticsError && (
-                      <div className="p-2 bg-red-100/80 border border-red-200 rounded-lg text-[10px] text-red-800 space-y-1">
-                        <p className="font-bold">Chyba diagnostiky:</p>
-                        <p className="opacity-95 leading-normal">{diagnosticsError}</p>
-                      </div>
-                    )}
-
-                    {diagnosticsResult && (
-                      <div className="space-y-2 text-[10px] animate-scale-up">
-                        {/* 1. WRITE PERMISSION */}
-                        <div className="p-2 bg-white border border-emerald-100 rounded-lg space-y-1 text-[#2c2c2c] shadow-xs">
-                          <div className="flex items-center justify-between font-bold">
-                            <span className="flex items-center gap-1 text-emerald-900">
-                              <Database className="h-3 w-3 text-emerald-600 shrink-0" />
-                              Zápis a správa receptů
-                            </span>
-                            {diagnosticsResult.writePermissionOk ? (
-                              <span className="text-[8px] bg-emerald-100 text-emerald-800 px-1 py-0.2 rounded font-black uppercase">
-                                OK
-                              </span>
-                            ) : (
-                              <span className="text-[8px] bg-red-100 text-red-800 px-1 py-0.2 rounded font-black uppercase">
-                                CHYBA
-                              </span>
-                            )}
-                          </div>
-                          <p className="text-slate-600 leading-normal">
-                            {diagnosticsResult.writePermissionMessage}
-                          </p>
-                          <p className="text-slate-500 font-semibold text-[9px]">
-                            Celkem receptů v databázi: <strong className="text-slate-700">{diagnosticsResult.recipesCount}</strong>
-                          </p>
-                        </div>
-
-                        {/* 3. GITHUB SYNC */}
-                        {diagnosticsResult.githubOk !== undefined && (
-                          <div className="p-2 bg-white border border-emerald-100 rounded-lg space-y-1 text-[#2c2c2c] shadow-xs animate-scale-up">
-                            <div className="flex items-center justify-between font-bold">
-                              <span className="flex items-center gap-1 text-emerald-900">
-                                <GitBranch className="h-3 w-3 text-indigo-500 shrink-0" />
-                                Propojení s GitHubem (Obousměrné)
-                              </span>
-                              {diagnosticsResult.githubOk ? (
-                                <span className="text-[8px] bg-emerald-100 text-emerald-800 px-1 py-0.2 rounded font-black uppercase">
-                                  OK
-                                </span>
-                              ) : (
-                                <span className="text-[8px] bg-amber-100 text-amber-800 px-1 py-0.2 rounded font-black uppercase">
-                                  BEZ PROPOJENÍ
-                                </span>
-                              )}
-                            </div>
-                            <p className="text-slate-600 leading-normal">
-                              {diagnosticsResult.githubMessage}
-                            </p>
-                          </div>
-                        )}
-
-                        {/* 2. GEMINI AI */}
-                        <div className="p-2 bg-white border border-emerald-100 rounded-lg space-y-1 text-[#2c2c2c] shadow-xs">
-                          <div className="flex items-center justify-between font-bold">
-                            <span className="flex items-center gap-1 text-emerald-900">
-                              <Sparkles className="h-3 w-3 text-amber-500 shrink-0" />
-                              Spolupráce Gemini AI
-                            </span>
-                            {diagnosticsResult.geminiOk ? (
-                              <span className="text-[8px] bg-emerald-100 text-emerald-800 px-1 py-0.2 rounded font-black uppercase">
-                                OK
-                              </span>
-                            ) : (
-                              <span className="text-[8px] bg-red-100 text-red-800 px-1 py-0.2 rounded font-black uppercase">
-                                CHYBA
-                              </span>
-                            )}
-                          </div>
-                          <p className="text-slate-600 leading-normal">
-                            {diagnosticsResult.geminiMessage}
-                          </p>
-                        </div>
-
-                        <div className="text-[9px] text-[#2D6A4F]/80 text-right italic font-medium">
-                          Ověřeno: {new Date(diagnosticsResult.timestamp).toLocaleTimeString("cs-CZ")}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              );
-            } else {
-              return (
-                <div className="p-4 bg-[#FDFCF7] border-b border-[#E8E8E1] text-[#4A4A40] space-y-2 no-print animate-fade-in">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-start gap-1.5 text-xs font-bold uppercase tracking-wider text-[#1B4332]">
-                      <Info className="h-4 w-4 shrink-0 text-[#2D6A4F] mt-0.5" />
-                      <span>Prohlížecí režim</span>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => setShowLoginModal(true)}
-                      className="text-[10px] bg-amber-100 hover:bg-amber-200 text-amber-800 px-2 py-0.5 rounded-md font-bold transition-all cursor-pointer"
-                    >
-                      Přihlásit se
-                    </button>
-                  </div>
-                  <p className="text-[11px] leading-relaxed opacity-95 text-slate-500">
-                    Recepty jsou pouze pro čtení. Pro editaci, mazání nebo tvorbu nových se přihlaste jako administrátor.
-                  </p>
-                </div>
-              );
-            }
-          })()}
 
           {/* SEARCH & FILTER CONTROLS */}
           <div className="p-4 border-b border-[#E8E8E1] bg-[#FDFCF7]/60 flex flex-col gap-3">
@@ -2935,20 +3026,6 @@ ${separator}`;
           {/* HISTORICAL & DEFAULT RECIPES LIST WITH ALPHABETICAL ACCORDIONS */}
           <div className="flex-1 overflow-y-auto p-4 space-y-3">
             {/* AI Generation Link directly in Sidebar */}
-            {isAdmin && (
-              <button
-                onClick={() => {
-                  setSelectedRecipe(null);
-                  setErrorMessage(null);
-                  setIsEditing(false);
-                }}
-                className="w-full bg-gradient-to-r from-amber-600 to-[#D97706] hover:from-amber-700 hover:to-[#C26405] active:scale-95 text-white font-bold py-3 px-4 rounded-xl shadow-xs hover:shadow-md transition-all flex items-center justify-center gap-2 text-[13px] cursor-pointer mb-2 animate-pulse-subtle"
-                title="Přidat recept"
-              >
-                <Sparkles className="h-4 w-4 text-amber-200 shrink-0" />
-                <span>Přidat recept (AI & 5 pilířů ověření)</span>
-              </button>
-            )}
 
             <div className="flex items-center justify-between text-[10px] uppercase tracking-widest text-[#9A9A8C] font-bold px-1 mb-1">
               <div className="flex items-center gap-1.5">
@@ -3006,14 +3083,14 @@ ${separator}`;
                                 [category]: !prev[category]
                               }));
                             }}
-                            className="w-full flex items-center justify-between py-1.5 px-2 hover:bg-[#F5F5F0] rounded-lg transition-colors text-left font-sans font-bold text-xs text-[#1B4332]"
+                            className="w-full flex items-center justify-between py-1.5 px-2 hover:bg-[#F5F5F0] rounded-lg transition-colors text-left font-sans font-bold text-sm text-[#1B4332]"
                           >
                             <div className="flex items-center gap-1.5 min-w-0">
                               <span className="text-base leading-none shrink-0">
-                                {category === "Pečivo" ? "🍞" : category === "Maso" ? "🥩" : category === "Polévky" ? "🥣" : category === "Sladká jídla a moučníky" ? "🍰" : "🍽️"}
+                                {getCategoryEmoji(category)}
                               </span>
                               <span className="truncate">{category}</span>
-                              <span className="text-[10px] font-sans text-white font-bold bg-[#2D6A4F] px-1.5 py-0.2 rounded-full shrink-0">
+                              <span className="text-[11px] font-sans text-white font-bold bg-[#2D6A4F] px-1.5 py-0.5 rounded-full shrink-0">
                                 {sortedRecs.length}
                               </span>
                             </div>
@@ -3045,7 +3122,7 @@ ${separator}`;
                                     }`}
                                   >
                                     <div className="flex flex-col justify-center min-h-[1.75rem] pr-6">
-                                      <h3 className={`font-semibold text-xs line-clamp-2 transition-colors leading-snug ${
+                                      <h3 className={`font-semibold text-sm line-clamp-2 transition-colors leading-snug ${
                                         isSelected ? "text-[#1B4332]" : "text-slate-900 group-hover:text-[#1B4332]"
                                       }`}>
                                         {recipe.title}
@@ -3103,14 +3180,14 @@ ${separator}`;
                                 [letter]: !prev[letter]
                               }));
                             }}
-                            className="w-full flex items-center justify-between py-1.5 px-2 hover:bg-[#F5F5F0] rounded-lg transition-colors text-left font-sans font-bold text-xs text-[#1B4332]"
+                            className="w-full flex items-center justify-between py-1.5 px-2 hover:bg-[#F5F5F0] rounded-lg transition-colors text-left font-sans font-bold text-sm text-[#1B4332]"
                           >
                             <div className="flex items-center gap-2 min-w-0">
                               <span className="w-5 h-5 flex items-center justify-center font-extrabold text-[11px] bg-[#1B4332] text-white rounded-md shrink-0">
                                 {letter}
                               </span>
                               <span className="truncate">Recepty od "{letter}"</span>
-                              <span className="text-[10px] font-sans text-white font-bold bg-[#2D6A4F] px-1.5 py-0.2 rounded-full shrink-0">
+                              <span className="text-[11px] font-sans text-white font-bold bg-[#2D6A4F] px-1.5 py-0.5 rounded-full shrink-0">
                                 {sortedRecs.length}
                               </span>
                             </div>
@@ -3142,7 +3219,7 @@ ${separator}`;
                                     }`}
                                   >
                                     <div className="flex flex-col justify-center min-h-[1.75rem] pr-6">
-                                      <h3 className={`font-semibold text-xs line-clamp-2 transition-colors leading-snug ${
+                                      <h3 className={`font-semibold text-sm line-clamp-2 transition-colors leading-snug ${
                                         isSelected ? "text-[#1B4332]" : "text-slate-900 group-hover:text-[#1B4332]"
                                       }`}>
                                         {recipe.title}
@@ -3281,77 +3358,7 @@ ${separator}`;
                 transition={{ duration: 0.25 }}
                 className="max-w-4xl mx-auto space-y-6"
               >
-                {/* Print and Actions Header toolbar */}
-                <div className="no-print flex flex-wrap gap-2 items-center justify-between pb-2">
-                  {isAdmin ? (
-                    <button
-                      onClick={() => {
-                        setSelectedRecipe(null);
-                        setErrorMessage(null);
-                        setIsEditing(false);
-                      }}
-                      className="text-base text-slate-600 hover:text-amber-700 font-semibold flex items-center gap-1.5 py-1 px-2.5 hover:bg-slate-100/80 rounded-lg transition-all cursor-pointer"
-                    >
-                      ← Vložit jiný recept / Nový
-                    </button>
-                  ) : (
-                    <div />
-                  )}
 
-                  <div className="flex items-center gap-2">
-                    {!isEditing && isAdmin && (
-                      <>
-                        <button
-                          onClick={handleAuditRecipe}
-                          disabled={isAuditing}
-                          className={`font-bold py-2 px-4 rounded-xl shadow-xs hover:shadow-sm transition-all flex items-center gap-2 text-sm cursor-pointer ${
-                            isAuditing
-                              ? "bg-amber-100 text-amber-800 border border-amber-200 cursor-not-allowed"
-                              : "bg-[#2D6A4F] hover:bg-[#1B4332] text-white"
-                          }`}
-                        >
-                          <Cpu className={`h-4 w-4 ${isAuditing ? "animate-spin" : ""}`} />
-                          <span>{isAuditing ? "Simuluji..." : "Kontrola receptu"}</span>
-                        </button>
-                        <button
-                          onClick={startEditingRecipe}
-                          className="bg-white border border-[#1B4332] text-[#1B4332] hover:bg-emerald-50 font-bold py-2 px-4 rounded-xl shadow-xs hover:shadow-xs transition-all flex items-center gap-2 text-sm cursor-pointer"
-                        >
-                          <Sparkles className="h-4 w-4" />
-                          <span>Upravit recept</span>
-                        </button>
-                      </>
-                    )}
-
-                    <button
-                      onClick={() => setShowPaperView(true)}
-                      className="bg-[#2D6A4F] hover:bg-[#1B4332] text-white font-bold py-2 px-4 rounded-xl shadow-xs hover:shadow-md transition-all flex items-center gap-2 text-sm cursor-pointer"
-                    >
-                      <BookOpen className="h-4 w-4" />
-                      <span>Zobrazit recept</span>
-                    </button>
-
-                    <button
-                      onClick={() => setShowExportView(true)}
-                      className="bg-[#FFFBEB] hover:bg-[#FEF3C7] text-[#B45309] border border-[#FDE68A] font-bold py-2 px-4 rounded-xl shadow-xs hover:shadow-xs transition-all flex items-center gap-2 text-sm cursor-pointer"
-                      title="Export kuchařského receptu pro tisk, kopírování, TXT nebo PDF archivaci"
-                    >
-                      <FileText className="h-4 w-4 text-[#D97706]" />
-                      <span>export receptu</span>
-                    </button>
-                    
-                    {isAdmin && (
-                      <button
-                        id={`btn-delete-recipe-detail-${selectedRecipe.id}`}
-                        onClick={(e) => handleDeleteRecipe(selectedRecipe.id, e)}
-                        className="bg-slate-100 hover:bg-red-50 text-slate-600 hover:text-red-600 border border-slate-200 hover:border-red-100 font-semibold p-2 rounded-xl transition-all cursor-pointer"
-                        title="Smazat recept"
-                      >
-                        <Trash2 className="h-4.5 w-4.5" />
-                      </button>
-                    )}
-                  </div>
-                </div>
 
                 {isEditing ? (
                   /* 2B. EDIT RECIPE CARD SYSTEM */
@@ -3563,11 +3570,9 @@ ${separator}`;
                             onChange={(e) => setEditCategory(e.target.value)}
                             className="w-full text-sm p-3 border border-[#E8E8E1] rounded-lg bg-[#FDFCF7] text-[#2C2C2C] focus:outline-hidden focus:ring-1 focus:ring-[#1B4332]"
                           >
-                            <option value="Maso">Maso</option>
-                            <option value="Pečivo">Pečivo</option>
-                            <option value="Polévky">Polévky</option>
-                            <option value="Sladká jídla a moučníky">Sladká jídla a moučníky</option>
-                            <option value="Ostatní">Ostatní</option>
+                            {allUsedCategories.map(cat => (
+                              <option key={cat} value={cat}>{cat}</option>
+                            ))}
                           </select>
                         </div>
 
@@ -4335,124 +4340,159 @@ ${separator}`;
               </motion.article>
             ) : (
               
-              /* 3. INPUT PORTAL: NOVÝ RECEPT */
+              /* 3. UNIVERSAL HOME SCREEN (DOMOVSKÁ OBRAZOVKA) */
               <motion.div
                 key="input-portal"
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -15 }}
                 transition={{ duration: 0.2 }}
-                className="max-w-3xl mx-auto space-y-6"
+                className="max-w-3xl mx-auto space-y-8 pb-10"
               >
-                {!isAdmin ? (
-                  !isStudioEnv ? (
-                    /* Elegant read-only Welcome Screen for normal visitors */
-                    <div className="bg-white border border-[#E8E8E1] rounded-2xl p-8 text-center space-y-6 shadow-md max-w-xl mx-auto my-8">
-                      <div className="mx-auto w-16 h-16 bg-amber-50 rounded-full flex items-center justify-center text-[#2D6A4F] border border-amber-100">
-                        <ChefHat className="w-8 h-8 animate-bounce-subtle" />
-                      </div>
-                      
-                      <div className="space-y-3">
-                        <h3 className="font-serif italic font-bold text-2xl text-[#1B4332]">
-                          Vítejte v AI Kuchařce
-                        </h3>
-                        <p className="text-sm text-[#4A4A40] leading-relaxed font-semibold">
-                          Vyberte si prosím některý z našich skvělých receptů v levém menu a objevte kouzlo vědecky podložené a technologicky vyladěné gastronomie!
-                        </p>
-                        <p className="text-xs text-slate-500 leading-relaxed">
-                          Všechny recepty jsou ověřeny pěti pilíři moderní kulinářské vědy a sestaveny zcela bez konzervantů či barviv. Každý krok obsahuje přesně odměřené hmotnosti a objemy surovin přímo v popisu, abyste při vaření nikdy nemuseli tápat.
-                        </p>
-                      </div>
-
-                      <div className="pt-4 border-t border-slate-100 grid grid-cols-2 gap-4 text-left">
-                        <div className="p-3 bg-[#FDFCF7] border border-[#E8E8E1] rounded-xl">
-                          <span className="block text-[10px] text-[#9A9A8C] uppercase font-bold tracking-wider">Mistrovská technika</span>
-                          <span className="text-xs text-[#4A4A40] mt-1 block font-medium">Fyzikálně optimalizované časy a teploty tepelné úpravy.</span>
-                        </div>
-                        <div className="p-3 bg-[#FDFCF7] border border-[#E8E8E1] rounded-xl">
-                          <span className="block text-[10px] text-[#9A9A8C] uppercase font-bold tracking-wider">Bez konzervantů</span>
-                          <span className="text-xs text-[#4A4A40] mt-1 block font-medium">100% přírodní suroviny a poctivé domácí postupy.</span>
-                        </div>
-                      </div>
+                {/* HERO WELCOME BANNER & DESCRIPTION */}
+                <div className="bg-white border border-[#E8E8E1] rounded-2xl p-8 sm:p-10 text-center space-y-6 shadow-sm max-w-2xl mx-auto my-4 relative overflow-hidden">
+                  <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-emerald-600 via-amber-500 to-emerald-700" />
+                  
+                  <div className="mx-auto w-18 h-18 bg-emerald-50 rounded-full flex items-center justify-center text-[#2D6A4F] border border-emerald-100/60 shadow-xs">
+                    <ChefHat className="w-10 h-10 animate-bounce-subtle" />
+                  </div>
+                  
+                  <div className="space-y-4">
+                    <span className="inline-block text-[10px] font-bold tracking-widest uppercase bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full">
+                      Vědecky ověřené kulinářské umění
+                    </span>
+                    <h3 className="font-serif italic font-extrabold text-3xl text-[#1B4332] tracking-tight">
+                      Vítejte v AI Kuchařce
+                    </h3>
+                    <p className="text-sm text-[#4A4A40] leading-relaxed font-semibold max-w-lg mx-auto">
+                      Váš inteligentní kulinářský asistent, který propojuje moderní vědu (Food Science) s poctivou, 100% přírodní domácí kuchyní.
+                    </p>
+                    <div className="text-xs text-slate-500 leading-relaxed max-w-xl mx-auto space-y-3 pt-2 text-justify sm:text-center">
+                      <p>
+                        <strong>AI Kuchařka</strong> slouží k precizní úpravě a optimalizaci receptů. 
+                        Na rozdíl od běžných receptářů, každý pokrm zde prochází přísným rozborem kulinářské chemie a fyziky. 
+                        Zásadně se vyhýbáme jakékoli průmyslové chemii, polotovarům či konzervantům.
+                      </p>
+                      <p>
+                        Každý krok postupu je navržen tak, aby byl maximálně srozumitelný. Ingredience jsou propočítávány 
+                        v reálném čase a jejich přesné gramáže, objemy či kusy vidíte <strong>přímo v textu konkrétního kroku</strong>, 
+                        takže nemusíte neustále přebíhat očima nahoru k seznamu surovin.
+                      </p>
                     </div>
-                  ) : (
-                    /* Admin/API key Lock Screen (Only in AI Google Studio) */
-                    <div className="bg-white border border-[#E8E8E1] rounded-2xl p-8 text-center space-y-6 shadow-md max-w-xl mx-auto my-8">
-                      <div className="mx-auto w-16 h-16 bg-amber-50 rounded-full flex items-center justify-center text-amber-600 border border-amber-100">
-                        <Lock className="w-8 h-8 animate-bounce-subtle" />
+                  </div>
+                </div>
+
+                {/* METODIKA STABILNÍHO VAŘENÍ (PĚT PILÍŘŮ AI KUCHAŘKY) */}
+                <div className="bg-white border border-[#E8E8E1] rounded-2xl p-6 sm:p-8 space-y-5 shadow-xs">
+                  <div className="space-y-1.5">
+                    <h4 className="font-serif italic font-bold text-xl text-[#1B4332] flex items-center gap-2">
+                      <Globe className="h-5.5 w-5.5 text-[#D97706]" />
+                      <span>Jak to funguje? (Pět pilířů technologie)</span>
+                    </h4>
+                    <p className="text-xs text-[#5C5C50] leading-relaxed font-medium">
+                      Prostřednictvím umělé inteligence prochází každý recept komplexní syntézou, která garantuje úspěch bez ohledu na úroveň vašich zkušeností:
+                    </p>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="bg-[#FDFCF7] p-4.5 rounded-xl border border-[#E8E8E1] space-y-1.5">
+                      <div className="flex items-center gap-2 text-xs font-bold text-[#1B4332] font-serif">
+                        <span className="bg-[#1B4332] text-white w-5.5 h-5.5 rounded-full flex items-center justify-center text-[11px] shrink-0">1</span>
+                        <span>Food Science (Chemie jídla)</span>
                       </div>
-                      
-                      <div className="space-y-2">
-                        <h3 className="font-serif italic font-bold text-xl text-[#1B4332]">
-                          Přidávání nových receptů je zabezpečeno
-                        </h3>
-                        <p className="text-sm text-[#4A4A40] leading-relaxed">
-                          Chcete-li generovat a vkládat nové AI recepty (ověřené <strong>pěti pilíři gastrotechnologie</strong> a zcela bez konzervantů), musíte se nejprve přihlásit administračním / API klíčem.
-                        </p>
-                      </div>
-
-                      <form
-                        onSubmit={async (e) => {
-                          e.preventDefault();
-                          await handleLoginWithPassword(adminPassword);
-                        }}
-                        className="space-y-4 pt-2 text-left"
-                      >
-                        <div className="space-y-1.5">
-                          <label className="block text-xs font-extrabold text-[#1B4332] uppercase tracking-wider">
-                            Administrační / API klíč:
-                          </label>
-                          <div className="relative">
-                            <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
-                              <Key className="w-4 h-4" />
-                            </span>
-                            <input
-                              type="password"
-                              placeholder="Zadejte administrační kód nebo API klíč..."
-                              value={adminPassword}
-                              onChange={(e) => {
-                                setAdminPassword(e.target.value);
-                                setLoginError(null);
-                              }}
-                              className="w-full text-sm pl-10 pr-4 py-3 border border-[#E8E8E1] rounded-xl focus:outline-hidden focus:ring-1 focus:ring-[#1B4332] focus:border-[#1B4332] bg-[#FDFCF7] text-[#2C2C2C] placeholder-[#9A9A8C]"
-                            />
-                          </div>
-                        </div>
-
-                        {loginError && (
-                          <div className="bg-red-50 border border-red-100 text-red-800 text-xs py-2 px-3 rounded-lg flex items-center gap-2">
-                            <AlertCircle className="h-4 w-4 text-red-600 shrink-0" />
-                            <span>{loginError}</span>
-                          </div>
-                        )}
-
-                        <button
-                          type="submit"
-                          disabled={isLoginLoading}
-                          className="w-full bg-[#D97706] hover:bg-[#C26405] disabled:bg-amber-800/40 active:scale-95 text-white font-bold py-3.5 px-6 rounded-xl transition-all shadow-sm hover:shadow-md flex items-center justify-center gap-2 cursor-pointer"
-                        >
-                          {isLoginLoading ? (
-                            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                          ) : (
-                            <LogIn className="w-4.5 h-4.5 text-amber-200" />
-                          )}
-                          <span>{isLoginLoading ? "Ověřování..." : "Ověřit a pokračovat k zadání"}</span>
-                        </button>
-                      </form>
+                      <p className="text-[11px] text-[#5C5C50] leading-relaxed">
+                        Propočítává přesné fyzikální teploty pro optimální rozklad kolagenu v mase a želatinizaci škrobů v omáčkách. Výsledkem je dokonale šťavnaté jídlo.
+                      </p>
                     </div>
-                  )
-                ) : (
-                  <>
+
+                    <div className="bg-[#FDFCF7] p-4.5 rounded-xl border border-[#E8E8E1] space-y-1.5">
+                      <div className="flex items-center gap-2 text-xs font-bold text-[#1B4332] font-serif">
+                        <span className="bg-[#1B4332] text-white w-5.5 h-5.5 rounded-full flex items-center justify-center text-[11px] shrink-0">2</span>
+                        <span>Culinary Masterclass (Praxe)</span>
+                      </div>
+                      <p className="text-[11px] text-[#5C5C50] leading-relaxed">
+                        Převádí složité techniky z michelinských restaurací do jednoduchých a snadno popsatelných manuálních úkonů pro domácí kuchyni.
+                      </p>
+                    </div>
+
+                    <div className="bg-[#FDFCF7] p-4.5 rounded-xl border border-[#E8E8E1] space-y-1.5">
+                      <div className="flex items-center gap-2 text-xs font-bold text-[#1B4332] font-serif">
+                        <span className="bg-[#1B4332] text-white w-5.5 h-5.5 rounded-full flex items-center justify-center text-[11px] shrink-0">3</span>
+                        <span>Analýza chuťových poměrů (Data)</span>
+                      </div>
+                      <p className="text-[11px] text-[#5C5C50] leading-relaxed">
+                        Porovnává a ladí poměry koření, solí a kyselin na základě tisíců úspěšných gastronomických receptur pro plnou, hlubokou chuť.
+                      </p>
+                    </div>
+
+                    <div className="bg-[#FDFCF7] p-4.5 rounded-xl border border-[#E8E8E1] space-y-1.5">
+                      <div className="flex items-center gap-2 text-xs font-bold text-[#1B4332] font-serif">
+                        <span className="bg-[#1B4332] text-white w-5.5 h-5.5 rounded-full flex items-center justify-center text-[11px] shrink-0">4</span>
+                        <span>Eliminace chyb amatérů (Prevence)</span>
+                      </div>
+                      <p className="text-[11px] text-[#5C5C50] leading-relaxed">
+                        Identifikuje kritické body, na kterých lidé nejčastěji pohoří (např. sražení omáčky, vysušení drůbeže) a předchází jim jasným varováním.
+                      </p>
+                    </div>
+
+                    <div className="bg-[#FDFCF7] p-4.5 rounded-xl border border-[#E8E8E1] space-y-1.5 md:col-span-2">
+                      <div className="flex items-center gap-2 text-xs font-bold text-[#1B4332] font-serif">
+                        <span className="bg-[#1B4332] text-white w-5.5 h-5.5 rounded-full flex items-center justify-center text-[11px] shrink-0">5</span>
+                        <span>Optimalizace moderních spotřebičů</span>
+                      </div>
+                      <p className="text-[11px] text-[#5C5C50] leading-relaxed">
+                        Přizpůsobuje receptury pro horkovzdušné fritézy, domácí pekárny, pomalé hrnce a roboty (Thermomix), čímž ušetří spoustu času i energie.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* RYCHLÝ PRŮVODCE PRO UŽIVATELE */}
+                <div className="bg-white border border-[#E8E8E1] rounded-2xl p-6 sm:p-8 space-y-5 shadow-xs">
+                  <h4 className="font-serif italic font-bold text-xl text-[#1B4332] flex items-center gap-2">
+                    <Sparkles className="h-5.5 w-5.5 text-emerald-600" />
+                    <span>Průvodce: Jak pracovat s kuchařkou?</span>
+                  </h4>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-left">
+                    <div className="p-4 bg-[#FDFCF7] border border-[#E8E8E1] rounded-xl space-y-1">
+                      <span className="block text-[10px] text-[#9A9A8C] uppercase font-black tracking-widest">Krok 1</span>
+                      <span className="font-serif font-bold text-sm text-[#1B4332] block">Vyberte si pokrm</span>
+                      <p className="text-xs text-[#5C5C50] leading-relaxed mt-1">
+                        V levém menu najdete přehledný seznam receptů rozdělených do kategorií. Klikněte na jakýkoli recept pro okamžité zobrazení detailů.
+                      </p>
+                    </div>
+
+                    <div className="p-4 bg-[#FDFCF7] border border-[#E8E8E1] rounded-xl space-y-1">
+                      <span className="block text-[10px] text-[#9A9A8C] uppercase font-black tracking-widest">Krok 2</span>
+                      <span className="font-serif font-bold text-sm text-[#1B4332] block">Upravte počet porcí</span>
+                      <p className="text-xs text-[#5C5C50] leading-relaxed mt-1">
+                        V detailu receptu můžete dynamicky měnit počet porcí. Všechny suroviny se bleskově přepočítají v seznamu i přímo v postupu přípravy.
+                      </p>
+                    </div>
+
+                    <div className="p-4 bg-[#FDFCF7] border border-[#E8E8E1] rounded-xl space-y-1">
+                      <span className="block text-[10px] text-[#9A9A8C] uppercase font-black tracking-widest">Krok 3</span>
+                      <span className="font-serif font-bold text-sm text-[#1B4332] block">Vytiskněte nebo sdílejte</span>
+                      <p className="text-xs text-[#5C5C50] leading-relaxed mt-1">
+                        Využijte tlačítko tisku pro zobrazení čisté tiskové šablony k vaření bez otisků prstů na displeji, nebo exportujte celý recept jako text.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* ZÓNA PRO ADMINISTRÁTORY (TVORBA NOVÝCH RECEPTŮ) */}
+                {isAdmin ? (
+                  <div className="space-y-4 animate-fade-in">
                     {/* Welcome Card Info */}
                     <div className="bg-gradient-to-r from-[#F0F4F1] to-[#FDFCF7] border border-[#2D6A4F]/20 rounded-2xl p-6 flex flex-col sm:flex-row gap-4 items-start sm:items-center shadow-xs">
-                      <div className="p-3 bg-[#1B4332] rounded-xl text-white self-start sm:self-center">
+                      <div className="p-3 bg-[#1B4332] rounded-xl text-white self-start sm:self-center shrink-0">
                         <Sparkles className="h-6 w-6" />
                       </div>
                       <div className="space-y-1">
-                        <h3 className="font-serif italic font-bold text-lg text-[#1B4332] leading-snug">Vítejte v AI Kuchařce!</h3>
-                        <p className="text-sm text-[#4A4A40] leading-relaxed">
-                          Vložte jakýkoli neuspořádaný recept, vyfocené notesy, kuchařku v PDF nebo jen seznam zbytků v lednici. 
-                          Prášek food science a profesionální barvy kuchařského inženýrství z něj obratem vytvoří špičkový gastronomický návod.
+                        <h3 className="font-serif italic font-bold text-lg text-[#1B4332] leading-snug">Administrátorský panel tvorby</h3>
+                        <p className="text-xs text-[#4A4A40] leading-relaxed">
+                          Jste přihlášeni jako Administrátor. Vložte jakýkoli neuspořádaný recept, vyfocený kuchařský zápisník, nebo PDF a nechte umělou inteligenci sestavit precizní recept.
                         </p>
                       </div>
                     </div>
@@ -4463,7 +4503,7 @@ ${separator}`;
                       className="bg-white border border-[#E8E8E1] rounded-2xl shadow-sm overflow-hidden p-6 sm:p-8 space-y-5"
                     >
                       <div className="space-y-2">
-                        <label className="block text-sm font-bold text-[#1B4332] uppercase tracking-wider">
+                        <label className="block text-xs font-bold text-[#1B4332] uppercase tracking-wider">
                           Vložte chaotický text receptu k opravě a syntéze
                         </label>
                         <textarea
@@ -4477,7 +4517,7 @@ ${separator}`;
 
                       {/* Multimodal Drag-and-Drop Area */}
                       <div className="space-y-2">
-                        <label className="block text-sm font-bold text-[#1B4332] uppercase tracking-wider">
+                        <label className="block text-xs font-bold text-[#1B4332] uppercase tracking-wider">
                           Nahrát fotku receptu nebo PDF dokument (Volitelné)
                         </label>
                         
@@ -4550,7 +4590,7 @@ ${separator}`;
                         <button
                           type="submit"
                           disabled={isLoading}
-                          className="w-full bg-[#D97706] hover:bg-[#C26405] disabled:bg-slate-300 disabled:cursor-not-allowed active:scale-[0.99] text-white font-bold py-3.5 px-6 rounded-lg shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
+                          className="w-full bg-[#D97706] hover:bg-[#C26405] disabled:bg-slate-300 disabled:cursor-not-allowed active:scale-[0.99] text-white font-bold py-3.5 px-6 rounded-lg shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer text-sm"
                         >
                           <Sparkles className="h-5 w-5" />
                           <span>Vylepšit můj recept (5 pilířů AI)</span>
@@ -4560,70 +4600,74 @@ ${separator}`;
                         </p>
                       </div>
                     </form>
-
-                    {/* Scientific Pillars Documentation Card */}
-                    <div className="bg-white border border-[#E8E8E1] rounded-2xl p-6 sm:p-8 space-y-4 shadow-xs">
-                      <h4 className="font-serif italic font-bold text-lg text-[#1B4332] flex items-center gap-2">
-                        <Globe className="h-5 w-5 text-[#D97706]" />
-                        <span>Metodika stabilního vaření (Pět pilířů AI Kuchařky)</span>
-                      </h4>
-                      <p className="text-xs text-[#5C5C50] leading-relaxed font-medium">
-                        Každý recept prochází komplexním syntetickým zpracováním, které zajišťuje, že se pokrm úspěšně podaří bez ohledu na úroveň vašich zkušeností:
-                      </p>
-                      
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="bg-[#FDFCF7] p-4 rounded-xl border border-[#E8E8E1] space-y-1">
-                          <div className="flex items-center gap-1.5 text-xs font-bold text-[#1B4332] font-serif">
-                            <span className="bg-[#1B4332] text-white w-5 h-5 rounded-full flex items-center justify-center text-[10px]">1</span>
-                            <span>Food Science (Chemie jídla)</span>
-                          </div>
-                          <p className="text-[10px] text-[#5C5C50] leading-relaxed">
-                            Propočítává správné teploty pro optimální rozložení kolagenu v mase a škrobů v omáčkách tak, aby jídlo bylo šťavnaté.
-                          </p>
-                        </div>
-
-                        <div className="bg-[#FDFCF7] p-4 rounded-xl border border-[#E8E8E1] space-y-1">
-                          <div className="flex items-center gap-1.5 text-xs font-bold text-[#1B4332] font-serif">
-                            <span className="bg-[#1B4332] text-white w-5 h-5 rounded-full flex items-center justify-center text-[10px]">2</span>
-                            <span>Culinary Masterclass (Praxe)</span>
-                          </div>
-                          <p className="text-[10px] text-[#5C5C50] leading-relaxed">
-                            Zjednodušuje haute-cuisine techniky mistrů šéfkuchařů do snadno replikovatelných manuálních postupů.
-                          </p>
-                        </div>
-
-                        <div className="bg-[#FDFCF7] p-4 rounded-xl border border-[#E8E8E1] space-y-1">
-                          <div className="flex items-center gap-1.5 text-xs font-bold text-[#1B4332] font-serif">
-                            <span className="bg-[#1B4332] text-white w-5 h-5 rounded-full flex items-center justify-center text-[10px]">3</span>
-                            <span>Analýza poměrů (Data)</span>
-                          </div>
-                          <p className="text-[10px] text-[#5C5C50] leading-relaxed">
-                            Agreguje kořenící a objemové modely tisíců receptur z databází k docílení vyvážené, bohaté chuti.
-                          </p>
-                        </div>
-
-                        <div className="bg-[#FDFCF7] p-4 rounded-xl border border-[#E8E8E1] space-y-1">
-                          <div className="flex items-center gap-1.5 text-xs font-bold text-[#1B4332] font-serif">
-                            <span className="bg-[#1B4332] text-white w-5 h-5 rounded-full flex items-center justify-center text-[10px]">4</span>
-                            <span>Eliminace chyb amatérů</span>
-                          </div>
-                          <p className="text-[10px] text-[#5C5C50] leading-relaxed">
-                            Skenuje diskuzní kuchyňská fóra k vypíchnutí kroků, na kterých lidé nejčastěji pohoří (např. sražení, vysušení).
-                          </p>
-                        </div>
-
-                        <div className="bg-[#FDFCF7] p-4 rounded-xl border border-[#E8E8E1] space-y-1 md:col-span-2">
-                          <div className="flex items-center gap-1.5 text-xs font-bold text-[#1B4332] font-serif">
-                            <span className="bg-[#1B4332] text-white w-5 h-5 rounded-full flex items-center justify-center text-[10px]">5</span>
-                            <span>Optimalizace moderních spotřebičů</span>
-                          </div>
-                          <p className="text-[10px] text-[#5C5C50] leading-relaxed">
-                            Přizpůsobuje receptury pro horkovzdušné fritézy, domácí pekárny, pomalé hrnce a roboty (Thermomix), čímž ušetří spoustu času i energie.
-                          </p>
-                        </div>
+                  </div>
+                ) : (
+                  isStudioEnv && (
+                    /* Admin/API key Lock Screen (Only visible in AI Studio Dev Environment for authorization) */
+                    <div className="bg-white border border-[#E8E8E1] rounded-2xl p-8 text-center space-y-6 shadow-md max-w-xl mx-auto my-4">
+                      <div className="mx-auto w-16 h-16 bg-amber-50 rounded-full flex items-center justify-center text-amber-600 border border-amber-100">
+                        <Lock className="w-8 h-8 animate-bounce-subtle" />
                       </div>
+                      
+                      <div className="space-y-2">
+                        <h3 className="font-serif italic font-bold text-xl text-[#1B4332]">
+                          Přidávání nových receptů je zabezpečeno
+                        </h3>
+                        <p className="text-xs text-[#4A4A40] leading-relaxed">
+                          Pro generování nových AI receptů se nejprve přihlaste administračním kódem nebo API klíčem.
+                        </p>
+                      </div>
+
+                      <form
+                        onSubmit={async (e) => {
+                          e.preventDefault();
+                          await handleLoginWithPassword(adminPassword);
+                        }}
+                        className="space-y-4 pt-2 text-left"
+                      >
+                        <div className="space-y-1.5">
+                          <label className="block text-xs font-extrabold text-[#1B4332] uppercase tracking-wider">
+                            Administrační / API klíč:
+                          </label>
+                          <div className="relative">
+                            <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
+                              <Key className="w-4 h-4" />
+                            </span>
+                            <input
+                              type="password"
+                              placeholder="Zadejte administrační kód nebo API klíč..."
+                              value={adminPassword}
+                              onChange={(e) => {
+                                setAdminPassword(e.target.value);
+                                setLoginError(null);
+                              }}
+                              className="w-full text-sm pl-10 pr-4 py-3 border border-[#E8E8E1] rounded-xl focus:outline-hidden focus:ring-1 focus:ring-[#1B4332] focus:border-[#1B4332] bg-[#FDFCF7] text-[#2C2C2C] placeholder-[#9A9A8C]"
+                            />
+                          </div>
+                        </div>
+
+                        {loginError && (
+                          <div className="bg-red-50 border border-red-100 text-red-800 text-xs py-2 px-3 rounded-lg flex items-center gap-2">
+                            <AlertCircle className="h-4 w-4 text-red-600 shrink-0" />
+                            <span>{loginError}</span>
+                          </div>
+                        )}
+
+                        <button
+                          type="submit"
+                          disabled={isLoginLoading}
+                          className="w-full bg-[#D97706] hover:bg-[#C26405] disabled:bg-amber-800/40 active:scale-95 text-white font-bold py-3.5 px-6 rounded-xl transition-all shadow-sm hover:shadow-md flex items-center justify-center gap-2 cursor-pointer text-xs"
+                        >
+                          {isLoginLoading ? (
+                            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                          ) : (
+                            <LogIn className="w-4.5 h-4.5 text-amber-200" />
+                          )}
+                          <span>{isLoginLoading ? "Ověřování..." : "Ověřit a pokračovat k zadání"}</span>
+                        </button>
+                      </form>
                     </div>
-                  </>
+                  )
                 )}
 
               </motion.div>
@@ -4632,6 +4676,250 @@ ${separator}`;
           
         </main>
       </div>
+
+      {/* ADMINISTRÁTORSKÝ STATUS PANEL (PŘESUNUTÝ NA SPODEK APLIKACE) */}
+      {isAdmin && (
+        <div className="no-print bg-emerald-50/90 border-t border-b border-emerald-200/80 py-6 px-6 text-emerald-800">
+          <div className="max-w-[1600px] mx-auto space-y-6">
+            
+            {/* Top Bar: Controls */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-emerald-200/50">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2 text-base font-bold uppercase tracking-wider text-emerald-950 font-serif">
+                  <Check className="h-5 w-5 shrink-0 text-emerald-600" />
+                  <span>Administrace AI Kuchařky</span>
+                </div>
+                <p className="text-xs leading-relaxed opacity-95 text-emerald-900 font-medium">
+                  Máte plný přístup ke správě receptů, synchronizaci i diagnostice. Změny se ukládají automaticky online.
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveTab("github");
+                    setShowLoginModal(true);
+                  }}
+                  className="text-xs bg-indigo-100 hover:bg-indigo-200 text-indigo-800 px-4 py-2 rounded-xl font-bold transition-all cursor-pointer shadow-xs flex items-center gap-1.5"
+                  title="Nastavení připojení k GitHubu"
+                >
+                  ⚙️ Nastavení GitHubu
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowCategoryEditorModal(true);
+                  }}
+                  className="text-xs bg-amber-100 hover:bg-amber-200 text-amber-800 px-4 py-2 rounded-xl font-bold transition-all cursor-pointer shadow-xs flex items-center gap-1.5"
+                  title="Editor kategorií"
+                >
+                  📁 Správa kategorií
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsAdmin(false);
+                    setAdminPassword("");
+                    localStorage.removeItem("admin_password_token");
+                  }}
+                  className="text-xs bg-red-100 hover:bg-red-200 text-red-800 px-4 py-2 rounded-xl font-bold transition-all cursor-pointer shadow-xs"
+                >
+                  Odhlásit se z administrace
+                </button>
+              </div>
+            </div>
+
+            {/* Grid Area: Sync & Diagnostics */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 pt-1">
+              
+              {/* Column 1: GitHub Synchronization */}
+              <div className="space-y-3 bg-white/40 p-5 rounded-2xl border border-emerald-200/40">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-emerald-950 uppercase tracking-wider flex items-center gap-1.5">
+                    🐙 GitHub Synchronizace
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleManualGithubSync}
+                    disabled={isManualSyncing}
+                    className="text-xs bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-300 text-white font-bold py-2 px-4 rounded-xl transition-all cursor-pointer flex items-center gap-2 shrink-0 shadow-sm"
+                  >
+                    {isManualSyncing ? (
+                      <>
+                        <RefreshCw className="h-3.5 w-3.5 animate-spin" />
+                        <span>Synchronizuji...</span>
+                      </>
+                    ) : (
+                      <>
+                        <GitBranch className="h-3.5 w-3.5" />
+                        <span>Synchronizovat s GitHubem</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+
+                {manualSyncResult && (
+                  <div className={`p-4 rounded-xl text-xs border ${
+                    manualSyncResult.success 
+                      ? "bg-emerald-100 border-emerald-200 text-emerald-900 animate-scale-up" 
+                      : "bg-red-100 border-red-200 text-red-950 animate-scale-up"
+                  }`}>
+                    <p className="font-semibold leading-normal">{manualSyncResult.message}</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Column 2: System Diagnostics */}
+              <div className="space-y-3 bg-white/40 p-5 rounded-2xl border border-emerald-200/40">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-emerald-950 uppercase tracking-wider flex items-center gap-1.5">
+                    🛠 Diagnostika systému
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={handleRunDiagnostics}
+                      disabled={isDiagnosing}
+                      className="text-xs bg-emerald-600 hover:bg-emerald-700 disabled:bg-[#A3E635]/15 disabled:text-[#1B4332]/60 text-white font-bold py-2 px-4 rounded-xl transition-all cursor-pointer flex items-center gap-1.5 shrink-0 shadow-sm"
+                    >
+                      {isDiagnosing ? (
+                        <>
+                          <RefreshCw className="h-3.5 w-3.5 animate-spin" />
+                          <span>Spouštím testy...</span>
+                        </>
+                      ) : (
+                        <>
+                          <RefreshCw className="h-3.5 w-3.5" />
+                          <span>Spustit diagnostiku</span>
+                        </>
+                      )}
+                    </button>
+                    {isDiagnosing && (
+                      <button
+                        type="button"
+                        onClick={handleStopDiagnostics}
+                        className="text-xs bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-3.5 rounded-xl transition-all cursor-pointer flex items-center gap-1.5 shrink-0 shadow-xs"
+                        title="Zastavit diagnostiku"
+                      >
+                        <Square className="h-3 w-3 fill-current" />
+                        <span>Zastavit</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* PROGRESS WINDOW FOR DIAGNOSTICS */}
+                {isDiagnosing && (
+                  <div className="p-4 bg-white border border-emerald-100 rounded-xl space-y-3 text-[#2c2c2c] shadow-xs animate-scale-up">
+                    <div className="flex items-center justify-between text-xs font-bold text-slate-700">
+                      <span className="truncate pr-1 text-slate-600">{diagnosticsProgressText}</span>
+                      <span className="font-mono text-emerald-700 shrink-0">{diagnosticsProgressPercent}%</span>
+                    </div>
+                    {/* Progress Bar */}
+                    <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                      <div
+                        className="bg-emerald-500 h-full transition-all duration-300"
+                        style={{ width: `${diagnosticsProgressPercent}%` }}
+                      />
+                    </div>
+                    {/* Step checklist */}
+                    <div className="grid grid-cols-2 gap-2 text-[11px] font-medium text-slate-500 pt-1.5 border-t border-slate-50">
+                      <div className={`flex items-center gap-1.5 ${diagnosticsStepIndex >= 0 ? 'text-emerald-800' : ''}`}>
+                        {diagnosticsStepIndex > 0 ? (
+                          <Check className="h-3 w-3 text-emerald-600 shrink-0" />
+                        ) : diagnosticsStepIndex === 0 ? (
+                          <RefreshCw className="h-3.5 w-3.5 text-emerald-600 animate-spin shrink-0" />
+                        ) : (
+                          <div className="h-1 w-1 rounded-full bg-slate-300 mx-1 shrink-0" />
+                        )}
+                        <span className={diagnosticsStepIndex === 0 ? 'font-bold' : ''}>1. Inicializace</span>
+                      </div>
+                      <div className={`flex items-center gap-1.5 ${diagnosticsStepIndex >= 1 ? 'text-emerald-800' : ''}`}>
+                        {diagnosticsStepIndex > 1 ? (
+                          <Check className="h-3 w-3 text-emerald-600 shrink-0" />
+                        ) : diagnosticsStepIndex === 1 ? (
+                          <RefreshCw className="h-3.5 w-3.5 text-emerald-600 animate-spin shrink-0" />
+                        ) : (
+                          <div className="h-1 w-1 rounded-full bg-slate-300 mx-1 shrink-0" />
+                        )}
+                        <span className={diagnosticsStepIndex === 1 ? 'font-bold' : ''}>2. Test zápisu</span>
+                      </div>
+                      <div className={`flex items-center gap-1.5 ${diagnosticsStepIndex >= 2 ? 'text-emerald-800' : ''}`}>
+                        {diagnosticsStepIndex > 2 ? (
+                          <Check className="h-3 w-3 text-emerald-600 shrink-0" />
+                        ) : diagnosticsStepIndex === 2 ? (
+                          <RefreshCw className="h-3.5 w-3.5 text-emerald-600 animate-spin shrink-0" />
+                        ) : (
+                          <div className="h-1 w-1 rounded-full bg-slate-300 mx-1 shrink-0" />
+                        )}
+                        <span className={diagnosticsStepIndex === 2 ? 'font-bold' : ''}>3. Spojení s Gemini AI</span>
+                      </div>
+                      <div className={`flex items-center gap-1.5 ${diagnosticsStepIndex >= 3 ? 'text-emerald-800' : ''}`}>
+                        {diagnosticsStepIndex > 3 ? (
+                          <Check className="h-3 w-3 text-emerald-600 shrink-0" />
+                        ) : diagnosticsStepIndex === 3 ? (
+                          <RefreshCw className="h-3.5 w-3.5 text-emerald-600 animate-spin shrink-0" />
+                        ) : (
+                          <div className="h-1 w-1 rounded-full bg-slate-300 mx-1 shrink-0" />
+                        )}
+                        <span className={diagnosticsStepIndex === 3 ? 'font-bold' : ''}>4. Sestavení reportu</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {diagnosticsError && (
+                  <div className="p-3.5 bg-red-100/80 border border-red-200 rounded-xl text-xs text-red-800 space-y-1 animate-scale-up">
+                    <p className="font-bold">Chyba diagnostiky:</p>
+                    <p className="opacity-95 leading-normal">{diagnosticsError}</p>
+                  </div>
+                )}
+
+                {diagnosticsResult && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs animate-scale-up">
+                    {/* 1. WRITE PERMISSION */}
+                    <div className="p-3 bg-white border border-emerald-100 rounded-xl space-y-1 text-[#2c2c2c] shadow-xs">
+                      <div className="flex items-center justify-between font-bold">
+                        <span className="flex items-center gap-1">
+                          <Database className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+                          Souborový systém:
+                        </span>
+                        {diagnosticsResult.writePermissionOk ? (
+                          <span className="text-emerald-600 font-extrabold uppercase text-[10px]">OK</span>
+                        ) : (
+                          <span className="text-red-600 font-extrabold uppercase text-[10px]">CHYBA</span>
+                        )}
+                      </div>
+                      <p className="text-slate-600 text-[11px] leading-snug font-medium">
+                        {diagnosticsResult.writePermissionMessage}
+                      </p>
+                    </div>
+
+                    {/* 2. GEMINI AI */}
+                    <div className="p-3 bg-white border border-emerald-100 rounded-xl space-y-1 text-[#2c2c2c] shadow-xs">
+                      <div className="flex items-center justify-between font-bold">
+                        <span className="flex items-center gap-1">
+                          <Sparkles className="h-3.5 w-3.5 text-amber-500 shrink-0" />
+                          Gemini AI:
+                        </span>
+                        {diagnosticsResult.geminiOk ? (
+                          <span className="text-emerald-600 font-extrabold uppercase text-[10px]">OK</span>
+                        ) : (
+                          <span className="text-red-600 font-extrabold uppercase text-[10px]">CHYBA</span>
+                        )}
+                      </div>
+                      <p className="text-slate-600 text-[11px] leading-snug font-medium">
+                        {diagnosticsResult.geminiMessage}
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* FOOTER */}
       <footer className="no-print bg-white border-t border-[#E8E8E1] py-5 px-6 text-center text-xs text-[#9A9A8C] mt-auto">
@@ -4655,7 +4943,7 @@ ${separator}`;
                   Odhlásit se
                 </button>
               </div>
-            ) : (
+            ) : isStudioEnv ? (
               <button
                 type="button"
                 onClick={() => setShowLoginModal(true)}
@@ -4663,7 +4951,7 @@ ${separator}`;
               >
                 🔐 Administrátorské přihlášení
               </button>
-            )}
+            ) : null}
           </div>
 
           <div className="flex items-center gap-4">
@@ -5003,6 +5291,560 @@ ${separator}`;
                 </div>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* NÁKUPNÍ KOŠÍK MODAL */}
+      {isCartOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs no-print animate-fade-in">
+          <div className="bg-[#FDFCF7] border border-[#E8E8E1] rounded-2xl shadow-xl w-full max-w-lg max-h-[85vh] overflow-hidden flex flex-col">
+            {/* Header */}
+            <div className="bg-[#1B4332] p-5 text-white flex items-center justify-between shrink-0">
+              <div className="flex items-center gap-2">
+                <ShoppingBag className="h-5 w-5 text-[#52B788]" />
+                <h3 className="font-serif italic font-bold text-lg tracking-tight">
+                  Váš nákupní košík
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsCartOpen(false)}
+                className="text-white/80 hover:text-white hover:bg-white/10 p-1.5 rounded-lg transition-all cursor-pointer"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            {/* Quick Actions (Add current recipe ingredients) */}
+            {selectedRecipe && (
+              <div className="p-4 bg-emerald-50 border-b border-[#E8E8E1] flex items-center justify-between gap-3 shrink-0">
+                <div className="text-xs text-[#1B4332] font-semibold truncate max-w-[65%]">
+                  Otevřený recept: <span className="font-serif italic">{selectedRecipe.title}</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleAddRecipeToCart}
+                  className="bg-[#2D6A4F] hover:bg-[#1B4332] text-white text-xs font-bold py-1.5 px-3 rounded-lg transition-all cursor-pointer shadow-xs whitespace-nowrap flex items-center gap-1"
+                >
+                  <Plus className="h-3 w-3" />
+                  <span>Vložit vše</span>
+                </button>
+              </div>
+            )}
+
+            {/* Content list */}
+            <div className="flex-1 overflow-y-auto p-5 space-y-4">
+              {cartItems.length === 0 ? (
+                <div className="text-center py-10 space-y-3">
+                  <div className="mx-auto w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
+                    <ShoppingBag className="w-6 h-6" />
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-sm font-bold text-slate-700">Košík je prázdný</p>
+                    <p className="text-xs text-slate-500 max-w-xs mx-auto leading-relaxed">
+                      Přidejte suroviny přímo z detailu kteréhokoli receptu nebo si napište vlastní položky níže.
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-[10px] uppercase font-bold tracking-wider text-slate-400 border-b border-slate-100 pb-1.5">
+                    <span>Položka</span>
+                    <span>Stav</span>
+                  </div>
+                  <div className="space-y-1.5">
+                    {cartItems.map((item) => (
+                      <div
+                        key={item.id}
+                        className={`flex items-center justify-between p-3 rounded-xl border transition-all ${
+                          item.checked
+                            ? "bg-slate-50/50 border-slate-100 opacity-60 line-through text-slate-400"
+                            : "bg-white border-[#E8E8E1] hover:border-emerald-200/60 shadow-2xs"
+                        }`}
+                      >
+                        <div className="flex items-center gap-2.5 flex-1 min-w-0">
+                          <input
+                            type="checkbox"
+                            checked={item.checked}
+                            onChange={() => {
+                              setCartItems(prev =>
+                                prev.map(c => (c.id === item.id ? { ...c, checked: !c.checked } : c))
+                              );
+                            }}
+                            className="h-4.5 w-4.5 rounded-md border-[#E8E8E1] text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+                          />
+                          <span className="text-sm font-medium leading-normal break-words pr-2">
+                            {item.name}
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setCartItems(prev => prev.filter(c => c.id !== item.id));
+                          }}
+                          className="text-xs text-slate-400 hover:text-red-500 font-bold p-1 rounded-lg hover:bg-red-50/80 transition-all cursor-pointer shrink-0"
+                          title="Odebrat z košíku"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Add Custom Item Form */}
+            <div className="p-4 border-t border-[#E8E8E1] bg-[#F4F3EA] space-y-3 shrink-0">
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (!customCartItem.trim()) return;
+                  const newItem = {
+                    id: `custom-${Date.now()}`,
+                    name: customCartItem.trim(),
+                    checked: false
+                  };
+                  setCartItems(prev => [...prev, newItem]);
+                  setCustomCartItem("");
+                }}
+                className="flex gap-2"
+              >
+                <input
+                  type="text"
+                  placeholder="Přidat vlastní položku (např. 2ks vajec)..."
+                  value={customCartItem}
+                  onChange={(e) => setCustomCartItem(e.target.value)}
+                  className="flex-1 text-xs px-3 py-2 border border-[#E8E8E1] bg-white rounded-lg focus:outline-hidden focus:ring-1 focus:ring-[#1B4332] focus:border-[#1B4332] text-[#2C2C2C] placeholder-[#9A9A8C]"
+                />
+                <button
+                  type="submit"
+                  className="bg-[#2D6A4F] hover:bg-[#1B4332] text-white font-bold py-1.5 px-4 rounded-lg text-xs cursor-pointer transition-all shrink-0 shadow-2xs"
+                >
+                  Přidat
+                </button>
+              </form>
+
+              {cartItems.length > 0 && (
+                <div className="flex gap-2 justify-between pt-1 text-xs">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const text = cartItems
+                        .map(i => `${i.checked ? "[x]" : "[ ]"} ${i.name}`)
+                        .join("\n");
+                      navigator.clipboard.writeText(text);
+                      alert("Nákupní lístek byl zkopírován do schránky!");
+                    }}
+                    className="text-[#1B4332] hover:underline font-bold flex items-center gap-1 cursor-pointer"
+                  >
+                    <Copy className="h-3 w-3" />
+                    <span>Kopírovat seznam</span>
+                  </button>
+                  {confirmClearCart ? (
+                    <div className="flex items-center gap-2 bg-red-50 text-red-700 p-1 px-2 rounded-lg border border-red-100 animate-fade-in select-none">
+                      <span className="font-semibold text-[10px]">Vymazat košík?</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setCartItems([]);
+                          setConfirmClearCart(false);
+                        }}
+                        className="bg-red-600 hover:bg-red-700 text-white font-bold px-2 py-0.5 rounded text-[10px] transition-all cursor-pointer"
+                      >
+                        Ano
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setConfirmClearCart(false)}
+                        className="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-2 py-0.5 rounded text-[10px] transition-all cursor-pointer"
+                      >
+                        Ne
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setConfirmClearCart(true)}
+                      className="text-red-700 hover:underline font-bold flex items-center gap-1 cursor-pointer"
+                    >
+                      <Trash2 className="h-3 w-3" />
+                      <span>Vymazat vše</span>
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* KATEGORIE EDITOR MODAL */}
+      {showCategoryEditorModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs no-print animate-fade-in">
+          <div className="bg-[#FDFCF7] border border-[#E8E8E1] rounded-2xl shadow-xl w-full max-w-4xl max-h-[85vh] overflow-hidden flex flex-col">
+            {/* Header */}
+            <div className="bg-[#1B4332] p-5 text-white flex items-center justify-between shrink-0">
+              <div className="flex items-center gap-2">
+                <FolderOpen className="h-5 w-5 text-[#52B788]" />
+                <h3 className="font-bold text-lg tracking-tight">
+                  Editor kategorií receptů
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowCategoryEditorModal(false);
+                }}
+                className="text-white/80 hover:text-white hover:bg-white/10 p-1.5 rounded-lg transition-all cursor-pointer"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            {/* Navigation Tabs */}
+            <div className="flex border-b border-[#E8E8E1] bg-[#F4F3EA] px-4 pt-2 shrink-0">
+              <button
+                type="button"
+                onClick={() => {
+                  setCategoryEditorTab("by-category");
+                }}
+                className={`px-4 py-2 text-xs font-bold rounded-t-xl transition-all cursor-pointer ${
+                  categoryEditorTab === "by-category"
+                    ? "bg-[#FDFCF7] text-[#1B4332] border-t border-x border-[#E8E8E1] -mb-[1px]"
+                    : "text-slate-500 hover:text-slate-800"
+                }`}
+              >
+                📁 Podle kategorií
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setCategoryEditorTab("all-recipes");
+                }}
+                className={`px-4 py-2 text-xs font-bold rounded-t-xl transition-all cursor-pointer ${
+                  categoryEditorTab === "all-recipes"
+                    ? "bg-[#FDFCF7] text-[#1B4332] border-t border-x border-[#E8E8E1] -mb-[1px]"
+                    : "text-slate-500 hover:text-slate-800"
+                }`}
+              >
+                📋 Všechny recepty
+              </button>
+            </div>
+
+            {/* Content Area */}
+            <div className="p-6 overflow-y-auto flex-1 space-y-4">
+              
+              {/* Tab 1: By Category */}
+              {categoryEditorTab === "by-category" && (
+                <div className="space-y-4">
+                  {/* Create New Category Form */}
+                  <div className="bg-emerald-50/50 p-4 rounded-xl border border-emerald-100 flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between animate-fade-in">
+                    <div className="space-y-1">
+                      <h4 className="text-xs font-bold text-emerald-900 uppercase tracking-wider">Vytvořit vlastní kategorii</h4>
+                      <p className="text-[11px] text-emerald-800">Přidejte novou kategorii do seznamu a přiřaďte jí recepty.</p>
+                    </div>
+                    <div className="flex gap-2 shrink-0">
+                      <input
+                        type="text"
+                        value={newCustomCategoryName}
+                        onChange={(e) => setNewCustomCategoryName(e.target.value)}
+                        placeholder="Název (např. Saláty, Dezerty...)"
+                        className="px-3 py-2 bg-white border border-[#E8E8E1] rounded-lg text-xs focus:outline-hidden focus:ring-1 focus:ring-[#1B4332] w-48 sm:w-64"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const name = newCustomCategoryName.trim();
+                          if (name) {
+                            if (allUsedCategories.includes(name)) {
+                              alert(`Kategorie "${name}" již existuje.`);
+                            } else {
+                              if (deletedDefaultCategories.includes(name)) {
+                                setDeletedDefaultCategories(prev => prev.filter(c => c !== name));
+                              } else {
+                                setLocalCustomCategories(prev => [...prev, name]);
+                              }
+                              setNewCustomCategoryName("");
+                            }
+                          }
+                        }}
+                        className="px-4 py-2 bg-[#1B4332] hover:bg-[#153528] active:scale-95 text-white text-xs font-bold rounded-lg cursor-pointer transition-all shrink-0"
+                      >
+                        Přidat
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Grid of Categories */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {allUsedCategories.map(category => {
+                      const assignedRecipes = recipes.filter(r => (r.category || getRecipeCategory(r)) === category);
+                      const sortedAssigned = [...assignedRecipes].sort((a,b) => a.title.localeCompare(b.title, "cs"));
+                      
+                      return (
+                        <div key={category} className="bg-white border border-[#E8E8E1] rounded-xl p-4 flex flex-col min-h-[220px]">
+                          {/* Category Header */}
+                          <div className="flex items-center justify-between pb-2 border-b border-[#F4F3EA] mb-3 min-h-[36px]">
+                            {editingCategoryName === category ? (
+                              <div className="flex items-center gap-1.5 w-full">
+                                <span className="text-lg shrink-0">{getCategoryEmoji(category)}</span>
+                                <input
+                                  type="text"
+                                  value={editingCategoryValue}
+                                  onChange={(e) => setEditingCategoryValue(e.target.value)}
+                                  className="px-2 py-1 bg-white border border-[#E8E8E1] rounded text-xs font-semibold text-[#1B4332] w-full focus:outline-hidden focus:ring-1 focus:ring-[#1B4332]"
+                                  autoFocus
+                                  onKeyDown={(e) => {
+                                    if (e.key === "Enter") {
+                                      handleRenameCategory(category, editingCategoryValue);
+                                      setEditingCategoryName(null);
+                                    } else if (e.key === "Escape") {
+                                      setEditingCategoryName(null);
+                                    }
+                                  }}
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    handleRenameCategory(category, editingCategoryValue);
+                                    setEditingCategoryName(null);
+                                  }}
+                                  className="text-xs text-emerald-600 hover:text-emerald-800 font-bold p-1 hover:bg-emerald-50 rounded cursor-pointer shrink-0"
+                                  title="Uložit název"
+                                >
+                                  ✔
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setEditingCategoryName(null);
+                                  }}
+                                  className="text-xs text-slate-400 hover:text-slate-600 font-bold p-1 hover:bg-slate-50 rounded cursor-pointer shrink-0"
+                                  title="Zrušit"
+                                >
+                                  ✕
+                                </button>
+                              </div>
+                            ) : (
+                              <div className="flex items-center justify-between w-full">
+                                <div className="flex items-center gap-1.5 text-sm font-bold text-[#1B4332] min-w-0">
+                                  <span className="text-lg shrink-0">{getCategoryEmoji(category)}</span>
+                                  <span className="truncate" title={category}>{category}</span>
+                                  <span className="text-[10px] text-white bg-[#2D6A4F] px-1.5 py-0.5 rounded-full font-sans font-bold shrink-0">
+                                    {sortedAssigned.length}
+                                  </span>
+                                </div>
+                                
+                                <div className="flex items-center gap-1.5 shrink-0 ml-2">
+                                  {/* Edit Button */}
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setEditingCategoryName(category);
+                                      setEditingCategoryValue(category);
+                                    }}
+                                    className="text-[10px] text-[#2D6A4F] hover:text-[#1B4332] font-semibold cursor-pointer hover:underline flex items-center gap-0.5"
+                                    title="Přejmenovat kategorii"
+                                  >
+                                    ✏️ Přejmenovat
+                                  </button>
+                                  
+                                  {/* Delete Button */}
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      handleDeleteCategory(category);
+                                    }}
+                                    className="text-[10px] text-red-500 hover:text-red-700 font-semibold cursor-pointer hover:underline flex items-center gap-0.5"
+                                    title="Smazat kategorii"
+                                  >
+                                    🗑️ Smazat
+                                  </button>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Recipe List */}
+                          <div className="flex-1 space-y-1.5 overflow-y-auto max-h-48 pr-1 mb-3">
+                            {sortedAssigned.length === 0 ? (
+                              <div className="text-center py-6 text-xs text-[#9A9A8C] italic">
+                                Žádné recepty v této kategorii
+                              </div>
+                            ) : (
+                              sortedAssigned.map(recipe => (
+                                <div key={recipe.id} className="flex items-center justify-between p-1.5 hover:bg-[#FDFCF7] rounded-lg border border-transparent hover:border-[#E8E8E1] text-xs">
+                                  <span className="font-medium text-slate-700 truncate pr-2 max-w-[180px] sm:max-w-xs" title={recipe.title}>
+                                    {recipe.title}
+                                  </span>
+                                  <div className="flex items-center gap-2 shrink-0">
+                                    {/* Indicator for manual/auto */}
+                                    {recipe.category ? (
+                                      <span className="text-[9px] bg-amber-50 border border-amber-200 text-amber-800 px-1 py-0.2 rounded font-sans font-bold cursor-help shrink-0" title="Ručně přiřazená kategorie">
+                                        R
+                                      </span>
+                                    ) : (
+                                      <span className="text-[9px] bg-slate-50 border border-slate-200 text-slate-500 px-1 py-0.2 rounded font-sans font-bold cursor-help shrink-0" title="Automaticky odhadnutá kategorie">
+                                        A
+                                      </span>
+                                    )}
+
+                                    {/* Dropdown to move */}
+                                    <select
+                                      value={category}
+                                      onChange={(e) => {
+                                        const targetCat = e.target.value;
+                                        const updatedList = recipes.map(r => r.id === recipe.id ? { ...r, category: targetCat } : r);
+                                        saveRecipesToStorage(updatedList);
+                                      }}
+                                      className="text-[11px] p-1 bg-white border border-[#E8E8E1] rounded focus:outline-hidden focus:ring-1 focus:ring-[#1B4332] font-medium"
+                                    >
+                                      {allUsedCategories.map(cat => (
+                                        <option key={cat} value={cat}>{cat}</option>
+                                      ))}
+                                    </select>
+
+                                    {/* Reset to auto */}
+                                    {recipe.category && (
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          const updatedRecipe = { ...recipe };
+                                          delete updatedRecipe.category;
+                                          const updatedList = recipes.map(r => r.id === recipe.id ? updatedRecipe : r);
+                                          saveRecipesToStorage(updatedList);
+                                        }}
+                                        className="text-[11px] text-red-500 hover:text-red-700 font-bold p-1 hover:bg-red-50 rounded cursor-pointer shrink-0"
+                                        title="Obnovit na automatické přiřazení"
+                                      >
+                                        ✕
+                                      </button>
+                                    )}
+                                  </div>
+                                </div>
+                              ))
+                            )}
+                          </div>
+
+                          {/* Quick Assign Dropdown */}
+                          <div className="pt-2 border-t border-[#F4F3EA] mt-auto">
+                            <select
+                              value=""
+                              onChange={(e) => {
+                                const recipeId = e.target.value;
+                                if (!recipeId) return;
+                                const updatedList = recipes.map(r => r.id === recipeId ? { ...r, category: category } : r);
+                                saveRecipesToStorage(updatedList);
+                              }}
+                              className="w-full text-xs p-2 bg-white border border-dashed border-slate-300 hover:border-slate-400 rounded-lg text-slate-500 font-medium cursor-pointer"
+                            >
+                              <option value="">➕ Přidat recept do této kategorie...</option>
+                              {recipes
+                                .filter(r => (r.category || getRecipeCategory(r)) !== category)
+                                .sort((a,b) => a.title.localeCompare(b.title, "cs"))
+                                .map(r => (
+                                  <option key={r.id} value={r.id}>{r.title}</option>
+                                ))
+                              }
+                            </select>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Tab 2: All Recipes List */}
+              {categoryEditorTab === "all-recipes" && (
+                <div className="space-y-4">
+                  {/* Search box */}
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={categorySearchQuery}
+                      onChange={(e) => setCategorySearchQuery(e.target.value)}
+                      placeholder="Vyhledat recept podle názvu..."
+                      className="w-full text-xs p-3 pl-9 border border-[#E8E8E1] rounded-xl bg-white text-[#2C2C2C] focus:outline-hidden focus:ring-1 focus:ring-[#1B4332]"
+                    />
+                    <div className="absolute left-3 top-3.5 text-slate-400">
+                      <Search className="h-4 w-4" />
+                    </div>
+                  </div>
+
+                  {/* List of Recipes */}
+                  <div className="border border-[#E8E8E1] rounded-xl bg-white divide-y divide-[#F4F3EA] overflow-y-auto max-h-[50vh]">
+                    {recipes
+                      .filter(recipe => recipe.title.toLowerCase().includes(categorySearchQuery.toLowerCase()))
+                      .sort((a,b) => a.title.localeCompare(b.title, "cs"))
+                      .map(recipe => {
+                        const currentCat = recipe.category || getRecipeCategory(recipe);
+                        return (
+                          <div key={recipe.id} className="p-3 flex items-center justify-between hover:bg-[#FDFCF7] transition-all text-xs">
+                            <div className="min-w-0 pr-4">
+                              <p className="font-bold text-slate-800 truncate">{recipe.title}</p>
+                              <p className="text-[10px] text-slate-400 mt-0.5">
+                                Aktuální druh: <span className="font-medium text-[#1B4332]">{currentCat}</span>
+                                {recipe.category ? (
+                                  <span className="ml-2 px-1 py-0.2 bg-amber-50 text-amber-700 border border-amber-200 rounded text-[9px] font-bold">Ručně</span>
+                                ) : (
+                                  <span className="ml-2 px-1 py-0.2 bg-slate-50 text-slate-500 border border-slate-200 rounded text-[9px] font-bold">Automaticky</span>
+                                )}
+                              </p>
+                            </div>
+                            
+                            <div className="flex items-center gap-2 shrink-0">
+                              <select
+                                value={currentCat}
+                                onChange={(e) => {
+                                  const targetCat = e.target.value;
+                                  const updatedList = recipes.map(r => r.id === recipe.id ? { ...r, category: targetCat } : r);
+                                  saveRecipesToStorage(updatedList);
+                                }}
+                                className="text-xs p-2 bg-white border border-[#E8E8E1] rounded-lg focus:outline-hidden focus:ring-1 focus:ring-[#1B4332] font-semibold cursor-pointer"
+                              >
+                                {allUsedCategories.map(cat => (
+                                  <option key={cat} value={cat}>{cat}</option>
+                                ))}
+                              </select>
+
+                              {recipe.category && (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const updatedRecipe = { ...recipe };
+                                    delete updatedRecipe.category;
+                                    const updatedList = recipes.map(r => r.id === recipe.id ? updatedRecipe : r);
+                                    saveRecipesToStorage(updatedList);
+                                  }}
+                                  className="px-2.5 py-2 bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-700 font-bold rounded-lg transition-colors cursor-pointer"
+                                  title="Obnovit na automatickou kategorii"
+                                >
+                                  Obnovit automatiku
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                  </div>
+                </div>
+              )}
+
+            </div>
+
+            {/* Footer */}
+            <div className="bg-[#F4F3EA] p-4 border-t border-[#E8E8E1] flex justify-end shrink-0">
+              <button
+                type="button"
+                onClick={() => setShowCategoryEditorModal(false)}
+                className="px-5 py-2 bg-[#1B4332] hover:bg-[#153528] active:scale-95 text-white text-xs font-bold rounded-lg shadow-sm transition-all cursor-pointer"
+              >
+                Hotovo / Zavřít
+              </button>
+            </div>
           </div>
         </div>
       )}

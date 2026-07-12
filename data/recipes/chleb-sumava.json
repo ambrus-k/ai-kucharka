@@ -1,31 +1,32 @@
 {
   "title": "Chléb Šumava",
-  "summary": "Tradiční pšenično-žitný kváskový chléb s precizně rozdělenou hydratací pro optimální rozvoj rozkvasu a autolýzu pšeničného těsta.",
+  "summary": "Tradiční pšenično-žitný chléb s inovovaným postupem autolýzy pouze pšeničné mouky pro optimální rozvoj lepku a perfektní strukturu střídy.",
   "ingredients": [
-    "20 g mateřského žitného kvásku",
-    "200 g žitné chlebové mouky (T930)",
-    "200 g vlažné vody (do rozkvasu)",
-    "500 g pšeničné chlebové mouky (T650)",
-    "250 g vlažné vody (na hnětení)",
+    "400 g pšeničné chlebové mouky (T650)",
+    "150 g žitné chlebové mouky (T930)",
+    "260 g vlažné vody (25 °C) na autolýzu",
+    "90 g vlažné vody (25 °C) na kvásek",
+    "150 g aktivního žitného kvásku (100% hydratace)",
     "14 g jemné mořské soli",
     "10 g celého kmínu",
-    "žitná chlebová mouka na vysypání ošatky"
+    "10 g tekuté Sladěnky",
+    "20 g rýžové mouky na vysypání ošatky"
   ],
   "instructions": [
-    "V míse důkladně smíchejte žitnou mouku, vlažnou vodu určenou do rozkvasu a mateřský kvásek. Směs přikryjte a nechte fermentovat při pokojové teplotě do ztrojnásobení objemu.",
-    "V samostatné míse promíchejte pšeničnou mouku se zbylou vlažnou vodou na hnětení a nechte těsto odpočívat, čímž zahájíte proces autolýzy pro rozvinutí lepkové struktury.",
-    "K autolyzovanému pšeničnému těstu přidejte vyběhlý žitný rozkvas, jemnou mořskou sůl a celý kmín.",
-    "Těsto zpracujte v kuchyňském robotu s hnětacím hákem, dokud se suroviny plně nespojí v hladké, elastické a nelepivé těsto.",
-    "Připravené těsto nechte zrát v přikryté míse při pokojové teplotě a v polovině této doby jej jednou přeložte pro zpevnění struktury.",
-    "Těsto stočte do ošatky vysypané žitnou moukou a nechte v teple kynout, dokud bochník nedosáhne optimálního objemu s pružným polštářovým efektem na dotek.",
-    "Vykynutý bochník vyklopte, vložte do studené trouby a upečte pomocí automatického programu kombinujícího počáteční zapaření a následný horkovzduch."
+    "V míse kuchyňského robota smíchejte 400 g pšeničné chlebové mouky (T650) a 260 g vlažné vody (25 °C). Nechte tuto směs odpočívat (autolyzovat) po dobu 40 minut při pokojové teplotě bez jakýchkoliv dalších přísad.",
+    "V samostatné nádobě důkladně rozmíchejte 150 g aktivního žitného kvásku, zbývajících 90 g vlažné vody (25 °C) a 10 g tekuté Sladěnky, dokud nevznikne homogenní tekutina.",
+    "K autolyzovanému těstu (ze 400 g pšeničné chlebové mouky T650 a 260 g vlažné vody) přidejte připravenou tekutou směs (150 g žitného kvásku, 90 g vody a 10 g Sladěnky), dále přisypte 150 g žitné chlebové mouky (T930), 14 g jemné mořské soli a 10 g celého kmínu. Hněťte hnětacím hákem na nejnižší rychlost po dobu 6 až 8 minut.",
+    "Uhnětené těsto (obsahující 400 g pšeničné mouky, 150 g žitné mouky, celkem 350 g vody, 150 g kvásku, 14 g soli, 10 g kmínu a 10 g Sladěnky) přikryjte a nechte 2 hodiny fermentovat při pokojové teplotě, přičemž po 60 minutách těsto jednou důkladně přeložte ze všech čtyř stran.",
+    "Z těsta (obsahujícího 400 g pšeničné mouky, 150 g žitné mouky, 350 g vody, 150 g kvásku, 14 g soli, 10 g kmínu a 10 g Sladěnky) vytvarujte pevný bochník a vložte jej spojem nahoru do ošatky vysypané 20 g rýžové mouky. Ošatku vložte do plastového sáčku a nechte fermentovat 12 až 14 hodin v lednici při 4 °C.",
+    "Vychlazené těsto (vytvarované z 400 g pšeničné mouky, 150 g žitné mouky, 350 g vody, 150 g kvásku, 14 g soli, 10 g kmínu, 10 g Sladěnky a vysypané 20 g rýžové mouky) vyklopte přímo na pečicí papír, podélně nařízněte a vložte do studené trouby, kterou následně zapněte na pečení se studeným startem.",
+    "Upečený horký chléb (obsahující upečenou směs ze 400 g pšeničné mouky, 150 g žitné mouky, 350 g vody, 150 g kvásku, 14 g soli, 10 g kmínu, 10 g Sladěnky a 20 g rýžové mouky) ihned po upečení přemístěte na chladicí mřížku a nechte jej minimálně 3 hodiny zcela vychladnout."
   ],
-  "applianceTips": "Pečení od studeného startu v parní troubě s řízeným dávkováním páry v první fázi simuluje profesionální pekařskou pec a zajistí maximální nárůst objemu a křupavou kůrku.",
-  "expertJustification": "Rozdělení vody na přesný podíl pro 100% hydrataci žitného rozkvasu a zbývající část pro pšeničnou autolýzu zaručuje optimální enzymatickou aktivitu. Čistá pšeničná autolýza bez přítomnosti soli a kyselosti z rozkvasu maximalizuje bobtnání bílkovin a pevnost lepkové sítě, která pak snadněji unese těžší žitnou složku.",
-  "applianceType": "Parní trouba s funkcí studeného startu",
-  "cookingTime": "14 hodin",
+  "applianceTips": "V parní troubě s pečením od studeného startu nastavte režim s nízkou úrovní páry (případně funkci klimatizovaného pečení), což podpoří maximální nárůst objemu během pozvolného zahřívání.",
+  "expertJustification": "Omezení autolýzy výhradně na pšeničnou mouku zabraňuje enzymatické degradaci žitné mouky, jejíž pentosany by při delším působení vody bez přítomnosti kyselin z kvásku oslabily strukturu střídy. Rozdělením vody na 260 g pro autolýzu pšenice a 90 g pro rozpuštění kvásku se Sladěnkou dosáhneme ideální rehydratace pšeničného lepku a zároveň zachováme dostatek tekutiny pro bezproblémovou integraci zbylých surovin.",
+  "applianceType": "Parní trouba s funkcí studeného startu a regulací vlhkosti",
+  "cookingTime": "17 hodin",
   "difficulty": "Střední",
   "category": "Pečivo",
   "id": "gen-1783540977144",
-  "updatedAt": "2026-07-12T15:28:43.375Z"
+  "updatedAt": "2026-07-09T06:36:38.036Z"
 }

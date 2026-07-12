@@ -55,6 +55,48 @@
     font-size: 11pt !important;
     line-height: 1.6 !important;
   }
+
+  /* Printing rules for Paper Cookbook Overlay (Zobrazit recept) */
+  body.paper-view-active {
+    background: #FDFBF7 !important;
+    color: #2C2A29 !important;
+  }
+  body.paper-view-active #root > *:not(.paper-cookbook-overlay) {
+    display: none !important;
+  }
+  body.paper-view-active .printable-recipe-sheet {
+    display: none !important;
+  }
+  body.paper-view-active .paper-cookbook-overlay {
+    position: static !important;
+    display: block !important;
+    background: #FDFBF7 !important;
+    color: #2C2A29 !important;
+    width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  body.paper-view-active .paper-cookbook-sheet-container {
+    background: transparent !important;
+    padding: 0 !important;
+    display: block !important;
+    overflow: visible !important;
+    height: auto !important;
+    width: 100% !important;
+  }
+  body.paper-view-active .paper-cookbook-sheet {
+    box-shadow: none !important;
+    border: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    display: block !important;
+    background: transparent !important;
+  }
+
   /* Page break rules for lists */
   h1, h2, h3, h4 {
     page-break-after: avoid;
