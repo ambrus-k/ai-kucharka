@@ -1,0 +1,36 @@
+{
+  "title": "Pečená sekaná",
+  "summary": "Dokonale šťavnatá sekaná z hovězího a vepřového masa s optimalizovanou texturou díky emulgaci bílkovin a šetrnému pečení.",
+  "ingredients": [
+    "500 g mletého vepřového bůčku",
+    "500 g mletého hovězího krku",
+    "2 starší bílé rohlíky",
+    "150 ml plnotučného mléka",
+    "2 střední cibule",
+    "20 g vepřového sádla",
+    "4 stroužky česneku",
+    "2 vejce",
+    "15 g soli",
+    "3 g mletého černého pepře",
+    "3 g drceného kmínu",
+    "4 g sušené majoránky",
+    "50 ml ledové vody"
+  ],
+  "instructions": [
+    "Starší rohlíky nakrájejte na drobné kostičky, vložte do hluboké mísy, zalijte studeným plnotučným mlékem a nechte pečivo zcela nasáknout.",
+    "Na pánvi rozpusťte vepřové sádlo a nechte na něm zesklovatět nadrobno nakrájenou cibuli. Krátce před koncem přidejte utřený česnek, nechte ho pouze rozvonět a směs stáhněte z ohně, aby zchladla.",
+    "Do mísy k namočenému pečivu přidejte mleté hovězí a vepřové maso, vejce, zchladlou cibulovou směs s česnekem, drcený kmín, mletý černý pepř a sůl. Sušenou majoránku promněte mezi dlaněmi přímo do mísy pro uvolnění esenciálních olejů.",
+    "Směs začněte důkladně hníst rukama. Během hnětení postupně přilévejte ledovou vodu, která pomůže emulgovat tuky a proteiny. Hmotu zpracovávejte tak dlouho, dokud nezačne být kompaktní, lepivá a neobjeví se jemná bílkovinná vlákna.",
+    "Masovou hmotu několikrát silou vyzdvihněte a uhoďte s ní o dno mísy, čímž vytěsníte přebytečný vzduch a zabráníte vzniku dutin v sekané.",
+    "Rukama namočenýma ve studené vodě vytvarujte pevnou, hladkou šišku bez prasklin a uložte ji do pekáče, který jste předtím vymazali sádlem.",
+    "Povrch sekané uhlaďte mokrýma rukama, podlijte dno pekáče trochou vody a pečte v troubě při nižší teplotě. Během pečení povrch pravidelně přelívejte horkým výpekem. Na závěr zvyšte teplotu na maximum pro vytvoření křupavé zlatavé kůrky."
+  ],
+  "applianceTips": "Pokud vlastníte parní troubu, pečte sekanou v režimu kombinované páry (25 % pára, 130 °C). Pára zabrání praskání povrchu a úniku šťávy. Posledních 10 minut přepněte na horkovzduch při 200 °C pro dokonalou kůrku. V horkovzdušné fritéze (Air Fryer) pečte na pečicím papíru při 160 °C, což zkrátí čas přípravy.",
+  "expertJustification": "Intenzivní hnětení za studena s přidáním ledové vody uvolňuje z masa protein myosin. Tento protein funguje jako přírodní emulgátor, který v masové matrici pevně uzamkne tuk a vodu, takže sekaná zůstane extrémně šťavnatá. Smažení cibule předem inaktivuje enzymy způsobující kvašení a nadýmání a uvolňuje sladkou chuť díky karamelizaci. Pečení při nižší teplotě zabraňuje prudkému stažení svalových vláken, které by jinak vytlačilo drahocennou šťávu ven.",
+  "applianceType": "Kombinovaná parní trouba",
+  "cookingTime": "1 h 15 min",
+  "difficulty": "Střední",
+  "category": "Maso",
+  "id": "gen-1783884048202",
+  "updatedAt": "2026-07-12T19:20:48.640Z"
+}
