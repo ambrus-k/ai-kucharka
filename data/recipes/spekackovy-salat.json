@@ -1,35 +1,34 @@
 {
   "title": "Špekáčkový salát",
-  "summary": "Klasický český salát s vylepšenou texturou a vyváženou kyselostí nálevu pro hlubší propojení chutí. [Zálivková fermentace: 30 min, odležení v chladu: 2–24 h]",
+  "summary": "Tradiční český salát s vylepšenou texturou díky řízenému marinování cibule a harmonizaci chutí v chladu.",
   "ingredients": [
-    "600 g kvalitních špekáčků s vysokým obsahem masa",
-    "200 g cibule, nakrájené na tenké půlměsíčky",
-    "200 g sterilovaných okurek, nakrájených na drobné kostičky",
-    "150 g kvalitní majonézy (ideálně domácí)",
+    "600 g kvalitních špekáčků",
+    "200 g cibule",
+    "200 g sterilovaných okurek",
+    "150 g domácí majonézy",
     "30 g plnotučné hořčice",
     "20 ml worcesterové omáčky",
-    "30 g kečupu (bez konzervantů)",
+    "30 g kečupu",
     "15 ml vinného octa",
-    "10 g krupicového cukru",
+    "10 g cukru krupice",
     "20 ml slunečnicového oleje",
-    "špetka čerstvě mletého černého pepře"
+    "1 g černého pepře"
   ],
   "instructions": [
-    "Důkladně promíchejte startovací emulzi (zálivku) se zeleninovým základem a uvolněnou šťávou (syrovátkou ze zeleniny) při pokojové teplotě pro optimální fermentaci chuti. Zakryjte směs a nechte ji fermentovat a odležet 30 minut.",
-    "Špekáčky oloupejte, podélně rozkrojte a nakrájejte na úhledné půlměsíčky.",
-    "V míse vyšlehejte metličkou olej, hořčici, worcester, kečup, ocet, cukr a pepř do emulze.",
-    "Do nálevu vhoďte nakrájenou cibuli a nechte ji 15 minut marinovat, aby zkřehla a ztratila agresivní štiplavost.",
-    "Přidejte nakrájené špekáčky a okurky a vše důkladně promíchejte, aby se suroviny obalily nálevem.",
-    "Nakonec vmíchejte majonézu a nechte salát v chladu odležet minimálně 4 hodiny, ideálně přes noc.",
-    "Pro rychlé a rovnoměrné nakrájení cibule a okurek použijte multifunkční kuchyňský robot s nástavcem na krájení, získáte tak konzistentní strukturu salátu.",
-    "Klíčem k úspěchu je marinování cibule v kyselém nálevu před přidáním majonézy; kyselina denaturuje sírnaté sloučeniny v cibuli a činí ji stravitelnější. Použití kvalitních špekáčků brání nadbytečnému uvolňování nekvalitního tuku do majonézy, což by vedlo k nevábně mastné konzistenci."
+    "Špekáčky zbavte střívka, podélně rozkrojte a nakrájejte na půlměsíčky.",
+    "Cibuli a okurky zpracujte v robotu na stejnoměrné kousky.",
+    "V míse vyšlehejte olej, hořčici, worcester, kečup, ocet, cukr a pepř do hladké emulze.",
+    "Do emulze vložte cibuli a nechte marinovat 20 minut, aby došlo k denaturaci sírných látek.",
+    "Do marinované cibule přidejte nakrájené špekáčky a okurky, vše promíchejte.",
+    "Jako poslední krok vmíchejte majonézu a salát dejte uležet do chladničky na 240 minut pro dokonalé propojení chutí."
   ],
-  "applianceTips": "Pro rychlé a rovnoměrné nakrájení cibule a okurek použijte multifunkční kuchyňský robot s nástavcem na krájení, získáte tak konzistentní strukturu salátu.",
-  "expertJustification": "Klíčem k úspěchu je marinování cibule v kyselém nálevu před přidáním majonézy; kyselina denaturuje sírnaté sloučeniny v cibuli a činí ji stravitelnější. Použití kvalitních špekáčků brání nadbytečnému uvolňování nekvalitního tuku do majonézy, což by vedlo k nevábně mastné konzistenci.",
-  "applianceType": "Thermomix / Kuchyňský robot",
-  "cookingTime": "150 min",
+  "applianceTips": "Použijte multifunkční robot s pulzní funkcí pro dosažení přesné textury zeleniny bez vzniku nežádoucí šťávy.",
+  "expertJustification": "Marinování cibule v kyselém prostředí před přidáním majonézy je klíčové pro stravitelnost. Delší odležení v chladu (240 minut) dovoluje osmotickému tlaku vyrovnat koncentraci solí a cukrů mezi masnou složkou a nálevem.",
+  "applianceType": "Multifunkční kuchyňský robot",
+  "cookingTime": "280 min",
   "difficulty": "Snadné",
   "category": "Ostatní",
   "id": "gen-1781777658404",
-  "estimatedCookingTime": "150 min"
+  "estimatedCookingTime": "20 min",
+  "updatedAt": "2026-07-13T11:41:40.813Z"
 }
