@@ -49,6 +49,7 @@ import {
   ShoppingBag
 } from "lucide-react";
 import { Recipe } from "./types";
+import { DEFAULT_RECIPES } from "./defaultRecipes";
 
 // Check if running inside Google AI Studio environment
 export const isStudioEnv = (() => {
@@ -436,6 +437,8 @@ export default function App() {
   // States for hidden admin mode
   const [isAdmin, setIsAdmin] = useState(false);
   const [adminPassword, setAdminPassword] = useState("");
+  const [showAdminSettingsModal, setShowAdminSettingsModal] = useState(false);
+  const [activeAdminTab, setActiveAdminTab] = useState<"backup" | "github" | "diagnostics" | "categories">("backup");
 
   // States for diagnostic test panel
   const [isDiagnosing, setIsDiagnosing] = useState(false);
@@ -2293,10 +2296,10 @@ ${separator}`;
         }
       }
 
-      // 3. Fallback to empty list
-      if (loadedList === null) {
-        loadedList = [];
-        console.log("Seznam receptů je prázdný.");
+      // 3. Fallback to empty list / DEFAULT_RECIPES
+      if (loadedList === null || loadedList.length === 0) {
+        loadedList = DEFAULT_RECIPES;
+        console.log("Seznam receptů je prázdný, načítám výchozí recepty.");
       }
 
       // Save and set
@@ -2581,7 +2584,7 @@ ${separator}`;
   };
 
   return (
-    <div className="min-h-screen bg-[#FDFCF7] text-[#2C2C2C] font-sans flex flex-col antialiased">
+    <div className="h-screen overflow-hidden bg-[#FDFCF7] text-[#2C2C2C] font-sans flex flex-col antialiased print:h-auto print:overflow-visible">
       {/* FLOATING PRINT / PDF STATUS NOTICE */}
       <AnimatePresence>
         {printNotice && (
@@ -2952,24 +2955,39 @@ ${separator}`;
 
           {/* 3. NOVÝ RECEPT (Admin) */}
           {isAdmin && (
-            <button
-              onClick={() => {
-                setSelectedRecipe(null);
-                setErrorMessage(null);
-                setIsEditing(false);
-              }}
-              className="bg-[#D97706] hover:bg-[#C26405] active:scale-95 text-white font-semibold py-2.5 px-4 rounded-lg shadow-sm hover:shadow-md transition-all flex items-center gap-2 text-sm cursor-pointer animate-fade-in"
-              title="Nový recept"
-            >
-              <Plus className="h-4 w-4" />
-              <span>Nový recept</span>
-            </button>
+            <>
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveAdminTab("backup"); // default to backup and transfer tab as requested!
+                  setShowAdminSettingsModal(true);
+                }}
+                className="bg-white hover:bg-[#FDFCF7] text-slate-700 hover:text-[#1B4332] border border-[#E8E8E1] hover:border-[#1B4332]/30 font-bold p-2.5 rounded-xl shadow-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                title="Administrace a nastavení kuchařky"
+              >
+                <Settings className="h-5 w-5 text-slate-600 hover:text-[#1B4332] transition-transform hover:rotate-45 duration-300" />
+                <span className="hidden md:inline text-xs font-bold uppercase tracking-wider">Nastavení</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  setSelectedRecipe(null);
+                  setErrorMessage(null);
+                  setIsEditing(false);
+                }}
+                className="bg-[#D97706] hover:bg-[#C26405] active:scale-95 text-white font-semibold py-2.5 px-4 rounded-lg shadow-sm hover:shadow-md transition-all flex items-center gap-2 text-sm cursor-pointer animate-fade-in"
+                title="Nový recept"
+              >
+                <Plus className="h-4 w-4" />
+                <span>Nový recept</span>
+              </button>
+            </>
           )}
         </div>
       </header>
 
       {/* BODY WORKSPACE */}
-      <div className="flex-1 max-w-[1600px] w-full mx-auto flex flex-col md:flex-row gap-0 overflow-hidden relative">
+      <div className="flex-1 max-w-[1600px] w-full mx-auto flex flex-col md:flex-row gap-0 overflow-hidden relative print:h-auto print:overflow-visible">
         
         {/* LEFT SIDEBAR: RECIPE LIST */}
         <aside className="no-print w-full md:w-80 lg:w-96 border-r border-[#E8E8E1] bg-white flex flex-col flex-shrink-0">
@@ -3252,21 +3270,8 @@ ${separator}`;
           </div>
 
           {/* SIDEBAR FOOTER METRICS INFO */}
-          <div className="p-4 bg-[#F5F5F0] border-t border-[#E8E8E1] text-xs text-[#5C5C50] flex flex-col gap-1.5">
-            <div className="flex items-center gap-1">
-              <Info className="h-3 w-3 text-[#1B4332]" />
-              <span className="font-semibold text-[#1B4332]">Odborná syntéza z 5 zdrojů:</span>
-            </div>
-            <ul className="list-disc pl-4 space-y-0.5 text-[10px] text-[#5C5C50]">
-              <li>Lékařská chemie & Food Science</li>
-              <li>Právo Culinary Masterclass</li>
-              <li>Agregátory tisíců receptur</li>
-              <li>Bezpečnostní analýza kuchařských chyb</li>
-              <li>Inženýrství moderních spotřebičů</li>
-            </ul>
-
-            {/* BACKUP & RESTORE OF RECIPES */}
-            <div className="mt-2 pt-2 border-t border-[#E8E8E1] flex flex-col gap-1.5">
+          {!isAdmin && (
+            <div className="p-4 bg-[#F5F5F0] border-t border-[#E8E8E1] text-xs text-[#5C5C50] flex flex-col gap-1.5">
               <span className="font-semibold text-[10px] text-[#1B4332] uppercase tracking-wider">Záloha a přenos receptů:</span>
               <div className="grid grid-cols-2 gap-1.5">
                 <button
@@ -3293,11 +3298,11 @@ ${separator}`;
                 </label>
               </div>
             </div>
-          </div>
+          )}
         </aside>
 
         {/* MAIN WORKSPACE REGION */}
-        <main id="main-area" className="flex-1 bg-[#FDFCF7]/50 overflow-y-auto p-4 md:p-6 lg:p-8">
+        <main id="main-area" className="flex-1 bg-[#FDFCF7]/50 overflow-y-auto p-4 md:p-6 lg:p-8 print:overflow-visible print:h-auto">
           
           <AnimatePresence mode="wait">
             
@@ -4677,249 +4682,7 @@ ${separator}`;
         </main>
       </div>
 
-      {/* ADMINISTRÁTORSKÝ STATUS PANEL (PŘESUNUTÝ NA SPODEK APLIKACE) */}
-      {isAdmin && (
-        <div className="no-print bg-emerald-50/90 border-t border-b border-emerald-200/80 py-6 px-6 text-emerald-800">
-          <div className="max-w-[1600px] mx-auto space-y-6">
-            
-            {/* Top Bar: Controls */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-emerald-200/50">
-              <div className="space-y-1">
-                <div className="flex items-center gap-2 text-base font-bold uppercase tracking-wider text-emerald-950 font-serif">
-                  <Check className="h-5 w-5 shrink-0 text-emerald-600" />
-                  <span>Administrace AI Kuchařky</span>
-                </div>
-                <p className="text-xs leading-relaxed opacity-95 text-emerald-900 font-medium">
-                  Máte plný přístup ke správě receptů, synchronizaci i diagnostice. Změny se ukládají automaticky online.
-                </p>
-              </div>
-              <div className="flex flex-wrap gap-2.5">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setActiveTab("github");
-                    setShowLoginModal(true);
-                  }}
-                  className="text-xs bg-indigo-100 hover:bg-indigo-200 text-indigo-800 px-4 py-2 rounded-xl font-bold transition-all cursor-pointer shadow-xs flex items-center gap-1.5"
-                  title="Nastavení připojení k GitHubu"
-                >
-                  ⚙️ Nastavení GitHubu
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowCategoryEditorModal(true);
-                  }}
-                  className="text-xs bg-amber-100 hover:bg-amber-200 text-amber-800 px-4 py-2 rounded-xl font-bold transition-all cursor-pointer shadow-xs flex items-center gap-1.5"
-                  title="Editor kategorií"
-                >
-                  📁 Správa kategorií
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsAdmin(false);
-                    setAdminPassword("");
-                    localStorage.removeItem("admin_password_token");
-                  }}
-                  className="text-xs bg-red-100 hover:bg-red-200 text-red-800 px-4 py-2 rounded-xl font-bold transition-all cursor-pointer shadow-xs"
-                >
-                  Odhlásit se z administrace
-                </button>
-              </div>
-            </div>
 
-            {/* Grid Area: Sync & Diagnostics */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 pt-1">
-              
-              {/* Column 1: GitHub Synchronization */}
-              <div className="space-y-3 bg-white/40 p-5 rounded-2xl border border-emerald-200/40">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-emerald-950 uppercase tracking-wider flex items-center gap-1.5">
-                    🐙 GitHub Synchronizace
-                  </span>
-                  <button
-                    type="button"
-                    onClick={handleManualGithubSync}
-                    disabled={isManualSyncing}
-                    className="text-xs bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-300 text-white font-bold py-2 px-4 rounded-xl transition-all cursor-pointer flex items-center gap-2 shrink-0 shadow-sm"
-                  >
-                    {isManualSyncing ? (
-                      <>
-                        <RefreshCw className="h-3.5 w-3.5 animate-spin" />
-                        <span>Synchronizuji...</span>
-                      </>
-                    ) : (
-                      <>
-                        <GitBranch className="h-3.5 w-3.5" />
-                        <span>Synchronizovat s GitHubem</span>
-                      </>
-                    )}
-                  </button>
-                </div>
-
-                {manualSyncResult && (
-                  <div className={`p-4 rounded-xl text-xs border ${
-                    manualSyncResult.success 
-                      ? "bg-emerald-100 border-emerald-200 text-emerald-900 animate-scale-up" 
-                      : "bg-red-100 border-red-200 text-red-950 animate-scale-up"
-                  }`}>
-                    <p className="font-semibold leading-normal">{manualSyncResult.message}</p>
-                  </div>
-                )}
-              </div>
-
-              {/* Column 2: System Diagnostics */}
-              <div className="space-y-3 bg-white/40 p-5 rounded-2xl border border-emerald-200/40">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-emerald-950 uppercase tracking-wider flex items-center gap-1.5">
-                    🛠 Diagnostika systému
-                  </span>
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={handleRunDiagnostics}
-                      disabled={isDiagnosing}
-                      className="text-xs bg-emerald-600 hover:bg-emerald-700 disabled:bg-[#A3E635]/15 disabled:text-[#1B4332]/60 text-white font-bold py-2 px-4 rounded-xl transition-all cursor-pointer flex items-center gap-1.5 shrink-0 shadow-sm"
-                    >
-                      {isDiagnosing ? (
-                        <>
-                          <RefreshCw className="h-3.5 w-3.5 animate-spin" />
-                          <span>Spouštím testy...</span>
-                        </>
-                      ) : (
-                        <>
-                          <RefreshCw className="h-3.5 w-3.5" />
-                          <span>Spustit diagnostiku</span>
-                        </>
-                      )}
-                    </button>
-                    {isDiagnosing && (
-                      <button
-                        type="button"
-                        onClick={handleStopDiagnostics}
-                        className="text-xs bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-3.5 rounded-xl transition-all cursor-pointer flex items-center gap-1.5 shrink-0 shadow-xs"
-                        title="Zastavit diagnostiku"
-                      >
-                        <Square className="h-3 w-3 fill-current" />
-                        <span>Zastavit</span>
-                      </button>
-                    )}
-                  </div>
-                </div>
-
-                {/* PROGRESS WINDOW FOR DIAGNOSTICS */}
-                {isDiagnosing && (
-                  <div className="p-4 bg-white border border-emerald-100 rounded-xl space-y-3 text-[#2c2c2c] shadow-xs animate-scale-up">
-                    <div className="flex items-center justify-between text-xs font-bold text-slate-700">
-                      <span className="truncate pr-1 text-slate-600">{diagnosticsProgressText}</span>
-                      <span className="font-mono text-emerald-700 shrink-0">{diagnosticsProgressPercent}%</span>
-                    </div>
-                    {/* Progress Bar */}
-                    <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
-                      <div
-                        className="bg-emerald-500 h-full transition-all duration-300"
-                        style={{ width: `${diagnosticsProgressPercent}%` }}
-                      />
-                    </div>
-                    {/* Step checklist */}
-                    <div className="grid grid-cols-2 gap-2 text-[11px] font-medium text-slate-500 pt-1.5 border-t border-slate-50">
-                      <div className={`flex items-center gap-1.5 ${diagnosticsStepIndex >= 0 ? 'text-emerald-800' : ''}`}>
-                        {diagnosticsStepIndex > 0 ? (
-                          <Check className="h-3 w-3 text-emerald-600 shrink-0" />
-                        ) : diagnosticsStepIndex === 0 ? (
-                          <RefreshCw className="h-3.5 w-3.5 text-emerald-600 animate-spin shrink-0" />
-                        ) : (
-                          <div className="h-1 w-1 rounded-full bg-slate-300 mx-1 shrink-0" />
-                        )}
-                        <span className={diagnosticsStepIndex === 0 ? 'font-bold' : ''}>1. Inicializace</span>
-                      </div>
-                      <div className={`flex items-center gap-1.5 ${diagnosticsStepIndex >= 1 ? 'text-emerald-800' : ''}`}>
-                        {diagnosticsStepIndex > 1 ? (
-                          <Check className="h-3 w-3 text-emerald-600 shrink-0" />
-                        ) : diagnosticsStepIndex === 1 ? (
-                          <RefreshCw className="h-3.5 w-3.5 text-emerald-600 animate-spin shrink-0" />
-                        ) : (
-                          <div className="h-1 w-1 rounded-full bg-slate-300 mx-1 shrink-0" />
-                        )}
-                        <span className={diagnosticsStepIndex === 1 ? 'font-bold' : ''}>2. Test zápisu</span>
-                      </div>
-                      <div className={`flex items-center gap-1.5 ${diagnosticsStepIndex >= 2 ? 'text-emerald-800' : ''}`}>
-                        {diagnosticsStepIndex > 2 ? (
-                          <Check className="h-3 w-3 text-emerald-600 shrink-0" />
-                        ) : diagnosticsStepIndex === 2 ? (
-                          <RefreshCw className="h-3.5 w-3.5 text-emerald-600 animate-spin shrink-0" />
-                        ) : (
-                          <div className="h-1 w-1 rounded-full bg-slate-300 mx-1 shrink-0" />
-                        )}
-                        <span className={diagnosticsStepIndex === 2 ? 'font-bold' : ''}>3. Spojení s Gemini AI</span>
-                      </div>
-                      <div className={`flex items-center gap-1.5 ${diagnosticsStepIndex >= 3 ? 'text-emerald-800' : ''}`}>
-                        {diagnosticsStepIndex > 3 ? (
-                          <Check className="h-3 w-3 text-emerald-600 shrink-0" />
-                        ) : diagnosticsStepIndex === 3 ? (
-                          <RefreshCw className="h-3.5 w-3.5 text-emerald-600 animate-spin shrink-0" />
-                        ) : (
-                          <div className="h-1 w-1 rounded-full bg-slate-300 mx-1 shrink-0" />
-                        )}
-                        <span className={diagnosticsStepIndex === 3 ? 'font-bold' : ''}>4. Sestavení reportu</span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {diagnosticsError && (
-                  <div className="p-3.5 bg-red-100/80 border border-red-200 rounded-xl text-xs text-red-800 space-y-1 animate-scale-up">
-                    <p className="font-bold">Chyba diagnostiky:</p>
-                    <p className="opacity-95 leading-normal">{diagnosticsError}</p>
-                  </div>
-                )}
-
-                {diagnosticsResult && (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs animate-scale-up">
-                    {/* 1. WRITE PERMISSION */}
-                    <div className="p-3 bg-white border border-emerald-100 rounded-xl space-y-1 text-[#2c2c2c] shadow-xs">
-                      <div className="flex items-center justify-between font-bold">
-                        <span className="flex items-center gap-1">
-                          <Database className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
-                          Souborový systém:
-                        </span>
-                        {diagnosticsResult.writePermissionOk ? (
-                          <span className="text-emerald-600 font-extrabold uppercase text-[10px]">OK</span>
-                        ) : (
-                          <span className="text-red-600 font-extrabold uppercase text-[10px]">CHYBA</span>
-                        )}
-                      </div>
-                      <p className="text-slate-600 text-[11px] leading-snug font-medium">
-                        {diagnosticsResult.writePermissionMessage}
-                      </p>
-                    </div>
-
-                    {/* 2. GEMINI AI */}
-                    <div className="p-3 bg-white border border-emerald-100 rounded-xl space-y-1 text-[#2c2c2c] shadow-xs">
-                      <div className="flex items-center justify-between font-bold">
-                        <span className="flex items-center gap-1">
-                          <Sparkles className="h-3.5 w-3.5 text-amber-500 shrink-0" />
-                          Gemini AI:
-                        </span>
-                        {diagnosticsResult.geminiOk ? (
-                          <span className="text-emerald-600 font-extrabold uppercase text-[10px]">OK</span>
-                        ) : (
-                          <span className="text-red-600 font-extrabold uppercase text-[10px]">CHYBA</span>
-                        )}
-                      </div>
-                      <p className="text-slate-600 text-[11px] leading-snug font-medium">
-                        {diagnosticsResult.geminiMessage}
-                      </p>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* FOOTER */}
       <footer className="no-print bg-white border-t border-[#E8E8E1] py-5 px-6 text-center text-xs text-[#9A9A8C] mt-auto">
@@ -5475,6 +5238,560 @@ ${separator}`;
                   )}
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ADMINISTRACE KUCHAŘKY & NASTAVENÍ MODAL */}
+      {showAdminSettingsModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs no-print animate-fade-in">
+          <div className="bg-[#FDFCF7] border border-[#E8E8E1] rounded-2xl shadow-2xl w-full max-w-4xl h-[85vh] md:h-[75vh] overflow-hidden flex flex-col animate-scale-up">
+            {/* Header */}
+            <div className="bg-[#1B4332] p-5 text-white flex items-center justify-between shrink-0">
+              <div className="flex items-center gap-3">
+                <Settings className="h-6 w-6 text-[#52B788] animate-spin-hover" />
+                <div>
+                  <h3 className="font-serif italic font-bold text-xl tracking-tight">
+                    Administrace & Nastavení kuchařky
+                  </h3>
+                  <p className="text-[11px] text-[#A3E635] font-medium leading-tight opacity-90">
+                    Zálohování, synchronizace s GitHubem, správa kategorií a diagnostika systému
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowAdminSettingsModal(false);
+                }}
+                className="text-white/80 hover:text-white hover:bg-white/10 p-2 rounded-lg transition-all cursor-pointer"
+                title="Zavřít administraci"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="flex flex-col md:flex-row flex-1 overflow-hidden">
+              {/* Left Sidebar (Tabs list) */}
+              <div className="w-full md:w-64 bg-[#F4F3EA] border-r border-[#E8E8E1] p-4 flex flex-col justify-between shrink-0">
+                <nav className="space-y-1">
+                  <button
+                    type="button"
+                    onClick={() => setActiveAdminTab("backup")}
+                    className={`w-full flex items-center gap-2.5 px-4 py-3 rounded-xl text-xs font-bold transition-all cursor-pointer text-left ${
+                      activeAdminTab === "backup"
+                        ? "bg-[#1B4332] text-white shadow-xs"
+                        : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/50"
+                    }`}
+                  >
+                    <Download className="h-4 w-4" />
+                    <span>Záloha a přenos receptů</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setActiveAdminTab("github")}
+                    className={`w-full flex items-center gap-2.5 px-4 py-3 rounded-xl text-xs font-bold transition-all cursor-pointer text-left ${
+                      activeAdminTab === "github"
+                        ? "bg-[#1B4332] text-white shadow-xs"
+                        : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/50"
+                    }`}
+                  >
+                    <GitBranch className="h-4 w-4" />
+                    <span>GitHub Synchronizace</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setActiveAdminTab("categories")}
+                    className={`w-full flex items-center gap-2.5 px-4 py-3 rounded-xl text-xs font-bold transition-all cursor-pointer text-left ${
+                      activeAdminTab === "categories"
+                        ? "bg-[#1B4332] text-white shadow-xs"
+                        : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/50"
+                    }`}
+                  >
+                    <FolderOpen className="h-4 w-4" />
+                    <span>Správa kategorií</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setActiveAdminTab("diagnostics")}
+                    className={`w-full flex items-center gap-2.5 px-4 py-3 rounded-xl text-xs font-bold transition-all cursor-pointer text-left ${
+                      activeAdminTab === "diagnostics"
+                        ? "bg-[#1B4332] text-white shadow-xs"
+                        : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/50"
+                    }`}
+                  >
+                    <Cpu className="h-4 w-4" />
+                    <span>Diagnostika systému</span>
+                  </button>
+                </nav>
+
+                {/* Left Sidebar Footer: Logout */}
+                <div className="pt-4 border-t border-[#E8E8E1] mt-4 md:mt-0">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsAdmin(false);
+                      setAdminPassword("");
+                      localStorage.removeItem("admin_password_token");
+                      setShowAdminSettingsModal(false);
+                    }}
+                    className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-red-50 hover:bg-red-100 text-red-600 hover:text-red-700 border border-red-200 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-xs"
+                    title="Odhlásit se z administračního účtu"
+                  >
+                    Odhlásit se z administrace
+                  </button>
+                </div>
+              </div>
+
+              {/* Right content panel */}
+              <div className="flex-1 p-6 overflow-y-auto bg-white flex flex-col">
+                
+                {/* TAB 1: BACKUP AND RESTORE */}
+                {activeAdminTab === "backup" && (
+                  <div className="space-y-6 animate-fade-in">
+                    <div>
+                      <h4 className="font-serif italic font-bold text-lg text-[#1B4332] mb-1">
+                        Zálohování a přenos receptů
+                      </h4>
+                      <p className="text-xs text-slate-500 font-medium">
+                        Exportujte celou kuchařku pro bezpečné uložení nebo importujte dříve uloženou zálohu.
+                      </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* Export card */}
+                      <div className="border border-[#E8E8E1] bg-[#FDFCF7]/40 rounded-2xl p-5 flex flex-col justify-between space-y-4">
+                        <div className="space-y-2">
+                          <div className="p-3.5 bg-emerald-50 text-[#1B4332] rounded-xl w-12 h-12 flex items-center justify-center">
+                            <Download className="h-6 w-6 text-emerald-700" />
+                          </div>
+                          <h5 className="font-serif font-bold text-base text-slate-800">Exportovat kuchařku</h5>
+                          <p className="text-xs text-slate-500 leading-relaxed">
+                            Stáhne kompletní databázi všech vašich receptů jako přenositelný <code className="bg-amber-100/60 px-1 py-0.5 rounded font-mono font-bold text-amber-900 text-[10px]">JSON</code> soubor.
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={handleExportBackup}
+                          className="w-full py-2.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                        >
+                          <Download className="h-4 w-4" />
+                          <span>Exportovat do souboru</span>
+                        </button>
+                      </div>
+
+                      {/* Import card */}
+                      <div className="border border-[#E8E8E1] bg-[#FDFCF7]/40 rounded-2xl p-5 flex flex-col justify-between space-y-4">
+                        <div className="space-y-2">
+                          <div className="p-3.5 bg-blue-50 text-blue-700 rounded-xl w-12 h-12 flex items-center justify-center">
+                            <Upload className="h-6 w-6 text-blue-700" />
+                          </div>
+                          <h5 className="font-serif font-bold text-base text-slate-800">Nahraní zálohy (Import)</h5>
+                          <p className="text-xs text-slate-500 leading-relaxed">
+                            Nahraje dříve vyexportované recepty ze souboru. <strong className="text-red-700">Pozor!</strong> Importované recepty se sloučí s vaším stávajícím seznamem.
+                          </p>
+                        </div>
+                        <label className="w-full py-2.5 px-4 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer text-center">
+                          <Upload className="h-4 w-4" />
+                          <span>Vybrat soubor se zálohou</span>
+                          <input
+                            type="file"
+                            accept=".json"
+                            onChange={handleImportBackup}
+                            className="hidden"
+                          />
+                        </label>
+                      </div>
+                    </div>
+
+                    <div className="bg-amber-50 border border-amber-200 text-amber-900 rounded-xl p-4 text-[11px] leading-relaxed">
+                      <p className="font-bold uppercase tracking-wider text-amber-950 mb-1">
+                        💡 Tip pro přenos dat:
+                      </p>
+                      <p>
+                        Zálohovací soubor obsahuje kompletní strukturu vašich receptů včetně surovin, fází přípravy, technologických tipů a vědeckých odůvodnění. Tento soubor můžete použít k bezpečnému přesunu celé své kuchařky na jiné zařízení nebo k obnově v případě nechtěného smazání.
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* TAB 2: GITHUB SYNC */}
+                {activeAdminTab === "github" && (
+                  <div className="space-y-6 animate-fade-in flex flex-col flex-1 overflow-hidden">
+                    <div>
+                      <h4 className="font-serif italic font-bold text-lg text-[#1B4332] mb-1">
+                        GitHub Synchronizace & Propojení
+                      </h4>
+                      <p className="text-xs text-slate-500 font-medium">
+                        Synchronizujte kuchařku s vaším repozitářem nebo upravte konfigurační údaje pro automatické ukládání.
+                      </p>
+                    </div>
+
+                    {/* Synchronization Status & Button */}
+                    <div className="bg-[#1B4332]/5 border border-emerald-100 p-4 rounded-xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                      <div className="space-y-0.5">
+                        <span className="text-xs font-bold text-emerald-950 uppercase tracking-wider flex items-center gap-1.5">
+                          🐙 Stav synchronizace
+                        </span>
+                        <p className="text-xs text-slate-600">
+                          Můžete spustit manuální synchronizaci, která nahraje všechny recepty na GitHub.
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleManualGithubSync}
+                        disabled={isManualSyncing}
+                        className="text-xs bg-[#1B4332] hover:bg-[#153528] disabled:bg-[#1B4332]/30 text-white font-bold py-2.5 px-4 rounded-xl transition-all cursor-pointer flex items-center gap-2 shrink-0 shadow-sm"
+                      >
+                        {isManualSyncing ? (
+                          <>
+                            <RefreshCw className="h-3.5 w-3.5 animate-spin" />
+                            <span>Synchronizuji...</span>
+                          </>
+                        ) : (
+                          <>
+                            <GitBranch className="h-3.5 w-3.5" />
+                            <span>Synchronizovat teď</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+
+                    {/* Sync Message Results */}
+                    {manualSyncResult && (
+                      <div className={`p-4 rounded-xl text-xs border ${
+                        manualSyncResult.success 
+                          ? "bg-emerald-100 border-emerald-200 text-emerald-900 animate-scale-up" 
+                          : "bg-red-100 border-red-200 text-red-950 animate-scale-up"
+                      }`}>
+                        <p className="font-semibold leading-normal">{manualSyncResult.message}</p>
+                      </div>
+                    )}
+
+                    {/* Repository Connection settings form */}
+                    <div className="border border-[#E8E8E1] bg-[#FDFCF7]/20 p-5 rounded-2xl space-y-4">
+                      <h5 className="font-bold text-sm text-slate-700 border-b border-[#E8E8E1] pb-2">
+                        Nastavení GitHub repozitáře
+                      </h5>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="space-y-1.5">
+                          <label className="block text-xs font-bold text-[#1B4332]">
+                            Uživatel / Vlastník repozitáře
+                          </label>
+                          <input
+                            type="text"
+                            value={githubUser}
+                            onChange={(e) => setGithubUser(e.target.value)}
+                            placeholder="ambrus-k"
+                            className="w-full px-3 py-2 bg-white border border-[#E8E8E1] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1B4332] text-xs font-medium"
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <label className="block text-xs font-bold text-[#1B4332]">
+                            Název repozitáře
+                          </label>
+                          <input
+                            type="text"
+                            value={githubRepo}
+                            onChange={(e) => setGithubRepo(e.target.value)}
+                            placeholder="ai-kucharka"
+                            className="w-full px-3 py-2 bg-white border border-[#E8E8E1] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1B4332] text-xs font-medium"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="space-y-1.5">
+                          <label className="block text-xs font-bold text-[#1B4332]">
+                            Větev repozitáře
+                          </label>
+                          <input
+                            type="text"
+                            value={githubBranch}
+                            onChange={(e) => setGithubBranch(e.target.value)}
+                            placeholder="main"
+                            className="w-full px-3 py-2 bg-white border border-[#E8E8E1] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1B4332] text-xs font-medium"
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <label className="block text-xs font-bold text-[#1B4332]">
+                            GitHub Personal Access Token (PAT)
+                          </label>
+                          <input
+                            type="password"
+                            value={githubToken}
+                            onChange={(e) => setGithubToken(e.target.value)}
+                            placeholder={githubToken ? "PONECHAT_STÁVAJÍCÍ" : "ghp_..."}
+                            className="w-full px-3 py-2 bg-white border border-[#E8E8E1] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1B4332] text-xs font-medium"
+                          />
+                        </div>
+                      </div>
+
+                      {githubStatusResult && (
+                        <div className={`p-3 rounded-xl text-xs flex items-start gap-2 border ${
+                          githubStatusResult.connected 
+                            ? "bg-emerald-50 border-emerald-200 text-emerald-800 animate-scale-up" 
+                            : "bg-red-50 border-red-200 text-red-800 animate-scale-up"
+                        }`}>
+                          <AlertCircle className={`h-4 w-4 shrink-0 ${githubStatusResult.connected ? "text-emerald-600" : "text-red-600"}`} />
+                          <div className="space-y-0.5">
+                            <p className="font-bold">{githubStatusResult.connected ? "Úspěšně propojeno" : "Chyba připojení"}</p>
+                            <p className="opacity-90">{githubStatusResult.message || githubStatusResult.errorMessage}</p>
+                          </div>
+                        </div>
+                      )}
+
+                      {saveGithubConfigSuccess && (
+                        <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-xs flex items-center gap-2 animate-scale-up">
+                          <Check className="h-4 w-4 text-emerald-600 shrink-0" />
+                          <span>{saveGithubConfigSuccess}</span>
+                        </div>
+                      )}
+
+                      <div className="pt-2 flex justify-end gap-3 border-t border-[#E8E8E1]">
+                        <button
+                          type="button"
+                          onClick={() => handleTestGithubConnection(githubUser, githubRepo, githubBranch, githubToken)}
+                          disabled={isTestingConnection}
+                          className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-800 border border-slate-200 rounded-xl text-xs font-semibold transition-all cursor-pointer disabled:opacity-50"
+                        >
+                          {isTestingConnection ? "Testuji..." : "Otestovat spojení"}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleSaveGithubConfig(githubUser, githubRepo, githubBranch, githubToken)}
+                          disabled={isSavingGithubConfig}
+                          className="px-4 py-2 bg-[#1B4332] hover:bg-[#153528] text-white rounded-xl text-xs font-bold shadow-sm transition-all cursor-pointer disabled:opacity-50"
+                        >
+                          {isSavingGithubConfig ? "Ukládám..." : "Uložit nastavení"}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* TAB 3: CATEGORIES */}
+                {activeAdminTab === "categories" && (
+                  <div className="space-y-6 animate-fade-in">
+                    <div>
+                      <h4 className="font-serif italic font-bold text-lg text-[#1B4332] mb-1">
+                        Správa a organizace kategorií
+                      </h4>
+                      <p className="text-xs text-slate-500 font-medium">
+                        Uspořádejte si strukturu kuchařky podle témat, surovin nebo příležitostí.
+                      </p>
+                    </div>
+
+                    <div className="border border-[#E8E8E1] bg-[#FDFCF7]/40 rounded-2xl p-6 flex flex-col md:flex-row gap-6 items-center">
+                      <div className="p-4 bg-amber-50 text-amber-700 rounded-2xl shrink-0">
+                        <FolderOpen className="h-10 w-10 text-amber-600" />
+                      </div>
+                      <div className="space-y-2 flex-1">
+                        <h5 className="font-serif font-bold text-base text-slate-800">
+                          Hromadný Editor kategorií receptů
+                        </h5>
+                        <p className="text-xs text-slate-500 leading-relaxed">
+                          Tento mocný nástroj vám umožňuje vidět přehledně všechny existující kategorie, vytvářet vlastní nové kategorie, snadno přesouvat recepty mezi sekcemi a přejmenovávat nebo slučovat duplicity.
+                        </p>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setShowCategoryEditorModal(true);
+                          }}
+                          className="mt-2 text-xs bg-[#1B4332] hover:bg-[#153528] text-white px-5 py-3 rounded-xl font-bold transition-all cursor-pointer shadow-sm flex items-center gap-2"
+                        >
+                          <FolderOpen className="h-4 w-4" />
+                          <span>Otevřít hromadný editor kategorií</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="bg-blue-50 border border-blue-200 text-blue-900 rounded-xl p-4 text-[11px] leading-relaxed">
+                      <p className="font-bold uppercase tracking-wider text-blue-950 mb-1">
+                        📌 Jak funguje automatická kategorizace?
+                      </p>
+                      <p>
+                        Pokud u receptu nezadáte kategorii manuálně, systém ji automaticky odvodí na základě názvu a surovin do odpovídajících gastronomických pilířů (Svačiny, Polévky, Hlavní jídla, Dezerty atd.). V editoru kategorií však můžete toto automatické chování přepsat a zařadit recept do libovolné vlastní složky.
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* TAB 4: DIAGNOSTICS */}
+                {activeAdminTab === "diagnostics" && (
+                  <div className="space-y-6 animate-fade-in">
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                      <div>
+                        <h4 className="font-serif italic font-bold text-lg text-[#1B4332] mb-1">
+                          Diagnostika kulinářského systému
+                        </h4>
+                        <p className="text-xs text-slate-500 font-medium">
+                          Otestujte připojení k souborovému systému, funkčnost Gemini API a spojení se sítí.
+                        </p>
+                      </div>
+
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={handleRunDiagnostics}
+                          disabled={isDiagnosing}
+                          className="text-xs bg-[#1B4332] hover:bg-[#153528] disabled:bg-emerald-300 text-white font-bold py-2 px-4 rounded-xl transition-all cursor-pointer flex items-center gap-1.5 shrink-0 shadow-sm"
+                        >
+                          {isDiagnosing ? (
+                            <>
+                              <RefreshCw className="h-3.5 w-3.5 animate-spin" />
+                              <span>Spouštím diagnostiku...</span>
+                            </>
+                          ) : (
+                            <>
+                              <RefreshCw className="h-3.5 w-3.5" />
+                              <span>Spustit diagnostiku</span>
+                            </>
+                          )}
+                        </button>
+                        {isDiagnosing && (
+                          <button
+                            type="button"
+                            onClick={handleStopDiagnostics}
+                            className="text-xs bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-3.5 rounded-xl transition-all cursor-pointer flex items-center gap-1.5 shrink-0 shadow-xs"
+                            title="Zastavit diagnostiku"
+                          >
+                            <Square className="h-3 w-3 fill-current" />
+                            <span>Zastavit</span>
+                          </button>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* PROGRESS WINDOW FOR DIAGNOSTICS */}
+                    {isDiagnosing && (
+                      <div className="p-4 bg-[#FDFCF7] border border-[#E8E8E1] rounded-xl space-y-3 text-[#2c2c2c] shadow-xs animate-scale-up">
+                        <div className="flex items-center justify-between text-xs font-bold text-slate-700">
+                          <span className="truncate pr-1 text-slate-600">{diagnosticsProgressText}</span>
+                          <span className="font-mono text-emerald-700 shrink-0">{diagnosticsProgressPercent}%</span>
+                        </div>
+                        {/* Progress Bar */}
+                        <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                          <div
+                            className="bg-emerald-500 h-full transition-all duration-300"
+                            style={{ width: `${diagnosticsProgressPercent}%` }}
+                          />
+                        </div>
+                        {/* Step checklist */}
+                        <div className="grid grid-cols-2 gap-2 text-[11px] font-medium text-slate-500 pt-1.5 border-t border-slate-200">
+                          <div className={`flex items-center gap-1.5 ${diagnosticsStepIndex >= 0 ? 'text-emerald-800' : ''}`}>
+                            {diagnosticsStepIndex > 0 ? (
+                              <Check className="h-3 w-3 text-emerald-600 shrink-0" />
+                            ) : diagnosticsStepIndex === 0 ? (
+                              <RefreshCw className="h-3.5 w-3.5 text-emerald-600 animate-spin shrink-0" />
+                            ) : (
+                              <div className="h-1 w-1 rounded-full bg-slate-300 mx-1 shrink-0" />
+                            )}
+                            <span className={diagnosticsStepIndex === 0 ? 'font-bold' : ''}>1. Inicializace</span>
+                          </div>
+                          <div className={`flex items-center gap-1.5 ${diagnosticsStepIndex >= 1 ? 'text-emerald-800' : ''}`}>
+                            {diagnosticsStepIndex > 1 ? (
+                              <Check className="h-3 w-3 text-emerald-600 shrink-0" />
+                            ) : diagnosticsStepIndex === 1 ? (
+                              <RefreshCw className="h-3.5 w-3.5 text-emerald-600 animate-spin shrink-0" />
+                            ) : (
+                              <div className="h-1 w-1 rounded-full bg-slate-300 mx-1 shrink-0" />
+                            )}
+                            <span className={diagnosticsStepIndex === 1 ? 'font-bold' : ''}>2. Test zápisu</span>
+                          </div>
+                          <div className={`flex items-center gap-1.5 ${diagnosticsStepIndex >= 2 ? 'text-emerald-800' : ''}`}>
+                            {diagnosticsStepIndex > 2 ? (
+                              <Check className="h-3 w-3 text-emerald-600 shrink-0" />
+                            ) : diagnosticsStepIndex === 2 ? (
+                              <RefreshCw className="h-3.5 w-3.5 text-emerald-600 animate-spin shrink-0" />
+                            ) : (
+                              <div className="h-1 w-1 rounded-full bg-slate-300 mx-1 shrink-0" />
+                            )}
+                            <span className={diagnosticsStepIndex === 2 ? 'font-bold' : ''}>3. Spojení s Gemini AI</span>
+                          </div>
+                          <div className={`flex items-center gap-1.5 ${diagnosticsStepIndex >= 3 ? 'text-emerald-800' : ''}`}>
+                            {diagnosticsStepIndex > 3 ? (
+                              <Check className="h-3 w-3 text-emerald-600 shrink-0" />
+                            ) : diagnosticsStepIndex === 3 ? (
+                              <RefreshCw className="h-3.5 w-3.5 text-emerald-600 animate-spin shrink-0" />
+                            ) : (
+                              <div className="h-1 w-1 rounded-full bg-slate-300 mx-1 shrink-0" />
+                            )}
+                            <span className={diagnosticsStepIndex === 3 ? 'font-bold' : ''}>4. Sestavení reportu</span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {diagnosticsError && (
+                      <div className="p-3.5 bg-red-50 border border-red-200 rounded-xl text-xs text-red-800 space-y-1 animate-scale-up">
+                        <p className="font-bold">Chyba diagnostiky:</p>
+                        <p className="opacity-95 leading-normal">{diagnosticsError}</p>
+                      </div>
+                    )}
+
+                    {diagnosticsResult && (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs animate-scale-up">
+                        {/* 1. WRITE PERMISSION */}
+                        <div className="p-4 bg-[#FDFCF7]/30 border border-[#E8E8E1] rounded-xl space-y-1 text-[#2c2c2c] shadow-xs">
+                          <div className="flex items-center justify-between font-bold">
+                            <span className="flex items-center gap-1">
+                              <Database className="h-4 w-4 text-emerald-600 shrink-0" />
+                              Souborový systém:
+                            </span>
+                            {diagnosticsResult.writePermissionOk ? (
+                              <span className="text-emerald-600 font-extrabold uppercase text-[10px] bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">OK</span>
+                            ) : (
+                              <span className="text-red-600 font-extrabold uppercase text-[10px] bg-red-50 px-2 py-0.5 rounded-full border border-red-200">CHYBA</span>
+                            )}
+                          </div>
+                          <p className="text-slate-600 text-[11px] leading-snug font-medium">
+                            {diagnosticsResult.writePermissionMessage}
+                          </p>
+                        </div>
+
+                        {/* 2. GEMINI AI */}
+                        <div className="p-4 bg-[#FDFCF7]/30 border border-[#E8E8E1] rounded-xl space-y-1 text-[#2c2c2c] shadow-xs">
+                          <div className="flex items-center justify-between font-bold">
+                            <span className="flex items-center gap-1">
+                              <Sparkles className="h-4 w-4 text-amber-500 shrink-0" />
+                              Gemini AI API:
+                            </span>
+                            {diagnosticsResult.geminiOk ? (
+                              <span className="text-emerald-600 font-extrabold uppercase text-[10px] bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">OK</span>
+                            ) : (
+                              <span className="text-red-600 font-extrabold uppercase text-[10px] bg-red-50 px-2 py-0.5 rounded-full border border-red-200">CHYBA</span>
+                            )}
+                          </div>
+                          <p className="text-slate-600 text-[11px] leading-snug font-medium">
+                            {diagnosticsResult.geminiMessage}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="bg-[#F4F3EA] p-4 border-t border-[#E8E8E1] flex justify-end shrink-0 gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowAdminSettingsModal(false);
+                }}
+                className="px-5 py-2 bg-[#1B4332] hover:bg-[#153528] active:scale-95 text-white text-xs font-bold rounded-xl shadow-sm transition-all cursor-pointer"
+              >
+                Hotovo / Zavřít
+              </button>
             </div>
           </div>
         </div>
