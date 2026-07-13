@@ -1,0 +1,33 @@
+{
+  "title": "Pšenično-žitný chléb s droždím",
+  "summary": "Tradiční domácí chléb s přídavkem sladu a octa nahrazujícího kvas, optimalizovaný pro dosažení nadýchané střídky a křupavé kůrky pomocí pečení s párou.",
+  "ingredients": [
+    "250 g pšeničné chlebové mouky",
+    "250 g žitné chlebové mouky",
+    "14 g čerstvého droždí",
+    "345 ml vlažné vody (20 °C)",
+    "15 ml jablečného octa (5% kyselost)",
+    "7 g tekutého ječného sladu (Sladěnka)",
+    "12 g jemné soli",
+    "5 g celého kmínu",
+    "15 g pšeničné mouky na pomoučnění",
+    "100 ml horké vody na zapaření"
+  ],
+  "instructions": [
+    "V misce důkladně rozpustíme droždí a ječný slad v části vlažné vody. Směs necháme na teplém místě vzejít, dokud se na hladině nevytvoří stabilní pěna.",
+    "V míse kuchyňského robotu promícháme pšeničnou chlebovou mouku, žitnou chlebovou mouku, jemnou sůl a celý kmín.",
+    "K suché směsi přilijeme vzešlý kvásek, zbývající vlažnou vodu a jablečný ocet. Těsto hněteme hnětacím hákem na nízkou rychlost, dokud se suroviny nespojí a nezačne se vyvíjet lepková struktura.",
+    "Uhnětené těsto vytvarujeme do hladké koule, vložíme do mísy, zakryjeme fólií a necháme kynout při pokojové teplotě, dokud nezdvojnásobí svůj objem.",
+    "Vykynuté těsto vyklopíme na pomoučněnou plochu, jemně stočíme do pevného bochníku a vložíme do vysypané ošatky k finálnímu kynutí pod utěrkou.",
+    "Vykynutý bochník vyklopíme na sázecí lopatu, nařízneme ostrým nožem a sesuneme na rozpálený kámen v troubě předehřáté na nejvyšší výkon. Na dno trouby okamžitě vlijeme horkou vodu pro vytvoření páry, po deseti minutách troubu odvětráme, snížíme teplotu a chléb dopékáme dozlatova."
+  ],
+  "applianceTips": "Pro nejlepší možný vývoj kůrky použijte litinový hrnec s poklicí předehřátý na maximum. Pečení v uzavřeném prostoru dokonale zadrží přirozenou vlhkost těsta a simuluje profesionální parní pec bez nutnosti externího zapařování.",
+  "expertJustification": "Úprava časů hnětení na delší interval je nezbytná pro správné rozvinutí lepkové sítě u pšeničné části mouky. Prodloužení obou fází kynutí zaručuje rovnoměrnou poréznost střídky a lepší stravitelnost. Pečení s počátečním teplotním šokem a párou zajistí maximální nárůst objemu těsta před vytvořením finální kůrky.",
+  "applianceType": "Elektrická trouba s pečicím kamenem",
+  "cookingTime": "165 min",
+  "difficulty": "Střední",
+  "category": "Pečivo",
+  "id": "gen-1783415546359",
+  "estimatedCookingTime": "35 min",
+  "updatedAt": "2026-07-13T08:57:21.308Z"
+}
