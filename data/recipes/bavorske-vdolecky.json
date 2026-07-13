@@ -1,6 +1,6 @@
 {
   "title": "Bavorské vdolečky",
-  "summary": "Tradiční nadýchané kynuté pečivo smažené dozlatova podle klasické pekařské metodiky. Podává se s povidly, zakysanou smetanou a strouhaným tvarohem.",
+  "summary": "Tradiční nadýchané kynuté pečivo smažené dozlatova. Podává se s povidly, zakysanou smetanou a strouhaným tvarohem.",
   "ingredients": [
     "250 ml plnotučného mléka",
     "500 g polohrubé mouky",
@@ -12,27 +12,27 @@
     "1 žloutek",
     "30 ml rumu",
     "500 ml řepkového oleje",
-    "200 g švestkových povidel bez konzervantů",
+    "200 g švestkových povidel",
     "200 g zakysané smetany",
     "100 g tvrdého tvarohu"
   ],
   "instructions": [
-    "V misce rozdrobte droždí, přelijte částí vlažného mléka, přidejte lžičku cukru a nechte na teplém místě vzejít kvásek, dokud se na hladině nevytvoří bohatá pěna.",
+    "V misce rozdrobte droždí, přelijte částí vlažného mléka, přidejte špetku cukru a nechte na teplém místě vzejít kvásek, dokud se na hladině nevytvoří bohatá pěna.",
     "Do mísy kuchyňského robotu prosejte mouku se solí, přidejte zbylý cukr, aktivovaný kvásek, celé vejce, žloutek, rum a vlahé rozpuštěné máslo.",
-    "Pomocí hnětacího háku vypracujte hladké, elastické těsto, které se nelepí na stěny. Mísu zakryjte fólií a nechte těsto kynout při pokojové teplotě do zdvojnásobení objemu.",
+    "Pomocí hnětacího háku hněťte těsto na nízkou rychlost po dobu deseti minut, dokud nevznikne hladká, elastická hmota, která se nelepí na stěny. Mísu zakryjte fólií a nechte kynout při pokojové teplotě do zdvojnásobení objemu.",
     "Vykynuté těsto vyklopte na pomoučněný vál, jemně ho prohněťte pro uvolnění přebytečných plynů a rozválejte na rovnoměrný plát.",
     "Pomocí kulatého vykrajovátka vytvarujte jednotlivé vdolečky, rozložte je na pomoučněnou plochu, přikryjte utěrkou a nechte podstoupit finální dokynutí.",
     "V hluboké pánvi rozehřejte dostatečné množství oleje na stabilní teplotu vhodnou pro smažení. Těsně před smažením vytvořte ve středu každého vdolečku prsty hluboký důlek.",
     "Vdolečky vkládejte do horkého oleje nejprve stranou s důlkem dolů, pánev zakryjte pokličkou a smažte dozlatova. Poté je otočte, dosmažte již odkryté a nechte okapat na papírovém ubrousku.",
-    "Teplé vdolečky ozdobte povidly nanesenými do důlku, přidejte lžičku zakysané smetany a bohatě posypejte jemně nastrouhaným tvarohem."
+    "Teplé vdolečky ozdobte povidly nanesenými do důlku, přidejte zakysanou smetanu a bohatě posypejte jemně nastrouhaným tvarohem."
   ],
   "applianceTips": "Při smažení na indukční varné desce využijte funkci přesného nastavení teploty na stupeň určený pro smažení (ideálně 170-175 °C). Tím zabráníte přepalování tuku a zajistíte rovnoměrné propečení střídky bez nadměrné absorpce oleje.",
-  "expertJustification": "Optimalizace kynutí a rozdělení smažení na fázi pod pokličkou (pára pomáhá rychlému nárůstu objemu) a fázi bez pokličky (dokonalé vybarvení a křupavá kůrka) odpovídá profesionální pekařské praxi. Rum v těstě funguje jako fyzikální bariéra, která díky rychlému odparu alkoholu během kontaktu s horkým olejem minimalizuje nasáknutí tuku do střídky.",
+  "expertJustification": "Přidání přesného času hnětení na deset minut v kuchyňském robotu zaručuje dokonalý rozvoj lepkové struktury. To zajišťuje optimální elasticitu těsta a jeho schopnost udržet plynné bublinky během kynutí a následného smažení. Rum v těstě nadále funguje jako fyzikální bariéra zabraňující nasáknutí tuku.",
   "applianceType": "Indukční varná deska",
-  "cookingTime": "20 min",
+  "cookingTime": "90 min",
   "difficulty": "Střední",
   "category": "Sladká jídla a moučníky",
   "id": "gen-1781777265750",
   "estimatedCookingTime": "10",
-  "updatedAt": "2026-07-13T08:35:50.393Z"
+  "updatedAt": "2026-07-13T08:38:42.227Z"
 }
