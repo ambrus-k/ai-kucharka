@@ -350,6 +350,86 @@ export function getStepIngredients(stepText: string, ingredients: string[], fact
 }
 
 export default function App() {
+  // State for Toast Notifications
+  const [toast, setToast] = useState<{ id: string; title: string; message: string; type: "success" | "info" | "warn" } | null>(null);
+
+  // Request Notification Permission on mount
+  useEffect(() => {
+    if (typeof window !== "undefined" && "Notification" in window && Notification.permission === "default") {
+      Notification.requestPermission().catch(err => console.log("Web Notification permission blocked:", err));
+    }
+  }, []);
+
+  const sendWorkFinishedNotification = (title: string, message: string, type: "success" | "info" | "warn" = "success") => {
+    // 1. Play sound chime
+    try {
+      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+      if (AudioContextClass) {
+        const audioCtx = new AudioContextClass();
+        const playChime = (freq: number, start: number, duration: number) => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.frequency.setValueAtTime(freq, start);
+          gain.gain.setValueAtTime(0.12, start);
+          gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
+          osc.start(start);
+          osc.stop(start + duration);
+        };
+        playChime(587.33, audioCtx.currentTime, 0.15); // D5
+        playChime(698.46, audioCtx.currentTime + 0.1, 0.25); // F5
+      }
+    } catch (e) {
+      console.warn("Could not play audio notification:", e);
+    }
+
+    // 2. Browser standard Web Notification API
+    if (typeof window !== "undefined" && "Notification" in window) {
+      if (Notification.permission === "granted") {
+        try {
+          new Notification(title, { body: message });
+        } catch (e) {
+          console.warn("Error triggering Notification:", e);
+        }
+      } else if (Notification.permission !== "denied") {
+        Notification.requestPermission().then(permission => {
+          if (permission === "granted") {
+            try {
+              new Notification(title, { body: message });
+            } catch (err) {
+              console.warn("Error triggering Notification:", err);
+            }
+          }
+        });
+      }
+    }
+
+    // 3. Browser Tab Title flash
+    const originalTitle = document.title;
+    let isFlashing = true;
+    let flashCount = 0;
+    const interval = setInterval(() => {
+      if (flashCount >= 12) {
+        clearInterval(interval);
+        document.title = originalTitle;
+      } else {
+        document.title = isFlashing ? `🔔 HOTOVO! ${title}` : originalTitle;
+        isFlashing = !isFlashing;
+        flashCount++;
+      }
+    }, 800);
+
+    // 4. In-app Toast alert
+    const id = Date.now().toString();
+    setToast({ id, title, message, type });
+    
+    // Automatically dismiss toast after 5 seconds
+    setTimeout(() => {
+      setToast(prev => prev && prev.id === id ? null : prev);
+    }, 5000);
+  };
+
   // State for recipe database
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
@@ -482,12 +562,12 @@ export default function App() {
   const [collapsedCategories, setCollapsedCategories] = useState<Record<string, boolean>>({});
   const [collapsedAlphabet, setCollapsedAlphabet] = useState<Record<string, boolean>>({});
   const [sidebarViewMode, setSidebarViewMode] = useState<"druh" | "abeceda">("druh");
-  const [mobileActiveTab, setMobileActiveTab] = useState<"list" | "home">("list");
+  const [mobileActiveTab, setMobileActiveTab] = useState<"list" | "home">("home");
 
-  // Auto-reset mobile active tab to list view when no recipe is selected
+  // Auto-reset mobile active tab to home view (intro screen) when no recipe is selected
   useEffect(() => {
     if (!selectedRecipe) {
-      setMobileActiveTab("list");
+      setMobileActiveTab("home");
     }
   }, [selectedRecipe]);
 
@@ -901,6 +981,11 @@ export default function App() {
         });
       }
 
+      sendWorkFinishedNotification(
+        "Vědecká kontrola dokončena",
+        `Rozbor receptu "${selectedRecipe.title}" pomocí Gemini 3.5 Flash proběhl úspěšně.`
+      );
+
     } catch (err: any) {
       if (err.name === "AbortError") {
         console.log("Audit aborted");
@@ -908,6 +993,11 @@ export default function App() {
       } else {
         console.error(err);
         setAuditError(err.message || "Nepodařilo se spojit se serverem pro kontrolu.");
+        sendWorkFinishedNotification(
+          "Chyba při kontrole receptu",
+          err.message || "Chyba při vědecké kontrole.",
+          "warn"
+        );
       }
     } finally {
       if (auditAbortRef.current === controller) {
@@ -953,6 +1043,7 @@ export default function App() {
   const [editExpertJustification, setEditExpertJustification] = useState("");
   const [editApplianceType, setEditApplianceType] = useState("");
   const [editCookingTime, setEditCookingTime] = useState("");
+  const [editEstimatedCookingTime, setEditEstimatedCookingTime] = useState("");
   const [editDifficulty, setEditDifficulty] = useState("Střední");
   const [editCategory, setEditCategory] = useState("Ostatní");
   
@@ -971,6 +1062,7 @@ export default function App() {
     setEditExpertJustification(selectedRecipe.expertJustification || "");
     setEditApplianceType(selectedRecipe.applianceType || "");
     setEditCookingTime(selectedRecipe.cookingTime || "");
+    setEditEstimatedCookingTime(selectedRecipe.estimatedCookingTime || "");
     setEditDifficulty(selectedRecipe.difficulty || "Střední");
     setEditCategory(selectedRecipe.category || getRecipeCategory(selectedRecipe));
     setEditPrompt("");
@@ -993,6 +1085,7 @@ export default function App() {
       expertJustification: editExpertJustification,
       applianceType: editApplianceType,
       cookingTime: editCookingTime,
+      estimatedCookingTime: editEstimatedCookingTime.trim() || editCookingTime || "20 min",
       difficulty: editDifficulty as "Snadné" | "Střední" | "Složité",
       category: editCategory,
       updatedAt: new Date().toISOString()
@@ -1071,20 +1164,32 @@ export default function App() {
 
       const editedRecipe: Recipe = data.recipe;
       
-      // Dump remaining steps if response returned quicker
+      // Clear local interval
       clearInterval(intervalId);
-      const remainingLogs: string[] = [];
-      for (let i = currentStep; i < logStepsTemplates.length; i++) {
-        const item = logStepsTemplates[i];
-        const parts = item.split(" ");
-        const level = parts[0].replace("[", "").replace("]", "");
-        const msg = parts.slice(1).join(" ");
-        const timeStr2 = new Date().toTimeString().split(' ')[0];
-        remainingLogs.push(`[${timeStr2}] [${level}] ${msg}`);
-      }
       
-      if (remainingLogs.length > 0) {
-        setEditLogs(prev => [...prev, ...remainingLogs]);
+      if (data.logs && Array.isArray(data.logs)) {
+        const now = new Date().toTimeString().split(' ')[0];
+        const serverLogsFormatted = data.logs.map((l: string) => {
+          // If the log already starts with a level indicator like [INFO] or [SUCCESS], keep it, else default to [PROCESS]
+          const cleaned = l.replace(/^\[[A-Z]+\]\s*/, "");
+          const match = l.match(/^\[([A-Z]+)\]/);
+          const level = match ? match[1] : "PROCESS";
+          return `[${now}] [${level}] ${cleaned}`;
+        });
+        setEditLogs(prev => [...prev, ...serverLogsFormatted]);
+      } else {
+        const remainingLogs: string[] = [];
+        for (let i = currentStep; i < logStepsTemplates.length; i++) {
+          const item = logStepsTemplates[i];
+          const parts = item.split(" ");
+          const level = parts[0].replace("[", "").replace("]", "");
+          const msg = parts.slice(1).join(" ");
+          const timeStr2 = new Date().toTimeString().split(' ')[0];
+          remainingLogs.push(`[${timeStr2}] [${level}] ${msg}`);
+        }
+        if (remainingLogs.length > 0) {
+          setEditLogs(prev => [...prev, ...remainingLogs]);
+        }
       }
 
       setEditTitle(editedRecipe.title || "");
@@ -1095,18 +1200,28 @@ export default function App() {
       setEditExpertJustification(editedRecipe.expertJustification || "");
       setEditApplianceType(editedRecipe.applianceType || "");
       setEditCookingTime(editedRecipe.cookingTime || "");
+      setEditEstimatedCookingTime(editedRecipe.estimatedCookingTime || "");
       setEditDifficulty(editedRecipe.difficulty || "Střední");
       setEditCategory(editedRecipe.category || getRecipeCategory(editedRecipe));
       setEditPrompt(""); // Clear prompt after success
 
       const timeStrSuccess = new Date().toTimeString().split(' ')[0];
       setEditLogs(prev => [...prev, `[${timeStrSuccess}] [SUCCESS] Recept byl úspěšně zrekonstruován a načten do formuláře!`]);
+      sendWorkFinishedNotification(
+        "Úprava receptu dokončena",
+        `Recept "${selectedRecipe.title}" byl úspěšně upraven kulinářským jádrem.`
+      );
     } catch (err: any) {
       clearInterval(intervalId);
       console.error(err);
       const timeStrErr = new Date().toTimeString().split(' ')[0];
       setEditLogs(prev => [...prev, `[${timeStrErr}] [WARN] Selhání při úpravě: ${err.message || "Neznámá chyba"}`]);
       setEditError(err.message || "Nepodařilo se spojit se serverem pro AI úpravu.");
+      sendWorkFinishedNotification(
+        "Úprava receptu selhala",
+        err.message || "Chyba při úpravě receptu kulinářským jádrem.",
+        "warn"
+      );
     } finally {
       setIsEditLoading(false);
     }
@@ -1269,7 +1384,8 @@ RECEPT: ${selectedRecipe.title.toUpperCase()}
 ${separator}
 
 Kategorie: ${selectedRecipe.category || getRecipeCategory(selectedRecipe)}
-Doba přípravy: ${selectedRecipe.cookingTime || "Není specifikováno"}
+Celková doba: ${selectedRecipe.cookingTime || "Není specifikováno"}
+Tepelná úprava (expert): ${selectedRecipe.estimatedCookingTime || "Není specifikováno"}
 Náročnost: ${selectedRecipe.difficulty || "Střední"}
 Doporučený spotřebič: ${selectedRecipe.applianceType || "Standardní spotřebič"}
 
@@ -2637,11 +2753,22 @@ ${separator}`;
               
               {/* Back Button */}
               <button
-                onClick={() => setShowPaperView(false)}
+                onClick={() => {
+                  setShowPaperView(false);
+                  setSelectedRecipe(null);
+                  setIsEditing(false);
+                  setShowExportView(false);
+                  setAuditSteps(null);
+                  setProposedChange(null);
+                  setAuditModifiedRecipe(null);
+                  setActiveStepIndex(-1);
+                  setErrorMessage(null);
+                  setSearchQuery(""); // Návrat do výchozího stavu - vymazat vyhledávání
+                }}
                 className="flex items-center gap-1.5 text-[#1B4332] hover:text-[#2D6A4F] font-sans font-bold text-sm transition-all cursor-pointer bg-white px-3 py-1.5 rounded-xl border border-[#E8E4DB] hover:border-[#1B4332]"
               >
                 <ChevronLeft className="h-4 w-4" />
-                <span>Zpět na detail</span>
+                <span>Zpět na úvod kuchařky</span>
               </button>
 
               {/* Adjusters Group */}
@@ -2700,14 +2827,71 @@ ${separator}`;
                   </div>
                 </div>
 
+                {/* Export Options (TXT, Copy) */}
+                <div className="flex items-center gap-1 bg-white border border-[#E8E4DB] rounded-xl p-1 font-sans text-xs shadow-2xs">
+                  {/* Stáhnout TXT */}
+                  <button
+                    onClick={() => {
+                      const element = document.createElement("a");
+                      const file = new Blob([generateRecipeText()], {type: 'text/plain;charset=utf-8'});
+                      element.href = URL.createObjectURL(file);
+                      element.download = `${selectedRecipe.title.toLowerCase().replace(/\s+/g, "_")}_recept.txt`;
+                      document.body.appendChild(element);
+                      element.click();
+                      document.body.removeChild(element);
+                    }}
+                    className="flex items-center gap-1 hover:bg-slate-50 text-slate-700 hover:text-[#1B4332] px-2.5 py-1 rounded-lg font-bold text-xs transition-all cursor-pointer"
+                    title="Stáhnout recept jako textový soubor (TXT)"
+                  >
+                    <Download className="h-3.5 w-3.5 text-emerald-600 font-bold" />
+                    <span>TXT</span>
+                  </button>
+
+                  {/* Zkopírovat text */}
+                  <button
+                    onClick={async () => {
+                      const txt = generateRecipeText();
+                      try {
+                        await navigator.clipboard.writeText(txt);
+                        setCopiedText(true);
+                        setTimeout(() => setCopiedText(false), 2000);
+                      } catch (err) {
+                        const textarea = document.createElement("textarea");
+                        textarea.value = txt;
+                        textarea.style.position = "fixed";
+                        document.body.appendChild(textarea);
+                        textarea.focus();
+                        textarea.select();
+                        try {
+                          document.execCommand("copy");
+                          setCopiedText(true);
+                          setTimeout(() => setCopiedText(false), 2000);
+                        } catch (e) {
+                          console.error("Clipboard copy failed", e);
+                        }
+                        document.body.removeChild(textarea);
+                      }
+                    }}
+                    className={`flex items-center gap-1 px-2.5 py-1 rounded-lg font-bold text-xs transition-all cursor-pointer ${
+                      copiedText 
+                        ? "bg-emerald-700 text-white" 
+                        : "hover:bg-slate-50 text-slate-700"
+                    }`}
+                    title="Zkopírovat recept do schránky"
+                  >
+                    <Copy className="h-3.5 w-3.5 text-slate-500 font-bold" />
+                    <span>{copiedText ? "Zkopírováno!" : "Kopírovat"}</span>
+                  </button>
+                </div>
+
                 {/* Print Button */}
                 <button
                   onClick={triggerPaperPrint}
-                  className="flex items-center gap-1.5 bg-white border border-[#E8E4DB] hover:border-[#1B4332] text-slate-700 hover:text-[#1B4332] px-3 py-1.5 rounded-xl font-sans font-bold text-sm transition-all cursor-pointer shadow-2xs"
+                  className="flex items-center gap-1.5 bg-[#1B4332] text-white hover:bg-[#2D6A4F] px-3.5 py-1.5 rounded-xl font-sans font-bold text-sm transition-all cursor-pointer shadow-md"
                   title="Vytisknout recept"
                 >
                   <Printer className="h-4 w-4" />
-                  <span className="hidden sm:inline">Tisk</span>
+                  <span>Tisk</span>
                 </button>
               </div>
 
@@ -2746,12 +2930,18 @@ ${separator}`;
                   )}
 
                   {/* Metadata grid */}
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 py-5 border-y border-[#E8E4DB] text-center font-sans text-xs uppercase tracking-wider text-slate-500 font-bold mt-6">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 py-5 border-y border-[#E8E4DB] text-center font-sans text-xs uppercase tracking-wider text-slate-500 font-bold mt-6">
                     <div>
                       <span className="block text-[#1B4332] font-extrabold text-base md:text-lg normal-case font-serif mb-0.5">
                         {selectedRecipe.cookingTime || "Není uvedeno"}
                       </span>
-                      Doba přípravy
+                      Celková doba
+                    </div>
+                    <div>
+                      <span className="block text-[#1B4332] font-extrabold text-base md:text-lg normal-case font-serif mb-0.5 text-emerald-800">
+                        {selectedRecipe.estimatedCookingTime || "Není uvedeno"}
+                      </span>
+                      Tepelná úprava (expert)
                     </div>
                     <div>
                       <span className="block text-[#1B4332] font-extrabold text-base md:text-lg normal-case font-serif mb-0.5">
@@ -2843,11 +3033,22 @@ ${separator}`;
             {/* Bottom Footer Go Back Controls */}
             <div className="bg-[#F5F2EA] pb-10 flex justify-center no-print">
               <button
-                onClick={() => setShowPaperView(false)}
+                onClick={() => {
+                  setShowPaperView(false);
+                  setSelectedRecipe(null);
+                  setIsEditing(false);
+                  setShowExportView(false);
+                  setAuditSteps(null);
+                  setProposedChange(null);
+                  setAuditModifiedRecipe(null);
+                  setActiveStepIndex(-1);
+                  setErrorMessage(null);
+                  setSearchQuery(""); // Návrat do výchozího stavu - vymazat vyhledávání
+                }}
                 className="bg-[#2D6A4F] hover:bg-[#1B4332] text-white font-bold py-3.5 px-8 rounded-2xl shadow-lg transition-all flex items-center gap-2 cursor-pointer text-base"
               >
                 <BookOpen className="h-5 w-5" />
-                <span>Zavřít knihu a zpět</span>
+                <span>Zavřít kuchařku a zpět na úvod</span>
               </button>
             </div>
           </motion.div>
@@ -2855,7 +3056,7 @@ ${separator}`;
       </AnimatePresence>
 
       {/* HEADER */}
-      <header className="no-print bg-white border-b border-[#E8E8E1] py-4 px-6 sticky top-0 z-40 shadow-xs flex items-center justify-between">
+      <header className="no-print bg-white border-b border-[#E8E8E1] py-3.5 px-4 md:px-6 sticky top-0 z-40 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-3">
         <button
           onClick={() => {
             setSelectedRecipe(null);
@@ -2868,7 +3069,7 @@ ${separator}`;
             setActiveStepIndex(-1);
             setErrorMessage(null);
           }}
-          className="flex items-center gap-3 hover:opacity-90 active:scale-98 transition-all text-left bg-transparent border-0 p-0 m-0 cursor-pointer group"
+          className="flex items-center gap-3 hover:opacity-90 active:scale-98 transition-all text-left bg-transparent border-0 p-0 m-0 cursor-pointer group shrink-0"
           title="Přejít na hlavní stránku"
         >
           <div className="bg-[#1B4332] text-white p-2 rounded-xl shadow-md group-hover:bg-[#2D6A4F] transition-colors">
@@ -2885,111 +3086,221 @@ ${separator}`;
           </div>
         </button>
 
-        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-          {/* 1. RECIPE SPECIFIC HEADER CONTROLS */}
-          {selectedRecipe && !isEditing && (
+        <div className="flex flex-wrap items-center gap-2 md:gap-2.5 ml-auto md:ml-0">
+          {/* 1. RECIPE SPECIFIC HEADER CONTROLS (WHEN A RECIPE IS SELECTED) */}
+          {selectedRecipe ? (
             <>
-              {isAdmin && (
+              {/* BACK BUTTON */}
+              {isEditing ? (
+                <button
+                  type="button"
+                  onClick={() => setIsEditing(false)}
+                  className="bg-[#F5F5F0] hover:bg-[#E8E8E1] text-[#2C2C2C] border border-[#E8E8E1] font-bold py-2 px-3 rounded-xl shadow-xs transition-all flex items-center justify-center gap-1.5 text-xs sm:text-sm cursor-pointer active:scale-98"
+                  title="Zrušit úpravy a vrátit se"
+                >
+                  <ChevronLeft className="h-4.5 w-4.5" />
+                  <span>Zpět</span>
+                </button>
+              ) : (
+                <button
+                  onClick={() => {
+                    setSelectedRecipe(null);
+                    setIsEditing(false);
+                    setShowExportView(false);
+                    setAuditSteps(null);
+                    setProposedChange(null);
+                    setAuditModifiedRecipe(null);
+                    setActiveStepIndex(-1);
+                    setErrorMessage(null);
+                    setSearchQuery(""); // Návrat do výchozího stavu - vymazat vyhledávání
+                  }}
+                  className="bg-[#1B4332] hover:bg-[#2D6A4F] text-white font-bold py-2 px-3 rounded-xl shadow-xs transition-all flex items-center justify-center gap-1.5 text-xs sm:text-sm cursor-pointer hover:shadow-md active:scale-98"
+                  title="Zpět na hlavní přehled receptů"
+                >
+                  <ChevronLeft className="h-4.5 w-4.5" />
+                  <span>Zpět</span>
+                </button>
+              )}
+
+              {/* PREVIOUS & NEXT RECIPE BUTTONS */}
+              {(() => {
+                const currentIndex = filteredRecipes.findIndex(r => r.id === selectedRecipe.id);
+                const hasPrev = currentIndex > 0;
+                const hasNext = currentIndex < filteredRecipes.length - 1 && currentIndex !== -1;
+
+                const handlePrev = () => {
+                  if (hasPrev) {
+                    const prevR = filteredRecipes[currentIndex - 1];
+                    setSelectedRecipe(prevR);
+                    setCheckedIngredients({});
+                    setCheckedInstructions({});
+                    setIsEditing(false);
+                    setShowExportView(false);
+                    setAuditSteps(null);
+                    setProposedChange(null);
+                    setAuditModifiedRecipe(null);
+                    setActiveStepIndex(-1);
+                    setErrorMessage(null);
+                  }
+                };
+
+                const handleNext = () => {
+                  if (hasNext) {
+                    const nextR = filteredRecipes[currentIndex + 1];
+                    setSelectedRecipe(nextR);
+                    setCheckedIngredients({});
+                    setCheckedInstructions({});
+                    setIsEditing(false);
+                    setShowExportView(false);
+                    setAuditSteps(null);
+                    setProposedChange(null);
+                    setAuditModifiedRecipe(null);
+                    setActiveStepIndex(-1);
+                    setErrorMessage(null);
+                  }
+                };
+
+                return (
+                  <>
+                    <button
+                      id="btn-previous-recipe"
+                      onClick={handlePrev}
+                      disabled={!hasPrev}
+                      className={`font-bold py-2 px-3 rounded-xl shadow-xs transition-all flex items-center justify-center gap-1 text-xs sm:text-sm cursor-pointer ${
+                        hasPrev 
+                          ? "bg-white border border-[#1B4332] text-[#1B4332] hover:bg-[#F0F4F1] active:scale-98" 
+                          : "bg-[#F5F5F0] text-[#9A9A8C] border border-[#E8E8E1] cursor-not-allowed opacity-55"
+                      }`}
+                      title="Přejít na předchozí recept"
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                      <span>Předchozí</span>
+                    </button>
+
+                    <button
+                      id="btn-next-recipe"
+                      onClick={handleNext}
+                      disabled={!hasNext}
+                      className={`font-bold py-2 px-3 rounded-xl shadow-xs transition-all flex items-center justify-center gap-1 text-xs sm:text-sm cursor-pointer ${
+                        hasNext 
+                          ? "bg-white border border-[#1B4332] text-[#1B4332] hover:bg-[#F0F4F1] active:scale-98" 
+                          : "bg-[#F5F5F0] text-[#9A9A8C] border border-[#E8E8E1] cursor-not-allowed opacity-55"
+                      }`}
+                      title="Přejít na další recept"
+                    >
+                      <span>Další</span>
+                      <ChevronRight className="h-4 w-4" />
+                    </button>
+                  </>
+                );
+              })()}
+
+              {/* EDITING MODE VS VIEWING MODE BUTTONS */}
+              {isEditing ? (
                 <>
-                  {/* Kontrola receptu */}
+                  {/* KONTROLA RECEPTU */}
                   <button
+                    type="button"
                     onClick={handleAuditRecipe}
                     disabled={isAuditing}
-                    className={`font-bold py-2 px-2.5 sm:px-4 rounded-xl shadow-xs transition-all flex items-center gap-1.5 text-xs sm:text-sm cursor-pointer ${
+                    className={`font-bold py-2 px-3 rounded-xl shadow-xs transition-all flex items-center gap-1.5 text-xs sm:text-sm cursor-pointer ${
                       isAuditing
-                        ? "bg-amber-100 text-amber-800 border border-amber-200 cursor-not-allowed"
-                        : "bg-[#2D6A4F] hover:bg-[#1B4332] text-white"
+                        ? "bg-amber-100 text-amber-800 border border-amber-200 cursor-not-allowed animate-pulse"
+                        : "bg-[#2D6A4F] hover:bg-[#1B4332] text-white hover:shadow-md active:scale-98"
                     }`}
                     title="Spustit vědeckou kontrolu a audit receptu"
                   >
-                    <Cpu className={`h-4 w-4 ${isAuditing ? "animate-spin" : ""}`} />
-                    <span className="hidden md:inline">{isAuditing ? "Simuluji..." : "Kontrola receptu"}</span>
-                    <span className="md:hidden inline-block">{isAuditing ? "..." : "Kontrola"}</span>
+                    <Cpu className={`h-4.5 w-4.5 ${isAuditing ? "animate-spin" : ""}`} />
+                    <span>{isAuditing ? "Simuluji..." : "Kontrola receptu"}</span>
                   </button>
 
-                  {/* Úprava receptu */}
+                  {/* ULOŽIT RECEPT */}
                   <button
-                    onClick={startEditingRecipe}
-                    className="bg-white border border-[#1B4332] text-[#1B4332] hover:bg-emerald-50 font-bold py-2 px-2.5 sm:px-4 rounded-xl shadow-xs transition-all flex items-center gap-1.5 text-xs sm:text-sm cursor-pointer"
-                    title="Upravit a doladit kulinářské parametry receptu"
+                    type="submit"
+                    form="edit-recipe-form"
+                    className="bg-[#1B4332] hover:bg-[#2D6A4F] text-white font-bold py-2 px-3.5 rounded-xl shadow-xs hover:shadow-md transition-all flex items-center gap-1.5 text-xs sm:text-sm cursor-pointer active:scale-98"
+                    title="Uložit změny v receptu"
                   >
-                    <Sparkles className="h-4 w-4" />
-                    <span className="hidden md:inline">Upravit recept</span>
-                    <span className="md:hidden inline-block">Upravit</span>
+                    <Check className="h-4.5 w-4.5" />
+                    <span>Uložit</span>
+                  </button>
+                </>
+              ) : (
+                <>
+                  {/* UPRAVIT RECEPT (For Admin) */}
+                  {isAdmin && (
+                    <button
+                      onClick={startEditingRecipe}
+                      className="bg-white border border-[#1B4332] text-[#1B4332] hover:bg-emerald-50 font-bold py-2 px-3 rounded-xl shadow-xs transition-all flex items-center gap-1.5 text-xs sm:text-sm cursor-pointer"
+                      title="Upravit a doladit kulinářské parametry receptu"
+                    >
+                      <Sparkles className="h-4 w-4" />
+                      <span>Upravit recept</span>
+                    </button>
+                  )}
+
+                  {/* ZOBRAZENÍ KUCHAŘKY */}
+                  <button
+                    onClick={() => setShowPaperView(true)}
+                    className="bg-[#2D6A4F] hover:bg-[#1B4332] text-white font-bold py-2 px-3 rounded-xl shadow-xs hover:shadow-md transition-all flex items-center gap-1.5 text-xs sm:text-sm cursor-pointer"
+                    title="Zobrazit recept jako tištěnou knihu / kuchařku"
+                  >
+                    <BookOpen className="h-4 w-4" />
+                    <span>Zobrazit recept</span>
                   </button>
                 </>
               )}
-
-              {/* Zobrazení receptu */}
-              <button
-                onClick={() => setShowPaperView(true)}
-                className="bg-[#2D6A4F] hover:bg-[#1B4332] text-white font-bold py-2 px-2.5 sm:px-4 rounded-xl shadow-xs hover:shadow-md transition-all flex items-center gap-1.5 text-xs sm:text-sm cursor-pointer"
-                title="Zobrazit recept jako tištěnou knihu / kuchařku"
-              >
-                <BookOpen className="h-4 w-4" />
-                <span className="hidden md:inline">Zobrazit recept</span>
-                <span className="md:hidden inline-block">Zobrazit</span>
-              </button>
-
-              {/* Export receptu */}
-              <button
-                onClick={() => setShowExportView(true)}
-                className="bg-[#FFFBEB] hover:bg-[#FEF3C7] text-[#B45309] border border-[#FDE68A] font-bold py-2 px-2.5 sm:px-4 rounded-xl shadow-xs transition-all flex items-center gap-1.5 text-xs sm:text-sm cursor-pointer"
-                title="Export kuchařského receptu pro tisk, kopírování, TXT nebo PDF archivaci"
-              >
-                <FileText className="h-4 w-4 text-[#D97706]" />
-                <span className="hidden md:inline">Export receptu</span>
-                <span className="md:hidden inline-block">Export</span>
-              </button>
+            </>
+          ) : (
+            <>
+              {/* HOME VIEW: Show "Nový recept" only if Admin */}
+              {isAdmin && (
+                <button
+                  onClick={() => {
+                    setSelectedRecipe(null);
+                    setErrorMessage(null);
+                    setIsEditing(false);
+                  }}
+                  className="bg-[#D97706] hover:bg-[#C26405] active:scale-95 text-white font-semibold py-2 px-3.5 rounded-xl shadow-sm hover:shadow-md transition-all flex items-center gap-1.5 text-xs sm:text-sm cursor-pointer"
+                  title="Vytvořit zcela nový recept"
+                >
+                  <Plus className="h-4 w-4" />
+                  <span>Nový recept</span>
+                </button>
+              )}
             </>
           )}
 
-          {/* 2. TLAČÍTKO KOŠÍK */}
+          {/* GENERAL ACTIONS (Shed for both home and recipe detailed views) */}
+          {/* NÁKUPNÍ KOŠÍK / LIST */}
           <button
             onClick={() => setIsCartOpen(true)}
-            className="bg-emerald-50 hover:bg-emerald-100 text-[#1B4332] border border-emerald-200/60 font-bold py-2 px-2.5 sm:px-4 rounded-xl shadow-xs transition-all flex items-center gap-1.5 text-xs sm:text-sm cursor-pointer relative"
+            className="bg-emerald-50 hover:bg-emerald-100 text-[#1B4332] border border-emerald-200/60 font-bold p-2 rounded-xl shadow-xs transition-all flex items-center justify-center cursor-pointer relative"
             title="Zobrazit nákupní lístek / košík surovin"
           >
             <div className="relative">
-              <ShoppingBag className="h-4 w-4 text-emerald-700" />
+              <ShoppingBag className="h-4.5 w-4.5 text-emerald-700" />
               {cartItems.length > 0 && (
-                <span className="absolute -top-2.5 -right-2.5 bg-red-500 text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center animate-pulse shadow-xs">
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[9px] font-black w-4.5 h-4.5 rounded-full flex items-center justify-center animate-pulse shadow-xs">
                   {cartItems.length}
                 </span>
               )}
             </div>
-            <span className="hidden sm:inline">Košík</span>
           </button>
 
-          {/* 3. NOVÝ RECEPT (Admin) */}
+          {/* ADMINISTRAČNÍ PANEL NASTAVENÍ (For Admin only) */}
           {isAdmin && (
-            <>
-              <button
-                type="button"
-                onClick={() => {
-                  setActiveAdminTab("backup"); // default to backup and transfer tab as requested!
-                  setShowAdminSettingsModal(true);
-                }}
-                className="bg-white hover:bg-[#FDFCF7] text-slate-700 hover:text-[#1B4332] border border-[#E8E8E1] hover:border-[#1B4332]/30 font-bold p-2.5 rounded-xl shadow-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer"
-                title="Administrace a nastavení kuchařky"
-              >
-                <Settings className="h-5 w-5 text-slate-600 hover:text-[#1B4332] transition-transform hover:rotate-45 duration-300" />
-                <span className="hidden md:inline text-xs font-bold uppercase tracking-wider">Nastavení</span>
-              </button>
-
-              <button
-                onClick={() => {
-                  setSelectedRecipe(null);
-                  setErrorMessage(null);
-                  setIsEditing(false);
-                }}
-                className="bg-[#D97706] hover:bg-[#C26405] active:scale-95 text-white font-semibold py-2.5 px-4 rounded-lg shadow-sm hover:shadow-md transition-all flex items-center gap-2 text-sm cursor-pointer animate-fade-in"
-                title="Nový recept"
-              >
-                <Plus className="h-4 w-4" />
-                <span>Nový recept</span>
-              </button>
-            </>
+            <button
+              type="button"
+              onClick={() => {
+                setActiveAdminTab("backup");
+                setShowAdminSettingsModal(true);
+              }}
+              className="bg-white hover:bg-[#FDFCF7] text-slate-700 hover:text-[#1B4332] border border-[#E8E8E1] hover:border-[#1B4332]/30 font-bold p-2 rounded-xl shadow-xs transition-all flex items-center justify-center cursor-pointer"
+              title="Administrace a nastavení kuchařky"
+            >
+              <Settings className="h-4.5 w-4.5 text-slate-600 hover:text-[#1B4332] transition-transform hover:rotate-45 duration-300" />
+            </button>
           )}
         </div>
       </header>
@@ -3412,28 +3723,203 @@ ${separator}`;
                 className="max-w-4xl mx-auto space-y-6"
               >
 
-                {/* 2A. NAVIGATION BACK BAR */}
-                <div className="no-print flex flex-col sm:flex-row items-stretch sm:items-center justify-between bg-white border border-[#E8E8E1] rounded-2xl p-4 gap-3 shadow-xs">
-                  <button
-                    onClick={() => {
-                      setSelectedRecipe(null);
-                      setIsEditing(false);
-                      setShowExportView(false);
-                      setAuditSteps(null);
-                      setProposedChange(null);
-                      setAuditModifiedRecipe(null);
-                      setActiveStepIndex(-1);
-                      setErrorMessage(null);
-                    }}
-                    className="bg-[#1B4332] hover:bg-[#2D6A4F] text-white font-bold py-2.5 px-5 rounded-xl shadow-xs transition-all flex items-center justify-center gap-2 text-sm cursor-pointer hover:shadow-md active:scale-98"
-                  >
-                    <ChevronLeft className="h-5 w-5" />
-                    <span>Zavřít recept a zpět na přehled</span>
-                  </button>
-                  <div className="text-xs text-[#5C5C50] font-medium text-center sm:text-right">
-                    Zobrazen detail receptu: <span className="font-bold text-[#1B4332]">{selectedRecipe.title}</span>
-                  </div>
-                </div>
+                {/* 2A. CONTENT WORKSPACE */}
+
+                {/* AI RECIPE AUDIT AND SIMULATION PANEL */}
+                <AnimatePresence>
+                  {(isAuditing || auditSteps) && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl mb-6 space-y-5 overflow-hidden text-slate-100"
+                    >
+                      <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+                        <div className="flex items-center gap-2.5">
+                          <div className="h-8 w-8 rounded-lg bg-emerald-500/15 flex items-center justify-center border border-emerald-500/30">
+                            <Cpu className="h-4 w-4 text-emerald-400 animate-pulse" />
+                          </div>
+                          <div>
+                            <h3 className="font-extrabold text-sm text-slate-200 uppercase tracking-wider">
+                              AI Simulátor & Kulinární Audit
+                            </h3>
+                            <p className="text-[11px] text-slate-400 mt-0.5 font-medium">
+                              Virtuální replikace receptu a hledání prostoru pro vylepšení
+                            </p>
+                          </div>
+                        </div>
+
+                        {isAuditing ? (
+                          <button
+                            onClick={handleStopAudit}
+                            className="text-red-400 hover:text-red-300 px-3 py-1.5 bg-red-950/45 hover:bg-red-950/80 border border-red-900/60 rounded-xl transition-all cursor-pointer flex items-center gap-1.5 text-xs font-bold shadow-xs active:scale-95"
+                            title="Zastavit audit"
+                          >
+                            <Square className="h-2.5 w-2.5 fill-current" />
+                            <span>Zastavit</span>
+                          </button>
+                        ) : (
+                          <button
+                            onClick={handleRejectAuditChange}
+                            className="text-slate-400 hover:text-slate-200 p-1 bg-slate-800/50 hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
+                            title="Zavřít audit"
+                          >
+                            <X className="h-4 w-4" />
+                          </button>
+                        )}
+                      </div>
+
+                      {/* Display Auditing Loader when no steps returned yet */}
+                      {isAuditing && !auditSteps && (
+                        <div className="py-8 flex flex-col items-center justify-center space-y-4">
+                          <div className="relative">
+                            <div className="w-12 h-12 rounded-full border-4 border-slate-800 border-t-emerald-500 animate-spin" />
+                            <div className="absolute inset-0 flex items-center justify-center animate-pulse">
+                              <Zap className="h-5 w-5 text-emerald-400" />
+                            </div>
+                          </div>
+                          <div className="text-center space-y-3">
+                            <p className="text-sm font-bold text-emerald-400 flex items-center justify-center gap-1.5">
+                              <span className="inline-block h-2 w-2 bg-emerald-500 rounded-full animate-ping"></span>
+                              Zpracovávám pomocí Gemini 3.5 Flash...
+                            </p>
+                            <p className="text-xs text-slate-400 max-w-md mx-auto leading-relaxed">
+                              Právě probíhá kompletní kulinářský audit s vědeckým kulinářským modelem <strong className="text-emerald-300">Gemini 3.5 Flash</strong>. Recept prochází chemickou simulací reakcí surovin, vyvažováním chutí a eliminací konzervantů.
+                            </p>
+                            <div className="text-[10px] text-slate-500 font-mono flex items-center justify-center gap-1 bg-slate-950 p-2 rounded-lg max-w-sm mx-auto border border-slate-800">
+                              <span>🚀 Aktivní relace: </span>
+                              <span className="text-emerald-400 font-bold">gemini-3.5-flash</span>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={handleStopAudit}
+                              className="mx-auto text-xs bg-red-950/80 hover:bg-red-900 text-red-200 font-bold py-1.5 px-4 rounded-xl border border-red-900/60 transition-all flex items-center gap-1.5 cursor-pointer hover:scale-105 active:scale-95 shadow-sm"
+                            >
+                              <Square className="h-2.5 w-2.5 fill-red-400" />
+                              <span>Zastavit kontrolu</span>
+                            </button>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Audit Error */}
+                      {auditError && (
+                        <div className="bg-red-950/40 border border-red-900/50 rounded-xl p-4 flex gap-3 text-red-200 text-sm">
+                          <AlertCircle className="h-5 w-5 text-red-400 shrink-0 mt-0.5" />
+                          <div>
+                            <p className="font-bold">Chyba při auditu receptu</p>
+                            <p className="text-xs text-red-300 mt-1">{auditError}</p>
+                            <button
+                              onClick={handleAuditRecipe}
+                              className="mt-3 text-xs bg-red-900/50 hover:bg-red-800/50 px-3 py-1.5 rounded-md font-semibold border border-red-800 transition-colors cursor-pointer"
+                            >
+                              Zkusit znovu
+                            </button>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Steps of Virtual Replication */}
+                      {auditSteps && (
+                        <div className="space-y-5">
+                          <div className="space-y-2">
+                            <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                              <History className="h-3.5 w-3.5 text-slate-500" />
+                              Protokol z virtuální kulinářské replikace
+                            </h4>
+                            
+                            <div className="space-y-2">
+                              {auditSteps.map((step, i) => {
+                                const isShown = i <= activeStepIndex;
+                                const isActive = i === activeStepIndex;
+                                const isCompleted = i < activeStepIndex || (!isAuditing && i === auditSteps.length - 1);
+                                
+                                if (!isShown) return null;
+
+                                return (
+                                  <motion.div
+                                    key={i}
+                                    initial={{ opacity: 0, x: -10 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    className={`p-3 rounded-lg border text-xs leading-relaxed transition-all flex gap-3 ${
+                                      isActive
+                                        ? "bg-emerald-950/30 border-emerald-500/40 text-emerald-300 font-medium"
+                                        : "bg-slate-900/40 border-slate-800/80 text-slate-300"
+                                    }`}
+                                  >
+                                    <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5 ${
+                                      isCompleted
+                                        ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
+                                        : "bg-amber-500/20 text-amber-400 border border-amber-500/30 animate-pulse"
+                                    }`}>
+                                      {isCompleted ? "✓" : i + 1}
+                                    </div>
+                                    <div>{step}</div>
+                                  </motion.div>
+                                );
+                              })}
+                            </div>
+                          </div>
+
+                          {/* Proposed change */}
+                          {!isAuditing && proposedChange && (
+                            <motion.div
+                              initial={{ opacity: 0, y: 10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              className="bg-amber-600/10 border border-amber-500/35 rounded-xl p-4 space-y-4"
+                            >
+                              <div className="flex items-start gap-3">
+                                <div className="p-2 bg-amber-500/15 rounded-lg text-amber-400 shrink-0">
+                                  <Zap className="h-5 w-5" />
+                                </div>
+                                <div className="space-y-1">
+                                  <h4 className="text-xs font-bold text-amber-400 uppercase tracking-wider">
+                                    Navrhovaná změna na základě simulace:
+                                  </h4>
+                                  <p className="text-sm text-amber-100 leading-relaxed font-semibold">
+                                    {proposedChange}
+                                  </p>
+                                </div>
+                              </div>
+
+                              <div className="bg-slate-950/70 p-4 rounded-xl border border-slate-800/80 text-[11px] font-mono leading-relaxed text-slate-400 space-y-1.5 shadow-inner">
+                                <div className="text-slate-300 font-bold border-b border-slate-800 pb-1 mb-1.5 text-xs">
+                                  Očekávaný vliv na stávající recept:
+                                </div>
+                                {auditModifiedRecipe && (
+                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1">
+                                    <div>• Nová doba: <span className="text-emerald-400 font-bold">{auditModifiedRecipe.cookingTime}</span> (původně: {selectedRecipe.cookingTime})</div>
+                                    <div>• Nová náročnost: <span className="text-emerald-400 font-bold">{auditModifiedRecipe.difficulty}</span></div>
+                                    <div>• Suroviny: <span className="text-emerald-400 font-bold">{auditModifiedRecipe.ingredients.length} položek</span> (původně: {selectedRecipe.ingredients.length})</div>
+                                    <div>• Postup: <span className="text-emerald-400 font-bold">{auditModifiedRecipe.instructions.length} kroků</span> (původně: {selectedRecipe.instructions.length})</div>
+                                  </div>
+                                )}
+                              </div>
+
+                              <div className="pt-1 flex items-center gap-3 flex-wrap">
+                                <button
+                                  type="button"
+                                  onClick={handleAcceptAuditChange}
+                                  className="bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs py-2.5 px-5 rounded-xl shadow-md hover:shadow-lg transition-all flex items-center gap-1.5 cursor-pointer"
+                                >
+                                  <Check className="h-4 w-4 stroke-[3]" />
+                                  <span>Přijmout změnu a aktualizovat recept</span>
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={handleRejectAuditChange}
+                                  className="bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs py-2.5 px-4 rounded-xl transition-all cursor-pointer border border-slate-700"
+                                >
+                                  Odmítnout
+                                </button>
+                              </div>
+                            </motion.div>
+                          )}
+                        </div>
+                      )}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
 
 
                 {isEditing ? (
@@ -3499,6 +3985,32 @@ ${separator}`;
                           )}
                         </button>
                       </div>
+
+                      {/* Prompt presets & Active model info */}
+                      <div className="flex flex-wrap items-center justify-between gap-2.5 mt-2 pt-1 border-t border-[#FEF3C7]">
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => setEditPrompt("AI")}
+                            className="bg-amber-100 hover:bg-amber-200 text-amber-800 text-[10px] sm:text-xs font-bold px-2.5 py-1.5 rounded-lg transition-all cursor-pointer border border-amber-200 active:scale-95"
+                            title="Nastavit prompt jako 'AI'"
+                          >
+                            🪄 Nastavit prompt jako 'AI'
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setEditPrompt("AI: Vyvážit chutě, optimalizovat nutriční hodnoty a zmodernizovat postupy.")}
+                            className="bg-[#FFFBEB] hover:bg-amber-100 text-[#B45309] text-[10px] sm:text-xs font-medium px-2.5 py-1.5 rounded-lg transition-all cursor-pointer border border-amber-200/50 active:scale-95"
+                            title="Nastavit pokročilý AI prompt"
+                          >
+                            💡 Pokročilý AI prompt
+                          </button>
+                        </div>
+                        <div className="text-[10px] text-[#92400E] font-mono font-bold bg-amber-50 px-2 py-1 rounded-lg border border-amber-200/40 flex items-center gap-1">
+                          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                          Aktivní model: Gemini 3.5 Flash
+                        </div>
+                      </div>
                       {editError && (
                         <p className="text-xs text-red-600 font-semibold mt-1 flex items-center gap-1">
                           <AlertCircle className="h-3.5 w-3.5" />
@@ -3548,7 +4060,7 @@ ${separator}`;
                     </div>
 
                     {/* MANUAL FIELDS */}
-                    <form onSubmit={handleSaveEditedRecipe} className="space-y-4">
+                    <form id="edit-recipe-form" onSubmit={handleSaveEditedRecipe} className="space-y-4">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {/* Title */}
                         <div className="space-y-1 md:col-span-2">
@@ -3614,7 +4126,7 @@ ${separator}`;
 
                         {/* Cooking Time */}
                         <div className="space-y-1">
-                          <label className="block text-xs font-bold text-[#1B4332] uppercase tracking-wider">Doba přípravy</label>
+                          <label className="block text-xs font-bold text-[#1B4332] uppercase tracking-wider">Celková doba</label>
                           <input 
                             type="text"
                             value={editCookingTime}
@@ -3622,6 +4134,22 @@ ${separator}`;
                             className="w-full text-sm p-3 border border-[#E8E8E1] rounded-lg bg-[#FDFCF7] text-[#2C2C2C] focus:outline-hidden focus:ring-1 focus:ring-[#1B4332]"
                             required
                           />
+                        </div>
+
+                        {/* Estimated Cooking Time */}
+                        <div className="space-y-1">
+                          <label className="block text-xs font-bold text-[#1B4332] uppercase tracking-wider flex items-center justify-between">
+                            <span>Tepelná úprava (expert)</span>
+                            <span className="text-[10px] text-amber-800 font-medium lowercase">volitelné</span>
+                          </label>
+                          <input 
+                            type="text"
+                            value={editEstimatedCookingTime}
+                            onChange={(e) => setEditEstimatedCookingTime(e.target.value)}
+                            className="w-full text-sm p-3 border border-[#E8E8E1] rounded-lg bg-[#FDFCF7] text-[#2C2C2C] focus:outline-hidden focus:ring-1 focus:ring-[#1B4332]"
+                            placeholder="Např. 45 min, nebo ponechte prázdné pro autodetekci"
+                          />
+                          <p className="text-[10px] text-slate-500 italic mt-0.5">Pokud ponecháte prázdné, doplní se automaticky podle celkové doby.</p>
                         </div>
 
                         {/* Difficulty */}
@@ -3675,24 +4203,6 @@ ${separator}`;
                             required
                           />
                         </div>
-                      </div>
-
-                      {/* Action buttons at bottom of form */}
-                      <div className="pt-4 border-t border-[#E8E8E1] flex items-center justify-end gap-3 flex-wrap">
-                        <button
-                          type="button"
-                          onClick={() => setIsEditing(false)}
-                          className="bg-[#F5F5F0] hover:bg-[#E8E8E1] text-[#2C2C2C] font-semibold py-2.5 px-5 rounded-lg text-sm transition-all cursor-pointer border border-[#E8E8E1]"
-                        >
-                          Zrušit
-                        </button>
-                        <button
-                          type="submit"
-                          className="bg-[#1B4332] hover:bg-[#2D6A4F] text-white font-bold py-2.5 px-6 rounded-lg text-sm shadow-sm transition-all cursor-pointer flex items-center gap-1.5"
-                        >
-                          <Check className="h-4 w-4" />
-                          <span>Uložit změny v receptu</span>
-                        </button>
                       </div>
                     </form>
                   </div>
@@ -3801,10 +4311,14 @@ ${separator}`;
                       </div>
 
                       {/* PARAMETERS SUMMARY GRID */}
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 py-4 border-b border-[#D8D2C2] text-xs sm:text-sm">
+                      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 py-4 border-b border-[#D8D2C2] text-xs sm:text-sm">
                         <div>
-                          <span className="block text-[10px] font-mono uppercase text-[#888172] font-bold">Doba přípravy</span>
+                          <span className="block text-[10px] font-mono uppercase text-[#888172] font-bold">Celková příprava</span>
                           <span className="font-extrabold text-[#1B4332] text-sm sm:text-base font-serif mt-0.5">{selectedRecipe.cookingTime}</span>
+                        </div>
+                        <div>
+                          <span className="block text-[10px] font-mono uppercase text-[#888172] font-bold">Tepelná úprava</span>
+                          <span className="font-extrabold text-[#1B4332] text-sm sm:text-base font-serif mt-0.5 text-emerald-800">{selectedRecipe.estimatedCookingTime || "Není uvedeno"}</span>
                         </div>
                         <div>
                           <span className="block text-[10px] font-mono uppercase text-[#888172] font-bold">Náročnost</span>
@@ -3882,196 +4396,6 @@ ${separator}`;
                   </div>
                 ) : (
                   <>
-                    {/* AI RECIPE AUDIT AND SIMULATION PANEL */}
-                    <AnimatePresence>
-                      {(isAuditing || auditSteps) && (
-                        <motion.div
-                          initial={{ opacity: 0, height: 0 }}
-                          animate={{ opacity: 1, height: "auto" }}
-                          exit={{ opacity: 0, height: 0 }}
-                          className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl mb-6 space-y-5 overflow-hidden text-slate-100"
-                        >
-                          <div className="flex items-center justify-between border-b border-slate-800 pb-4">
-                            <div className="flex items-center gap-2.5">
-                              <div className="h-8 w-8 rounded-lg bg-emerald-500/15 flex items-center justify-center border border-emerald-500/30">
-                                <Cpu className="h-4 w-4 text-emerald-400 animate-pulse" />
-                              </div>
-                              <div>
-                                <h3 className="font-extrabold text-sm text-slate-200 uppercase tracking-wider">
-                                  AI Simulátor & Kulinární Audit
-                                </h3>
-                                <p className="text-[11px] text-slate-400 mt-0.5 font-medium">
-                                  Virtuální replikace receptu a hledání prostoru pro vylepšení
-                                </p>
-                              </div>
-                            </div>
-
-                            {isAuditing ? (
-                              <button
-                                onClick={handleStopAudit}
-                                className="text-red-400 hover:text-red-300 px-3 py-1.5 bg-red-950/45 hover:bg-red-950/80 border border-red-900/60 rounded-xl transition-all cursor-pointer flex items-center gap-1.5 text-xs font-bold shadow-xs active:scale-95"
-                                title="Zastavit audit"
-                              >
-                                <Square className="h-2.5 w-2.5 fill-current" />
-                                <span>Zastavit</span>
-                              </button>
-                            ) : (
-                              <button
-                                onClick={handleRejectAuditChange}
-                                className="text-slate-400 hover:text-slate-200 p-1 bg-slate-800/50 hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
-                                title="Zavřít audit"
-                              >
-                                <X className="h-4 w-4" />
-                              </button>
-                            )}
-                          </div>
-
-                          {/* Display Auditing Loader when no steps returned yet */}
-                          {isAuditing && !auditSteps && (
-                            <div className="py-8 flex flex-col items-center justify-center space-y-4">
-                              <div className="relative">
-                                <div className="w-12 h-12 rounded-full border-4 border-slate-800 border-t-emerald-500 animate-spin" />
-                                <div className="absolute inset-0 flex items-center justify-center animate-pulse">
-                                  <Zap className="h-5 w-5 text-emerald-400" />
-                                </div>
-                              </div>
-                              <div className="text-center space-y-3">
-                                <p className="text-sm font-bold text-emerald-400">
-                                  Spouštím kulinářský simulátor...
-                                </p>
-                                <p className="text-xs text-slate-400 max-w-md mx-auto leading-relaxed">
-                                  Program podrobuje složení a postup receptu kulinářské simulaci, kontroluje chemii jídla a reakce.
-                                </p>
-                                <button
-                                  type="button"
-                                  onClick={handleStopAudit}
-                                  className="mx-auto text-xs bg-red-950/80 hover:bg-red-900 text-red-200 font-bold py-1.5 px-4 rounded-xl border border-red-900/60 transition-all flex items-center gap-1.5 cursor-pointer hover:scale-105 active:scale-95 shadow-sm"
-                                >
-                                  <Square className="h-2.5 w-2.5 fill-red-400" />
-                                  <span>Zastavit kontrolu</span>
-                                </button>
-                              </div>
-                            </div>
-                          )}
-
-                          {/* Audit Error */}
-                          {auditError && (
-                            <div className="bg-red-950/40 border border-red-900/50 rounded-xl p-4 flex gap-3 text-red-200 text-sm">
-                              <AlertCircle className="h-5 w-5 text-red-400 shrink-0 mt-0.5" />
-                              <div>
-                                <p className="font-bold">Chyba při auditu receptu</p>
-                                <p className="text-xs text-red-300 mt-1">{auditError}</p>
-                                <button
-                                  onClick={handleAuditRecipe}
-                                  className="mt-3 text-xs bg-red-900/50 hover:bg-red-800/50 px-3 py-1.5 rounded-md font-semibold border border-red-800 transition-colors cursor-pointer"
-                                >
-                                  Zkusit znovu
-                                </button>
-                              </div>
-                            </div>
-                          )}
-
-                          {/* Steps of Virtual Replication */}
-                          {auditSteps && (
-                            <div className="space-y-5">
-                              <div className="space-y-2">
-                                <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                                  <History className="h-3.5 w-3.5 text-slate-500" />
-                                  Protokol z virtuální kulinářské replikace
-                                </h4>
-                                
-                                <div className="space-y-2">
-                                  {auditSteps.map((step, i) => {
-                                    const isShown = i <= activeStepIndex;
-                                    const isActive = i === activeStepIndex;
-                                    const isCompleted = i < activeStepIndex || (!isAuditing && i === auditSteps.length - 1);
-                                    
-                                    if (!isShown) return null;
-
-                                    return (
-                                      <motion.div
-                                        key={i}
-                                        initial={{ opacity: 0, x: -10 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        className={`p-3 rounded-lg border text-xs leading-relaxed transition-all flex gap-3 ${
-                                          isActive
-                                            ? "bg-emerald-950/30 border-emerald-500/40 text-emerald-300 font-medium"
-                                            : "bg-slate-900/40 border-slate-800/80 text-slate-300"
-                                        }`}
-                                      >
-                                        <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5 ${
-                                          isCompleted
-                                            ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
-                                            : "bg-amber-500/20 text-amber-400 border border-amber-500/30 animate-pulse"
-                                        }`}>
-                                          {isCompleted ? "✓" : i + 1}
-                                        </div>
-                                        <div>{step}</div>
-                                      </motion.div>
-                                    );
-                                  })}
-                                </div>
-                              </div>
-
-                              {/* Proposed change */}
-                              {!isAuditing && proposedChange && (
-                                <motion.div
-                                  initial={{ opacity: 0, y: 10 }}
-                                  animate={{ opacity: 1, y: 0 }}
-                                  className="bg-amber-600/10 border border-amber-500/35 rounded-xl p-4 space-y-4"
-                                >
-                                  <div className="flex items-start gap-3">
-                                    <div className="p-2 bg-amber-500/15 rounded-lg text-amber-400 shrink-0">
-                                      <Zap className="h-5 w-5" />
-                                    </div>
-                                    <div className="space-y-1">
-                                      <h4 className="text-xs font-bold text-amber-400 uppercase tracking-wider">
-                                        Navrhovaná změna na základě simulace:
-                                      </h4>
-                                      <p className="text-sm text-amber-100 leading-relaxed font-semibold">
-                                        {proposedChange}
-                                      </p>
-                                    </div>
-                                  </div>
-
-                                  <div className="bg-slate-950/70 p-4 rounded-xl border border-slate-800/80 text-[11px] font-mono leading-relaxed text-slate-400 space-y-1.5 shadow-inner">
-                                    <div className="text-slate-300 font-bold border-b border-slate-800 pb-1 mb-1.5 text-xs">
-                                      Očekávaný vliv na stávající recept:
-                                    </div>
-                                    {auditModifiedRecipe && (
-                                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1">
-                                        <div>• Nová doba: <span className="text-emerald-400 font-bold">{auditModifiedRecipe.cookingTime}</span> (původně: {selectedRecipe.cookingTime})</div>
-                                        <div>• Nová náročnost: <span className="text-emerald-400 font-bold">{auditModifiedRecipe.difficulty}</span></div>
-                                        <div>• Suroviny: <span className="text-emerald-400 font-bold">{auditModifiedRecipe.ingredients.length} položek</span> (původně: {selectedRecipe.ingredients.length})</div>
-                                        <div>• Postup: <span className="text-emerald-400 font-bold">{auditModifiedRecipe.instructions.length} kroků</span> (původně: {selectedRecipe.instructions.length})</div>
-                                      </div>
-                                    )}
-                                  </div>
-
-                                  <div className="pt-1 flex items-center gap-3 flex-wrap">
-                                    <button
-                                      type="button"
-                                      onClick={handleAcceptAuditChange}
-                                      className="bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs py-2.5 px-5 rounded-xl shadow-md hover:shadow-lg transition-all flex items-center gap-1.5 cursor-pointer"
-                                    >
-                                      <Check className="h-4 w-4 stroke-[3]" />
-                                      <span>Přijmout změnu a aktualizovat recept</span>
-                                    </button>
-                                    <button
-                                      type="button"
-                                      onClick={handleRejectAuditChange}
-                                      className="bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs py-2.5 px-4 rounded-xl transition-all cursor-pointer border border-slate-700"
-                                    >
-                                      Odmítnout
-                                    </button>
-                                  </div>
-                                </motion.div>
-                              )}
-                            </div>
-                          )}
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
 
                     {/* 2A. MAIN RECIPE PAPER CARD WITH SYSTEMATICALLY INCREASED FONT READABILITY */}
                   <div className="bg-white border border-[#E8E8E1] rounded-2xl shadow-sm overflow-hidden p-6 sm:p-8 space-y-6 print:border-none print:shadow-none print:p-0">
@@ -6234,6 +6558,28 @@ ${separator}`;
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Premium Toast Notification System */}
+      {toast && (
+        <div className="fixed bottom-6 right-6 z-[9999] max-w-md w-[350px] bg-[#1B4332] text-white border-l-4 border-[#D97706] rounded-xl shadow-2xl p-4 flex items-start gap-3 pointer-events-auto transition-all duration-300 transform translate-y-0 scale-100 font-sans">
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-bold uppercase tracking-wider text-[#F59E0B] flex items-center gap-1.5">
+              <span className="inline-block h-1.5 w-1.5 rounded-full bg-[#F59E0B] animate-ping"></span>
+              {toast.title}
+            </p>
+            <p className="text-xs text-[#E8F5E9] mt-1 leading-relaxed font-medium">
+              {toast.message}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setToast(null)}
+            className="text-white/60 hover:text-white text-xs font-bold px-1.5 py-0.5 hover:bg-white/10 rounded-md cursor-pointer transition-colors shrink-0"
+          >
+            ✕
+          </button>
         </div>
       )}
     </div>

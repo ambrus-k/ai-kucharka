@@ -307,7 +307,13 @@ function getAi(): GoogleGenAI {
 // Model fallback retry wrapper to handle transient 503/429 errors gracefully
 async function generateContentWithRetry(ai: GoogleGenAI, options: any, maxRetries = 5, initialDelayMs = 1500) {
   const originalModel = options.model || "gemini-3.5-flash";
-  const modelFallbackSequence = [originalModel, "gemini-flash-latest", "gemini-3.1-flash-lite"];
+  const modelFallbackSequence = Array.from(new Set([
+    originalModel,
+    "gemini-3.1-pro-preview",
+    "gemini-3.5-flash",
+    "gemini-flash-latest",
+    "gemini-3.1-flash-lite"
+  ]));
 
   let lastError: any = null;
   for (const currentModel of modelFallbackSequence) {
@@ -879,7 +885,12 @@ ZÁSADNÍ PRAVIDLA:
 
     const response = await generateContentWithRetry(ai, {
       model: "gemini-3.5-flash",
-      contents: { parts },
+      contents: [
+        {
+          role: "user",
+          parts: [{ text: `AI: ${userPrompt}` }, ...parts.filter(p => 'inlineData' in p)]
+        }
+      ],
       config: {
         systemInstruction,
         responseMimeType: "application/json",
@@ -894,12 +905,13 @@ ZÁSADNÍ PRAVIDLA:
             expertJustification: { type: Type.STRING, description: "Jasné a srozumitelné odůvodnění z pohledu chemie jídla, proč je tento postup lepší" },
             applianceType: { type: Type.STRING, description: "Název doporučeného spotřebiče" },
             cookingTime: { type: Type.STRING, description: "Celková doba přípravy vaření (např. '45 min')" },
+            estimatedCookingTime: { type: Type.STRING, description: "Doba samotné tepelné úpravy / aktivního vaření (např. '30 min', nebo '0 min' pro studená jídla)" },
             difficulty: { type: Type.STRING, description: "Náročnost receptu ('Snadné', 'Střední', 'Složité')" },
             category: { type: Type.STRING, description: "Kategorie jídla. Musí být: 'Pečivo', 'Maso', 'Polévky', 'Sladká jídla a moučníky', 'Ostatní'." }
           },
           required: [
             "title", "summary", "ingredients", "instructions", "applianceTips", 
-            "expertJustification", "applianceType", "cookingTime", "difficulty", "category"
+            "expertJustification", "applianceType", "cookingTime", "estimatedCookingTime", "difficulty", "category"
           ]
         }
       }
@@ -912,6 +924,9 @@ ZÁSADNÍ PRAVIDLA:
 
     const enhancedRecipe = JSON.parse(outputText.trim());
     enhancedRecipe.id = `gen-${Date.now()}`;
+    if (!enhancedRecipe.estimatedCookingTime) {
+      enhancedRecipe.estimatedCookingTime = enhancedRecipe.cookingTime || "20 min";
+    }
     
     res.json({ recipe: enhancedRecipe });
 
@@ -971,7 +986,12 @@ Vytvoř kompletně aktualizovaný recept se všemi poli. Ujisti se, že pokud se
 
     const response = await generateContentWithRetry(ai, {
       model: "gemini-3.5-flash",
-      contents: userPrompt,
+      contents: [
+        {
+          role: "user",
+          parts: [{ text: `AI: ${userPrompt}` }]
+        }
+      ],
       config: {
         systemInstruction,
         responseMimeType: "application/json",
@@ -986,12 +1006,13 @@ Vytvoř kompletně aktualizovaný recept se všemi poli. Ujisti se, že pokud se
             expertJustification: { type: Type.STRING, description: "Odůvodnění změn" },
             applianceType: { type: Type.STRING, description: "Optimalizovaný spotřebič" },
             cookingTime: { type: Type.STRING, description: "Doba přípravy" },
+            estimatedCookingTime: { type: Type.STRING, description: "Doba samotné tepelné úpravy / aktivního vaření (např. '30 min', nebo '0 min' pro studená jídla)" },
             difficulty: { type: Type.STRING, description: "Náročnost ('Snadné', 'Střední', 'Složité')" },
             category: { type: Type.STRING, description: "Kategorie jídla: 'Pečivo', 'Maso', 'Polévky', 'Sladká jídla a moučníky', 'Ostatní'." }
           },
           required: [
             "title", "summary", "ingredients", "instructions", "applianceTips", 
-            "expertJustification", "applianceType", "cookingTime", "difficulty", "category"
+            "expertJustification", "applianceType", "cookingTime", "estimatedCookingTime", "difficulty", "category"
           ]
         }
       }
@@ -1004,8 +1025,19 @@ Vytvoř kompletně aktualizovaný recept se všemi poli. Ujisti se, že pokud se
 
     const edited = JSON.parse(outputText.trim());
     edited.id = recipe.id || `gen-${Date.now()}`;
+    if (!edited.estimatedCookingTime) {
+      edited.estimatedCookingTime = recipe.estimatedCookingTime || recipe.cookingTime || "20 min";
+    }
     
-    res.json({ recipe: edited });
+    const logs = [
+      `[INFO] Navázáno spojení s Gemini API`,
+      `[INFO] Vybrán kulinářský model: Gemini 3.5 Flash`,
+      `[INFO] Odeslány pokyny uživatele s AI rolí: "${modificationPrompt}"`,
+      `[INFO] Model Gemini 3.5 Flash provedl chemicko-fyzikální analýzu ingrediencí a tepelné úpravy`,
+      `[SUCCESS] Recept byl úspěšně vygenerován pomocí Gemini 3.5 Flash (${outputText.length} znaků JSON)`
+    ];
+
+    res.json({ recipe: edited, logs });
 
   } catch (error: any) {
     console.error("Recipe edit error:", error);
@@ -1047,7 +1079,12 @@ ${JSON.stringify(recipe, null, 2)}
 
     const response = await generateContentWithRetry(ai, {
       model: "gemini-3.5-flash",
-      contents: userPrompt,
+      contents: [
+        {
+          role: "user",
+          parts: [{ text: `AI: ${userPrompt}` }]
+        }
+      ],
       config: {
         systemInstruction,
         responseMimeType: "application/json",

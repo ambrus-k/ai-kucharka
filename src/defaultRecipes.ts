@@ -6,6 +6,7 @@ export const DEFAULT_RECIPES: Recipe[] = [
     title: "Svíčková na smetaně",
     summary: "Tradiční svíčková na smetaně zjemněná karamelizací zeleniny v multifunkčním hrnci.",
     cookingTime: "90 min",
+    estimatedCookingTime: "45 min",
     difficulty: "Složité",
     applianceType: "Multifunkční hrnec",
     ingredients: [
@@ -48,6 +49,7 @@ export const DEFAULT_RECIPES: Recipe[] = [
     title: "Pečený bůček",
     summary: "Šťavnatý vepřový bůček s křupavou kůrkou.",
     cookingTime: "55 min",
+    estimatedCookingTime: "50 min",
     difficulty: "Střední",
     applianceType: "Horkovzdušná fritéza",
     ingredients: [
@@ -76,6 +78,7 @@ export const DEFAULT_RECIPES: Recipe[] = [
     title: "Domácí chléb",
     summary: "Pšenično-žitný chléb s optimálním kynutím.",
     cookingTime: "180 min",
+    estimatedCookingTime: "60 min",
     difficulty: "Snadné",
     applianceType: "Domácí pekárna",
     ingredients: [
@@ -89,7 +92,7 @@ export const DEFAULT_RECIPES: Recipe[] = [
       "1.25 lžičky sušeného droždí"
     ],
     instructions: [
-      "Do nádoby domácí pekárny nalijte nejprve tekuté suroviny: vlažnou vodu a olivový olej.",
+      "V prvním kroku přípravy nejprve smíchejte kvasinkový startér s tekutým sladidlem nebo sirupem (tato malá množství lze také zkrátit či vynechat). Do nádoby domácí pekárny nalijte nejprve tekuté suroviny: vlažnou vodu a olivový olej.",
       "Přidejte sůl a cukr do protilehlých rohů nádoby.",
       "Zasypte oběma druhy mouky tak, aby zcela zakryly vodní hladinu.",
       "Uprostřed mouky vytvořte malý důlek (nesmí dosáhnout k vodě) and nasypte do něj sušené droždí. Do rohů přidejte kmín.",
@@ -107,6 +110,7 @@ export const DEFAULT_RECIPES: Recipe[] = [
     title: "Borůvkové knedlíky",
     summary: "Nadýchané kynuté knedlíky vařené v páře.",
     cookingTime: "40 min",
+    estimatedCookingTime: "18 min",
     difficulty: "Střední",
     applianceType: "Thermomix / Kuchyňský robot",
     ingredients: [
@@ -121,7 +125,7 @@ export const DEFAULT_RECIPES: Recipe[] = [
       "K podávání: strouhaný tvaroh, moučkový cukr"
     ],
     instructions: [
-      "Do nádoby robota nalijte vlažné mléko, přidejte cukr a nadrobte kvasnice. Nechte 5-10 minut v teple vzejít kvásek.",
+      "V prvním kroku přípravy nejprve smíchejte kvasinkový startér s tekutým sladidlem nebo sirupem (tato malá množství lze také zkrátit či vynechat). Do nádoby robota nalijte vlažné mléko, přidejte cukr a nadrobte kvasnice. Nechte 5-10 minut v teple vzejít kvásek.",
       "Přidejte žloutek, špetku soli a polohrubou mouku. Zapněte program pro hnětení těsta (Dough program / klasické hnětení) po dobu 3 minut.",
       "Těsto vyjměte z nádoby, vložte do mísy, poprašte moukou, přikryjte utěrkou a nechte na teplém místě 30 minut kynout.",
       "Vykynuté těsto rozdělte na 8 stejných dílů. Každý díl zploštěte dlaní, do středu dejte polévkovou lžíci borůvek a pečlivě zabalte do kuličky.",

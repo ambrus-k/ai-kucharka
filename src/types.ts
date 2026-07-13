@@ -8,6 +8,7 @@ export interface Recipe {
   expertJustification: string;
   applianceType: string; // e.g. "Horkovzdušná fritéza", "Thermomix", "Pomalý hrnec", "Domácí pekárna", "Klasická trouba"
   cookingTime: string; // e.g. "45 min"
+  estimatedCookingTime?: string; // e.g. "20 min" (expert estimated active heating/cooking time)
   difficulty: "Snadné" | "Střední" | "Složité";
   category?: string;
   isDefault?: boolean;
