@@ -1,28 +1,31 @@
 {
   "title": "Máslová veka",
-  "summary": "Tradiční nadýchané pečivo s obsahem másla pro jemnou texturu a křupavou kůrku. [Startovní fermentace: 30 min, hnětení: 10 min, kynutí: 60–90 min, pečení/smažení: 15–45 min]",
+  "summary": "Tradiční nadýchané pečivo s máslem, připravené metodou důkladného hnětení a řízeného kynutí pro optimální texturu střídky.",
   "ingredients": [
     "285 g vlažného plnotučného mléka",
     "60 g změklého másla",
-    "500 g hladké pšeničné mouky (typ 00 nebo na světlé pečivo)",
+    "500 g hladké pšeničné mouky",
     "11 g soli",
     "6 g instantního droždí"
   ],
   "instructions": [
-    "Důkladně promíchejte droždí (startovací kulturu) s vlažným mlékem či syrovátkou o teplotě 30–35 °C pro optimální fermentaci. Zakryjte směs a nechte ji fermentovat 30 minut v teple, aby se plně aktivovaly kvasinky a vzešel stabilní kvásek.",
-    "Zvolte program Těsto, který zajistí důkladné propracování lepku pro optimální strukturu střídky.",
-    "Vykynuté těsto rozdělte na dvě stejné části a nechte 10 minut odpočinout pod utěrkou.",
-    "Každý díl vytvarujte do obdélníku, srolujte do pevného válečku a důkladně uzavřete sváry prsty.",
-    "Veky přeneste na plech s pečicím papírem, zakryjte a nechte v teple kynout 45 minut.",
-    "Potřete rozšlehaným vejcem pro zlatavý vzhled a pečte v předehřáté troubě na 190 °C po dobu 25 minut do tmavě zlaté barvy.",
-    "Po upečení nechte veky zcela vychladnout na mřížce, aby se ustálila střídka."
+    "Smíchejte droždí s vlažným mlékem a nechte 15 minut aktivovat v teplém prostředí.",
+    "Do mísy prosejte mouku, přidejte sůl, aktivovaný kvásek a změklé máslo.",
+    "Hněťte těsto pomocí kuchyňského robota 12 minut, dokud není hladké, elastické a nelepí se na stěny nádoby.",
+    "Nechte těsto kynout v uzavřené nádobě 60 minut, dokud nezdvojnásobí svůj objem.",
+    "Vykynuté těsto rozdělte na dva stejné díly a nechte 10 minut odpočinout.",
+    "Každý díl rozválejte a srolujte do pevného válečku, přičemž sváry důkladně utěsněte.",
+    "Veky přeneste na plech a nechte kynout dalších 45 minut pod čistou utěrkou.",
+    "Povrch jemně potřete vodou či vejcem a pečte v předehřáté troubě 25 minut při teplotě 190 °C.",
+    "Po vyjmutí z trouby nechte pečivo chladnout na mřížce po dobu 30 minut."
   ],
-  "applianceTips": "Při použití domácí pekárny využijte funkci odloženého startu tak, aby těsto bylo připraveno přesně ve chvíli, kdy máte čas na tvarování. Pokud vlastníte parní troubu, využijte krátký cyklus páry v prvních 5 minutách pečení pro dosažení tenké a křupavé kůrky.",
-  "expertJustification": "Zvýšení teploty pečení na 190 °C zajistí rychlejší nárůst těsta v troubě (tzv. oven spring) předtím, než se kůrka uzavře. Použití mléka a tuku (másla) zvyšuje plasticitu těsta a jemnost střídky díky emulgaci a inhibici tvorby velkých lepkových vazeb. Důkladné uzavření svárů zabraňuje praskání veky během pečení.",
-  "applianceType": "Domácí pekárna",
-  "cookingTime": "120 min",
+  "applianceTips": "Pro dosažení profesionální krusty použijte v první fázi pečení vstřikování páry nebo vložte na dno trouby plech s horkou vodou na prvních 5 minut.",
+  "expertJustification": "Optimalizace doby hnětení na 12 minut zajišťuje správnou vývojovou fázi lepkové sítě, zatímco prodloužená fermentace v závěrečné fázi kynutí zaručuje lehkou a nadýchanou strukturu střídky bez defektů.",
+  "applianceType": "Hnětací robot a pečicí trouba",
+  "cookingTime": "155 min",
   "difficulty": "Střední",
   "category": "Pečivo",
   "id": "gen-1781777771572",
-  "estimatedCookingTime": "120 min"
+  "estimatedCookingTime": "25 min",
+  "updatedAt": "2026-07-13T09:53:41.877Z"
 }
