@@ -1,0 +1,36 @@
+{
+  "id": "knedliky",
+  "title": "Parní borůvkové knedlíky",
+  "summary": "Tradiční kynuté knedlíky s borůvkami připravované v páře, která zajišťuje dokonalou nadýchanost a zabraňuje sražení střídky.",
+  "cookingTime": "95 min",
+  "difficulty": "Střední",
+  "applianceType": "Thermomix / Kuchyňský robot s parním nástavcem",
+  "ingredients": [
+    "250g polohrubé mouky",
+    "120ml polotučného mléka",
+    "15g čerstvého droždí",
+    "1 lžíce cukru krupice",
+    "1 žloutek",
+    "Špetka soli",
+    "250g čerstvých borůvek",
+    "100g másla",
+    "Strouhaný tvrdý tvaroh na posypání",
+    "Moučkový cukr na posypání"
+  ],
+  "instructions": [
+    "Rozmíchejte droždí ve vlažném mléce s cukrem a nechte na teplém místě vzejít aktivní kvásek.",
+    "Do mísy kuchyňského robota přidejte mouku, žloutek, špetku soli a vzešlý kvásek. Pomocí hnětacího háku vypracujte hladké, elastické těsto, které se nelepí na stěny nádoby.",
+    "Těsto zakryjte utěrkou a nechte v teple kynout, dokud nezdvojnásobí svůj objem.",
+    "Vykynuté těsto rozdělte na stejné díly. Každý kousek dlaní zploštěte, naplňte borůvkami, pečlivě zabalte do kuličky a spoj důkladně utěsněte.",
+    "Vytvarované knedlíky položte spojem dolů na pomoučenou plochu, zakryjte a nechte ještě chvíli dokynout, aby se stabilizovala jejich struktura.",
+    "Do nádoby robota nalijte vodu. Parní nástavec vymažte rozpuštěným máslem a rozložte do něj knedlíky s dostatečnými rozestupy.",
+    "Spusťte program parního vaření a vařte v intenzivní páře pod pokličkou. Během vaření poklici neodklápějte.",
+    "Uvařené knedlíky ihned po vyjmutí propíchněte špejlí nebo vidličkou, aby se uvolnila vnitřní pára. Podávejte přelité rozpuštěným máslem, posypané strouhaným tvarohem a moučkovým cukrem."
+  ],
+  "applianceTips": "Při vaření v parním nástavci dbejte na to, aby knedlíky nezakryly všechny otvory pro průchod páry. Cirkulace horkého vzduchu musí být rovnoměrná pro konzistentní prohřátí těsta bez oslizlých míst.",
+  "expertJustification": "Úprava časů kynutí a hnětení vychází z pekařské technologie pro kynutá těsta s vyšším obsahem tuku a žloutků. Dostatečný vývoj lepku při hnětení drží borůvkovou šťávu uvnitř a druhé kynutí zabraňuje praskání knedlíků při prudkém nárůstu teploty v páře. Zkrácení doby napařování na optimální čas zamezuje rozbřednutí střídky.",
+  "isDefault": true,
+  "category": "Sladká jídla a moučníky",
+  "estimatedCookingTime": "12 min",
+  "updatedAt": "2026-07-13T08:48:20.040Z"
+}
