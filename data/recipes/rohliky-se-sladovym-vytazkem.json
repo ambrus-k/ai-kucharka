@@ -1,6 +1,6 @@
 {
   "title": "Rohlíky se sladovým výtažkem",
-  "summary": "Vylepšená receptura s vyšší hydratací pro dosažení nadýchané střídky a dokonalé křupavé kůrky. [Startovní fermentace: 30 min, hnětení: 10 min, kynutí: 60–90 min, pečení/smažení: 15–45 min]",
+  "summary": "Klasické pečivo s vysokou hydratací a sladovým výtažkem pro dosažení profesionální textury střídky a křupavé kůrky.",
   "ingredients": [
     "500 g pšeničné mouky hladké",
     "270 g vlažné vody",
@@ -10,22 +10,22 @@
     "30 g vepřového sádla"
   ],
   "instructions": [
-    "Důkladně promíchejte droždí (startovací kulturu) s vlažným mlékem či syrovátkou o teplotě 30–35 °C pro optimální fermentaci. Zakryjte směs a nechte ji fermentovat 30 minut v teple, aby se plně aktivovaly kvasinky a vzešel stabilní kvásek.",
-    "Smíchejte mouku s většinou vody a nechte směs zakrytou odpočinout, aby se vytvořila optimální struktura lepku.",
-    "V oddělené nádobě rozmíchejte sladový výtažek a droždí ve zbylé vodě, poté tekutinu vlijte k základu a začněte hnětení.",
-    "Přidejte sůl a pokračujte v hnětení, dokud těsto nezačne vykazovat známky elasticity a hladkosti.",
-    "Zapracujte do těsta sádlo a hněťte tak dlouho, dokud není povrch zcela hladký a těsto se nelepí na stěny mísy.",
-    "Nechte těsto vykynout do dvojnásobného objemu, během kynutí jednou jemně přeložte pro posílení struktury.",
-    "Těsto rozdělte na stejné díly, vytvarujte bochánky a nechte je krátce odpočinout před finálním vyválením do trojúhelníků.",
-    "Pevně srolujte rohlíky od širší strany ke špičce, nechte dokynout na plechu a poté upečte v troubě s dostatečným zapařením."
+    "Droždí rozmíchejte v části vlažné tekutiny a nechte 15 minut aktivovat v teplém prostředí pro vytvoření startovací kultury.",
+    "Mouku smíchejte se zbylou tekutinou a sladovým výtažkem. Nechte směs 20 minut autolýzovat pro lepší hydrataci lepkových vláken.",
+    "Přidejte aktivovaný kvásek a hněťte v robotu 8 minut při nízké rychlosti, dokud není těsto kompaktní.",
+    "Přidejte sůl a zapracujte sádlo. Pokračujte v hnětení dalších 7 minut, dokud těsto není elastické a nelepí se na stěny mísy.",
+    "Těsto nechte 60 minut kynout v uzavřené nádobě, přičemž po 30 minutách proveďte překlad pro zpevnění struktury.",
+    "Vykynuté těsto rozdělte na stejné díly a vytvarujte bochánky, které nechte 10 minut odpočinout.",
+    "Těsto vyválejte do trojúhelníkového tvaru a pevně srolujte do finální podoby rohlíku.",
+    "Nechte rohlíky na plechu dokynout po dobu 30 minut a následně pečte v zapařené troubě."
   ],
-  "applianceTips": "Při pečení využijte funkci parního rázu trouby. Pokud trouba nemá přímé zapařování, použijte vyhřátý lávový kámen nebo plech s horkými kameny pro okamžitý vývin páry.",
-  "expertJustification": "Zvýšení hydratace na 60 % usnadňuje manipulaci s těstem, umožňuje lepší nárůst objemu během pečení a zabraňuje přílišné hutnosti střídky, která byla slabinou původního receptu.",
-  "applianceType": "Planetární robot a parní trouba",
-  "cookingTime": "120 min",
+  "applianceTips": "Pro dosažení ideální krusty předehřejte troubu na maximum a při vložení plechu využijte parní ráz nebo vlijte 50 ml vroucí vody na spodní rozpálený plech.",
+  "expertJustification": "Zavedení autolýzy a dvoufázového hnětení výrazně zlepšuje tažnost těsta. Sladový výtažek podporuje enzymatickou aktivitu, která zajišťuje lepší karamelizaci kůrky bez nutnosti přidávání cukru.",
+  "applianceType": "Planetární robot a horkovzdušná trouba s funkcí páry",
+  "cookingTime": "150 min",
   "difficulty": "Střední",
   "category": "Pečivo",
   "id": "gen-1781775974569",
-  "updatedAt": "2026-07-13T10:01:44.816Z",
-  "estimatedCookingTime": "120 min"
+  "updatedAt": "2026-07-13T10:02:29.895Z",
+  "estimatedCookingTime": "18 min"
 }
