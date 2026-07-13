@@ -1,0 +1,30 @@
+{
+  "title": "Rohlíky se sladovým výtažkem",
+  "summary": "Profesionální pečivo s postupnou autolýzou a precizním vrstvením pro dosažení ideální textury střídky.",
+  "ingredients": [
+    "500 g pšeničné mouky hladké (typ 00, min. 11,5 % proteinu)",
+    "240 g studené vody",
+    "30 g vlažné vody",
+    "6 g diastatického sladového výtažku",
+    "12 g čerstvého droždí",
+    "10 g jemné soli",
+    "30 g vepřového sádla"
+  ],
+  "instructions": [
+    "Smíchejte mouku s většinovým podílem studené vody na nízkou rychlost v robotu, dokud se nespojí, a nechte směs odpočinout pod utěrkou pro plnou hydrataci lepku.",
+    "Ve zbylé vlažné vodě rozmíchejte sladový výtažek a droždí, směs přidejte k odleželému těstu a hněťte na nízkou rychlost do úplného zapracování.",
+    "Do těsta přisypte sůl a krátce hněťte, aby se krystalky plně rozpustily a lepek se zpevnil.",
+    "Postupně do těsta zapracujte změklé sádlo a hněťte na střední rychlost, dokud není těsto hladké a neprojde testem okénka.",
+    "Těsto nechte kynout, v polovině doby jej přeložte, poté rozdělte na stejnoměrné kousky a vytvarujte bochánky, které nechte krátce odpočinout.",
+    "Bochánky vyválejte na trojúhelníky, pevně srolujte s tahem za špičku a nechte finálně dokynout na plechu.",
+    "Pečte v předehřáté troubě s intenzivním zapařením, v závěru páru vypusťte pro dosažení křupavosti a ihned po upečení povrch lehce zamlžte čistou vodou."
+  ],
+  "applianceTips": "Pro dosažení profesionálních výsledků použijte parní konvektomat nebo troubu s přímým vstřikováním páry. Pokud peče v běžné troubě, vložte na dno plech s horkými kameny a po vložení pečiva na ně vlijte hrnek horké vody.",
+  "expertJustification": "Oddělená hydratace mouky (autolýza) bez soli a tuku umožňuje enzymatickou aktivitu diastatického sladu a lepší rozvoj lepkové sítě. Fázové přidávání tuku až po zpevnění lepkové struktury zajišťuje optimální vláčnost střídky a brání předčasnému obalení proteinů tukem, což by omezilo absorpci vody.",
+  "applianceType": "Planetární robot a parní trouba",
+  "cookingTime": "150 min",
+  "difficulty": "Složité",
+  "category": "Pečivo",
+  "id": "gen-1781775974569",
+  "updatedAt": "2026-07-13T05:07:59.822Z"
+}
