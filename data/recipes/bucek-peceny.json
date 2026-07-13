@@ -1,31 +1,30 @@
 {
   "id": "bucek",
-  "title": "Bůček pečený ",
-  "summary": "Šťavnatý vepřový bůček s křupavou kůrkou. [Startovní odpočinek: 30 min, marinování: 2–24 h, pečení/dušení: 1,5–3 h]",
-  "cookingTime": "180 min",
+  "title": "Bůček pečený",
+  "summary": "Šťavnatý vepřový bůček s maximálně křupavou krustou připravený dvoufázovou metodou v horkovzdušné fritéze.",
+  "cookingTime": "80 min",
   "difficulty": "Střední",
   "applianceType": "Horkovzdušná fritéza",
   "ingredients": [
-    "1 kg vepřového bůčku (s kůží, bez kosti)",
-    "2 lžičky hrubozrnné soli",
-    "1 lžička drceného kmínu",
-    "4 stroužky česneku (utřené)",
-    "1 lžíce jablečného octa",
-    "1 lžička kukuřičného škrobu"
+    "1000 g vepřového bůčku bez kosti s kůží",
+    "12 g hrubozrnné soli",
+    "5 g drceného kmínu",
+    "20 g utřeného česneku",
+    "15 ml jablečného octa",
+    "5 g kukuřičného škrobu"
   ],
   "instructions": [
-    "Důkladně promíchejte startovací marinádu (kořenící směs) s masovým základem a tekutou bází (vývarem, mlékem či syrovátkou) o teplotě 30 °C pro optimální enzymatické zrání. Zakryjte směs a nechte ji odpočívat 30 minut pro maximální absorpci chutí.",
-    "Kůži bůčku ostrým nožem nakrájejte do mřížky (řežte pouze do tuku, ne do masa).",
-    "Do masa ze spodní a bočních stran vetřete utřený česnek, kmín a sůl. Kůži nechte čistou.",
-    "Osušte kůži papírovou utěrkou, potřete jablečným octem a rovnoměrně posypejte tenkou vrstvou soli smíchané s kukuřičným škrobem.",
-    "Vložte bůček do koše fritézy kůží dolů a pečte na 160 °C po dobu 35 minut, aby se maso prohřálo a tuk začal pomalu odtékat.",
-    "Opatrně bůček otočte kůží nahoru. Zvyšte teplotu na 200 °C a pečte dalších 15 až 20 minut, dokud kůže nevytvoří puchýřky a nebude extrémně křupavá.",
-    "Před krájením nechte bůček 10 minut odpočinout na prkénku, aby se šťávy uvnitř stabilizovaly."
+    "Povrch kůže nařežte do husté mřížky tak, abyste nezasáhli hluboko do masité části.",
+    "Do spodní a bočních stran masa důkladně vetřete sůl, kmín a utřený česnek. Kůži ponechte suchou a čistou.",
+    "Povrch kůže potřete jablečným octem a následně lehce poprašte směsí soli a kukuřičného škrobu pro dosažení optimální dehydratace povrchu.",
+    "Vložte bůček do fritézy kůží dolů a zahřívejte při 150 °C po dobu 45 minut, aby došlo k pozvolnému uvolnění tuku a jemnému prohřátí struktury masa.",
+    "Po uplynutí času bůček opatrně otočte kůží nahoru a zvyšte teplotu na 200 °C po dobu 20 minut, dokud povrch nevytvoří rovnoměrně křupavou krustu.",
+    "Vyjměte maso ze spotřebiče a před krájením jej nechte 15 minut odpočívat na mřížce, aby se vnitřní šťávy rovnoměrně redistribuovaly."
   ],
-  "applianceTips": "V horkovzdušné fritéze cirkuluje vzduch velmi rychle. Kukuřičný škrob a ocet na kůži vytáhnou přebytečnou vlhkost z povrchových buněk, což zaručí bleskové vytvoření křupavé krusty bez vysušení celého kusu masa.",
-  "expertJustification": "Podle fyziky tepla: Dvoufázová metoda kombinuje pomalou želatinizaci kolagenu (při 160 °C, kdy maso změkne a pustí tuk) s bleskovou dehydratací kůže při vysoké teplotě (200 °C), která prudce expanduje vzduchové kapsy v kůži.",
+  "applianceTips": "Při pečení kůží nahoru zajistěte, aby kolem masa proudil vzduch. Pokud máte fritézu s menším košem, podložte bůček, aby se teplo dostalo i pod něj.",
+  "expertJustification": "Dvoufázový proces využívá fyzikální jev denaturace proteinů při nízké teplotě, což zaručuje měkkost, následovanou Maillardovou reakcí a rychlou dehydratací povrchu při vysoké teplotě pro efekt 'crackling'.",
   "category": "Maso",
   "isDefault": true,
-  "updatedAt": "2026-07-13T09:42:25.391Z",
-  "estimatedCookingTime": "180 min"
+  "updatedAt": "2026-07-13T11:34:39.967Z",
+  "estimatedCookingTime": "65 min"
 }
