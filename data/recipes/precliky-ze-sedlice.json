@@ -1,0 +1,31 @@
+{
+  "title": "Preclíky ze Sedlice",
+  "summary": "Tradiční slané pečivo s vláčným středem a zlatavou kůrkou připravené pomocí dlouhého kynutí.",
+  "ingredients": [
+    "500 g hladké pšeničné mouky",
+    "200 g sádla",
+    "125 ml plnotučného mléka",
+    "42 g čerstvého droždí",
+    "10 g soli",
+    "50 g máku a hrubozrnné soli na posyp",
+    "30 ml mléka na potření"
+  ],
+  "instructions": [
+    "Droždí rozmíchejte ve vlažném mléce a nechte krátce aktivovat, aby se vytvořil kvásek.",
+    "Do mísy prosejte mouku se solí, přidejte sádlo a připravený kvásek.",
+    "Hněťte těsto tak dlouho, dokud není pružné, hladké a zcela nelepivé.",
+    "Zakryté těsto nechte v teple kynout, dokud zdvojnásobí svůj objem.",
+    "Vykynuté těsto rozdělte na stejné části, ze kterých vyválejte prameny a vytvarujte preclíky.",
+    "Preclíky vyskládejte na plech a nechte krátce dokynout před pečením.",
+    "Povrch potřete mlékem, posypte mákem či hrubozrnnou solí a pečte v předehřáté troubě dozlatova."
+  ],
+  "applianceTips": "Využijte parní funkci trouby pro vlhkou atmosféru během prvních minut pečení, což zajistí maximální objem a křupavý povrch.",
+  "expertJustification": "Zachování poměru surovin při 500 g mouky zajišťuje optimální hydrataci těsta a správnou lepkovou strukturu, která po upečení garantuje kýženou křehkost.",
+  "applianceType": "Horkovzdušná trouba",
+  "cookingTime": "150 min",
+  "difficulty": "Střední",
+  "category": "Pečivo",
+  "id": "gen-1781777534961",
+  "estimatedCookingTime": "15 min",
+  "updatedAt": "2026-07-13T11:45:34.681Z"
+}
