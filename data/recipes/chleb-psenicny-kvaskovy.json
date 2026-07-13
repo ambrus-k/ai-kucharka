@@ -1,30 +1,29 @@
 {
   "title": "Chléb pšeničný kváskový",
-  "summary": "Klasický pšeničný chléb s žitným kvasem, optimalizovaný pomocí autolýzy s teplou vodou pro dokonalý rozvoj lepku a vzdušnou střídku. [Startovní fermentace: 30 min, autolýza: 30–40 min, kynutí: 4–14 h, pečení: 45–50 min]",
+  "summary": "Profesionálně vedený pšeničný chléb využívající techniky autolýzy a řízené chladové fermentace pro dosažení maximální vzdušnosti střídky a komplexní chuti.",
   "ingredients": [
-    "350 g pšeničné hladké mouky (s obsahem proteinu alespoň 12 %)",
+    "350 g pšeničné hladké mouky (protein 12 %)",
     "200 g pšeničné chlebové mouky",
-    "350 g vlažné vody (24 °C)",
+    "350 g filtrované vody (24 °C)",
     "200 g aktivního žitného kvásku (100% hydratace)",
     "13 g jemné mořské soli",
     "6 g celého kmínu"
   ],
   "instructions": [
-    "Důkladně promíchejte mateřský kvásek (startovací kulturu) se syrovátkou či vlažnou vodou o teplotě 30–35 °C pro optimální fermentaci. Zakryjte směs a nechte ji fermentovat 30 minut, aby se probudily divoké kvasinky a mléčné bakterie.",
-    "Příprava rozkvasu: 8 až 12 hodin před samotným hnětením smíchejte žitné mouky, vody a lžíci aktivního kvásku. Nechte zrát při pokojové teplotě do zdvojnásobení objemu.",
-    "Teplá autolýza: V míse kuchyňského robotu promíchejte obě pšeničné mouky s vlažnou vodou (24 °C). Nechte 40 minut odpočívat pro plný rozvoj enzymatických procesů a přirozené vytvoření lepkové sítě.",
-    "Hnětení: K autolyzovanému těstu přidejte rozkvas, sůl a kmín. Hněťte na nízkou rychlost 3 minuty, poté na střední rychlost 4 minuty, dokud se těsto nezačne čistě oddělovat od stěn mísy.",
-    "Fermentace za pokojové teploty: Těsto nechte zrát 3 hodiny při pokojové teplotě (21 až 23 °C). Během prvních 90 minut proveďte každých 30 minut tři série šetrných překladů pro zpevnění struktury.",
-    "Tvarování bochníku: Těsto vyklopte na pomoučenou plochu, jemně předtvarujte a nechte 15 minut odpočívat. Poté vytvarujte pevný bochník a vložte jej spojem nahoru do ošatky vysypané rýžovou moukou.",
-    "Chladová retardace: Ošatku s těstem vložte do igelitového sáčku a uložte do chladničky stabilizované na 4 °C na 12 až 15 hodin pro pomalé zrání a rozvoj chuti.",
-    "Pečení: Troubu s litinovým hrncem předehřejte na 250 °C po dobu 45 minut. Chléb vyklopte na pečicí papír, nařízněte žiletkou pod úhlem 45 stupňů a vložte do rozpáleného hrnce. Pečte pod poklicí 20 minut na 250 °C, poté bez poklice 18 minut na 210 °C."
+    "V míse důkladně promíchejte obě mouky s vlažnou vodou tak, aby v těstě nezůstala žádná suchá místa. Nechte směs odpočívat, aby proběhla autolýza a přirozeně se rozvinula lepková síť.",
+    "Do autolyzovaného základu vmíchejte aktivní kvásek. Následně přidejte sůl a kmín. Těsto hněťte v robotu při nízkých otáčkách, dokud není hladké, elastické a neodlepuje se od stěn nádoby.",
+    "Těsto přemístěte do nádoby a nechte jej zrát při pokojové teplotě. V prvních devadesáti minutách proveďte pravidelné série překladů, které zajistí potřebnou strukturu a pevnost střídky.",
+    "Po dokončení kynutí těsto opatrně vyklopte na lehce pomoučenou plochu, proveďte jemné předtvarování a nechte krátce odpočinout. Následně vytvořte pevný bochník a vložte jej do ošatky vysypané rýžovou moukou.",
+    "Ošatku s těstem umístěte do chladničky pro pomalou fermentaci, která prohloubí chuťový profil a zajistí lepší stravitelnost.",
+    "Troubu s litinovým hrncem uvnitř rozpalte na vysokou teplotu. Chléb vyklopte na pečicí papír, proveďte hluboký řez a vložte do rozpáleného hrnce. Pečte nejprve pod poklicí pro vytvoření páry, poté dopečte odkryté do tmavě zlaté barvy."
   ],
-  "applianceTips": "Pro pečení použijte těžký litinový hrnec (Dutch oven). Dlouhé předehřátí hrnce nahromadí dostatek tepla, které po uzavření s chlebem vytvoří ideální parní láznici imitující profesionální pekařskou pec.",
-  "expertJustification": "Záměna ledové vody za vodu o teplotě 24 °C umožnila dosažení optimální startovní teploty těsta. Odstranil se teplotní šok kvasinek, enzymy v autolýze fungovaly efektivně a výsledný bochník vykazuje o 30 % větší objem, divočejší střídku a křupavější kůrku.",
-  "applianceType": "Klasická trouba s litinovým hrncem",
-  "cookingTime": "360 min",
+  "applianceTips": "Klíčem k úspěchu je maximální předehřátí litinového hrnce. Parní ráz v uzavřeném prostoru během prvních minut pečení umožní maximální nárůst objemu (tzv. oven spring).",
+  "expertJustification": "Postup byl optimalizován dle pekařské praxe s důrazem na enzymatickou aktivitu. Autolýza bez soli umožňuje lepší hydrataci lepku, zatímco chladová retardace stabilizuje organické kyseliny, což vede k lepší struktuře střídky a delší trvanlivosti.",
+  "applianceType": "Trouba s litinovým hrncem",
+  "cookingTime": "960 min",
   "difficulty": "Střední",
   "category": "Pečivo",
   "id": "gen-1781443902352",
-  "estimatedCookingTime": "360 min"
+  "estimatedCookingTime": "45 min",
+  "updatedAt": "2026-07-13T09:00:45.936Z"
 }
