@@ -1,0 +1,32 @@
+{
+  "title": "Žitno-pšeničné pečivo",
+  "summary": "Řemeslné pečivo s vysokým podílem vlákniny a optimalizovanou fermentací pro dosažení nadýchané střídky.",
+  "ingredients": [
+    "350 g pšeničné hladké mouky",
+    "150 g žitné chlebové mouky (lze nahradit žitnou celozrnnou moukou)",
+    "300 ml vlažné vody (při použití celozrnné varianty zvyšte hydrataci na 330 ml)",
+    "20 g čerstvého droždí",
+    "30 g sádla",
+    "10 g soli",
+    "5 g medu"
+  ],
+  "instructions": [
+    "Droždí rozpusťte ve vlažné vodě s medem a nechte vzejít, dokud nevznikne aktivní kvásek.",
+    "Do mísy prosejte oba druhy mouky, přidejte sůl, připravený kvásek a rozpuštěné sádlo.",
+    "Hněťte hákem na nízkou rychlost, dokud těsto není hladké a přestane se lepit na stěny mísy.",
+    "Zakryté těsto nechte v teple kynout, dokud nezdvojnásobí svůj objem.",
+    "Těsto rozdělte na stejnoměrné díly, vytvarujte bochánky a nechte je krátce odpočinout pod utěrkou.",
+    "Vytvarujte výsledné tvary, přeneste na plech a nechte finálně nakynout.",
+    "Před pečením povrch postříkejte vodou, případně posypte solí či kmínem.",
+    "Pečte v předehřáté troubě se zapařením, poté teplotu snižte a dopečte dozlatova."
+  ],
+  "applianceTips": "Využijte program pro kynutí při 30 °C pro stabilní výsledek a funkci pečení s přidanou párou pro dosažení profesionální kůrky.",
+  "expertJustification": "Zvýšení hydratace u celozrnné mouky je nezbytné kvůli vyšší absorpční schopnosti vlákniny, což zajistí, že střídka zůstane vláčná a nebude vysušená.",
+  "applianceType": "Horkovzdušná trouba s funkcí páry",
+  "cookingTime": "155 min",
+  "difficulty": "Střední",
+  "category": "Pečivo",
+  "id": "gen-1783916906147",
+  "updatedAt": "2026-07-13T17:59:13.305Z",
+  "estimatedCookingTime": "25 min"
+}
