@@ -1,6 +1,6 @@
 {
   "title": "Coleslaw",
-  "summary": "Tradiční zelný salát s krémovým dresinkem, stabilizovaný metodou řízené osmózy a mechanického narušení struktury pro optimální texturu a křupavost.",
+  "summary": "Precizně technicky zpracovaný zelný salát, kde osmóza a následná stabilizace textury vytvářejí ideální křupavost bez nežádoucího vodnatění.",
   "ingredients": [
     "800 g bílého zelí",
     "150 g mrkve",
@@ -15,19 +15,19 @@
     "2 g čerstvě mletého černého pepře"
   ],
   "instructions": [
-    "Očištěné bílé zelí nakrouhejte na jemné nudličky, v míse ho důkladně prohněťte se solí a nechte minimálně třicet minut odpočívat, aby proběhla hluboká osmóza a uvolnila se buněčná voda.",
-    "Mezitím očistěte mrkev a celer a nastrouhejte je na požadovanou tloušťku, šalotku nakrájejte velmi ostrým nožem na drobné kostičky, čímž zabráníte uvolnění hořkých silic.",
-    "Zelí přeneste do pevného plátna a silným tlakem z něj vymačkejte maximum tekutiny, dokud nebude na dotek téměř suché, následně ho promíchejte s připravenou zeleninou.",
-    "V samostatné misce energicky prošlehejte jablečný ocet, hořčici, cukr a pepř, dokud se krystalky cukru zcela nerozpustí, poté vmíchejte majonézu a smetanu do hladké, stabilní emulze.",
-    "Dresink důkladně zapracujte do zeleninové směsi, salát přetáhněte potravinářskou fólií a nechte v chladničce dozrát po dobu nejméně čtyř hodin před podáváním."
+    "Zelí nakrouhejte na tenké nudličky, v míse ho promíchejte se solí a nechte 20 min odpočívat pro zahájení procesu osmózy.",
+    "Během odpočinku zelí nastrouhejte mrkev a celer, šalotku nasekejte nadrobno a připravte si dresink smícháním octa, hořčice, cukru a pepře v homogenní tekutinu.",
+    "Po uplynutí 20 min zelí důkladně promačkejte a v utěrce nebo odstředivce vymačkejte veškerou uvolněnou tekutinu, aby salát zůstal křupavý.",
+    "Do připravené tekuté směsi vmíchejte majonézu a smetanu, čímž vznikne stabilní emulze, kterou následně důkladně zapracujte do zeleninové směsi.",
+    "Salát dejte odležet do chladničky na 120 min, aby došlo k hloubkové harmonizaci chutí a stabilizaci dresinku na surovinách."
   ],
-  "applianceTips": "Pro maximální efektivitu krouhání zelí využijte food processor s tenkým krouhacím diskem. K vymačkání vody ze zelí lze v profesionální praxi úspěšně využít odstředivku na salát s vloženým plátnem.",
-  "expertJustification": "Fyzikální hnětení se solí urychluje narušení buněčných stěn a zkracuje čas osmózy. Dokonalé vyždímání zabrání synerezi (uvolňování vody do dresinku) během zrání. Rozpuštění cukru v kyselé složce před přidáním tuků zaručuje homogenní distribuci chuti, zatímco minimálně čtyřhodinové zrání v chladu stabilizuje emulzi a harmonizuje chuťový profil.",
+  "applianceTips": "K dosažení konzistentní struktury použijte food processor s vlnitým krouhacím diskem. Rychlou filtraci buněčné vody zajistí odstředivka na salát.",
+  "expertJustification": "Zkrácení doby osmózy na 20 minut zabrání nadměrnému zničení buněčné struktury, zatímco 120 minut chlazení je optimální doba pro infiltraci dresinku do pórů zeleniny bez degradace čerstvosti.",
   "applianceType": "Kuchyňský robot s krouhacím diskem",
-  "cookingTime": "270 min",
+  "cookingTime": "140 min",
   "difficulty": "Snadné",
   "category": "Ostatní",
   "id": "gen-1782536706330",
   "estimatedCookingTime": "0 min",
-  "updatedAt": "2026-07-13T08:52:45.427Z"
+  "updatedAt": "2026-07-13T09:12:40.064Z"
 }
