@@ -1,34 +1,37 @@
 {
   "title": "Mazanec",
-  "summary": "Bohaté kynuté těsto s máslem a rozinkami, optimalizované pro dosažení vláčné střídky a stabilní kůrky. [Startovní fermentace: 30 min, hnětení: 10 min, kynutí: 60–90 min, pečení/smažení: 15–45 min]",
+  "summary": "Tradiční kynuté bohaté těsto připravené procesem dlouhé fermentace pro dosažení maximální vláčnosti a struktury střídky.",
   "ingredients": [
-    "250 g hladké mouky (ideálně typ 00)",
+    "250 g hladké mouky typ 00",
     "250 g polohrubé mouky",
-    "210 ml plnotučného mléka (vlažné)",
-    "125 g změklého másla",
+    "210 ml plnotučného mléka",
+    "125 g másla",
     "100 g krupicového cukru",
-    "5 ks žloutků (pokojová teplota)",
+    "5 ks žloutků",
     "30 g čerstvého droždí",
-    "5 g jemné soli",
-    "5 g čerstvé citronové kůry",
-    "50 g rozinek namočených v 20 ml rumu",
-    "30 g mandlových plátků na ozdobu"
+    "5 g soli",
+    "5 g citronové kůry",
+    "50 g rozinek",
+    "20 ml rumu",
+    "30 g mandlových plátků"
   ],
   "instructions": [
-    "Důkladně promíchejte droždí (startovací kulturu) s vlažným mlékem či syrovátkou o teplotě 30–35 °C pro optimální fermentaci. Zakryjte směs a nechte ji fermentovat 30 minut v teple, aby se plně aktivovaly kvasinky a vzešel stabilní kvásek.",
-    "Veškeré suroviny kromě másla a rozinek hněťte v robotu 10 minut na nízkou rychlost, dokud nevznikne kompaktní těsto.",
-    "Postupně přidávejte změklé máslo a hněťte dalších 10-12 minut, dokud se těsto nelepí na stěny mísy.",
-    "Vpracujte rozinky s rumem a nechte těsto kynout v teple 90 minut, dokud nezdvojnásobí svůj objem.",
-    "Těsto vyklopte, vytvarujte pevný bochník a nechte na plechu kynout dalších 60 minut pod utěrkou.",
-    "Povrch potřete žloutkem, posypte mandlemi a pečte dle instrukcí pro teplotu.",
-    "Pečte prvních 10 minut na 180 °C, poté snižte na 160 °C a dopečte do vnitřní teploty 92 °C."
+    "Aktivujte kvásek smícháním droždí s vlažným mlékem a špetkou cukru, nechte pracovat 20 minut.",
+    "Do mísy robotu prosejte oba druhy mouky, přidejte zbytek cukru, sůl, citronovou kůru a žloutky. Přilijte aktivovaný kvásek a hněťte 10 minut na nízký stupeň.",
+    "Do vypracovaného těsta postupně zapracujte změklé máslo a hněťte dalších 12 minut, dokud není těsto elastické a nelepí se.",
+    "Do hotového těsta ručně vmíchejte rozinky předem namočené v rumu a nechte v teple kynout 90 minut.",
+    "Vykynuté těsto přeneste na vál, vytvarujte pevný bochník a přemístěte na plech s pečicím papírem.",
+    "Nechte bochník dokynout dalších 60 minut pod utěrkou.",
+    "Povrch potřete rozšlehaným žloutkem, posypte mandlemi a vložte do trouby.",
+    "Pečte 10 minut při teplotě 180 °C, poté snižte teplotu na 160 °C a dopečte po dobu 35 minut do vnitřní teploty 92 °C."
   ],
-  "applianceTips": "Při použití domácí pekárny zvolte program 'Těsto'. Po ukončení programu vyjměte, vytvarujte bochník a nechte dokynout v teple mimo stroj. Pokud používáte multifunkční horkovzdušnou troubu, aktivujte funkci 'Steam' nebo vložte na dno pekáč s horkou vodou pro lepší nárůst a tenčí kůrku.",
-  "expertJustification": "Prodloužení doby hnětení s tukem je klíčové pro správnou tvorbu lepkové sítě, která udrží těžké těsto bohaté na žloutky. Snížení teploty pečení po prvních 10 minutách zabrání rychlému vysušení kůrky a umožní rovnoměrný nárůst bez praskání. Vnitřní teplota 92 °C je objektivním indikátorem bezpečného propečení, kdy je škrob kompletně želatinizovaný, ale vaječné bílkoviny zůstávají ještě vláčné.",
-  "applianceType": "Klasická trouba",
-  "cookingTime": "120 min",
+  "applianceTips": "Využijte funkci kynutí v troubě při 30 °C pro stabilnější a rychlejší výsledek, následně použijte pro pečení program s mírnou vlhkostí pro dosažení tenké kůrky.",
+  "expertJustification": "Změna postupu na delší hnětení a řízenou teplotu kynutí zajišťuje lepší rozvoj lepkové sítě, což je klíčové pro udržení bohatého obsahu tuku a žloutků v těstě.",
+  "applianceType": "Horkovzdušná trouba",
+  "cookingTime": "217 min",
   "difficulty": "Střední",
   "category": "Pečivo",
   "id": "gen-1781776592663",
-  "estimatedCookingTime": "120 min"
+  "estimatedCookingTime": "45 min",
+  "updatedAt": "2026-07-13T09:54:12.964Z"
 }
