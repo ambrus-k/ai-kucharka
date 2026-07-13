@@ -482,6 +482,14 @@ export default function App() {
   const [collapsedCategories, setCollapsedCategories] = useState<Record<string, boolean>>({});
   const [collapsedAlphabet, setCollapsedAlphabet] = useState<Record<string, boolean>>({});
   const [sidebarViewMode, setSidebarViewMode] = useState<"druh" | "abeceda">("druh");
+  const [mobileActiveTab, setMobileActiveTab] = useState<"list" | "home">("list");
+
+  // Auto-reset mobile active tab to list view when no recipe is selected
+  useEffect(() => {
+    if (!selectedRecipe) {
+      setMobileActiveTab("list");
+    }
+  }, [selectedRecipe]);
 
   // States for input portal
   const [rawText, setRawText] = useState("");
@@ -2989,8 +2997,42 @@ ${separator}`;
       {/* BODY WORKSPACE */}
       <div className="flex-1 max-w-[1600px] w-full mx-auto flex flex-col md:flex-row gap-0 overflow-hidden relative print:h-auto print:overflow-visible">
         
+        {/* MOBILE NAVIGATION TABS (Only visible on mobile when no recipe is selected) */}
+        {!selectedRecipe && (
+          <div className="md:hidden no-print w-full bg-white border-b border-[#E8E8E1] p-2 flex gap-2 flex-shrink-0">
+            <button
+              onClick={() => setMobileActiveTab("list")}
+              className={`flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                mobileActiveTab === "list"
+                  ? "bg-[#1B4332] text-white shadow-xs"
+                  : "bg-[#F5F5F0] text-[#5C5C50] hover:text-[#1B4332] hover:bg-[#F5F5F0]/80"
+              }`}
+            >
+              <BookOpen className="h-4 w-4" />
+              <span>Seznam receptů</span>
+            </button>
+            <button
+              onClick={() => setMobileActiveTab("home")}
+              className={`flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                mobileActiveTab === "home"
+                  ? "bg-[#1B4332] text-white shadow-xs"
+                  : "bg-[#F5F5F0] text-[#5C5C50] hover:text-[#1B4332] hover:bg-[#F5F5F0]/80"
+              }`}
+            >
+              <ChefHat className="h-4 w-4" />
+              <span>O kuchařce (Úvod)</span>
+            </button>
+          </div>
+        )}
+
         {/* LEFT SIDEBAR: RECIPE LIST */}
-        <aside className="no-print w-full md:w-80 lg:w-96 border-r border-[#E8E8E1] bg-white flex flex-col flex-shrink-0">
+        <aside className={`no-print w-full md:w-80 lg:w-96 border-r border-[#E8E8E1] bg-white flex-col flex-shrink-0 ${
+          selectedRecipe 
+            ? "hidden" 
+            : mobileActiveTab === "list"
+              ? "flex flex-1 md:flex-initial h-full"
+              : "hidden md:flex h-full"
+        }`}>
 
           {/* SEARCH & FILTER CONTROLS */}
           <div className="p-4 border-b border-[#E8E8E1] bg-[#FDFCF7]/60 flex flex-col gap-3">
@@ -3302,7 +3344,13 @@ ${separator}`;
         </aside>
 
         {/* MAIN WORKSPACE REGION */}
-        <main id="main-area" className="flex-1 bg-[#FDFCF7]/50 overflow-y-auto p-4 md:p-6 lg:p-8 print:overflow-visible print:h-auto">
+        <main id="main-area" className={`flex-1 bg-[#FDFCF7]/50 overflow-y-auto p-4 md:p-6 lg:p-8 print:overflow-visible print:h-auto ${
+          selectedRecipe 
+            ? "block" 
+            : mobileActiveTab === "home" 
+              ? "block" 
+              : "hidden md:block"
+        }`}>
           
           <AnimatePresence mode="wait">
             
@@ -3363,6 +3411,29 @@ ${separator}`;
                 transition={{ duration: 0.25 }}
                 className="max-w-4xl mx-auto space-y-6"
               >
+
+                {/* 2A. NAVIGATION BACK BAR */}
+                <div className="no-print flex flex-col sm:flex-row items-stretch sm:items-center justify-between bg-white border border-[#E8E8E1] rounded-2xl p-4 gap-3 shadow-xs">
+                  <button
+                    onClick={() => {
+                      setSelectedRecipe(null);
+                      setIsEditing(false);
+                      setShowExportView(false);
+                      setAuditSteps(null);
+                      setProposedChange(null);
+                      setAuditModifiedRecipe(null);
+                      setActiveStepIndex(-1);
+                      setErrorMessage(null);
+                    }}
+                    className="bg-[#1B4332] hover:bg-[#2D6A4F] text-white font-bold py-2.5 px-5 rounded-xl shadow-xs transition-all flex items-center justify-center gap-2 text-sm cursor-pointer hover:shadow-md active:scale-98"
+                  >
+                    <ChevronLeft className="h-5 w-5" />
+                    <span>Zavřít recept a zpět na přehled</span>
+                  </button>
+                  <div className="text-xs text-[#5C5C50] font-medium text-center sm:text-right">
+                    Zobrazen detail receptu: <span className="font-bold text-[#1B4332]">{selectedRecipe.title}</span>
+                  </div>
+                </div>
 
 
                 {isEditing ? (
