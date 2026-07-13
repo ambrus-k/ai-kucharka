@@ -1,32 +1,32 @@
 {
   "title": "Rohlíky/housky žitno-pšeničné",
-  "summary": "Řemeslné pečivo s obsahem žitné mouky pro vláčnou střídku a křupavou krustu, připravené s důrazem na správnou hydrataci. [Startovní fermentace: 30 min, hnětení: 10 min, kynutí: 60–90 min, pečení/smažení: 15–45 min]",
+  "summary": "Řemeslné pečivo s vysokým podílem vlákniny, kde správná hydratace a postupná fermentace zaručují optimální strukturu střídky.",
   "ingredients": [
     "350 g pšeničné hladké mouky",
-    "150 g žitné chlebové nebo celozrnné mouky",
-    "285 ml vlažné vody (pro chlebovou mouku) nebo 315 ml (pro celozrnnou mouku)",
-    "19 g čerstvého droždí",
-    "31 g sádla",
-    "11 g soli",
-    "6 g sladovitu nebo medu"
+    "150 g žitné chlebové mouky",
+    "300 ml vlažné vody",
+    "20 g čerstvého droždí",
+    "30 g sádla",
+    "10 g soli",
+    "5 g medu"
   ],
   "instructions": [
-    "Důkladně promíchejte droždí (startovací kulturu) s vlažným mlékem či syrovátkou o teplotě 30–35 °C pro optimální fermentaci. Zakryjte směs a nechte ji fermentovat 30 minut v teple, aby se plně aktivovaly kvasinky a vzešel stabilní kvásek.",
-    "Do mísy robotu prosejte oba druhy mouky, přidejte sůl, kvásek, zbylou vodu a sádlo.",
-    "Hněťte hákem na nízkou rychlost do spojení surovin, následně na střední rychlost do vytvoření hladkého a pružného bochníku, který se nelepí na stěny.",
-    "Vytvarujte kouli, vložte do vymazané mísy a nechte kynout pod utěrkou až do zdvojnásobení objemu.",
-    "Těsto rozdělte na stejné díly, vytvořte bochánky a po krátkém odpočinku vytvarujte do tvaru rohlíků nebo housek.",
-    "Skládejte na plech s pečicím papírem a nechte kynout pod utěrkou až do viditelného nabytí objemu.",
-    "Pečivo postříkejte vodou, posypte dle preferencí a pečte v troubě s úvodním zapařením horkou vodou na spodním plechu.",
-    "Po krátkém počátečním pečení v páře odstraňte spodní plech, snižte teplotu a dopečte dozlatova."
+    "Droždí rozpusťte ve vlažné vodě s medem a nechte 15 minut stát, dokud nevznikne aktivní kvásek.",
+    "Do mísy prosejte oba druhy mouky, přidejte sůl, vzešlý kvásek a rozpuštěné sádlo.",
+    "Hněťte hákem 10 minut na nízkou rychlost, dokud není těsto hladké a nelepí se na stěny mísy.",
+    "Těsto zakryjte a nechte v teple kynout 60 minut, dokud nezdvojnásobí svůj objem.",
+    "Těsto rozdělte na díly, vytvarujte bochánky a nechte je 10 minut odpočinout pod utěrkou.",
+    "Vytvarujte rohlíky nebo housky, vyskládejte je na plech a nechte kynout dalších 45 minut.",
+    "Pečivo postříkejte vodou, případně posypte solí nebo kmínem.",
+    "Pečte v troubě vyhřáté na 230 °C se zapařením 15 minut, poté snižte teplotu na 200 °C a dopečte 10 minut dozlatova."
   ],
-  "applianceTips": "Použijte kuchyňský robot s hnětacím hákem pro dosažení optimální elasticity lepkové sítě, což je klíčové zejména při práci se žitnou složkou.",
-  "expertJustification": "Zvýšený podíl žitné mouky vyžaduje vyšší hydrataci těsta pro zachování elasticity. Sladovit podporuje enzymatickou aktivitu a Maillardovu reakci při pečení, zatímco správné zapaření trouby zajistí ideální texturu kůrky bez potřeby umělých přísad.",
-  "applianceType": "Trouba s funkcí páry nebo horkovzdušná trouba",
-  "cookingTime": "120 min",
+  "applianceTips": "Při pečení využijte program pro kynutí v troubě nastavený na 30 °C a následně funkci pečení s přidanou párou pro dosažení profesionální kůrky.",
+  "expertJustification": "Zkrácení doby prvotní fermentace droždí na 15 minut je efektivnější, zatímco delší finální kynutí po vytvarování lépe vyvíjí plyny v lepkové síti. Vyšší počáteční teplota pečení se zapařením je kritická pro objem (tzv. oven spring) a lesklou kůrku.",
+  "applianceType": "Horkovzdušná trouba s funkcí páry",
+  "cookingTime": "155 min",
   "difficulty": "Střední",
   "category": "Pečivo",
   "id": "gen-1783916906147",
-  "updatedAt": "2026-07-13T06:14:37.847Z",
-  "estimatedCookingTime": "120 min"
+  "updatedAt": "2026-07-13T10:03:00.153Z",
+  "estimatedCookingTime": "25 min"
 }
