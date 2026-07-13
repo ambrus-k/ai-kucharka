@@ -1,6 +1,6 @@
 {
   "id": "bucek",
-  "title": "Pečený bůček",
+  "title": "Bůček pečený ",
   "summary": "Šťavnatý vepřový bůček s křupavou kůrkou. [Startovní odpočinek: 30 min, marinování: 2–24 h, pečení/dušení: 1,5–3 h]",
   "cookingTime": "180 min",
   "difficulty": "Střední",
@@ -26,6 +26,6 @@
   "expertJustification": "Podle fyziky tepla: Dvoufázová metoda kombinuje pomalou želatinizaci kolagenu (při 160 °C, kdy maso změkne a pustí tuk) s bleskovou dehydratací kůže při vysoké teplotě (200 °C), která prudce expanduje vzduchové kapsy v kůži.",
   "category": "Maso",
   "isDefault": true,
-  "updatedAt": "2026-07-10T06:30:05.907Z",
+  "updatedAt": "2026-07-13T09:42:25.391Z",
   "estimatedCookingTime": "180 min"
 }
