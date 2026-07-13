@@ -1,5 +1,5 @@
 {
-  "title": "Mistrovský chléb Šumava",
+  "title": "Chléb Šumava",
   "summary": "Tradiční pecen s vylepšenou strukturou díky přesně časované autolýze a důrazu na teplotu středu střídky.",
   "ingredients": [
     "20 g aktivního žitného kvásku",
@@ -26,5 +26,6 @@
   "difficulty": "Střední",
   "category": "Pečivo",
   "id": "gen-1783540977144",
-  "updatedAt": "2026-07-13T11:53:47.941Z"
+  "updatedAt": "2026-07-13T11:58:48.094Z",
+  "estimatedCookingTime": "540 min"
 }
