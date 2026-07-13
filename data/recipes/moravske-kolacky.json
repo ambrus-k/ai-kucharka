@@ -1,6 +1,6 @@
 {
   "title": "Moravské koláčky",
-  "summary": "Tradiční kynuté koláčky s bohatou tvarohovou náplní a povidly, připravené z kvalitního máslového těsta bez umělých tuků.",
+  "summary": "Tradiční kynuté koláčky s bohatou tvarohovou náplní a povidly, připravené z kvalitního máslového těsta bez umělých tuků. [Startovní fermentace: 30 min, hnětení: 10 min, kynutí: 60–90 min, pečení/smažení: 15–45 min]",
   "ingredients": [
     "500 g hladké mouky (typ 00)",
     "250 g změklého másla (bez náhražek)",
@@ -17,7 +17,7 @@
     "Drobenka: 50 g másla, 50 g hrubé mouky, 50 g cukru krystal"
   ],
   "instructions": [
-    "Z vlažného mléka, lžičky cukru a droždí vytvořte kvásek a nechte jej v teple vzejít.",
+    "Důkladně promíchejte droždí (startovací kulturu) s vlažným mlékem či syrovátkou o teplotě 30–35 °C pro optimální fermentaci. Zakryjte směs a nechte ji fermentovat 30 minut v teple, aby se plně aktivovaly kvasinky a vzešel stabilní kvásek.",
     "Do mísy prosejte mouku, přidejte sůl, zbytek cukru, žloutek, vzešlý kvásek a změklé máslo nakrájené na kostičky.",
     "Vypracujte hladké nelepivé těsto. V tomto receptu není nutné dlouhé kynutí v míse, těsto lze zpracovávat ihned po propracování.",
     "Těsto rozdělte na menší díly, vytvarujte kuličky a pokládejte je na plech s pečicím papírem.",
@@ -28,8 +28,9 @@
   "applianceTips": "Při použití kuchyňského robota (např. Thermomix) použijte hnětací funkci po dobu 3 minut. Pokud máte horkovzdušnou fritézu s pečicí formou, můžete koláčky péct při 160 °C po dobu cca 10 minut, což zajistí rovnoměrnější propečení díky cirkulaci vzduchu.",
   "expertJustification": "Odstranil jsem ztužený rostlinný tuk (Omega), protože obsahuje nezdravé transmastné kyseliny a zhoršuje senzorickou kvalitu pečiva. Použití výhradně másla zajistí lepší chuť a správnou texturu střídky. Přechod na hladkou mouku zaručuje jemnější strukturu koláčků, zatímco přesné dodržení poměru tuku a mouky zabraňuje vysychání těsta.",
   "applianceType": "Domácí trouba / Kuchyňský robot",
-  "cookingTime": "60 min",
+  "cookingTime": "120 min",
   "difficulty": "Střední",
   "category": "Pečivo",
-  "id": "gen-1781777490075"
+  "id": "gen-1781777490075",
+  "estimatedCookingTime": "120 min"
 }

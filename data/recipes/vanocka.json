@@ -1,6 +1,6 @@
 {
   "title": "Vánočka",
-  "summary": "Nadýchaná máslová vánočka připravená metodou omládku pro optimální strukturu střídky a dlouhotrvající vláčnost.",
+  "summary": "Nadýchaná máslová vánočka připravená metodou omládku pro optimální strukturu střídky a dlouhotrvající vláčnost. [Startovní fermentace: 30 min, hnětení: 10 min, kynutí: 60–90 min, pečení/smažení: 15–45 min]",
   "ingredients": [
     "250 g hladké pšeničné mouky",
     "250 g polohrubé pšeničné mouky",
@@ -17,7 +17,7 @@
     "1 ks vejce na potření"
   ],
   "instructions": [
-    "V teplém mléce rozmíchejte droždí, 10 g cukru a 50 g hladké mouky. Nechte 20 minut vzejít kvásek.",
+    "Důkladně promíchejte droždí (startovací kulturu) s vlažným mlékem či syrovátkou o teplotě 30–35 °C pro optimální fermentaci. Zakryjte směs a nechte ji fermentovat 30 minut v teple, aby se plně aktivovaly kvasinky a vzešel stabilní kvásek.",
     "Do mísy kuchyňského robota dejte mouku, zbylý cukr, sůl, citronovou kůru, žloutky, rum z namočených rozinek a kvásek.",
     "Hněťte na nízkou rychlost 10 minut. Poté postupně přidávejte změklé máslo a hněťte dalších 12 minut, dokud není těsto hladké a elastické.",
     "Do těsta krátce zapracujte rozinky a nechte kynout v teple 90 minut, v polovině času těsto přeložte.",
@@ -28,8 +28,9 @@
   "applianceTips": "Pro automatizaci hnětení využijte kuchyňský robot s hnětacím hákem. Pro kynutí je ideální parní trouba s nastavenou funkcí kynutí (30 °C, vlhkost 70 %) nebo domácí pekárna, která těsto hněte i kyne při stabilní teplotě.",
   "expertJustification": "Změna teploty a postupu vkládání másla (postupná inkorporace) zajišťuje správnou emulgaci tuků v lepkové síti, což zabraňuje 'těžkosti' těsta. Vnitřní teplota 92 °C je kritickým bodem pro denaturaci proteinů a želatinizaci škrobů, což zaručuje, že vánočka nebude uvnitř syrová, ale zároveň zůstane vláčná a nevysušená.",
   "applianceType": "Kuchyňský robot",
-  "cookingTime": "240 min",
+  "cookingTime": "120 min",
   "difficulty": "Střední",
   "category": "Pečivo",
-  "id": "gen-1781776790684"
+  "id": "gen-1781776790684",
+  "estimatedCookingTime": "120 min"
 }

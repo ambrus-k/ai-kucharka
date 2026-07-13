@@ -1,6 +1,6 @@
 {
   "title": "Bavorské vdolečky",
-  "summary": "Tradiční kynuté vdolečky s vláčným těstem, připravené s důrazem na správnou fermentaci a ideální teplotu smažení.",
+  "summary": "Tradiční kynuté vdolečky s vláčným těstem, připravené s důrazem na správnou fermentaci a ideální teplotu smažení. [Startovní fermentace: 30 min, hnětení: 10 min, kynutí: 60–90 min, pečení/smažení: 15–45 min]",
   "ingredients": [
     "250 ml plnotučného mléka (vlažného)",
     "500 g polohrubé mouky",
@@ -17,7 +17,7 @@
     "100 g tvrdého tvarohu na strouhání"
   ],
   "instructions": [
-    "V teplém mléce rozmíchejte cukr a droždí a nechte 10 minut vzejít kvásek.",
+    "Důkladně promíchejte droždí (startovací kulturu) s vlažným mlékem či syrovátkou o teplotě 30–35 °C pro optimální fermentaci. Zakryjte směs a nechte ji fermentovat 30 minut v teple, aby se plně aktivovaly kvasinky a vzešel stabilní kvásek.",
     "V míse nebo robotu smíchejte mouku se solí, přidejte kvásek, vejce, žloutek, rum a změklé máslo.",
     "Hněťte těsto, dokud není hladké a nelepí se na stěny nádoby. Nechte kynout na teplém místě přikryté utěrkou cca 60 minut.",
     "Vykynuté těsto vyválejte na pomoučněném vále na plát silný 1 cm a vykrájejte kolečka o průměru 6-8 cm.",
@@ -32,5 +32,6 @@
   "cookingTime": "120 min",
   "difficulty": "Střední",
   "category": "Sladká jídla a moučníky",
-  "id": "gen-1781777265750"
+  "id": "gen-1781777265750",
+  "estimatedCookingTime": "120 min"
 }

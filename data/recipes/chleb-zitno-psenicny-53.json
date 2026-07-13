@@ -1,6 +1,6 @@
 {
   "title": "Chléb žitno-pšeničný 5:3",
-  "summary": "Vylepšený recept s oddělenou autolýzou pro silnější strukturu střídy a precizní teplotní křivkou pečení.",
+  "summary": "Vylepšený recept s oddělenou autolýzou pro silnější strukturu střídy a precizní teplotní křivkou pečení. [Startovní fermentace: 30 min, autolýza: 30–40 min, kynutí: 4–14 h, pečení: 45–50 min]",
   "ingredients": [
     "200 g aktivního žitného kvásku",
     "400 g žitné mouky chlebové T930",
@@ -10,17 +10,19 @@
     "11 g celého kmínu"
   ],
   "instructions": [
-    "Smíchejte 400 g žitné mouky, 300 g pšeničné mouky a 480 g vody. Nechte 60 minut odpočívat (autolýza bez kvásku).",
-    "Do autolyzovaného těsta zapracujte 200 g kvásku, sůl a kmín. Důkladně prohněťte, dokud těsto není homogenní.",
+    "Důkladně promíchejte mateřský kvásek (startovací kulturu) se syrovátkou či vlažnou vodou o teplotě 30–35 °C pro optimální fermentaci. Zakryjte směs a nechte ji fermentovat 30 minut, aby se probudily divoké kvasinky a mléčné bakterie.",
+    "Smíchejte žitné mouky, pšeničné mouky a vody. Nechte 60 minut odpočívat (autolýza bez kvásku).",
+    "Do autolyzovaného těsta zapracujte kvásku, sůl a kmín. Důkladně prohněťte, dokud těsto není homogenní.",
     "Nechte kynout 3 hodiny při pokojové teplotě (překládejte každých 45 minut), poté vytvarujte a dejte kynout do chladu na 12 hodin.",
     "Pečte prvních 15 minut na 250 °C se zapařením, poté snižte na 210 °C na 20 minut a nakonec dopékejte 20 minut na 180 °C."
   ],
   "applianceTips": "Při závěrečné fázi pečení nechte mírně pootevřená dvířka trouby (na 1 cm) pro odvod přebytečné vlhkosti a získání křupavé krusty.",
   "expertJustification": "Oddělená autolýza bez kvásku zabraňuje předčasné degradaci lepku kyselinami a postupný pokles teploty pečení zajistí propečení bez připálení žitných cukrů.",
   "applianceType": "Elektrická horkovzdušná trouba",
-  "cookingTime": "17 hodin",
+  "cookingTime": "360 min",
   "difficulty": "Střední",
   "category": "Pečivo",
   "id": "gen-1783527082168",
-  "updatedAt": "2026-07-08T16:16:46.581Z"
+  "updatedAt": "2026-07-08T16:16:46.581Z",
+  "estimatedCookingTime": "360 min"
 }

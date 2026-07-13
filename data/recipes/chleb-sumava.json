@@ -1,6 +1,6 @@
 {
   "title": "Chléb Šumava",
-  "summary": "Tradiční pšenično-žitný kváskový chléb s precizně rozdělenou hydratací pro optimální rozvoj rozkvasu a autolýzu pšeničného těsta.",
+  "summary": "Tradiční pšenično-žitný kváskový chléb s precizně rozdělenou hydratací pro optimální rozvoj rozkvasu a autolýzu pšeničného těsta. [Startovní fermentace: 30 min, autolýza: 30–40 min, kynutí: 4–14 h, pečení: 45–50 min]",
   "ingredients": [
     "20 g mateřského žitného kvásku",
     "200 g žitné chlebové mouky (T930)",
@@ -12,7 +12,7 @@
     "žitná chlebová mouka na vysypání ošatky"
   ],
   "instructions": [
-    "V míse důkladně smíchejte žitnou mouku, vlažnou vodu určenou do rozkvasu a mateřský kvásek. Směs přikryjte a nechte fermentovat při pokojové teplotě do ztrojnásobení objemu.",
+    "Důkladně promíchejte mateřský kvásek (startovací kulturu) se syrovátkou či vlažnou vodou o teplotě 30–35 °C pro optimální fermentaci. Zakryjte směs a nechte ji fermentovat 30 minut, aby se probudily divoké kvasinky a mléčné bakterie.",
     "V samostatné míse promíchejte pšeničnou mouku se zbylou vlažnou vodou na hnětení a nechte těsto odpočívat, čímž zahájíte proces autolýzy pro rozvinutí lepkové struktury.",
     "K autolyzovanému pšeničnému těstu přidejte vyběhlý žitný rozkvas, jemnou mořskou sůl a celý kmín.",
     "Těsto zpracujte v kuchyňském robotu s hnětacím hákem, dokud se suroviny plně nespojí v hladké, elastické a nelepivé těsto.",
@@ -23,9 +23,10 @@
   "applianceTips": "Pečení od studeného startu v parní troubě s řízeným dávkováním páry v první fázi simuluje profesionální pekařskou pec a zajistí maximální nárůst objemu a křupavou kůrku.",
   "expertJustification": "Rozdělení vody na přesný podíl pro 100% hydrataci žitného rozkvasu a zbývající část pro pšeničnou autolýzu zaručuje optimální enzymatickou aktivitu. Čistá pšeničná autolýza bez přítomnosti soli a kyselosti z rozkvasu maximalizuje bobtnání bílkovin a pevnost lepkové sítě, která pak snadněji unese těžší žitnou složku.",
   "applianceType": "Parní trouba s funkcí studeného startu",
-  "cookingTime": "14 hodin",
+  "cookingTime": "360 min",
   "difficulty": "Střední",
   "category": "Pečivo",
   "id": "gen-1783540977144",
-  "updatedAt": "2026-07-12T15:28:43.375Z"
+  "updatedAt": "2026-07-12T15:28:43.375Z",
+  "estimatedCookingTime": "360 min"
 }

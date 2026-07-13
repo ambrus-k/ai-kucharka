@@ -1,6 +1,6 @@
 {
   "title": "Rohlíky pšeničné",
-  "summary": "Nadýchané domácí rohlíky s křupavou kůrkou, připravené technikou autolýzy pro maximální vláčnost střídky.",
+  "summary": "Nadýchané domácí rohlíky s křupavou kůrkou, připravené technikou autolýzy pro maximální vláčnost střídky. [Startovní fermentace: 30 min, hnětení: 10 min, kynutí: 60–90 min, pečení/smažení: 15–45 min]",
   "ingredients": [
     "500 g hladké pšeničné mouky (protein 11,5 %)",
     "270 g vody",
@@ -10,6 +10,7 @@
     "30 g vepřového sádla"
   ],
   "instructions": [
+    "Důkladně promíchejte droždí (startovací kulturu) s vlažným mlékem či syrovátkou o teplotě 30–35 °C pro optimální fermentaci. Zakryjte směs a nechte ji fermentovat 30 minut v teple, aby se plně aktivovaly kvasinky a vzešel stabilní kvásek.",
     "Smíchejte mouku s většinou vody a nechte směs odpočívat, aby došlo k plné hydrataci lepku.",
     "Po uplynutí času vmíchejte aktivovaný kvásek z droždí, cukru a zbytku vody.",
     "Začněte hnětení při nízkých otáčkách, dokud se suroviny nespojí v jednotnou hmotu.",
@@ -24,9 +25,10 @@
   "applianceTips": "Pokud nemáte funkci páry, vložte na dno trouby rozpálený plech nebo nádobu s lávovými kameny, do které při vkládání pečiva vlijete deci vroucí vody.",
   "expertJustification": "Autolýza rozkládá bílkoviny na menší řetězce, což snižuje napětí těsta. To umožňuje snadnější tvarování bez trhání a vede k rovnoměrnější struktuře střídky.",
   "applianceType": "Parní trouba",
-  "cookingTime": "140 min",
+  "cookingTime": "120 min",
   "difficulty": "Střední",
   "category": "Pečivo",
   "id": "gen-1781436210192",
-  "updatedAt": "2026-07-13T05:15:39.169Z"
+  "updatedAt": "2026-07-13T05:15:39.169Z",
+  "estimatedCookingTime": "120 min"
 }

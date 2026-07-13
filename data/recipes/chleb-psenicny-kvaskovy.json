@@ -1,6 +1,6 @@
 {
   "title": "Chléb pšeničný kváskový",
-  "summary": "Klasický pšeničný chléb s žitným kvasem, optimalizovaný pomocí autolýzy s teplou vodou pro dokonalý rozvoj lepku a vzdušnou střídku.",
+  "summary": "Klasický pšeničný chléb s žitným kvasem, optimalizovaný pomocí autolýzy s teplou vodou pro dokonalý rozvoj lepku a vzdušnou střídku. [Startovní fermentace: 30 min, autolýza: 30–40 min, kynutí: 4–14 h, pečení: 45–50 min]",
   "ingredients": [
     "350 g pšeničné hladké mouky (s obsahem proteinu alespoň 12 %)",
     "200 g pšeničné chlebové mouky",
@@ -10,7 +10,8 @@
     "6 g celého kmínu"
   ],
   "instructions": [
-    "Příprava rozkvasu: 8 až 12 hodin před samotným hnětením smíchejte 100 g žitné mouky, 100 g vody a lžíci aktivního kvásku. Nechte zrát při pokojové teplotě do zdvojnásobení objemu.",
+    "Důkladně promíchejte mateřský kvásek (startovací kulturu) se syrovátkou či vlažnou vodou o teplotě 30–35 °C pro optimální fermentaci. Zakryjte směs a nechte ji fermentovat 30 minut, aby se probudily divoké kvasinky a mléčné bakterie.",
+    "Příprava rozkvasu: 8 až 12 hodin před samotným hnětením smíchejte žitné mouky, vody a lžíci aktivního kvásku. Nechte zrát při pokojové teplotě do zdvojnásobení objemu.",
     "Teplá autolýza: V míse kuchyňského robotu promíchejte obě pšeničné mouky s vlažnou vodou (24 °C). Nechte 40 minut odpočívat pro plný rozvoj enzymatických procesů a přirozené vytvoření lepkové sítě.",
     "Hnětení: K autolyzovanému těstu přidejte rozkvas, sůl a kmín. Hněťte na nízkou rychlost 3 minuty, poté na střední rychlost 4 minuty, dokud se těsto nezačne čistě oddělovat od stěn mísy.",
     "Fermentace za pokojové teploty: Těsto nechte zrát 3 hodiny při pokojové teplotě (21 až 23 °C). Během prvních 90 minut proveďte každých 30 minut tři série šetrných překladů pro zpevnění struktury.",
@@ -21,8 +22,9 @@
   "applianceTips": "Pro pečení použijte těžký litinový hrnec (Dutch oven). Dlouhé předehřátí hrnce nahromadí dostatek tepla, které po uzavření s chlebem vytvoří ideální parní láznici imitující profesionální pekařskou pec.",
   "expertJustification": "Záměna ledové vody za vodu o teplotě 24 °C umožnila dosažení optimální startovní teploty těsta. Odstranil se teplotní šok kvasinek, enzymy v autolýze fungovaly efektivně a výsledný bochník vykazuje o 30 % větší objem, divočejší střídku a křupavější kůrku.",
   "applianceType": "Klasická trouba s litinovým hrncem",
-  "cookingTime": "16 h",
+  "cookingTime": "360 min",
   "difficulty": "Střední",
   "category": "Pečivo",
-  "id": "gen-1781443902352"
+  "id": "gen-1781443902352",
+  "estimatedCookingTime": "360 min"
 }

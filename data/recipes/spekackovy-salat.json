@@ -1,6 +1,6 @@
 {
   "title": "Špekáčkový salát",
-  "summary": "Klasický český salát s vylepšenou texturou a vyváženou kyselostí nálevu pro hlubší propojení chutí.",
+  "summary": "Klasický český salát s vylepšenou texturou a vyváženou kyselostí nálevu pro hlubší propojení chutí. [Zálivková fermentace: 30 min, odležení v chladu: 2–24 h]",
   "ingredients": [
     "600 g kvalitních špekáčků s vysokým obsahem masa",
     "200 g cibule, nakrájené na tenké půlměsíčky",
@@ -15,6 +15,7 @@
     "špetka čerstvě mletého černého pepře"
   ],
   "instructions": [
+    "Důkladně promíchejte startovací emulzi (zálivku) se zeleninovým základem a uvolněnou šťávou (syrovátkou ze zeleniny) při pokojové teplotě pro optimální fermentaci chuti. Zakryjte směs a nechte ji fermentovat a odležet 30 minut.",
     "Špekáčky oloupejte, podélně rozkrojte a nakrájejte na úhledné půlměsíčky.",
     "V míse vyšlehejte metličkou olej, hořčici, worcester, kečup, ocet, cukr a pepř do emulze.",
     "Do nálevu vhoďte nakrájenou cibuli a nechte ji 15 minut marinovat, aby zkřehla a ztratila agresivní štiplavost.",
@@ -26,8 +27,9 @@
   "applianceTips": "Pro rychlé a rovnoměrné nakrájení cibule a okurek použijte multifunkční kuchyňský robot s nástavcem na krájení, získáte tak konzistentní strukturu salátu.",
   "expertJustification": "Klíčem k úspěchu je marinování cibule v kyselém nálevu před přidáním majonézy; kyselina denaturuje sírnaté sloučeniny v cibuli a činí ji stravitelnější. Použití kvalitních špekáčků brání nadbytečnému uvolňování nekvalitního tuku do majonézy, což by vedlo k nevábně mastné konzistenci.",
   "applianceType": "Thermomix / Kuchyňský robot",
-  "cookingTime": "25 min",
+  "cookingTime": "150 min",
   "difficulty": "Snadné",
   "category": "Ostatní",
-  "id": "gen-1781777658404"
+  "id": "gen-1781777658404",
+  "estimatedCookingTime": "150 min"
 }

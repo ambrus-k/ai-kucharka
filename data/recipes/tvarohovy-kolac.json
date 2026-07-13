@@ -1,6 +1,6 @@
 {
   "title": "Tvarohový koláč",
-  "summary": "Vláčný tvarohový dezert s vyváženým poměrem bílkovin a strukturovanou texturou bez zbytečného přebytku cukru.",
+  "summary": "Vláčný tvarohový dezert s vyváženým poměrem bílkovin a strukturovanou texturou bez zbytečného přebytku cukru. [Startovní fermentace: 30 min, hnětení: 10 min, kynutí: 60–90 min, pečení/smažení: 15–45 min]",
   "ingredients": [
     "3 ks vejce (velikost M)",
     "65 g máslo, rozpuštěné a zchladlé",
@@ -12,6 +12,7 @@
     "1 g sůl"
   ],
   "instructions": [
+    "Důkladně promíchejte droždí (startovací kulturu) s vlažným mlékem či syrovátkou o teplotě 30–35 °C pro optimální fermentaci. Zakryjte směs a nechte ji fermentovat 30 minut v teple, aby se plně aktivovaly kvasinky a vzešel stabilní kvásek.",
     "Troubu předehřejte na 180 °C a dortovou formu vymažte máslem a vysypte krupicí.",
     "Vejce s moučkovým a vanilkovým cukrem vyšlehejte kuchyňským robotem do světlé husté pěny (cca 5 minut).",
     "Do pěny postupně zašlehejte rozpuštěné máslo při nízkých otáčkách.",
@@ -22,8 +23,9 @@
   "applianceTips": "Pokud používáte kuchyňský robot (např. Thermomix), použijte metlu pro šlehání vajec s cukrem na rychlost 4 po dobu 5 minut; následně tvaroh s ostatními surovinami vmíchejte na rychlost 2 po dobu 30 sekund, aby nedošlo k rozbití struktury pěny.",
   "expertJustification": "Snížení počáteční teploty na 180 °C oproti původním 200 °C zabrání prudké denaturaci proteinů, díky čemuž koláč nepopraská a zůstane uvnitř vláčný. Správným vyšleháním vajec vytvoříme emulzi, která zajistí objem bez nutnosti přidávat nadbytečné množství kypřicích látek. Použití hrudkovitého tvarohu v kombinaci s krupičkou zajišťuje správnou želatinizaci škrobu, což vytváří pevnou, ale krémovou texturu.",
   "applianceType": "Klasická trouba",
-  "cookingTime": "50 min",
+  "cookingTime": "120 min",
   "difficulty": "Snadné",
   "category": "Sladká jídla a moučníky",
-  "id": "gen-1781777341621"
+  "id": "gen-1781777341621",
+  "estimatedCookingTime": "120 min"
 }

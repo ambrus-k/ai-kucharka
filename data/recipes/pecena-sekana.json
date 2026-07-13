@@ -1,6 +1,6 @@
 {
   "title": "Pečená sekaná",
-  "summary": "Dokonale šťavnatá sekaná z hovězího a vepřového masa s optimalizovanou texturou díky emulgaci bílkovin a šetrnému pečení.",
+  "summary": "Dokonale šťavnatá sekaná z hovězího a vepřového masa s optimalizovanou texturou díky emulgaci bílkovin a šetrnému pečení. [Startovní odpočinek: 30 min, marinování: 2–24 h, pečení/dušení: 1,5–3 h]",
   "ingredients": [
     "500 g mletého vepřového bůčku",
     "500 g mletého hovězího krku",
@@ -17,6 +17,7 @@
     "50 ml ledové vody"
   ],
   "instructions": [
+    "Důkladně promíchejte startovací marinádu (kořenící směs) s masovým základem a tekutou bází (vývarem, mlékem či syrovátkou) o teplotě 30 °C pro optimální enzymatické zrání. Zakryjte směs a nechte ji odpočívat 30 minut pro maximální absorpci chutí.",
     "Starší rohlíky nakrájejte na drobné kostičky, vložte do hluboké mísy, zalijte studeným plnotučným mlékem a nechte pečivo zcela nasáknout.",
     "Na pánvi rozpusťte vepřové sádlo a nechte na něm zesklovatět nadrobno nakrájenou cibuli. Krátce před koncem přidejte utřený česnek, nechte ho pouze rozvonět a směs stáhněte z ohně, aby zchladla.",
     "Do mísy k namočenému pečivu přidejte mleté hovězí a vepřové maso, vejce, zchladlou cibulovou směs s česnekem, drcený kmín, mletý černý pepř a sůl. Sušenou majoránku promněte mezi dlaněmi přímo do mísy pro uvolnění esenciálních olejů.",
@@ -28,9 +29,10 @@
   "applianceTips": "Pokud vlastníte parní troubu, pečte sekanou v režimu kombinované páry (25 % pára, 130 °C). Pára zabrání praskání povrchu a úniku šťávy. Posledních 10 minut přepněte na horkovzduch při 200 °C pro dokonalou kůrku. V horkovzdušné fritéze (Air Fryer) pečte na pečicím papíru při 160 °C, což zkrátí čas přípravy.",
   "expertJustification": "Intenzivní hnětení za studena s přidáním ledové vody uvolňuje z masa protein myosin. Tento protein funguje jako přírodní emulgátor, který v masové matrici pevně uzamkne tuk a vodu, takže sekaná zůstane extrémně šťavnatá. Smažení cibule předem inaktivuje enzymy způsobující kvašení a nadýmání a uvolňuje sladkou chuť díky karamelizaci. Pečení při nižší teplotě zabraňuje prudkému stažení svalových vláken, které by jinak vytlačilo drahocennou šťávu ven.",
   "applianceType": "Kombinovaná parní trouba",
-  "cookingTime": "1 h 15 min",
+  "cookingTime": "180 min",
   "difficulty": "Střední",
   "category": "Maso",
   "id": "gen-1783884048202",
-  "updatedAt": "2026-07-12T19:20:48.640Z"
+  "updatedAt": "2026-07-12T19:20:48.640Z",
+  "estimatedCookingTime": "180 min"
 }

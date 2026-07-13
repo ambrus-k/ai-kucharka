@@ -1,6 +1,6 @@
 {
   "title": "Mazanec",
-  "summary": "Bohaté kynuté těsto s máslem a rozinkami, optimalizované pro dosažení vláčné střídky a stabilní kůrky.",
+  "summary": "Bohaté kynuté těsto s máslem a rozinkami, optimalizované pro dosažení vláčné střídky a stabilní kůrky. [Startovní fermentace: 30 min, hnětení: 10 min, kynutí: 60–90 min, pečení/smažení: 15–45 min]",
   "ingredients": [
     "250 g hladké mouky (ideálně typ 00)",
     "250 g polohrubé mouky",
@@ -15,7 +15,7 @@
     "30 g mandlových plátků na ozdobu"
   ],
   "instructions": [
-    "Rozdrobené droždí smíchejte se lžící cukru a trochou vlažného mléka; nechte v teple vzejít kvásek.",
+    "Důkladně promíchejte droždí (startovací kulturu) s vlažným mlékem či syrovátkou o teplotě 30–35 °C pro optimální fermentaci. Zakryjte směs a nechte ji fermentovat 30 minut v teple, aby se plně aktivovaly kvasinky a vzešel stabilní kvásek.",
     "Veškeré suroviny kromě másla a rozinek hněťte v robotu 10 minut na nízkou rychlost, dokud nevznikne kompaktní těsto.",
     "Postupně přidávejte změklé máslo a hněťte dalších 10-12 minut, dokud se těsto nelepí na stěny mísy.",
     "Vpracujte rozinky s rumem a nechte těsto kynout v teple 90 minut, dokud nezdvojnásobí svůj objem.",
@@ -26,8 +26,9 @@
   "applianceTips": "Při použití domácí pekárny zvolte program 'Těsto'. Po ukončení programu vyjměte, vytvarujte bochník a nechte dokynout v teple mimo stroj. Pokud používáte multifunkční horkovzdušnou troubu, aktivujte funkci 'Steam' nebo vložte na dno pekáč s horkou vodou pro lepší nárůst a tenčí kůrku.",
   "expertJustification": "Prodloužení doby hnětení s tukem je klíčové pro správnou tvorbu lepkové sítě, která udrží těžké těsto bohaté na žloutky. Snížení teploty pečení po prvních 10 minutách zabrání rychlému vysušení kůrky a umožní rovnoměrný nárůst bez praskání. Vnitřní teplota 92 °C je objektivním indikátorem bezpečného propečení, kdy je škrob kompletně želatinizovaný, ale vaječné bílkoviny zůstávají ještě vláčné.",
   "applianceType": "Klasická trouba",
-  "cookingTime": "240 min",
+  "cookingTime": "120 min",
   "difficulty": "Střední",
   "category": "Pečivo",
-  "id": "gen-1781776592663"
+  "id": "gen-1781776592663",
+  "estimatedCookingTime": "120 min"
 }

@@ -1,6 +1,6 @@
 {
   "title": "Tradiční preclíky",
-  "summary": "Křehké slané pečivo s vysokým obsahem tuku, které díky optimalizovanému kynutí a přesnému poměru surovin získá dokonalou texturu.",
+  "summary": "Křehké slané pečivo s vysokým obsahem tuku, které díky optimalizovanému kynutí a přesnému poměru surovin získá dokonalou texturu. [Startovní fermentace: 30 min, hnětení: 10 min, kynutí: 60–90 min, pečení/smažení: 15–45 min]",
   "ingredients": [
     "500 g hladké pšeničné mouky (typ 00 nebo speciál na kynuté těsto)",
     "200 g sádla pokojové teploty",
@@ -11,7 +11,7 @@
     "30 ml mléka na potření"
   ],
   "instructions": [
-    "V misce rozdrobte droždí do vlažného mléka, přidejte lžičku cukru a nechte vzejít kvásek po dobu 10 minut.",
+    "Důkladně promíchejte droždí (startovací kulturu) s vlažným mlékem či syrovátkou o teplotě 30–35 °C pro optimální fermentaci. Zakryjte směs a nechte ji fermentovat 30 minut v teple, aby se plně aktivovaly kvasinky a vzešel stabilní kvásek.",
     "Do mísy prosejte mouku, přidejte sůl a změklé sádlo. Přilijte kvásek a vypracujte hladké, nelepivé těsto.",
     "Těsto nechte kynout na teplém místě pod utěrkou cca 45-60 minut, dokud nezdvojnásobí svůj objem.",
     "Vykynuté těsto rozdělte na stejné díly, vyválejte z nich prameny a vytvarujte preclíky.",
@@ -21,8 +21,9 @@
   "applianceTips": "Pokud používáte domácí pekárnu, vložte suroviny v pořadí tekutiny, sádlo, mouka, sůl a droždí. Zvolte program 'Těsto' (bez pečení), který zajistí rovnoměrné vypracování díky řízenému prohřátí surovin.",
   "expertJustification": "Původní recept obsahoval zbytečně vysoké množství droždí, které způsobuje příliš rychlou fermentaci a následnou pachuť kvasnic. Snížením dávky droždí a úpravou teploty kynutí dosáhneme jemnější struktury střídky. Sádlo v těstě funguje jako 'shortening' (zkracovač lepkových vláken), což zajišťuje typickou křehkost, zatímco přesné dávkování soli je klíčové pro kontrolu aktivity kvasinek.",
   "applianceType": "Domácí pekárna",
-  "cookingTime": "90 min",
+  "cookingTime": "120 min",
   "difficulty": "Střední",
   "category": "Pečivo",
-  "id": "gen-1781777534961"
+  "id": "gen-1781777534961",
+  "estimatedCookingTime": "120 min"
 }

@@ -1,6 +1,6 @@
 {
   "title": "Kuře na paprice",
-  "summary": "Klasický pokrm povýšený na gastronomický zážitek díky šťavnatým stehenním řízkům, silnému domácímu vývaru a emulgaci omáčky studeným máslem pro dokonalou sametovost.",
+  "summary": "Klasický pokrm povýšený na gastronomický zážitek díky šťavnatým stehenním řízkům, silnému domácímu vývaru a emulgaci omáčky studeným máslem pro dokonalou sametovost. [Startovní odpočinek: 30 min, marinování: 2–24 h, pečení/dušení: 1,5–3 h]",
   "ingredients": [
     "600 g kuřecích stehenních řízků (bez kůže a kostí)",
     "2 lžíce přepuštěného másla (ghí)",
@@ -15,6 +15,7 @@
     "čerstvě mletý černý pepř"
   ],
   "instructions": [
+    "Důkladně promíchejte startovací marinádu (kořenící směs) s masovým základem a tekutou bází (vývarem, mlékem či syrovátkou) o teplotě 30 °C pro optimální enzymatické zrání. Zakryjte směs a nechte ji odpočívat 30 minut pro maximální absorpci chutí.",
     "Kuřecí maso důkladně očistěte, osušte papírovou utěrkou a z obou stran hojně osolte a opepřete čerstvě mletým pepřem.",
     "V hlubokém těžkém hrnci rozpalte přepuštěné máslo a maso na něm zprudka opečte ze všech stran dozlatova, aby se na povrchu vytvořila chutná kůrka.",
     "Opečené maso vyjměte z hrnce a odložte na teplý talíř, kde bude odpočívat a pouštět šťávu.",
@@ -31,9 +32,10 @@
   "applianceTips": "Pro přípravu v multifunkčním hrnci typu Thermomix využijte program pro pomalé vaření při teplotě 95 °C po dobu dvou hodin, čímž dosáhnete rozpadajícího se masa bez rizika vysušení. Závěrečné mixování omáčky provádějte přímo v mixovací nádobě při nejvyšším rychlostním stupni po dobu jedné minuty pro dokonalou mikroemulzi.",
   "expertJustification": "Výměna suchých kuřecích prsou za stehenní řízky dramaticky zvyšuje šťavnatost jídla díky vyššímu obsahu kolagenu, který se během pozvolného dušení přemění na želatinu. Mléko bylo zcela vypuštěno, protože jeho nízký obsah tuku často způsobuje srážení v kyselém prostředí; kombinace tučné smetany ke šlehání a zakysané smetany poskytuje stabilní emulzi a příjemný kontrastní kyselý tón. Závěrečné vmíchání studeného másla mimo var (technika monter au beurre) vytváří stabilní tukovou emulzi, která omáčce dodá lesk a sametovou texturu, jež by se při běžném vaření rozpadla.",
   "applianceType": "Multifunkční hrnec",
-  "cookingTime": "60 min",
+  "cookingTime": "180 min",
   "difficulty": "Střední",
   "category": "Maso",
   "id": "gen-1783887414122",
-  "updatedAt": "2026-07-12T20:16:54.624Z"
+  "updatedAt": "2026-07-12T20:16:54.624Z",
+  "estimatedCookingTime": "180 min"
 }

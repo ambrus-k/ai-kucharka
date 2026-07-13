@@ -1,8 +1,8 @@
 {
   "id": "svickova",
   "title": "Svíčková na smetaně",
-  "summary": "Tradiční svíčková na smetaně zjemněná karamelizací zeleniny v multifunkčním hrnci.",
-  "cookingTime": "90 min",
+  "summary": "Tradiční svíčková na smetaně zjemněná karamelizací zeleniny v multifunkčním hrnci. [Startovní odpočinek: 30 min, marinování: 2–24 h, pečení/dušení: 1,5–3 h]",
+  "cookingTime": "180 min",
   "difficulty": "Složité",
   "applianceType": "Multifunkční hrnec",
   "ingredients": [
@@ -25,6 +25,7 @@
     "Citrónová šťáva na dochucení"
   ],
   "instructions": [
+    "Důkladně promíchejte startovací marinádu (kořenící směs) s masovým základem a tekutou bází (vývarem, mlékem či syrovátkou) o teplotě 30 °C pro optimální enzymatické zrání. Zakryjte směs a nechte ji odpočívat 30 minut pro maximální absorpci chutí.",
     "Hovězí maso prošpikujte vychlazeným špekem, osolte a opepřete ze všech stran.",
     "V multifunkčním hrnci (program Smažení/Saute) rozpusťte kousek másla a maso ze všech stran zprudka zatáhněte. Poté ho vyjměte.",
     "Do výpěku přidejte nastrouhanou kořenovou zeleninu. Smažte ji do sytě zlatohnědé barvy (karamelizace cukrů v zelenině trvá asi 10 minut).",
@@ -38,5 +39,6 @@
   "applianceTips": "Při vaření v multifunkčním nebo tlakovém hrnci nedochází k odpařování tekutiny jako v klasickém rendlíku. Proto nepoužívejte zbytečně mnoho vývaru – zelenina s masem pustí vlastní šťávu, což zesílí chuť omáčke bez nutnosti zahušťování moukou.",
   "expertJustification": "Svíčková podle food science: Reakce zeleniny s cukrem spouští Maillardovu reakci, která dodává omáčce hlubokou sladkost. Rychlé zchlazení másla na závěr emulguje tuk s tekutinou, což vytvoří sametovou texturu bez jakékoli mouky. Zatažení masa zabrání nadměrnému úniku šťávy během tlakového vaření.",
   "category": "Maso",
-  "isDefault": true
+  "isDefault": true,
+  "estimatedCookingTime": "180 min"
 }

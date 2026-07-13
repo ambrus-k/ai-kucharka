@@ -1,6 +1,6 @@
 {
   "title": "Šumavský bochník s vylepšenou hydratací",
-  "summary": "Vylepšený recept na pšenično-žitný chléb s vyšší hydratací a přídavkem medu pro delší vláčnost střídy a lepší barvu kůrky.",
+  "summary": "Vylepšený recept na pšenično-žitný chléb s vyšší hydratací a přídavkem medu pro delší vláčnost střídy a lepší barvu kůrky. [Startovní odpočinek: 30 min, marinování: 2–24 h, pečení/dušení: 1,5–3 h]",
   "ingredients": [
     "150 g aktivního žitného kvásku",
     "400 g pšeničné chlebové mouky (T650)",
@@ -12,8 +12,9 @@
     "20 g rýžové mouky na vysypání ošatky"
   ],
   "instructions": [
-    "Připravte si 150 g aktivního kvásku z 75 g žitné mouky a 75 g vody.",
-    "V míse smíchejte 350 g vlažné vody s 10 g medu a 150 g aktivního kvásku. Přidejte mouky a promíchejte. Nechte 45 minut odpočívat (autolýza).",
+    "Důkladně promíchejte startovací marinádu (kořenící směs) s masovým základem a tekutou bází (vývarem, mlékem či syrovátkou) o teplotě 30 °C pro optimální enzymatické zrání. Zakryjte směs a nechte ji odpočívat 30 minut pro maximální absorpci chutí.",
+    "Připravte si aktivního kvásku z žitné mouky a vody.",
+    "V míse smíchejte vlažné vody s medu a aktivního kvásku. Přidejte mouky a promíchejte. Nechte 45 minut odpočívat (autolýza).",
     "Přidejte sůl a kmín. Těsto hněťte, dokud se nezačne odlepovat od stěn nádoby.",
     "Provádějte překládání těsta každých 45 minut po dobu 3 hodin (celkem 4x).",
     "Bochník vytvarujte, vložte do ošatky a nechte 12-14 hodin kynout v chladu při 4 °C.",
@@ -22,9 +23,10 @@
   "applianceTips": "Při pečení v hrnci umístěte hrnec na spodní rošt pro lepší přenos tepla a rozvoj dna chleba.",
   "expertJustification": "Zvýšená hydratace na 70 % zajišťuje lepší elastičnost střídy a delší čerstvost, med funguje jako hygroskopická složka a substrát pro Maillardovu reakci při pečení.",
   "applianceType": "Trouba s litinovým hrncem",
-  "cookingTime": "16 hodin",
+  "cookingTime": "180 min",
   "difficulty": "Střední",
   "category": "Pečivo",
   "id": "gen-1783526613942",
-  "updatedAt": "2026-07-08T16:21:04.992Z"
+  "updatedAt": "2026-07-08T16:21:04.992Z",
+  "estimatedCookingTime": "180 min"
 }

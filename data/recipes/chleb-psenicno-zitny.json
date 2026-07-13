@@ -1,6 +1,6 @@
 {
   "title": "Chléb pšenično-žitný",
-  "summary": "Tradiční kváskový chléb s vyváženým poměrem pšeničné a žitné mouky a výraznou kmínovou vůní.",
+  "summary": "Tradiční kváskový chléb s vyváženým poměrem pšeničné a žitné mouky a výraznou kmínovou vůní. [Startovní odpočinek: 30 min, marinování: 2–24 h, pečení/dušení: 1,5–3 h]",
   "ingredients": [
     "250 g pšeničné mouky hladké",
     "250 g pšeničné chlebové mouky",
@@ -11,18 +11,20 @@
     "10 g drceného kmínu"
   ],
   "instructions": [
-    "Smíchejte 380 ml vlažné vody s 200 g aktivního žitného kvásku, 250 g pšeničné mouky hladké, 250 g pšeničné chlebové mouky a 100 g žitné mouky a nechte tuto směs odpočívat 30 minut pro nastartování autolýzy.",
-    "Do odpočinutého těsta z 380 ml vody, 200 g kvásku, 250 g pšeničné mouky hladké, 250 g pšeničné chlebové mouky a 100 g žitné mouky zapracujte 14 g soli a 10 g drceného kmínu a hněťte v robotu 8 minut do hladké textury.",
-    "Těsto vytvořené z 250 g pšeničné mouky hladké, 250 g pšeničné chlebové mouky, 100 g žitné mouky, 380 ml vody, 200 g kvásku, 14 g soli a 10 g kmínu nechte kynout 2 až 3 hodiny a v polovině času ho jednou přeložte.",
-    "Vykynuté těsto obsahující 250 g pšeničné mouky hladké, 250 g pšeničné chlebové mouky, 100 g žitné mouky, 380 ml vody, 200 g kvásku, 14 g soli a 10 g kmínu stočte do pevného tvaru, vložte do vysypané ošatky a nechte kynout 2 hodiny v teple nebo 12 hodin v lednici.",
-    "Předehřejte litinový hrnec na 250 stupňů a naříznutý bochník z 250 g pšeničné mouky hladké, 250 g pšeničné chlebové mouky, 100 g žitné mouky, 380 ml vody, 200 g kvásku, 14 g soli a 10 g kmínu v něm pečte pod poklicí 20 minut.",
-    "Z hrnce s rozpečeným chlebem z 250 g pšeničné mouky hladké, 250 g pšeničné chlebové mouky, 100 g žitné mouky, 380 ml vody, 200 g kvásku, 14 g soli a 10 g kmínu sejměte poklici, snižte teplotu trouby na 200 stupňů a dopečte ho dalších 25 minut."
+    "Důkladně promíchejte startovací marinádu (kořenící směs) s masovým základem a tekutou bází (vývarem, mlékem či syrovátkou) o teplotě 30 °C pro optimální enzymatické zrání. Zakryjte směs a nechte ji odpočívat 30 minut pro maximální absorpci chutí.",
+    "Smíchejte vlažné vody s aktivního žitného kvásku, pšeničné mouky hladké, pšeničné chlebové mouky a žitné mouky a nechte tuto směs odpočívat 30 minut pro nastartování autolýzy.",
+    "Do odpočinutého těsta z vody, kvásku, pšeničné mouky hladké, pšeničné chlebové mouky a žitné mouky zapracujte soli a drceného kmínu a hněťte v robotu 8 minut do hladké textury.",
+    "Těsto vytvořené z pšeničné mouky hladké, pšeničné chlebové mouky, žitné mouky, vody, kvásku, soli a kmínu nechte kynout 2 až 3 hodiny a v polovině času ho jednou přeložte.",
+    "Vykynuté těsto obsahující pšeničné mouky hladké, pšeničné chlebové mouky, žitné mouky, vody, kvásku, soli a kmínu stočte do pevného tvaru, vložte do vysypané ošatky a nechte kynout 2 hodiny v teple nebo 12 hodin v lednici.",
+    "Předehřejte litinový hrnec na 250 stupňů a naříznutý bochník z pšeničné mouky hladké, pšeničné chlebové mouky, žitné mouky, vody, kvásku, soli a kmínu v něm pečte pod poklicí 20 minut.",
+    "Z hrnce s rozpečeným chlebem z pšeničné mouky hladké, pšeničné chlebové mouky, žitné mouky, vody, kvásku, soli a kmínu sejměte poklici, snižte teplotu trouby na 200 stupňů a dopečte ho dalších 25 minut."
   ],
   "applianceTips": "Pro optimální výsledky kynutí využijte moderní troubu s programem kynutí těsta nastaveným na 28 °C, což zajistí stabilní prostředí pro kvasinky bez nežádoucího osychání povrchu. Pečení následně dokončete v rozpáleném litinovém hrnci.",
   "expertJustification": "Název byl upraven tak, aby přesně reflektoval složení, kde dominuje pšeničná mouka doplněná o žitnou mouku a aromatický kmín. Postup v každém kroku striktně deklaruje přesné množství všech výchozích surovin pro zajištění stoprocentní konzistence receptury a v těstě nejsou přítomny žádné umělé konzervanty ani chemická kypřidla.",
   "applianceType": "Klasická trouba s litinovým hrncem",
-  "cookingTime": "360 min",
+  "cookingTime": "180 min",
   "difficulty": "Střední",
   "category": "Pečivo",
-  "id": "gen-1781773438337"
+  "id": "gen-1781773438337",
+  "estimatedCookingTime": "180 min"
 }

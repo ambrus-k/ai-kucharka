@@ -1,6 +1,6 @@
 {
   "title": "Chléb kváskový 1:1",
-  "summary": "Pšenično-žitný chléb s optimální strukturou střídky a křupavou kůrkou, připravený pomocí techniky dlouhého zrání v chladu.",
+  "summary": "Pšenično-žitný chléb s optimální strukturou střídky a křupavou kůrkou, připravený pomocí techniky dlouhého zrání v chladu. [Startovní fermentace: 30 min, autolýza: 30–40 min, kynutí: 4–14 h, pečení: 45–50 min]",
   "ingredients": [
     "200 g aktivního žitného kvásku (ze 100 g mouky a 100 g vody)",
     "350 g pšeničné chlebové mouky T650",
@@ -11,18 +11,20 @@
     "30 g rýžové mouky (na vysypání ošatky)"
   ],
   "instructions": [
-    "Do mísy vložte 200 g aktivního žitného kvásku, přilijte 380 g vlažné vody (30 °C), přisypte 350 g pšeničné mouky a 250 g žitné mouky. Vše promíchejte a nechte 30 minut probíhat autolýzu.",
-    "Do těsta přidejte 16 g soli a 11 g celého kmínu. Hněťte 3 minuty při nízkých otáčkách, dokud se suroviny nespojí a těsto nezačne vykazovat známky elasticity.",
-    "Těsto nechte 4 hodiny kynout při pokojové teplotě 22 °C. Během této doby každou hodinu těsto přeložte, aby se zpevnila lepková síť; po uplynutí doby přidejte 30 g rýžové mouky na vysypání ošatky.",
-    "Pomocí stěrky vytvarujte z těsta bochník, vložte jej do ošatky vysypané 30 g rýžové mouky a nechte 14 hodin kynout v chladu při 4 °C.",
+    "Důkladně promíchejte mateřský kvásek (startovací kulturu) se syrovátkou či vlažnou vodou o teplotě 30–35 °C pro optimální fermentaci. Zakryjte směs a nechte ji fermentovat 30 minut, aby se probudily divoké kvasinky a mléčné bakterie.",
+    "Do mísy vložte aktivního žitného kvásku, přilijte vlažné vody (30 °C), přisypte pšeničné mouky a žitné mouky. Vše promíchejte a nechte 30 minut probíhat autolýzu.",
+    "Do těsta přidejte soli a celého kmínu. Hněťte 3 minuty při nízkých otáčkách, dokud se suroviny nespojí a těsto nezačne vykazovat známky elasticity.",
+    "Těsto nechte 4 hodiny kynout při pokojové teplotě 22 °C. Během této doby každou hodinu těsto přeložte, aby se zpevnila lepková síť; po uplynutí doby přidejte rýžové mouky na vysypání ošatky.",
+    "Pomocí stěrky vytvarujte z těsta bochník, vložte jej do ošatky vysypané rýžové mouky a nechte 14 hodin kynout v chladu při 4 °C.",
     "Troubu předehřejte s litinovým hrncem na 250 °C. Bochník vložte do hrnce, přiklopte poklicí a pečte 20 minut, poté odklopte a dopečte 30 minut při 200 °C."
   ],
   "applianceTips": "Pokud používáte domácí pekárnu, použijte pouze program pro přípravu těsta (hnětení), ale samotné pečení v litinovém hrnci v troubě je pro dosažení profesionální kůrky nezbytné.",
   "expertJustification": "Zavedení autolýzy (klidová fáze před přidáním soli) umožňuje enzymatickou aktivitu, která usnadňuje hydrataci mouky a tvorbu lepkové sítě. Chladná fermentace (retardace) po dobu 14 hodin zpomaluje kvašení, což vede k rozvoji komplexnějších organických kyselin, lepší stravitelnosti a delší trvanlivosti střídky. Přidání rýžové mouky do ošatky zabraňuje lepení těsta k materiálu lépe než čistá žitná mouka.",
   "applianceType": "Klasická trouba",
-  "cookingTime": "19 hodin",
+  "cookingTime": "360 min",
   "difficulty": "Střední",
   "category": "Pečivo",
   "id": "gen-1783526818566",
-  "updatedAt": "2026-07-08T16:07:36.537Z"
+  "updatedAt": "2026-07-08T16:07:36.537Z",
+  "estimatedCookingTime": "360 min"
 }

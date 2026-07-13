@@ -1,6 +1,6 @@
 {
   "title": "Škvarkové placky",
-  "summary": "Tradiční kynuté placky s vrstvenou strukturou vytvořenou technikou laminace sádla a škvarků. Výsledkem je křehké, nadýchané pečivo s výraznou chutí.",
+  "summary": "Tradiční kynuté placky s vrstvenou strukturou vytvořenou technikou laminace sádla a škvarků. Výsledkem je křehké, nadýchané pečivo s výraznou chutí. [Startovní fermentace: 30 min, hnětení: 10 min, kynutí: 60–90 min, pečení/smažení: 15–45 min]",
   "ingredients": [
     "500 g pšeničné hladké mouky",
     "230 ml vlažného mléka",
@@ -16,10 +16,10 @@
     "Celý kmín na posypání"
   ],
   "instructions": [
-    "Ve vlažném mléce s cukrem rozmíchejte droždí a nechte vzejít kvásek.",
-    "Do mísy prosejte mouku, přidejte sůl, pepř, drcený kmín, jedno vejce, kvásek a 60 g rozpuštěného sádla.",
+    "Důkladně promíchejte droždí (startovací kulturu) s vlažným mlékem či syrovátkou o teplotě 30–35 °C pro optimální fermentaci. Zakryjte směs a nechte ji fermentovat 30 minut v teple, aby se plně aktivovaly kvasinky a vzešel stabilní kvásek.",
+    "Do mísy prosejte mouku, přidejte sůl, pepř, drcený kmín, jedno vejce, kvásek a rozpuštěného sádla.",
     "Vypracujte hladké nelepivé těsto a nechte kynout 60 minut při pokojové teplotě.",
-    "Škvarky jemně nasekejte a smíchejte se 120 g změklého sádla na pastu.",
+    "Škvarky jemně nasekejte a smíchejte se změklého sádla na pastu.",
     "Těsto rozválejte, potřete třetinou směsi, přeložte na třetiny, otočte a postup opakujte celkem 3x s 15minutovou pauzou v chladu mezi překlady.",
     "Vyválejte na tloušťku 1,5 cm, vykrojte placky, na povrchu vyznačte mřížku a nechte na plechu kynout dalších 30 minut.",
     "Potřete vejcem, posypte solí a kmínem, poté pečte při 190 °C po dobu 18 minut dozlatova."
@@ -30,5 +30,6 @@
   "cookingTime": "120 min",
   "difficulty": "Střední",
   "category": "Pečivo",
-  "id": "gen-1781778421698"
+  "id": "gen-1781778421698",
+  "estimatedCookingTime": "120 min"
 }

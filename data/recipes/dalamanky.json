@@ -1,6 +1,6 @@
 {
   "title": "Dalamánky",
-  "summary": "Křupavé dalamánky s vysokým obsahem vlákniny a vyváženou fermentací, připravené s využitím moderní techniky zapařování.",
+  "summary": "Křupavé dalamánky s vysokým obsahem vlákniny a vyváženou fermentací, připravené s využitím moderní techniky zapařování. [Startovní fermentace: 30 min, hnětení: 10 min, kynutí: 60–90 min, pečení/smažení: 15–45 min]",
   "ingredients": [
     "350 g pšeničné chlebové mouky",
     "150 g žitné chlebové mouky",
@@ -12,7 +12,7 @@
     "5 g celého kmínu"
   ],
   "instructions": [
-    "Rozpusťte čerstvé droždí spolu s ječným sladem ve vlažné vodě a nechte krátce odstát, dokud se na hladině nevytvoří aktivní pěna.",
+    "Důkladně promíchejte droždí (startovací kulturu) s vlažným mlékem či syrovátkou o teplotě 30–35 °C pro optimální fermentaci. Zakryjte směs a nechte ji fermentovat 30 minut v teple, aby se plně aktivovaly kvasinky a vzešel stabilní kvásek.",
     "V míse kuchyňského robota smíchejte oba druhy mouky, sůl a kmín. Přidejte připravený kvásek a jablečný ocet.",
     "Pomocí hnětacího háku vypracujte hladké a nelepivé těsto. Hnětení udržujte na nízké rychlosti, aby nedošlo k poškození struktury lepku obsaženého v žitné mouce.",
     "Zakryté těsto nechte v teple kynout, dokud viditelně nezdvojnásobí svůj původní objem.",
@@ -23,9 +23,10 @@
   "applianceTips": "Pro dokonalý výsledek můžete využít program pro kynutí v domácí pekárně a následné pečení v horkovzdušné fritéze (při 180 °C po dobu cca 12 minut), která zajistí extrémně křupavou kůrku díky efektivní cirkulaci vzduchu.",
   "expertJustification": "Kombinace jablečného octa a ječného sladu upravuje pH těsta, což zpomaluje degradaci žitného škrobu a zlepšuje barvu kůrky prostřednictvím Maillardovy reakce. Omezení času hnětení je klíčové, neboť žitná mouka neobsahuje glutenin a gliadin v poměru vhodném pro tvorbu silné lepkové sítě, proto by přílišné mechanické namáhání vedlo k degradaci těsta na lepivou hmotu.",
   "applianceType": "Domácí pekárna nebo kuchyňský robot",
-  "cookingTime": "110 min",
+  "cookingTime": "120 min",
   "difficulty": "Střední",
   "category": "Pečivo",
   "id": "gen-1783722072636",
-  "updatedAt": "2026-07-10T22:21:45.941Z"
+  "updatedAt": "2026-07-10T22:21:45.941Z",
+  "estimatedCookingTime": "120 min"
 }

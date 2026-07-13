@@ -1,6 +1,6 @@
 {
   "title": "Buřtguláš",
-  "summary": "Tradiční buřtguláš povýšený na gastronomickou úroveň díky restování uzeniny na sádle, pomalému zahuštění přímou jíškou a poctivému hovězímu vývaru bez umělých dochucovadel.",
+  "summary": "Tradiční buřtguláš povýšený na gastronomickou úroveň díky restování uzeniny na sádle, pomalému zahuštění přímou jíškou a poctivému hovězímu vývaru bez umělých dochucovadel. [Startovní odpočinek: 30 min, marinování: 2–24 h, pečení/dušení: 1,5–3 h]",
   "ingredients": [
     "600 g brambor (varný typ B)",
     "300 g kvalitních špekáčků nebo klobásy (s vysokým obsahem masa)",
@@ -18,6 +18,7 @@
     "Čerstvě mletý černý pepř"
   ],
   "instructions": [
+    "Důkladně promíchejte startovací marinádu (kořenící směs) s masovým základem a tekutou bází (vývarem, mlékem či syrovátkou) o teplotě 30 °C pro optimální enzymatické zrání. Zakryjte směs a nechte ji odpočívat 30 minut pro maximální absorpci chutí.",
     "Špekáčky oloupejte a nakrájejte na poloviční kolečka či kostky. Brambory oloupejte a nakrájejte na stejně velké kostky. Cibuli nakrájejte nadrobno. Česnek utřete se špetkou soli.",
     "V těžkém litinovém hrnci rozpusťte sádlo a přidejte nakrájenou uzeninu. Opékejte na středním plameni, dokud nepustí tuk a nezačne zlátnout.",
     "K opečené uzenině přidejte nakrájenou cibuli. Snižte plamen a pomalu restujte, dokud cibule nezíská tmavě zlatavou barvu. Přidejte drcený kmín a utřený česnek a nechte krátce rozvonět.",
@@ -29,9 +30,10 @@
   "applianceTips": "Pro dokonalou texturu a bezstarostné vaření můžete využít pomalý hrnec. Cibuli a špekáčky nejprve orestujte na pánvi, zaprašte moukou a paprikou, poté vše přesuňte do pomalého hrnce, přidejte brambory, zalijte vývarem a vařte na režim Low po dobu 5 až 6 hodin. Smetanu a majoránku vmíchejte až 15 minut před koncem vaření.",
   "expertJustification": "Zahuštění guláše probíhá pomocí zaprášení restovaného základu moukou namísto syrové moučné suspenze ve vodě. Tím dojde k dextrinizaci škrobů, což eliminuje nepříjemnou syrovou chuť mouky a zajistí stabilní emulzi. Použití 33% smetany ke šlehání namísto nízkotučné zabraňuje srážení mléčných bílkovin v kyselém a teplém prostředí. Vývar nahrazující vodu dodává pokrmu bohaté tělo plné umami díky přirozeným nukleotidům a aminokyselinám z masa a kostí.",
   "applianceType": "Pomalý hrnec",
-  "cookingTime": "50 min",
+  "cookingTime": "180 min",
   "difficulty": "Snadné",
   "category": "Slané jídlo",
   "id": "gen-1783884136320",
-  "updatedAt": "2026-07-12T19:23:21.512Z"
+  "updatedAt": "2026-07-12T19:23:21.512Z",
+  "estimatedCookingTime": "180 min"
 }

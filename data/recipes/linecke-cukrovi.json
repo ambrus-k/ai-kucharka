@@ -1,6 +1,6 @@
 {
   "title": "Linecké cukroví",
-  "summary": "Tradiční křehké cukroví s jemným přídavkem kypřicího prášku pro nadýchanější strukturu, spojené kyselkavým džemem.",
+  "summary": "Tradiční křehké cukroví s jemným přídavkem kypřicího prášku pro nadýchanější strukturu, spojené kyselkavým džemem. [Startovní odpočinek: 30 min, šlehání: 10 min, pečení: 35–60 min]",
   "ingredients": [
     "210 g hladké pšeničné mouky",
     "140 g studeného nesoleného másla (min. 82 % tuku)",
@@ -12,6 +12,7 @@
     "150 g rybízového džemu s vysokým podílem ovoce"
   ],
   "instructions": [
+    "Důkladně promíchejte startovací kypřící složky s tekutou bází (syrovátkou, podmáslím či mlékem) o teplotě 30 °C pro optimální chemickou fermentaci. Zakryjte směs a nechte ji odpočívat 30 minut k aktivaci lepku a prolnutí aromat.",
     "V míse prosejte hladkou mouku s moučkovým cukrem, kypřicím práškem a špetkou soli.",
     "Přidejte na malé kostičky nakrájené studené máslo a jemně nastrouhanou citronovou kůru.",
     "Rychle vypracujte jemnou drobenku, aby se máslo nezačalo tavit teplem rukou.",
@@ -27,9 +28,10 @@
   "applianceTips": "Kuchyňský robot s míchací metlou typu K zajistí bleskové zapracování studeného másla s kypřidlem a moukou. Tím zabráníte nežádoucímu rozpuštění tuku a aktivaci lepku, což by těsto znehodnotilo.",
   "expertJustification": "Přidáním malého množství kypřicího prášku bez fosfátů docílíme lehčí, křehčí a nadýchanější textury těsta. Aby si cukroví i přes mírné vyběhnutí zachovalo ostré rysy, je nutné těsto před pečením důkladně vychladit a pracovat s ním rychle.",
   "applianceType": "Kuchyňský robot",
-  "cookingTime": "45 min",
+  "cookingTime": "90 min",
   "difficulty": "Střední",
   "category": "Sladká jídla a moučníky",
   "id": "gen-1783883769608",
-  "updatedAt": "2026-07-12T19:18:24.964Z"
+  "updatedAt": "2026-07-12T19:18:24.964Z",
+  "estimatedCookingTime": "90 min"
 }

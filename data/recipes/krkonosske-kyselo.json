@@ -1,6 +1,6 @@
 {
   "title": "Krkonošské kyselo",
-  "summary": "Tradiční hustá polévka založená na fermentovaném žitném kvásku, vylepšená precizní technikou vaření pro dosažení vyvážené kyselosti a textury.",
+  "summary": "Tradiční hustá polévka založená na fermentovaném žitném kvásku, vylepšená precizní technikou vaření pro dosažení vyvážené kyselosti a textury. [Startovní fermentace: 30 min, autolýza: 30–40 min, kynutí: 4–14 h, pečení: 45–50 min]",
   "ingredients": [
     "200 g aktivního žitného kvásku",
     "1,2 l horkého zeleninového vývaru",
@@ -14,6 +14,7 @@
     "Sůl podle chuti"
   ],
   "instructions": [
+    "Důkladně promíchejte mateřský kvásek (startovací kulturu) se syrovátkou či vlažnou vodou o teplotě 30–35 °C pro optimální fermentaci. Zakryjte směs a nechte ji fermentovat 30 minut, aby se probudily divoké kvasinky a mléčné bakterie.",
     "Brambory uvařte ve slupce do měkka, nechte vychladnout, oloupejte a nakrájejte na úhledné kostky.",
     "Do hrnce vlijte horký vývar, přidejte namočené houby i s tekutinou a kmín.",
     "Do vývaru za stálého metličkového míchání vlijte kvásek. Začněte zahřívat a vařte na mírném ohni 20 minut, aby se aktivní látky v kvásku stabilizovaly a houby změkly.",
@@ -25,8 +26,9 @@
   "applianceTips": "Při použití Thermomixu vložte vývar, houby a kmín do nádoby a vařte 10 min/100 °C/zpětný chod (rychlost 1). Přidejte kvásek a vařte dalších 15 min/90 °C/zpětný chod (rychlost 2), čímž zamezíte přichycení kvásku ke dnu.",
   "expertJustification": "Změna postupu vaření vajec a brambor zamezuje jejich rozvaření a zakalení polévky. Přidání kvásku do horkého (ne vroucího) vývaru zajišťuje lepší želatinizaci škrobů bez rizika sražení. Separátní příprava vajec zajišťuje, že polévka zůstane čirá a vejce vytvoří v textuře žádoucí kontrastní elementy.",
   "applianceType": "Thermomix / Kuchyňský robot",
-  "cookingTime": "40 min",
+  "cookingTime": "360 min",
   "difficulty": "Střední",
   "category": "Polévky",
-  "id": "gen-1781777007027"
+  "id": "gen-1781777007027",
+  "estimatedCookingTime": "360 min"
 }

@@ -1,6 +1,6 @@
 {
   "title": "Coleslaw",
-  "summary": "Dokonale křupavý a vyvážený zelný salát s krémovým dresinkem, optimalizovaný pomocí osmózy pro stabilní konzistenci bez uvolňování přebytečné vody.",
+  "summary": "Dokonale křupavý a vyvážený zelný salát s krémovým dresinkem, optimalizovaný pomocí osmózy pro stabilní konzistenci bez uvolňování přebytečné vody. [Zálivková fermentace: 30 min, odležení v chladu: 2–24 h]",
   "ingredients": [
     "800 g bílého zelí (očištěného)",
     "150 g mrkve",
@@ -15,17 +15,19 @@
     "2 g čerstvě mletého černého pepře"
   ],
   "instructions": [
-    "Pomocí kuchyňského robotu s krouhacím kotoučem nakrouhejte 800 g očištěného bílého zelí na jemné proužky. Nakrouhané zelí přemístěte do velké mísy, zasypejte 15 g soli a čistýma rukama ho intenzivně promačkávejte po dobu přibližně 2 minut. Poté nechte zelí 30 minut odpočívat při pokojové teplotě, aby procesem osmózy pustilo nežádoucí buněčnou vodu.",
-    "Během odpočinku zelí si v kuchyňském robotu na hrubším struhadle nastrouhejte 150 g očištěné mrkve, na velmi jemném struhadle nastrouhejte 50 g očištěného bulvového celeru a ostrým nožem nakrájejte 50 g šalotky na drobné kostičky.",
-    "Změklé zelí přendejte do čisté bavlněné utěrky nebo jemného síta a kroucením z něj důkladně vymačkejte veškerou uvolněnou slanou tekutinu. Vymačkané, suché zelí vraťte zpět do mísy a přidejte k němu nastrouhaných 150 g mrkve, 50 g celeru a nakrájených 50 g šalotky.",
-    "V samostatné menší misce důkladně metličkou vyšlehejte dresink složený ze 150 g kvalitní majonézy, 100 ml smetany ke šlehání, 25 g cukru krupice, 15 ml jablečného octa, 5 g dijonské hořčice a 2 g čerstvě mletého černého pepře, dokud se krystalky cukru zcela nerozpustí a nevznikne hladká, emulgovaná omáčka.",
+    "Důkladně promíchejte startovací emulzi (zálivku) se zeleninovým základem a uvolněnou šťávou (syrovátkou ze zeleniny) při pokojové teplotě pro optimální fermentaci chuti. Zakryjte směs a nechte ji fermentovat a odležet 30 minut.",
+    "Pomocí kuchyňského robotu s krouhacím kotoučem nakrouhejte očištěného bílého zelí na jemné proužky. Nakrouhané zelí přemístěte do velké mísy, zasypejte soli a čistýma rukama ho intenzivně promačkávejte po dobu přibližně 2 minut. Poté nechte zelí 30 minut odpočívat při pokojové teplotě, aby procesem osmózy pustilo nežádoucí buněčnou vodu.",
+    "Během odpočinku zelí si v kuchyňském robotu na hrubším struhadle nastrouhejte očištěné mrkve, na velmi jemném struhadle nastrouhejte očištěného bulvového celeru a ostrým nožem nakrájejte šalotky na drobné kostičky.",
+    "Změklé zelí přendejte do čisté bavlněné utěrky nebo jemného síta a kroucením z něj důkladně vymačkejte veškerou uvolněnou slanou tekutinu. Vymačkané, suché zelí vraťte zpět do mísy a přidejte k němu nastrouhaných mrkve, celeru a nakrájených šalotky.",
+    "V samostatné menší misce důkladně metličkou vyšlehejte dresink složený ze kvalitní majonézy, smetany ke šlehání, cukru krupice, jablečného octa, dijonské hořčice a čerstvě mletého černého pepře, dokud se krystalky cukru zcela nerozpustí a nevznikne hladká, emulgovaná omáčka.",
     "Připravený krémový dresink vlijte do mísy k vymačkanému zelí, mrkvi, celeru a šalotce. Všechny suroviny vařečkou důkladně promíchejte, aby se dresink dostal do všech vrstev. Salát uzavřete do vzduchotěsné nádoby a uložte do chladničky na minimálně 2 hodiny, ideálně na 12 až 24 hodin, aby se chutě plně stabilizovaly a propojily."
   ],
   "applianceTips": "Pro dosažení dokonale identické textury jako z prvotřídní restaurace použijte kuchyňský robot s krouhacími disky. Zelí krouhejte na 2mm plátky a mrkev s celerem na 3mm nudličky (julienne). Robot zajistí rovnoměrnost řezu, což zabrání nadměrnému narušení buněčných stěn a salát si zachová optimální křupavost.",
   "expertJustification": "Původní recept doporučoval drtit zelí ručně až 30 minut, což mechanicky devastuje buněčnou strukturu zeleniny a mění ji v bláto. Vylepšený postup využívá food science metodu osmózy: krátké promačkání se solí a následné 30minutové odstátí vytáhne přebytečnou vodu přirozeně, aniž by se zničila křupavost. Vymačkáním vody v utěrce zabráníme tomu, aby salát po smíchání s majonézou zvodnatěl. Použití jablečného octa namísto běžného lihového dodá jemnější kyselost a stopové množství dijonské hořčice působí jako přírodní emulgátor, který udrží dresink stabilní a krémový bez separace tuku.",
   "applianceType": "Thermomix / Kuchyňský robot",
-  "cookingTime": "45 min",
+  "cookingTime": "150 min",
   "difficulty": "Snadné",
   "category": "Ostatní",
-  "id": "gen-1782536706330"
+  "id": "gen-1782536706330",
+  "estimatedCookingTime": "150 min"
 }

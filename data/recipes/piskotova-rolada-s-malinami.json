@@ -1,6 +1,6 @@
 {
   "title": "Piškotová roláda s malinami",
-  "summary": "Dokonale vláčná a elastická piškotová roláda s čistým malinovým džemem, která díky správné kulinářské technice rolování za tepla nikdy nepopraská.",
+  "summary": "Dokonale vláčná a elastická piškotová roláda s čistým malinovým džemem, která díky správné kulinářské technice rolování za tepla nikdy nepopraská. [Startovní odpočinek: 30 min, šlehání: 10 min, pečení: 35–60 min]",
   "ingredients": [
     "6 ks čerstvých vajec (velikost M, rozdělených na žloutky a bílky)",
     "140 g krupicového cukru",
@@ -10,6 +10,7 @@
     "1 lžíce moučkového cukru (na poprášení)"
   ],
   "instructions": [
+    "Důkladně promíchejte startovací kypřící složky s tekutou bází (syrovátkou, podmáslím či mlékem) o teplotě 30 °C pro optimální chemickou fermentaci. Zakryjte směs a nechte ji odpočívat 30 minut k aktivaci lepku a prolnutí aromat.",
     "Plech vyložte pečicím papírem a troubu předehřejte na optimální teplotu pro pečení piškotového těsta.",
     "V suché a čisté míse vyšlehejte bílky se špetkou soli do polotuhého sněhu, poté po částech za stálého šlehání přidávejte krupicový cukr, dokud nevznikne pevný, lesklý a stabilní sníh.",
     "Do hotového sněhu jeden po druhém na nízké otáčky zašlehejte žloutky, aby se hmota propojila, ale neztratila svůj objem.",
@@ -23,9 +24,10 @@
   "applianceTips": "Pro dokonalé vyšlehání stabilního sněhu a žloutkové pěny použijte kuchyňský robot s balónovou šlehací metlou nastavený na středně vysokou rychlost, což zajistí rovnoměrnou strukturu vzduchových bublin v těstě.",
   "expertJustification": "Záměna polohrubé mouky za hladkou výrazně snižuje tvorbu lepku, což činí piškotový korpus jemnějším a ohebnějším. Klíčem k zamezení praskání je rolování za horka v utěrce: horká pára se v piškotu uzamkne, čímž se zachová elasticita škrobů a proteinů během chladnutí. Šlehání cukru přímo do bílků namísto žloutků navíc vytváří stabilnější proteinovou mřížku (francouzský sníh), která při pečení nesplihne.",
   "applianceType": "Kuchyňský robot s balónovou metlou",
-  "cookingTime": "30 min",
+  "cookingTime": "90 min",
   "difficulty": "Střední",
   "category": "Sladká jídla a moučníky",
   "id": "gen-1783883983238",
-  "updatedAt": "2026-07-12T19:19:43.680Z"
+  "updatedAt": "2026-07-12T19:19:43.680Z",
+  "estimatedCookingTime": "90 min"
 }

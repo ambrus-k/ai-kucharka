@@ -1,6 +1,6 @@
 {
   "title": "Langoše",
-  "summary": "Klasické langoše upravené s nižším podílem mléka pro pevnější, méně lepivé těsto a sladěnkou místo cukru pro intenzivnější kynutí a optimální barvu kůrky.",
+  "summary": "Klasické langoše upravené s nižším podílem mléka pro pevnější, méně lepivé těsto a sladěnkou místo cukru pro intenzivnější kynutí a optimální barvu kůrky. [Startovní fermentace: 30 min, hnětení: 10 min, kynutí: 60–90 min, pečení/smažení: 15–45 min]",
   "ingredients": [
     "500 g hladké pšeničné mouky (s obsahem proteinu nad 12 %)",
     "200 g plnotučného mléka (vlažného, cca 35 °C)",
@@ -16,20 +16,21 @@
     "150 g zakysané smetany na ozdobu"
   ],
   "instructions": [
-    "V misce důkladně smíchejte 200 g vlažného plnotučného mléka, 10 g sladěnky a 15 g rozdrobeného čerstvého droždí. Nechte na teplém místě 10 minut vzejít kvásek.",
-    "Do mísy kuchyňského robotu prosejte 500 g hladké pšeničné mouky, přidejte 10 g jemné soli, 80 g zakysané smetany, 20 g řepkového oleje a celý vzešlý kvásek (obsahující 200 g mléka, 10 g sladěnky a 15 g droždí). Hněťte hnětacím hákem na rychlost 2 po dobu 8 minut do hladkého a pružného těsta.",
-    "Uhnětené těsto (připravené z 500 g mouky, 200 g mléka, 80 g smetany, 15 g droždí, 10 g sladěnky, 10 g soli a 20 g oleje) vytvarujte do koule, vložte do mísy, přikryjte fólií a nechte kynout na teplém místě po dobu 1 hodiny.",
-    "Vykynuté těsto (celkem cca 835 g) rozdělte na 6 stejných dílů o hmotnosti cca 139 g. Každý bochánek lehce potřete malým množstvím (cca 5 ml) z připravených 1000 ml řepkového oleje a nechte na ploše 20 minut odpočívat.",
-    "Rukama potřenýma tenkým filmem oleje (cca 5 ml z vyhrazených 1000 ml řepkového oleje) vytahujte jednotlivých 6 bochánků těsta (každý o hmotnosti 139 g) od středu k okrajům tak, aby střed byl velmi tenký a okraje mírně širší.",
-    "V hluboké pánvi rozehřejte zbývající část z 1000 ml řepkového oleje na stabilní teplotu 180 °C. Každý vytvarovaný langoš (vytvořený ze 139 g těsta) smažte 60 až 90 sekund z každé strany dozlatova.",
-    "Hotové langoše nechte okapat na savém papíru. Následně je potřete směsí ze 4 stroužků utřeného česneku a 50 ml teplé vody, potřete 150 g zakysané smetany a posypejte 150 g nastrouhané goudy."
+    "Důkladně promíchejte droždí (startovací kulturu) s vlažným mlékem či syrovátkou o teplotě 30–35 °C pro optimální fermentaci. Zakryjte směs a nechte ji fermentovat 30 minut v teple, aby se plně aktivovaly kvasinky a vzešel stabilní kvásek.",
+    "Do mísy kuchyňského robotu prosejte hladké pšeničné mouky, přidejte jemné soli, zakysané smetany, řepkového oleje a celý vzešlý kvásek (obsahující mléka, sladěnky a droždí). Hněťte hnětacím hákem na rychlost 2 po dobu 8 minut do hladkého a pružného těsta.",
+    "Uhnětené těsto (připravené z mouky, mléka, smetany, droždí, sladěnky, soli a oleje) vytvarujte do koule, vložte do mísy, přikryjte fólií a nechte kynout na teplém místě po dobu 1 hodiny.",
+    "Vykynuté těsto (celkem cca ) rozdělte na 6 stejných dílů o hmotnosti cca . Každý bochánek lehce potřete malým množstvím (cca ) z připravených řepkového oleje a nechte na ploše 20 minut odpočívat.",
+    "Rukama potřenýma tenkým filmem oleje (cca z vyhrazených řepkového oleje) vytahujte jednotlivých 6 bochánků těsta (každý o hmotnosti ) od středu k okrajům tak, aby střed byl velmi tenký a okraje mírně širší.",
+    "V hluboké pánvi rozehřejte zbývající část z řepkového oleje na stabilní teplotu 180 °C. Každý vytvarovaný langoš (vytvořený ze těsta) smažte 60 až 90 sekund z každé strany dozlatova.",
+    "Hotové langoše nechte okapat na savém papíru. Následně je potřete směsí ze 4 stroužků utřeného česneku a teplé vody, potřete zakysané smetany a posypejte nastrouhané goudy."
   ],
   "applianceTips": "Pro dokonalé hnětení tužšího těsta použijte kuchyňský robot s celokovovými převody a hnětacím hákem. Pro přesnou teplotu smažení 180 °C, která zabrání přepalování oleje, použijte indukční varnou desku s externí teplotní sondou vloženou přímo do oleje.",
   "expertJustification": "Snížení objemu mléka na 200 g zpevnilo strukturu těsta, což umožňuje snadnější vytahování bez rizika potrhání. Nahrazení bílého cukru sladěnkou (ječným sladem) dodává kvasinkám lépe využitelnou maltózu, což urychluje fermentaci, zlepšuje elasticitu lepku a díky Maillardově reakci zajišťuje sytější zlatavé zbarvení kůrky bez nepříjemné pachuti rafinovaného cukru.",
   "applianceType": "Kuchyňský robot a indukční deska s teplotní sondou",
-  "cookingTime": "1 h 45 min",
+  "cookingTime": "120 min",
   "difficulty": "Střední",
   "category": "Slané jídlo",
   "id": "gen-1781590909243",
-  "updatedAt": "2026-07-12T16:00:48.087Z"
+  "updatedAt": "2026-07-12T16:00:48.087Z",
+  "estimatedCookingTime": "120 min"
 }

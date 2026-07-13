@@ -1,6 +1,6 @@
 {
   "title": "Makový koláč se švestkami",
-  "summary": "Tradiční kynutý koláč s poctivou domácí makovou náplní a šťavnatými švestkami, vylepšený o jemnější kynuté těsto a finální rumovo-máslovou glazuru pro dlouhotrvající vláčnost.",
+  "summary": "Tradiční kynutý koláč s poctivou domácí makovou náplní a šťavnatými švestkami, vylepšený o jemnější kynuté těsto a finální rumovo-máslovou glazuru pro dlouhotrvající vláčnost. [Startovní fermentace: 30 min, hnětení: 10 min, kynutí: 60–90 min, pečení/smažení: 15–45 min]",
   "ingredients": [
     "Těsto: 250 g hladké pšeničné mouky",
     "Těsto: 50 g krupicového cukru",
@@ -25,7 +25,7 @@
     "Glazura: 20 ml tuzemského rumu"
   ],
   "instructions": [
-    "Nejprve si připravte kvásek: do misky s vlažným mlékem rozdrobte čerstvé droždí, přidejte lžičku cukru odebranou z celkového množství a nechte na teplém místě vzejít, dokud se na hladině nevytvoří hustá pěna.",
+    "Důkladně promíchejte droždí (startovací kulturu) s vlažným mlékem či syrovátkou o teplotě 30–35 °C pro optimální fermentaci. Zakryjte směs a nechte ji fermentovat 30 minut v teple, aby se plně aktivovaly kvasinky a vzešel stabilní kvásek.",
     "Mezitím si vyrobte domácí makovou náplň bez konzervantů: v malém rendlíku přiveďte k varu mléko s mletým mákem, cukrem, máslem a skořicí. Za stálého míchání vařte do zhoustnutí, odstavte a vmíchejte rum. Nechte zcela vychladnout.",
     "Do mísy prosejte hladkou mouku, přidejte zbylý cukr, sůl a citronovou kůru. Přilijte vzejitý kvásek, žloutek a začněte hníst.",
     "Jakmile se suroviny začnou spojovat, po částech zapracujte změklé máslo a pokračujte v hnětení, dokud nevznikne hladké, lesklé, mírně lepivé a elastické těsto.",
@@ -40,9 +40,10 @@
   "applianceTips": "Kynuté těsto zpracujte v kuchyňském robotu s hnětacím hákem po dobu 8 minut na střední rychlost. Intenzivní mechanická práce dokonale rozvine lepkovou strukturu hladké mouky, což zajistí, že těsto unese vlhkou náplň, aniž by kleslo.",
   "expertJustification": "Použití hladké mouky místo polohrubé v kynutém těstě zvyšuje kapacitu zadržování plynů díky silnější lepkové síti, což vede k jemnější a nadýchanější střídě. Domácí maková náplň bez kupovaných směsí eliminuje modifikované škroby a umělá aromata. Ukládání švestek slupkou dolů funguje jako mechanická bariéra, která brání uvolněné kyselé ovocné šťávě v rozmáčení kynutého podkladu. Finální potření horkého koláče emulzí z rumu a rozpuštěného másla vytvoří ochranný film, který uzamyká vlhkost uvnitř a výrazně zpomaluje proces retrogradace (stárnutí) pšeničného škrobu.",
   "applianceType": "Kuchyňský robot s hnětacím hákem",
-  "cookingTime": "80 min",
+  "cookingTime": "120 min",
   "difficulty": "Střední",
   "category": "Sladká jídla a moučníky",
   "id": "gen-1783883583875",
-  "updatedAt": "2026-07-12T19:13:04.310Z"
+  "updatedAt": "2026-07-12T19:13:04.310Z",
+  "estimatedCookingTime": "120 min"
 }

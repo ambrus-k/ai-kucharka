@@ -1,6 +1,6 @@
 {
   "title": "Třená bábovka",
-  "summary": "Klasická nadýchaná bábovka s vylepšenou strukturou díky preciznímu šlehání a vyváženému poměru surovin.",
+  "summary": "Klasická nadýchaná bábovka s vylepšenou strukturou díky preciznímu šlehání a vyváženému poměru surovin. [Startovní odpočinek: 30 min, šlehání: 10 min, pečení: 35–60 min]",
   "ingredients": [
     "420 g polohrubé mouky",
     "320 g krupicového cukru",
@@ -13,6 +13,7 @@
     "kůra z 1 bio citronu"
   ],
   "instructions": [
+    "Důkladně promíchejte startovací kypřící složky s tekutou bází (syrovátkou, podmáslím či mlékem) o teplotě 30 °C pro optimální chemickou fermentaci. Zakryjte směs a nechte ji odpočívat 30 minut k aktivaci lepku a prolnutí aromat.",
     "Troubu předehřejte na 170 °C a formu na bábovku vymažte máslem a vysypte hrubou moukou.",
     "Změklé máslo ušlehejte s cukrem a vanilkovým cukrem do světlé a nadýchané pěny, poté postupně zašlehejte žloutky.",
     "Bílky vyšlehejte se špetkou soli na tuhý sníh.",
@@ -25,8 +26,9 @@
   "applianceTips": "Pokud používáte kuchyňský robot, šlehejte žloutkovou směs při střední rychlosti po dobu 5 minut pro maximální emulgaci. Při pečení v horkovzdušné troubě snižte teplotu o 10 °C oproti receptu pro rovnoměrnější vyběhnutí bábovky.",
   "expertJustification": "Změna postupu na oddělené šlehání bílků zajišťuje mechanickou stabilizaci struktury (pěny), která nahrazuje nutnost nadměrného kypření chemickými látkami. Přesné vážení místo odhadů na lžíce eliminuje chybu 'gumovosti' bábovky, ke které dochází při vysokém obsahu lepku v poměru k tuku.",
   "applianceType": "Klasická trouba",
-  "cookingTime": "65 min",
+  "cookingTime": "90 min",
   "difficulty": "Střední",
   "category": "Sladká jídla a moučníky",
-  "id": "gen-1781848561960"
+  "id": "gen-1781848561960",
+  "estimatedCookingTime": "90 min"
 }
