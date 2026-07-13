@@ -1,0 +1,31 @@
+{
+  "title": "Žitno-pšeničné pečivo",
+  "summary": "Řemeslné pečivo s obsahem žitné mouky pro vláčnou střídku a křupavou krustu, připravené s důrazem na správnou hydrataci.",
+  "ingredients": [
+    "350 g pšeničné hladké mouky",
+    "150 g žitné chlebové nebo celozrnné mouky",
+    "285 ml vlažné vody (pro chlebovou mouku) nebo 315 ml (pro celozrnnou mouku)",
+    "19 g čerstvého droždí",
+    "31 g sádla",
+    "11 g soli",
+    "6 g sladovitu nebo medu"
+  ],
+  "instructions": [
+    "Odlijte část vlažné vody, rozmíchejte v ní sladidlo a droždí, zaprašte trochou mouky a nechte vzejít kvásek v teple.",
+    "Do mísy robotu prosejte oba druhy mouky, přidejte sůl, kvásek, zbylou vodu a sádlo.",
+    "Hněťte hákem na nízkou rychlost do spojení surovin, následně na střední rychlost do vytvoření hladkého a pružného bochníku, který se nelepí na stěny.",
+    "Vytvarujte kouli, vložte do vymazané mísy a nechte kynout pod utěrkou až do zdvojnásobení objemu.",
+    "Těsto rozdělte na stejné díly, vytvořte bochánky a po krátkém odpočinku vytvarujte do tvaru rohlíků nebo housek.",
+    "Skládejte na plech s pečicím papírem a nechte kynout pod utěrkou až do viditelného nabytí objemu.",
+    "Pečivo postříkejte vodou, posypte dle preferencí a pečte v troubě s úvodním zapařením horkou vodou na spodním plechu.",
+    "Po krátkém počátečním pečení v páře odstraňte spodní plech, snižte teplotu a dopečte dozlatova."
+  ],
+  "applianceTips": "Použijte kuchyňský robot s hnětacím hákem pro dosažení optimální elasticity lepkové sítě, což je klíčové zejména při práci se žitnou složkou.",
+  "expertJustification": "Zvýšený podíl žitné mouky vyžaduje vyšší hydrataci těsta pro zachování elasticity. Sladovit podporuje enzymatickou aktivitu a Maillardovu reakci při pečení, zatímco správné zapaření trouby zajistí ideální texturu kůrky bez potřeby umělých přísad.",
+  "applianceType": "Trouba s funkcí páry nebo horkovzdušná trouba",
+  "cookingTime": "120 minut",
+  "difficulty": "Střední",
+  "category": "Pečivo",
+  "id": "gen-1783916906147",
+  "updatedAt": "2026-07-13T06:14:05.441Z"
+}
