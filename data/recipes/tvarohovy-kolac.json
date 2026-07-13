@@ -1,9 +1,9 @@
 {
   "title": "Tvarohový koláč",
-  "summary": "Vláčný tvarohový dezert s vyváženým poměrem bílkovin a strukturovanou texturou bez zbytečného přebytku cukru. [Startovní fermentace: 30 min, hnětení: 10 min, kynutí: 60–90 min, pečení/smažení: 15–45 min]",
+  "summary": "Vláčný tvarohový dezert připravený pomocí šetrného pečení, který využívá přirozenou emulgaci vajec pro dosažení nadýchané struktury.",
   "ingredients": [
-    "3 ks vejce (velikost M)",
-    "65 g máslo, rozpuštěné a zchladlé",
+    "150 g vejce (3 kusy velikosti M)",
+    "65 g máslo",
     "150 g moučkový cukr",
     "10 g vanilkový cukr",
     "500 g plnotučný hrudkovitý tvaroh",
@@ -12,20 +12,21 @@
     "1 g sůl"
   ],
   "instructions": [
-    "Důkladně promíchejte droždí (startovací kulturu) s vlažným mlékem či syrovátkou o teplotě 30–35 °C pro optimální fermentaci. Zakryjte směs a nechte ji fermentovat 30 minut v teple, aby se plně aktivovaly kvasinky a vzešel stabilní kvásek.",
-    "Troubu předehřejte na 180 °C a dortovou formu vymažte máslem a vysypte krupicí.",
-    "Vejce s moučkovým a vanilkovým cukrem vyšlehejte kuchyňským robotem do světlé husté pěny (cca 5 minut).",
-    "Do pěny postupně zašlehejte rozpuštěné máslo při nízkých otáčkách.",
-    "Tvaroh krátce prošlehejte, aby se spojil, poté vmíchejte krupičku, kypřicí prášek a špetku soli.",
-    "Tvarohovou směs jemně stěrkou zapracujte do vaječné pěny, aby zůstala nadýchaná.",
-    "Těsto vlijte do připravené formy a pečte 35–40 minut dozlatova."
+    "Troubu předehřejte na 170 °C a dortovou formu ošetřete tukem a krupičkou pro zajištění rovnoměrné kůrky.",
+    "V kuchyňském robotu šlehejte vejce s oběma druhy cukru po dobu 8 minut, dokud směs nezíská hustou, světlou konzistenci s vysokým objemem.",
+    "Během šlehání vajec za stálého míchání vlijte zchladlé rozpuštěné máslo, aby se emulze stabilizovala.",
+    "V samostatné míse krátce promíchejte tvaroh s krupičkou, kypřicím práškem a solí tak, aby suroviny vytvořily homogenní základ.",
+    "Tvarohovou směs opatrně vmíchejte pomocí silikonové stěrky do vyšlehané vaječné pěny, postupujte krouživými pohyby zdola nahoru, aby nedošlo k degradaci vzduchových bublin.",
+    "Těsto rovnoměrně vlijte do připravené formy a pečte 40 minut, dokud koláč na povrchu nezíská zlatavou barvu a není na dotek pružný.",
+    "Po upečení nechte koláč 10 minut chladnout ve formě a následně jej vyjměte na mřížku pro dokončení procesu stabilizace struktury před krájením."
   ],
-  "applianceTips": "Pokud používáte kuchyňský robot (např. Thermomix), použijte metlu pro šlehání vajec s cukrem na rychlost 4 po dobu 5 minut; následně tvaroh s ostatními surovinami vmíchejte na rychlost 2 po dobu 30 sekund, aby nedošlo k rozbití struktury pěny.",
-  "expertJustification": "Snížení počáteční teploty na 180 °C oproti původním 200 °C zabrání prudké denaturaci proteinů, díky čemuž koláč nepopraská a zůstane uvnitř vláčný. Správným vyšleháním vajec vytvoříme emulzi, která zajistí objem bez nutnosti přidávat nadbytečné množství kypřicích látek. Použití hrudkovitého tvarohu v kombinaci s krupičkou zajišťuje správnou želatinizaci škrobu, což vytváří pevnou, ale krémovou texturu.",
-  "applianceType": "Klasická trouba",
-  "cookingTime": "120 min",
+  "applianceTips": "Při použití kuchyňského robota s planetárním systémem šlehání použijte pro fázi s vejci nástavec balonová metla na vysoké otáčky. Pro závěrečné spojení s tvarohovou složkou zvolte pomalý režim nebo ruční zapracování, aby se zachovala lehkost těsta.",
+  "expertJustification": "Recept byl optimalizován pro dosažení stabilní pěnové struktury bez nutnosti fermentace, která je u tvarohových koláčů typu 'cheesecake' nadbytečná. Snížením teploty na 170 °C eliminujeme riziko rychlého vysychání okrajů a umožníme postupnému vyrovnání vnitřní teploty, což vede k rovnoměrnému propečení bez popraskání povrchu.",
+  "applianceType": "Horkovzdušná trouba",
+  "cookingTime": "60 min",
   "difficulty": "Snadné",
   "category": "Sladká jídla a moučníky",
   "id": "gen-1781777341621",
-  "estimatedCookingTime": "120 min"
+  "estimatedCookingTime": "40 min",
+  "updatedAt": "2026-07-13T11:51:37.096Z"
 }
