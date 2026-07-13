@@ -1,29 +1,30 @@
 {
   "title": "Tradiční preclíky",
-  "summary": "Křehké slané pečivo s vysokým obsahem tuku, které díky optimalizovanému kynutí a přesnému poměru surovin získá dokonalou texturu. [Startovní fermentace: 30 min, hnětení: 10 min, kynutí: 60–90 min, pečení/smažení: 15–45 min]",
+  "summary": "Křehké slané pečivo s dlouhým zráním těsta pro jemnou texturu a autentickou chuť.",
   "ingredients": [
-    "500 g hladké pšeničné mouky (typ 00 nebo speciál na kynuté těsto)",
-    "200 g sádla pokojové teploty",
-    "125 ml plnotučného mléka (vlažného)",
-    "42 g čerstvého droždí (půl kostky)",
-    "10 g soli (do těsta)",
-    "50 g máku, hrubozrnné soli nebo kmínu na posypání",
+    "500 g hladké pšeničné mouky",
+    "200 g sádla",
+    "125 ml plnotučného mléka",
+    "15 g čerstvého droždí",
+    "10 g soli",
+    "50 g máku a hrubozrnné soli",
     "30 ml mléka na potření"
   ],
   "instructions": [
-    "Důkladně promíchejte droždí (startovací kulturu) s vlažným mlékem či syrovátkou o teplotě 30–35 °C pro optimální fermentaci. Zakryjte směs a nechte ji fermentovat 30 minut v teple, aby se plně aktivovaly kvasinky a vzešel stabilní kvásek.",
-    "Do mísy prosejte mouku, přidejte sůl a změklé sádlo. Přilijte kvásek a vypracujte hladké, nelepivé těsto.",
-    "Těsto nechte kynout na teplém místě pod utěrkou cca 45-60 minut, dokud nezdvojnásobí svůj objem.",
-    "Vykynuté těsto rozdělte na stejné díly, vyválejte z nich prameny a vytvarujte preclíky.",
-    "Každý preclík na jedné straně potřete mlékem a přitiskněte do směsi máku a soli.",
-    "Pečte v předehřáté troubě na 170 °C po dobu 15–18 minut dozlatova."
+    "Droždí rozmíchejte ve vlažném mléce a nechte 15 min aktivovat. Pamatujte, že nízká dávka droždí vyžaduje delší čas, ale zajistí lepší chuť.",
+    "Do mísy prosejte mouku se solí, přidejte sádlo a aktivovaný kvásek. Hněťte 10 min, dokud nevznikne pružné a nelepivé těsto.",
+    "Těsto nechte kynout v míse pod utěrkou 90 min v prostředí o teplotě 24 °C.",
+    "Vykynuté těsto rozdělte na stejné díly a vyválejte z nich prameny, ze kterých vytvarujte preclíky.",
+    "Preclíky nechte na plechu dokynout dalších 20 min před finální úpravou.",
+    "Povrch potřete mlékem, posypte mákem či solí a pečte v předehřáté troubě na 190 °C po dobu 15 min dozlatova."
   ],
-  "applianceTips": "Pokud používáte domácí pekárnu, vložte suroviny v pořadí tekutiny, sádlo, mouka, sůl a droždí. Zvolte program 'Těsto' (bez pečení), který zajistí rovnoměrné vypracování díky řízenému prohřátí surovin.",
-  "expertJustification": "Původní recept obsahoval zbytečně vysoké množství droždí, které způsobuje příliš rychlou fermentaci a následnou pachuť kvasnic. Snížením dávky droždí a úpravou teploty kynutí dosáhneme jemnější struktury střídky. Sádlo v těstě funguje jako 'shortening' (zkracovač lepkových vláken), což zajišťuje typickou křehkost, zatímco přesné dávkování soli je klíčové pro kontrolu aktivity kvasinek.",
-  "applianceType": "Domácí pekárna",
-  "cookingTime": "120 min",
+  "applianceTips": "Pro ideální kynutí využijte funkci parní trouby s nízkou teplotou 30 °C, nebo použijte program kynutí u pekárny, který udržuje konstantní vlhkost a teplotu pro rovnoměrnou fermentaci.",
+  "expertJustification": "Snížení množství droždí omezuje tvorbu kvasných pachutí a umožňuje enzymům v mouce lépe pracovat, což vede k delší trvanlivosti a lepší struktuře. Prodloužení doby kynutí při pokojové teplotě posiluje lepkovou síť.",
+  "applianceType": "Horkovzdušná trouba",
+  "cookingTime": "150 min",
   "difficulty": "Střední",
   "category": "Pečivo",
   "id": "gen-1781777534961",
-  "estimatedCookingTime": "120 min"
+  "estimatedCookingTime": "15 min",
+  "updatedAt": "2026-07-13T11:43:00.439Z"
 }
