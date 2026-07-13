@@ -1,34 +1,33 @@
 {
   "title": "Třená bábovka",
-  "summary": "Klasická nadýchaná bábovka s vylepšenou strukturou díky preciznímu šlehání a vyváženému poměru surovin. [Startovní odpočinek: 30 min, šlehání: 10 min, pečení: 35–60 min]",
+  "summary": "Tradiční bábovka s precizně vypracovanou strukturou díky emulgaci tuků a mechanickému provzdušnění těsta.",
   "ingredients": [
     "420 g polohrubé mouky",
     "320 g krupicového cukru",
-    "5 ks vajec (oddělené žloutky a bílky)",
-    "12 g kypřicího prášku do pečiva (bezfosfátový)",
+    "5 ks vajec",
+    "12 g kypřicího prášku do pečiva",
     "20 g vanilkového cukru",
     "180 g změklého másla",
     "250 ml plnotučného mléka",
-    "20 g kvalitního holandského kakaa",
-    "kůra z 1 bio citronu"
+    "20 g holandského kakaa",
+    "5 g citronové kůry"
   ],
   "instructions": [
-    "Důkladně promíchejte startovací kypřící složky s tekutou bází (syrovátkou, podmáslím či mlékem) o teplotě 30 °C pro optimální chemickou fermentaci. Zakryjte směs a nechte ji odpočívat 30 minut k aktivaci lepku a prolnutí aromat.",
-    "Troubu předehřejte na 170 °C a formu na bábovku vymažte máslem a vysypte hrubou moukou.",
-    "Změklé máslo ušlehejte s cukrem a vanilkovým cukrem do světlé a nadýchané pěny, poté postupně zašlehejte žloutky.",
-    "Bílky vyšlehejte se špetkou soli na tuhý sníh.",
-    "Do máslové směsi střídavě vmíchávejte mouku s kypřicím práškem, mlékem a nastrouhanou citronovou kůrou.",
-    "Opatrně ručně vmíchejte sníh z bílků, aby těsto zůstalo vzdušné.",
-    "Odeberte třetinu těsta a zamíchejte do ní kakao.",
-    "Do formy vlijte část světlého těsta, poté tmavé a nakonec zbytek světlého. Můžete lehce promíchnout špejlí pro mramorování.",
-    "Pečte v předehřáté troubě cca 45–50 minut, dokud špejle zapíchnutá do středu nevyjde čistá."
+    "Při teplotě 22 °C vyšlehejte změklé máslo s cukrem a vanilkovým cukrem po dobu 8 minut, dokud směs nezíská světlou barvu a krémovou konzistenci.",
+    "Postupně do směsi zašlehávejte žloutky po dobu 3 minut, čímž vytvoříte stabilní emulzi.",
+    "Bílky vyšlehejte se špetkou soli po dobu 5 minut na pevný, nikoliv však vysušený sníh.",
+    "Do máslového základu opatrně stěrkou vmíchejte mouku prosátou s kypřicím práškem a mléko tak, aby byla směs homogenní.",
+    "Na závěr jemně zapracujte sníh z bílků a citronovou kůru pomocí techniky překládání, aby nedošlo ke zhroucení struktury.",
+    "Do třetiny připraveného těsta vmíchejte kakao a následně střídavě vrstvěte světlé a tmavé těsto do vymazané a vysypané formy.",
+    "Vložte do předehřáté trouby a pečte 50 minut při teplotě 170 °C, přičemž po 40 minutách provedete test špejlí pro kontrolu propečení středu."
   ],
-  "applianceTips": "Pokud používáte kuchyňský robot, šlehejte žloutkovou směs při střední rychlosti po dobu 5 minut pro maximální emulgaci. Při pečení v horkovzdušné troubě snižte teplotu o 10 °C oproti receptu pro rovnoměrnější vyběhnutí bábovky.",
-  "expertJustification": "Změna postupu na oddělené šlehání bílků zajišťuje mechanickou stabilizaci struktury (pěny), která nahrazuje nutnost nadměrného kypření chemickými látkami. Přesné vážení místo odhadů na lžíce eliminuje chybu 'gumovosti' bábovky, ke které dochází při vysokém obsahu lepku v poměru k tuku.",
-  "applianceType": "Klasická trouba",
-  "cookingTime": "90 min",
+  "applianceTips": "Využijte planetární mixér pro šlehání máslového základu na střední rychlost. Pokud disponujete horkovzdušnou funkcí, nastavte teplotu na 160 °C pro rovnoměrnější distribuci tepla v celém objemu formy.",
+  "expertJustification": "Změny reflektují technologický postup 'creaming method', kde správná emulgace tuku a cukru zásadně ovlivňuje pórovitost výsledného moučníku. Časy byly upraveny dle standardů cukrářské praxe pro dosažení maximálního objemu bez nutnosti přidaných chemických stabilizátorů.",
+  "applianceType": "Horkovzdušná trouba",
+  "cookingTime": "70 min",
   "difficulty": "Střední",
   "category": "Sladká jídla a moučníky",
   "id": "gen-1781848561960",
-  "estimatedCookingTime": "90 min"
+  "estimatedCookingTime": "50 min",
+  "updatedAt": "2026-07-13T11:51:02.534Z"
 }
