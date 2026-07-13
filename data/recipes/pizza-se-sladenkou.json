@@ -1,28 +1,28 @@
 {
   "title": "Pizza se sladěnkou",
-  "summary": "Optimalizované těsto s využitím čerstvého droždí a sladěnky pro hlubší chuťový profil a vynikající barvu kůrky. [Startovní fermentace: 30 min, hnětení: 10 min, kynutí: 60–90 min, pečení/smažení: 15–45 min]",
+  "summary": "Profesionální receptura pro autentickou pizzu s využitím sladěnky pro optimální fermentaci a dokonalou karamelizaci kůrky.",
   "ingredients": [
-    "500 g pšeničné mouky typ 00",
-    "325 g vlažné vody",
+    "500 g pšeničné mouky typu 00",
+    "325 g vody o teplotě 24 °C",
     "15 g čerstvého droždí",
     "7 g ječné sladěnky",
     "15 g extra panenského olivového oleje",
     "12 g mořské soli"
   ],
   "instructions": [
-    "Důkladně promíchejte droždí (startovací kulturu) s vlažným mlékem či syrovátkou o teplotě 30–35 °C pro optimální fermentaci. Zakryjte směs a nechte ji fermentovat 30 minut v teple, aby se plně aktivovaly kvasinky a vzešel stabilní kvásek.",
-    "Do mísy robota nasypte mouku, přilijte směs s droždím a hněťte 3 minuty na nízkou rychlost.",
-    "Přidejte sůl a olivový olej a hněťte dalších 7 minut, dokud těsto není hladké a elastické.",
-    "Těsto nechte v teple kynout 60 minut pod zakrytou utěrkou.",
-    "Rozdělte těsto na 3 bochníky, vytvarujte je a nechte dalších 60 minut odpočívat při pokojové teplotě.",
-    "Těsto vytvarujte do kruhu, naneste suroviny a pečte v rozpálené troubě na maximální výkon po dobu 5-7 minut."
+    "Ve vodě rozmíchejte droždí se sladěnkou. Tuto směs vlijte k prosáté mouce a začněte hníst na nízký stupeň.",
+    "Po zapracování všech tekutin přidejte sůl a olej. Hněťte při střední rychlosti, dokud není těsto hladké, lesklé a nejeví známky silné lepkové sítě.",
+    "Těsto přikryjte a nechte 60 minut odpočívat při pokojové teplotě, následně jej přeložte (technika stretch and fold) a nechte dalších 60 minut kynout.",
+    "Zpracované těsto rozdělte na bochníky, vložte do uzavřené nádoby a nechte zrát 12 hodin v chladu, což zajistí komplexní chuťový profil.",
+    "Před pečením nechte bochníky 120 minut temperovat při pokojové teplotě, poté vytvarujte pizzy, doplňte ingrediencemi a pečte při maximální možné teplotě do zlatova."
   ],
-  "applianceTips": "Při použití kuchyňského robota s hákem nastavte nízké otáčky, aby nedocházelo k nadměrnému zahřívání lepkové sítě, což udržuje těsto vláčné a snadno tvarovatelné.",
-  "expertJustification": "Sladěnka obsahuje přírodní enzymy a komplexní cukry, které podporují aktivitu čerstvého droždí a přispívají k lepší karamelizaci (Maillardova reakce) během pečení, což dává pizze typickou zlatavou barvu a bohatší chuť oproti rafinovanému cukru.",
-  "applianceType": "Kuchyňský robot",
-  "cookingTime": "120 min",
+  "applianceTips": "Pro dosažení výsledků jako z profesionální pece použijte pizza kámen nebo ocelovou desku; před pečením nechte spotřebič nahřát na maximum alespoň 60 minut.",
+  "expertJustification": "Dlouhá fermentace v chladu rozkládá složité sacharidy, čímž zlepšuje stravitelnost a texturu střídky, zatímco sladěnka poskytuje přirozenou výživu kvasinkám a posiluje Maillardovu reakci při vysokých teplotách.",
+  "applianceType": "Trouba s funkcí horkovzduchu a pizza kamenem",
+  "cookingTime": "960 min",
   "difficulty": "Střední",
   "category": "Ostatní",
   "id": "gen-1781777082731",
-  "estimatedCookingTime": "120 min"
+  "estimatedCookingTime": "10 min",
+  "updatedAt": "2026-07-13T10:00:35.799Z"
 }
