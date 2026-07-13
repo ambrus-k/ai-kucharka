@@ -1,37 +1,34 @@
 {
   "title": "Linecké cukroví",
-  "summary": "Tradiční křehké cukroví s jemným přídavkem kypřicího prášku pro nadýchanější strukturu, spojené kyselkavým džemem. [Startovní odpočinek: 30 min, šlehání: 10 min, pečení: 35–60 min]",
+  "summary": "Křehké máslové cukroví s ovocnou náplní, připravené s důrazem na dokonalou texturu a stabilitu těsta.",
   "ingredients": [
     "210 g hladké pšeničné mouky",
-    "140 g studeného nesoleného másla (min. 82 % tuku)",
+    "140 g studeného másla",
     "70 g moučkového cukru",
     "2 žloutky",
-    "3 g kypřicího prášku do pečiva (bez fosfátů)",
-    "1 lžička nastrouhané bio citronové kůry",
-    "1 špetka soli",
-    "150 g rybízového džemu s vysokým podílem ovoce"
+    "3 g kypřicího prášku bez fosfátů",
+    "5 g citronové kůry",
+    "1 g soli",
+    "150 g rybízového džemu"
   ],
   "instructions": [
-    "Důkladně promíchejte startovací kypřící složky s tekutou bází (syrovátkou, podmáslím či mlékem) o teplotě 30 °C pro optimální chemickou fermentaci. Zakryjte směs a nechte ji odpočívat 30 minut k aktivaci lepku a prolnutí aromat.",
-    "V míse prosejte hladkou mouku s moučkovým cukrem, kypřicím práškem a špetkou soli.",
-    "Přidejte na malé kostičky nakrájené studené máslo a jemně nastrouhanou citronovou kůru.",
-    "Rychle vypracujte jemnou drobenku, aby se máslo nezačalo tavit teplem rukou.",
-    "Přidejte žloutky a bleskově zpracujte v jednolité a hladké těsto.",
-    "Zabalte těsto do fólie a nechte ho v chladničce odležet nejlépe přes noc.",
-    "Těsto rozválejte na pomoučeném vále na stejnoměrně tenký plát.",
-    "Vykrajujte požadované tvary a u poloviny z nich vyřízněte středový otvor.",
-    "Kousky rozložte na plech s pečicím papírem.",
-    "Pečte v předehřáté horkovzdušné troubě dozlatova, těsto však nesmí ztmavnout.",
-    "Po upečení nechte korpusy zcela vychladnout na kovové mřížce.",
-    "Plné tvary potřete ovocným džemem, vrchní díly lehce pocukrujte a opatrně spojte."
+    "V míse prosejte mouku, moučkový cukr, sůl a kypřicí prášek.",
+    "Do suché směsi zapracujte na kostičky nakrájené studené máslo a citronovou kůru pomocí kuchyňského robota s metlou typu K, dokud nevznikne jemná drobenka.",
+    "Přidejte žloutky a bleskově zpracujte v hladké, homogenní těsto.",
+    "Těsto zabalte do fólie a ponechte v chladu odležet 720 minut.",
+    "Vychlazené těsto vyválejte na pomoučeném vále na plát o tloušťce 3 mm.",
+    "Vykrájejte požadované tvary, přičemž u poloviny z nich vykrojte středový otvor.",
+    "Tvary rozložte na plech s pečicím papírem a pečte 8 minut při 170 °C v horkovzdušné troubě.",
+    "Upečené korpusy nechte 60 minut chladnout na mřížce.",
+    "Plné tvary potřete džemem, přiklopte otvorem a případně dozdobte cukrem."
   ],
-  "applianceTips": "Kuchyňský robot s míchací metlou typu K zajistí bleskové zapracování studeného másla s kypřidlem a moukou. Tím zabráníte nežádoucímu rozpuštění tuku a aktivaci lepku, což by těsto znehodnotilo.",
-  "expertJustification": "Přidáním malého množství kypřicího prášku bez fosfátů docílíme lehčí, křehčí a nadýchanější textury těsta. Aby si cukroví i přes mírné vyběhnutí zachovalo ostré rysy, je nutné těsto před pečením důkladně vychladit a pracovat s ním rychle.",
-  "applianceType": "Kuchyňský robot",
-  "cookingTime": "90 min",
+  "applianceTips": "Využijte planetární mixér na nízké otáčky, aby nedošlo k zahřátí másla třením. Stabilizace těsta v chladu před pečením je kritická pro udržení ostrých hran při vykrajování.",
+  "expertJustification": "Odborná praxe vyžaduje minimálně 12 hodin odpočinku těsta v chladu pro hydrataci lepku a stabilizaci tuku, což zabraňuje deformaci při pečení. Krátký čas pečení při vyšší teplotě zajistí křehkost bez nadměrného vysušení.",
+  "applianceType": "Kuchyňský robot a horkovzdušná trouba",
+  "cookingTime": "800 min",
   "difficulty": "Střední",
   "category": "Sladká jídla a moučníky",
   "id": "gen-1783883769608",
-  "updatedAt": "2026-07-12T19:18:24.964Z",
-  "estimatedCookingTime": "90 min"
+  "updatedAt": "2026-07-13T09:46:41.927Z",
+  "estimatedCookingTime": "8 min"
 }
