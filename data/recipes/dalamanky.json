@@ -1,32 +1,32 @@
 {
   "title": "Dalamánky",
-  "summary": "Křupavé dalamánky s vysokým obsahem vlákniny a vyváženou fermentací, připravené s využitím moderní techniky zapařování. [Startovní fermentace: 30 min, hnětení: 10 min, kynutí: 60–90 min, pečení/smažení: 15–45 min]",
+  "summary": "Křupavé žitno-pšeničné pečivo s vysokým obsahem vlákniny, připravené metodou řízené fermentace pro maximální rozvoj chuti a struktury střídky.",
   "ingredients": [
-    "350 g pšeničné chlebové mouky",
-    "150 g žitné chlebové mouky",
-    "325 ml vlažné vody",
-    "12 g čerstvého droždí",
-    "7 g ječného sladu (Sladěnka)",
-    "10 ml jablečného octa",
-    "12 g jemné mořské soli",
-    "5 g celého kmínu"
+    "350 g pšeničná chlebová mouka",
+    "150 g žitná chlebová mouka",
+    "325 ml vlažná voda",
+    "12 g čerstvé droždí",
+    "7 g ječný slad",
+    "10 ml jablečný ocet",
+    "12 g mořská sůl",
+    "5 g celý kmín"
   ],
   "instructions": [
-    "Důkladně promíchejte droždí (startovací kulturu) s vlažným mlékem či syrovátkou o teplotě 30–35 °C pro optimální fermentaci. Zakryjte směs a nechte ji fermentovat 30 minut v teple, aby se plně aktivovaly kvasinky a vzešel stabilní kvásek.",
-    "V míse kuchyňského robota smíchejte oba druhy mouky, sůl a kmín. Přidejte připravený kvásek a jablečný ocet.",
-    "Pomocí hnětacího háku vypracujte hladké a nelepivé těsto. Hnětení udržujte na nízké rychlosti, aby nedošlo k poškození struktury lepku obsaženého v žitné mouce.",
-    "Zakryté těsto nechte v teple kynout, dokud viditelně nezdvojnásobí svůj původní objem.",
-    "Vykynuté těsto přeneste na vál, jemně jej prohněťte a rozdělte na stejně velké díly. Vytvarujte oválné bochánky.",
-    "Dalamánky vyskládejte na plech s pečicím papírem, lehce zaprašte moukou a nechte pod utěrkou finálně nakynout. Před vložením do pece je na povrchu podélně nařízněte.",
-    "Pečte v předehřáté troubě se zapařením pomocí horké vody na spodním plechu. Po prvotní fázi v páře odvětrejte vlhkost a dopečte dozlatova při nižší teplotě."
+    "Droždí rozmíchejte v části vlažné vody se sladem a nechte 15 minut vzejít kvásek při teplotě 28 °C.",
+    "Do mísy prosejte obě mouky, přidejte sůl, kmín, zbytek vody, jablečný ocet a vzešlý kvásek.",
+    "Pomocí hnětacího stroje vypracujte elastické těsto. Proces by měl trvat 8 minut na nízký rychlostní stupeň, aby se vytvořila správná lepková vazba bez zbytečného zahřátí.",
+    "Těsto nechte 60 minut kynout v uzavřené nádobě při teplotě 24 °C, dokud zdvojnásobí svůj objem.",
+    "Vykynuté těsto rozdělte na stejné bochánky a vytvarujte pevné oválné tvary.",
+    "Na plechu nechte bochánky 30 minut finálně kynout pod utěrkou. Povrch nařízněte žiletkou pro kontrolovaný růst během pečení.",
+    "Pečte v troubě s parním zárazem při 230 °C po dobu 8 minut, poté snižte teplotu na 200 °C a dopečte 12 minut dozlatova."
   ],
-  "applianceTips": "Pro dokonalý výsledek můžete využít program pro kynutí v domácí pekárně a následné pečení v horkovzdušné fritéze (při 180 °C po dobu cca 12 minut), která zajistí extrémně křupavou kůrku díky efektivní cirkulaci vzduchu.",
-  "expertJustification": "Kombinace jablečného octa a ječného sladu upravuje pH těsta, což zpomaluje degradaci žitného škrobu a zlepšuje barvu kůrky prostřednictvím Maillardovy reakce. Omezení času hnětení je klíčové, neboť žitná mouka neobsahuje glutenin a gliadin v poměru vhodném pro tvorbu silné lepkové sítě, proto by přílišné mechanické namáhání vedlo k degradaci těsta na lepivou hmotu.",
-  "applianceType": "Domácí pekárna nebo kuchyňský robot",
-  "cookingTime": "120 min",
+  "applianceTips": "Při použití horkovzdušné trouby využijte funkci připařování. Pokud ji přístroj nemá, umístěte na dno trouby plech s horkými kameny a při vkládání pečiva na ně vlijte 50 ml vody.",
+  "expertJustification": "Jablečný ocet snižuje pH, což je u žitných těst kritické pro aktivitu amyláz a prevenci lepkavosti střídky. Snížení intenzity hnětení oproti čistě pšeničným receptům brání únavě lepku, což je u směsí s vysokým podílem žita klíčové pro finální objem.",
+  "applianceType": "Konvektomat nebo horkovzdušná trouba",
+  "cookingTime": "125 min",
   "difficulty": "Střední",
   "category": "Pečivo",
   "id": "gen-1783722072636",
-  "updatedAt": "2026-07-10T22:21:45.941Z",
-  "estimatedCookingTime": "120 min"
+  "updatedAt": "2026-07-13T09:13:26.683Z",
+  "estimatedCookingTime": "20 min"
 }
