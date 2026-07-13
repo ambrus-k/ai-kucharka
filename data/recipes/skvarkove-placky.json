@@ -1,35 +1,36 @@
 {
   "title": "Škvarkové placky",
-  "summary": "Tradiční kynuté placky s vrstvenou strukturou vytvořenou technikou laminace sádla a škvarků. Výsledkem je křehké, nadýchané pečivo s výraznou chutí. [Startovní fermentace: 30 min, hnětení: 10 min, kynutí: 60–90 min, pečení/smažení: 15–45 min]",
+  "summary": "Tradiční vrstvené pečivo s obsahem sádla a škvarků připravené technikou studené laminace pro dosažení maximální křehkosti.",
   "ingredients": [
     "500 g pšeničné hladké mouky",
     "230 ml vlažného mléka",
     "20 g čerstvého droždí",
     "5 g krystalového cukru",
-    "2 ks vejce (1 do těsta, 1 na potření)",
+    "100 g vejce (2 kusy)",
     "10 g jemné soli",
-    "120 g kvalitních vepřových škvarků",
-    "180 g vepřového sádla (60 g do těsta, 120 g do náplně)",
+    "120 g vepřových škvarků",
+    "180 g vepřového sádla",
     "2 g mletého černého pepře",
     "5 g drceného kmínu",
-    "Hrubozrnná sůl na posypání",
-    "Celý kmín na posypání"
+    "5 g hrubozrnné soli",
+    "3 g celého kmínu"
   ],
   "instructions": [
-    "Důkladně promíchejte droždí (startovací kulturu) s vlažným mlékem či syrovátkou o teplotě 30–35 °C pro optimální fermentaci. Zakryjte směs a nechte ji fermentovat 30 minut v teple, aby se plně aktivovaly kvasinky a vzešel stabilní kvásek.",
-    "Do mísy prosejte mouku, přidejte sůl, pepř, drcený kmín, jedno vejce, kvásek a rozpuštěného sádla.",
-    "Vypracujte hladké nelepivé těsto a nechte kynout 60 minut při pokojové teplotě.",
-    "Škvarky jemně nasekejte a smíchejte se změklého sádla na pastu.",
-    "Těsto rozválejte, potřete třetinou směsi, přeložte na třetiny, otočte a postup opakujte celkem 3x s 15minutovou pauzou v chladu mezi překlady.",
-    "Vyválejte na tloušťku 1,5 cm, vykrojte placky, na povrchu vyznačte mřížku a nechte na plechu kynout dalších 30 minut.",
-    "Potřete vejcem, posypte solí a kmínem, poté pečte při 190 °C po dobu 18 minut dozlatova."
+    "Aktivujte kvasinky v mléce s cukrem po dobu 15 minut, dokud se nevytvoří stabilní pěna.",
+    "Ve hnětači spojte mouku, sůl, pepř, drcený kmín, vejce, kvásek a rozpuštěné sádlo. Hněťte 10 minut do dosažení pružné konzistence.",
+    "Nechte těsto fermentovat v teple 60 minut.",
+    "Během kynutí zpracujte škvarky se sádlem na homogenní směs a nechte ztuhnout v chladu.",
+    "Rozválejte těsto, naneste tukovou směs a proveďte překlady typu kniha celkem 3x, přičemž mezi každým překladem nechte těsto odpočívat 20 minut v chladu.",
+    "Rozválejte na finální výšku, vykrojte tvary, vyznačte mřížku a nechte 20 minut finálně kynout.",
+    "Povrch potřete rozšlehaným vejcem, posypte hrubou solí a kmínem a pečte 20 minut při 190 °C."
   ],
-  "applianceTips": "Při použití horkovzdušné fritézy (Air Fryer) nastavte teplotu na 180 °C a pečte 12–15 minut. Placky v koši nepřekrývejte, aby horký vzduch mohl rovnoměrně cirkulovat a vytvořit křupavou krustu.",
-  "expertJustification": "Laminace (překládání) vytvoří vrstvy tuku mezi vrstvami těsta, což při pečení způsobí separaci lepkové sítě a vznik lístkování. Dodržení 2 % soli optimalizuje fermentační aktivitu kvasinek. Chlazení těsta mezi překlady je kritické, aby sádlo zůstalo v plastickém stavu a nevsáklo se do mouky, což by vedlo k tuhosti namísto křehkosti.",
-  "applianceType": "Klasická trouba",
-  "cookingTime": "120 min",
+  "applianceTips": "Při pečení v horkovzdušné troubě využijte funkci napařování v prvních 5 minutách pro lepší expanzi lepkové struktury.",
+  "expertJustification": "Proces laminace tuku do kynutého těsta vyžaduje udržení tuku v tuhém stavu, proto je 20minutové chlazení mezi překlady klíčové. Doba kynutí 60 minut zajistí dostatečnou produkci CO2 pro lehkou střídku.",
+  "applianceType": "Horkovzdušná trouba",
+  "cookingTime": "150 min",
   "difficulty": "Střední",
   "category": "Pečivo",
   "id": "gen-1781778421698",
-  "estimatedCookingTime": "120 min"
+  "estimatedCookingTime": "20 min",
+  "updatedAt": "2026-07-13T11:39:48.251Z"
 }
