@@ -1,33 +1,30 @@
 {
   "title": "Piškotová roláda s malinami",
-  "summary": "Dokonale vláčná a elastická piškotová roláda s čistým malinovým džemem, která díky správné kulinářské technice rolování za tepla nikdy nepopraská. [Startovní odpočinek: 30 min, šlehání: 10 min, pečení: 35–60 min]",
+  "summary": "Lehká a pružná piškotová roláda s malinovou náplní, připravená metodou francouzského sněhu pro maximální nadýchanost.",
   "ingredients": [
-    "6 ks čerstvých vajec (velikost M, rozdělených na žloutky a bílky)",
+    "180 g čerstvých vajec (6 ks, oddělené bílky a žloutky)",
     "140 g krupicového cukru",
-    "100 g hladké pšeničné mouky (jemně prosáté)",
-    "1 špetka jemné mořské soli",
-    "250 g kvalitního malinového džemu (bez umělých konzervantů a želírujících látek)",
-    "1 lžíce moučkového cukru (na poprášení)"
+    "100 g hladké pšeničné mouky",
+    "2 g jemné mořské soli",
+    "250 g malinového džemu (domácí, bez konzervantů)",
+    "15 g moučkového cukru"
   ],
   "instructions": [
-    "Důkladně promíchejte startovací kypřící složky s tekutou bází (syrovátkou, podmáslím či mlékem) o teplotě 30 °C pro optimální chemickou fermentaci. Zakryjte směs a nechte ji odpočívat 30 minut k aktivaci lepku a prolnutí aromat.",
-    "Plech vyložte pečicím papírem a troubu předehřejte na optimální teplotu pro pečení piškotového těsta.",
-    "V suché a čisté míse vyšlehejte bílky se špetkou soli do polotuhého sněhu, poté po částech za stálého šlehání přidávejte krupicový cukr, dokud nevznikne pevný, lesklý a stabilní sníh.",
-    "Do hotového sněhu jeden po druhém na nízké otáčky zašlehejte žloutky, aby se hmota propojila, ale neztratila svůj objem.",
-    "Prosátou hladkou mouku po částech velmi jemně a trpělivě zapracujte do vaječné pěny pomocí silikonové stěrky krouživými pohyby odspodu nahoru, abyste v těstě udrželi maximum vzduchu.",
-    "Těsto rovnoměrně rozetřete na připravený plech pomocí cukrářské palety do hladké, stejně vysoké vrstvy.",
-    "Pečte v předehřáté troubě dozlatova. Těsto musí po lehkém dotyku prstem pružit zpět a nesmí se přesušit, aby neztratilo svoji elasticitu.",
-    "Čistou textilní utěrku lehce poprašte moučkovým cukrem. Upečený piškot ihned po vytažení z trouby překlopte na utěrku, opatrně stáhněte pečicí papír a ještě za horka roládu i s utěrkou pevně zarolujte od delší strany a nechte ji v tomto stavu zcela vychladnout.",
-    "Vychladlou roládu opatrně rozbalte, rovnoměrně potřete malinovým džemem po celé ploše s vynecháním vzdálenějšího okraje a opět pevně sviňte.",
-    "Před krájením nechte roládu krátce odležet v chladu a těsně před podáváním ji jemně poprašte moučkovým cukrem."
+    "Troubu předehřejte na 200 °C. Plech vyložte kvalitním pečicím papírem.",
+    "Bílky se solí šlehejte na střední výkon, dokud nevznikne měkká pěna. Poté postupně zašlehávejte cukr, dokud není sníh pevný, lesklý a tvoří špičky, což trvá přibližně 8 minut.",
+    "Do sněhu krátce zašlehejte žloutky při nízkých otáčkách, jen aby se spojily.",
+    "Prosetou mouku jemně vmíchejte do vaječné směsi ručně silikonovou stěrkou, abyste zachovali objem těsta.",
+    "Těsto rozetřete na plech do stejnoměrné vrstvy a pečte 8 minut dozlatova.",
+    "Ihned po upečení piškot vyklopte na utěrku posypanou moučkovým cukrem, opatrně stáhněte papír a těsto i s utěrkou zamotejte. Nechte rolovat 15 minut.",
+    "Vychladlý korpus rozviňte, potřete džemem, pevně stočte a před podáváním nechte v chladu 20 minut odpočinout."
   ],
-  "applianceTips": "Pro dokonalé vyšlehání stabilního sněhu a žloutkové pěny použijte kuchyňský robot s balónovou šlehací metlou nastavený na středně vysokou rychlost, což zajistí rovnoměrnou strukturu vzduchových bublin v těstě.",
-  "expertJustification": "Záměna polohrubé mouky za hladkou výrazně snižuje tvorbu lepku, což činí piškotový korpus jemnějším a ohebnějším. Klíčem k zamezení praskání je rolování za horka v utěrce: horká pára se v piškotu uzamkne, čímž se zachová elasticita škrobů a proteinů během chladnutí. Šlehání cukru přímo do bílků namísto žloutků navíc vytváří stabilnější proteinovou mřížku (francouzský sníh), která při pečení nesplihne.",
-  "applianceType": "Kuchyňský robot s balónovou metlou",
-  "cookingTime": "90 min",
+  "applianceTips": "Použijte planetární robot s balónovou metlou pro dosažení maximálního objemu sněhu. U horkovzdušné trouby snižte teplotu o 20 °C, aby nedošlo k vysušení povrchu.",
+  "expertJustification": "Zkrácení doby pečení na 8 minut při vyšší teplotě zajistí, že jádro piškotu zůstane vlhké a pružné, což je klíčové pro zabránění praskání. Metoda francouzského sněhu vytváří strukturní integritu, která umožňuje piškotu držet tvar bez nutnosti použití kypřidel.",
+  "applianceType": "Horkovzdušná trouba a kuchyňský robot",
+  "cookingTime": "55 min",
   "difficulty": "Střední",
   "category": "Sladká jídla a moučníky",
   "id": "gen-1783883983238",
-  "updatedAt": "2026-07-12T19:19:43.680Z",
-  "estimatedCookingTime": "90 min"
+  "updatedAt": "2026-07-13T09:59:47.030Z",
+  "estimatedCookingTime": "8 min"
 }
