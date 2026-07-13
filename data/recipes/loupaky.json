@@ -1,33 +1,35 @@
 {
   "title": "Loupáky",
-  "summary": "Tradiční sladké pečivo s vylepšenou strukturou díky kombinaci másla a sádla pro maximální vláčnost. [Startovní fermentace: 30 min, hnětení: 10 min, kynutí: 60–90 min, pečení/smažení: 15–45 min]",
+  "summary": "Tradiční sladké pečivo s vláčnou strukturou díky kombinaci másla a sádla a preciznímu procesu kynutí.",
   "ingredients": [
-    "500 g hladké pšeničné mouky (ideálně typ 00)",
-    "250 ml plnotučného mléka (vlažného)",
-    "40 g másla (změklého)",
-    "40 g vepřového sádla (změklého)",
+    "500 g hladké pšeničné mouky",
+    "250 ml plnotučného mléka",
+    "40 g másla",
+    "40 g vepřového sádla",
     "70 g cukru krupice",
     "8 g soli",
     "2 žloutky",
     "21 g čerstvého droždí",
-    "Kůra z 1/2 bio citronu",
-    "1 vejce na potření",
-    "Mák na posyp"
+    "5 g citronové kůry",
+    "1 vejce",
+    "20 g máku"
   ],
   "instructions": [
-    "Důkladně promíchejte droždí (startovací kulturu) s vlažným mlékem či syrovátkou o teplotě 30–35 °C pro optimální fermentaci. Zakryjte směs a nechte ji fermentovat 30 minut v teple, aby se plně aktivovaly kvasinky a vzešel stabilní kvásek.",
-    "Zvolte program Těsto (cca 110 minut), který zajistí optimální vypracování lepkové sítě.",
-    "Vykynuté těsto rozdělte na 12 stejných částí a vyválejte do podoby úzkého trojúhelníku.",
-    "Trojúhelníky srolujte od základny ke špičce a vytvarujte do podkovy.",
-    "Přeneste na plech s pečicím papírem a nechte kynout na teplém místě 35 minut pod utěrkou.",
-    "Potřete rozšlehaným vejcem, posypte mákem a pečte v předehřáté troubě na 180 °C 15 minut do zlatavé barvy."
+    "Aktivujte droždí ve vlažném mléce s malým množstvím cukru po dobu 15 minut, aby se vytvořil silný kvásek.",
+    "Do mísy prosejte mouku, přidejte sůl, zbylý cukr, citronovou kůru, žloutky, kvásek a směs másla se sádlem.",
+    "Hněťte těsto mechanicky 10 minut, dokud není hladké, pružné a nelepí se na stěny nádoby.",
+    "Nechte těsto kynout v teple pod utěrkou 60 minut, dokud nezdvojnásobí svůj objem.",
+    "Vykynuté těsto rozdělte na stejné díly a vyválejte do tenkých trojúhelníků, které srolujete od základny ke špičce do tvaru podkovy.",
+    "Tvarované pečivo vyskládejte na plech a nechte finálně kynout 40 minut.",
+    "Potřete rozšlehaným vejcem, posypte mákem a pečte v předehřáté troubě na 180 °C po dobu 15 minut do dosažení zlatohnědého povrchu."
   ],
-  "applianceTips": "Při použití domácí pekárny zajistěte, aby mléko mělo max. 30 °C, jinak hrozí inaktivace kvasinek. Pro pečení v parní troubě využijte funkci páry po dobu prvních 5 minut pro dosažení lesklé a křupavé kůrky.",
-  "expertJustification": "Kombinace másla a sádla je klíčová: sádlo zajišťuje křehkost a vláčnost střídky díky svým bodům tání, zatímco máslo dodává požadovanou chuť. Žloutky fungují jako přírodní emulgátor, který propojí tuky s moukou a vytvoří jemnější texturu. Správné pořadí surovin v pekárně chrání droždí před přímým kontaktem se solí, která by jinak zpomalila fermentační proces.",
-  "applianceType": "Domácí pekárna",
-  "cookingTime": "120 min",
+  "applianceTips": "Při použití pekárny vložte nejprve tekuté suroviny, poté suché a nakonec droždí; využijte program pro hnětení a první kynutí. Parní troubu nastavte na 15 minut s nízkou vlhkostí pro optimální lesk kůrky.",
+  "expertJustification": "Prodloužení doby kynutí a precizní hnětení napomáhají správnému vývoji lepkové sítě. Sádlo díky nižšímu bodu tání zajišťuje dlouhotrvající vláčnost střídky bez nutnosti chemických přísad.",
+  "applianceType": "Domácí pekárna a trouba",
+  "cookingTime": "140 min",
   "difficulty": "Střední",
   "category": "Pečivo",
   "id": "gen-1781776531747",
-  "estimatedCookingTime": "120 min"
+  "estimatedCookingTime": "15 min",
+  "updatedAt": "2026-07-13T09:52:26.446Z"
 }
