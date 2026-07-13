@@ -1,30 +1,31 @@
 {
   "title": "Chléb pšenično-žitný",
-  "summary": "Tradiční kváskový chléb s vyváženým poměrem pšeničné a žitné mouky a výraznou kmínovou vůní. [Startovní odpočinek: 30 min, marinování: 2–24 h, pečení/dušení: 1,5–3 h]",
+  "summary": "Tradiční kváskový bochník s vysokou hydratací, připravený pomocí autolýzy pro maximální rozvoj lepkové sítě a bohatou chuť.",
   "ingredients": [
     "250 g pšeničné mouky hladké",
     "250 g pšeničné chlebové mouky",
     "100 g žitné mouky",
     "380 ml vlažné vody",
-    "200 g aktivního žitného kvásku (100% hydratace)",
+    "200 g aktivního žitného kvásku",
     "14 g soli",
     "10 g drceného kmínu"
   ],
   "instructions": [
-    "Důkladně promíchejte startovací marinádu (kořenící směs) s masovým základem a tekutou bází (vývarem, mlékem či syrovátkou) o teplotě 30 °C pro optimální enzymatické zrání. Zakryjte směs a nechte ji odpočívat 30 minut pro maximální absorpci chutí.",
-    "Smíchejte vlažné vody s aktivního žitného kvásku, pšeničné mouky hladké, pšeničné chlebové mouky a žitné mouky a nechte tuto směs odpočívat 30 minut pro nastartování autolýzy.",
-    "Do odpočinutého těsta z vody, kvásku, pšeničné mouky hladké, pšeničné chlebové mouky a žitné mouky zapracujte soli a drceného kmínu a hněťte v robotu 8 minut do hladké textury.",
-    "Těsto vytvořené z pšeničné mouky hladké, pšeničné chlebové mouky, žitné mouky, vody, kvásku, soli a kmínu nechte kynout 2 až 3 hodiny a v polovině času ho jednou přeložte.",
-    "Vykynuté těsto obsahující pšeničné mouky hladké, pšeničné chlebové mouky, žitné mouky, vody, kvásku, soli a kmínu stočte do pevného tvaru, vložte do vysypané ošatky a nechte kynout 2 hodiny v teple nebo 12 hodin v lednici.",
-    "Předehřejte litinový hrnec na 250 stupňů a naříznutý bochník z pšeničné mouky hladké, pšeničné chlebové mouky, žitné mouky, vody, kvásku, soli a kmínu v něm pečte pod poklicí 20 minut.",
-    "Z hrnce s rozpečeným chlebem z pšeničné mouky hladké, pšeničné chlebové mouky, žitné mouky, vody, kvásku, soli a kmínu sejměte poklici, snižte teplotu trouby na 200 stupňů a dopečte ho dalších 25 minut."
+    "Smíchejte pšeničné i žitnou mouku s většinou vody a nechte směs odpočívat půl hodiny, čímž dojde k hydrataci škrobů a startu autolýzy.",
+    "Do autolyzovaného těsta přidejte aktivní kvásek a zbylou část vody; hněťte v robotu při nízké rychlosti, dokud těsto nezačne vykazovat první známky elasticity.",
+    "Přidejte sůl a drcený kmín a pokračujte v hnětení, dokud není těsto hladké, pružné a neodlepuje se od stěn mísy.",
+    "Nechte těsto fermentovat v teple přibližně tři hodiny, přičemž v průběhu procesu proveďte tři série překládání v hodinových intervalech pro zpevnění struktury.",
+    "Vykynuté těsto opatrně vyklopte na pomoučený vál, vytvarujte do napnutého bochníku a vložte do ošatky vysypané moukou k finálnímu kynutí.",
+    "Rozpalte troubu společně s litinovým hrncem na vysokou teplotu; následně bochník nařežte, vložte do nádoby a pečte pod poklicí pro vytvoření páry.",
+    "Po úvodní fázi odstraňte poklici, snižte teplotu a dopečte do sytě zlatavé barvy a charakteristického zvuku při poklepu na spodní stranu."
   ],
-  "applianceTips": "Pro optimální výsledky kynutí využijte moderní troubu s programem kynutí těsta nastaveným na 28 °C, což zajistí stabilní prostředí pro kvasinky bez nežádoucího osychání povrchu. Pečení následně dokončete v rozpáleném litinovém hrnci.",
-  "expertJustification": "Název byl upraven tak, aby přesně reflektoval složení, kde dominuje pšeničná mouka doplněná o žitnou mouku a aromatický kmín. Postup v každém kroku striktně deklaruje přesné množství všech výchozích surovin pro zajištění stoprocentní konzistence receptury a v těstě nejsou přítomny žádné umělé konzervanty ani chemická kypřidla.",
-  "applianceType": "Klasická trouba s litinovým hrncem",
-  "cookingTime": "180 min",
+  "applianceTips": "Před pečením využijte funkci parního rázu, pokud ji vaše trouba umožňuje, nebo ponechte v hrnci poklici dostatečně dlouho, aby vlhkost obsažená v těstě zajistila maximální objem střídky.",
+  "expertJustification": "Postup byl upraven dle pekařských standardů zahrnutím autolýzy a systematického překládání těsta, což vede k lepší struktuře střídky a delší čerstvosti bez nutnosti aditiv.",
+  "applianceType": "Trouba s litinovým hrncem",
+  "cookingTime": "5 hodin",
   "difficulty": "Střední",
   "category": "Pečivo",
   "id": "gen-1781773438337",
-  "estimatedCookingTime": "180 min"
+  "estimatedCookingTime": "45 min",
+  "updatedAt": "2026-07-13T08:59:32.684Z"
 }
