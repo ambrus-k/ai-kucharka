@@ -1,0 +1,31 @@
+{
+  "title": "Kvásový chléb",
+  "summary": "Tradiční pecen s optimalizovaným procesem fermentace pro maximální vývoj lepku a chuťový profil.",
+  "ingredients": [
+    "20 g aktivního žitného kvásku",
+    "200 g žitné chlebové mouky",
+    "200 g vody pro rozkvas",
+    "500 g pšeničné chlebové mouky",
+    "250 g vody pro autolýzu",
+    "14 g mořské soli",
+    "10 g drceného kmínu"
+  ],
+  "instructions": [
+    "Smíchejte suroviny na rozkvas a nechte jej při pokojové teplotě fermentovat 8 hodin, dokud nezdvojnásobí svůj objem.",
+    "Poté smíchejte mouku s vodou určenou pro autolýzu a nechte směs 60 minut odpočívat pro dokonalou hydrataci lepkových vláken.",
+    "Do autolyzovaného těsta vpracujte vyzrálý rozkvas, sůl a kmín. Hněťte 10 minut, dokud těsto není hladké a vysoce elastické.",
+    "Během 4 hodin primární fermentace proveďte každých 45 minut sérii překladů, aby těsto získalo pevnou vnitřní strukturu.",
+    "Těsto stočte do pevného bochníku a nechte v ošatce kynout dalších 120 minut při pokojové teplotě.",
+    "Pečte v prudce vyhřáté troubě s litinovým hrncem po dobu 30 minut se zapařením.",
+    "Po odvětrání páry snižte teplotu a dopečte dalších 20 minut, dokud střídka nedosáhne ideální vnitřní teploty."
+  ],
+  "applianceTips": "Využijte funkci 'Proofing' ve vaší moderní troubě pro stabilizaci teploty během fermentace na přesných 26 °C.",
+  "expertJustification": "Časování kroků bylo upraveno na základě kinetiky kvasinek, čímž se zamezuje proteolytickému rozkladu lepku a zajišťuje se optimální nadýchanost střídky.",
+  "applianceType": "Trouba s funkcí páry nebo litinový hrnec",
+  "cookingTime": "860 min",
+  "difficulty": "Střední",
+  "category": "Pečivo",
+  "id": "gen-1783540977144",
+  "updatedAt": "2026-07-13T12:01:16.190Z",
+  "estimatedCookingTime": "50 min"
+}
