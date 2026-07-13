@@ -1,26 +1,28 @@
 {
   "title": "Kynuté ovocné knedlíky",
-  "summary": "Nadýchané kynuté knedlíky plněné sezónním ovocem, připravené s využitím domácí pekárny pro optimální hydrataci těsta. [Startovní fermentace: 30 min, hnětení: 10 min, kynutí: 60–90 min, pečení/smažení: 15–45 min]",
+  "summary": "Nadýchané kynuté knedlíky vařené v páře, využívající metodu prodloužené fermentace pro maximální lehkost a chuť.",
   "ingredients": [
-    "250 ml vlažného plnotučného mléka",
-    "2 ks vajec (velikost M)",
-    "350 g hladké mouky (typ 00)",
+    "250 ml plnotučného mléka",
+    "2 ks vajec",
+    "350 g hladké mouky",
     "200 g hrubé mouky",
-    "15 g krupicového cukru",
+    "15 g cukru",
     "10 g čerstvého droždí",
-    "5 g jemné mořské soli"
+    "5 g soli"
   ],
   "instructions": [
-    "Důkladně promíchejte droždí (startovací kulturu) s vlažným mlékem či syrovátkou o teplotě 30–35 °C pro optimální fermentaci. Zakryjte směs a nechte ji fermentovat 30 minut v teple, aby se plně aktivovaly kvasinky a vzešel stabilní kvásek.",
-    "Po vykynutí těsta vyklopte těsto na vál posypaný trochou mouky. Rozdělte těsto na stejné díly (cca na kus) a dlaněmi vytvarujte placičky. Do středu každé placičky vložte vybrané ovoce (švestky, meruňky nebo jahody) a pečlivě uzavřete. Knedlíky nechte na plechu ještě 15 minut kynout.",
-    "Připravte si hrnec s pařákem nebo parní hrnec. Knedlíky vkládejte do parního lázně tak, aby se vzájemně nedotýkaly (při vaření v páře se zvětší). Vařte v páře přesně 8 minut. Po vyjmutí ihned každý knedlík propíchněte vidlicí, aby unikla horká pára a těsto zůstalo nadýchané a nesrazilo se."
+    "V teplém mléce rozmíchejte droždí se špetkou cukru a nechte 20 minut pracovat na vlažném místě.",
+    "Do mísy prosejte obě mouky, přidejte sůl, zbylý cukr, vejce a vzešlý kvásek. Vše propracujte v pružné těsto, které nechte v teple kynout 60 minut do zdvojnásobení objemu.",
+    "Vykynuté těsto rozdělte na stejné díly, vytvarujte placky a vložte ovoce. Pevně uzavřete a nechte na válu 20 minut kynout.",
+    "Připravte si parní lázeň. Knedlíky vkládejte do napařovače a vařte 10 minut. Ihned po vyjmutí propíchněte vidlicí, aby unikla pára."
   ],
-  "applianceTips": "Domácí pekárna zajistí ideální teplotu pro fermentaci, což je klíčové pro strukturu lepku. Vaření v páře je preferováno před varem ve vodě, neboť knedlíky zůstávají díky přímému kontaktu s párou lehčí a nehrozí jejich rozmočení.",
-  "expertJustification": "Úprava poměru mouky na hladkou a hrubou zajišťuje optimální elasticitu (lepek) a zároveň typickou strukturu kynutého těsta. Snížení množství droždí oproti původnímu receptu vede k pomalejší a kvalitnější fermentaci, která eliminuje kvasnicovou pachuť. Separace soli od droždí je nutná pro zamezení osmotického šoku kvasinek, což je běžná chyba domácích kuchařů.",
-  "applianceType": "Domácí pekárna",
-  "cookingTime": "120 min",
+  "applianceTips": "Použití parní konvekce nebo parního hrnce zajistí rovnoměrný nárůst těsta bez rizika rozmočení, které hrozí při klasickém varu ve vodě.",
+  "expertJustification": "Optimalizovaná doba kynutí a teplota mléka zajišťují správnou hydrataci lepkové sítě, což vede k jemnější střídce. Krátké napařování zachovává integritu ovocné náplně a nadýchanost textury.",
+  "applianceType": "Parní hrnec",
+  "cookingTime": "110 min",
   "difficulty": "Střední",
   "category": "Sladká jídla a moučníky",
   "id": "gen-1782536913905",
-  "estimatedCookingTime": "120 min"
+  "estimatedCookingTime": "10 min",
+  "updatedAt": "2026-07-13T09:16:47.265Z"
 }
