@@ -1,0 +1,30 @@
+{
+  "title": "Kváskový chléb s kmínem",
+  "summary": "Tradiční řemeslný chléb s dlouhou fermentací pro dosažení optimální stravitelnosti a křupavé kůrky.",
+  "ingredients": [
+    "200 g aktivního žitného kvásku",
+    "350 g pšeničné chlebové mouky T650",
+    "250 g žitné chlebové mouky T930",
+    "380 g vlažné vody",
+    "16 g jemné mořské soli",
+    "11 g celého kmínu",
+    "30 g rýžové mouky na vysypání ošatky"
+  ],
+  "instructions": [
+    "Smíchejte aktivní kvásek s vlažnou vodou a oběma druhy mouky. Nechte směs odpočívat pro proces autolýzy, který iniciuje enzymatický rozklad škrobů a bílkovin.",
+    "Po dokončení autolýzy vmíchejte sůl a kmín. Těsto krátce prohněťte, dokud není homogenní a pružné.",
+    "Během hlavního kynutí při pokojové teplotě provádějte pravidelné překládání těsta v hodinových intervalech pro zpevnění lepkové struktury.",
+    "Vytvarujte bochník a vložte jej do ošatky důkladně vysypané rýžovou moukou, aby nedošlo k přilepení.",
+    "Ošatku s těstem umístěte do chladného prostředí pro dlouhou fermentaci, která rozvine hlubokou chuť a aroma.",
+    "Troubu s prázdným litinovým hrncem rozpalte na vysokou teplotu. Do rozpáleného hrnce opatrně vyklopte těsto, přiklopte poklicí pro vytvoření páry a pečte. Následně poklici sejměte a dopečte do tmavě zlaté barvy pro dosažení křupavé kůrky."
+  ],
+  "applianceTips": "Pro pečení v domácích podmínkách je klíčové využití litinového hrnce, který funguje jako pec v peci a udržuje stabilní vlhkost během prvních minut pečení.",
+  "expertJustification": "Autolýza zkracuje čas hnětení a zlepšuje roztažnost těsta. Chladná fermentace (retardace) je klíčem k enzymatické aktivitě, která odbourává antinutriční látky a zvyšuje biologickou dostupnost minerálů z celozrnných mouk.",
+  "applianceType": "Horkovzdušná trouba s litinovým nádobím",
+  "cookingTime": "1140 min",
+  "difficulty": "Střední",
+  "category": "Pečivo",
+  "id": "gen-1783526818566",
+  "updatedAt": "2026-07-13T08:55:14.632Z",
+  "estimatedCookingTime": "50 min"
+}
