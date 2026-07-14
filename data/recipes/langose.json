@@ -1,6 +1,6 @@
 {
   "title": "Langoše",
-  "summary": "Tradiční kynuté langoše s vylepšenou hydratací pro maximální nadýchanost a vláčnost.",
+  "summary": "Tradiční kynuté langoše s vysokou hydratací pro dosažení nadýchané střídky a křupavých okrajů.",
   "ingredients": [
     "500 g pšeničné mouky (typ 00)",
     "325 g plnotučného mléka (vlažného)",
@@ -15,22 +15,20 @@
     "150 g zakysané smetany"
   ],
   "instructions": [
-    "V části vlažného mléka nechte vzejít droždí se sladěnkou.",
-    "V míse robota smíchejte mouku se zbytkem mléka, solí a vzešlým kváskem. Hněťte na pomalý stupeň do spojení surovin, poté přilijte olej a vypracujte hladké, nelepivé těsto.",
-    "Nechte těsto kynout v teple pod utěrkou, dokud nezdvojnásobí svůj objem.",
-    "Vykynuté těsto rozdělte na stejnoměrné bochánky, potřete je olejem a nechte krátce odpočinout.",
-    "Každý bochánek vytahujte od středu směrem k okrajům tak, aby okraje zůstaly mírně vyšší než střed.",
-    "Smažte v rozpáleném oleji dozlatova z obou stran.",
-    "Hotové kusy odkládejte na papírovou utěrku a ihned potřete česnekem utřeným s vodou.",
-    "Na závěr potřete smetanou a posypejte strouhaným sýrem."
+    "Ve vlažném mléce rozmíchejte sladěnku a droždí; nechte vzejít kvásek po dobu 10 minut.",
+    "V míse robota propojte mouku se solí, přidejte kvásek a hněťte 5 minut, poté zapracujte olej a nechte kynout 60 minut.",
+    "Vykynuté těsto rozdělte na bochánky, potřete povrch olejem a nechte odpočinout pod utěrkou 15 minut.",
+    "Z těsta vytahujte placky směrem od středu k okrajům tak, aby okraje zůstaly silnější než střed.",
+    "Smažte v rozpáleném oleji z obou stran do zlatavé barvy přibližně 3 minuty na kus.",
+    "Ihned po usmažení potřete langoše česnekem rozetřeným s vodou, naneste smetanu a zasypejte strouhaným sýrem."
   ],
-  "applianceTips": "Použijte hnětací hák na nízké otáčky maximálně 5 minut. Vyhněte se intenzivnímu hnětení, které by narušilo jemnou texturu střídky.",
-  "expertJustification": "Zvýšení hydratace na 65 % je klíčem k vytvoření většího množství bublin při smažení. Kratší doba hnětení zabraňuje vzniku příliš tuhého lepkového skeletu, který by bránil snadnému vytahování těsta.",
+  "applianceTips": "Použijte hnětací hák na nízké otáčky. Pro smažení udržujte teplotu oleje stabilně na 170-175 °C pro dosažení ideální textury bez nadměrného nasáknutí tukem.",
+  "expertJustification": "Zvýšení hydratace na 65 % a využití ječné sladěnky podporuje fermentační aktivitu a karamelizaci povrchu při smažení. Časování jednotlivých kroků zajišťuje optimální rozvoj lepkové sítě a textury těsta.",
   "applianceType": "Planetární robot a fritéza",
   "cookingTime": "90 min",
   "difficulty": "Střední",
   "category": "Slané pečivo",
   "id": "gen-1781590909243",
-  "updatedAt": "2026-07-14T05:37:49.842Z",
+  "updatedAt": "2026-07-14T05:38:47.322Z",
   "estimatedCookingTime": "15 min"
 }
