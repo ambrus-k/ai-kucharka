@@ -1,0 +1,29 @@
+{
+  "title": "Šumavský bochník mistra pekaře",
+  "summary": "Stabilní receptura s důrazem na šetrné zpracování žitných pentosanů a optimální fermentační křivku.",
+  "ingredients": [
+    "100 g žitného kvásku (aktivní)",
+    "200 g žitné chlebové mouky",
+    "200 g vody (pro rozkvas)",
+    "500 g pšeničné chlebové mouky",
+    "280 g vody (pro autolýzu)",
+    "14 g mořské soli",
+    "10 g drceného kmínu"
+  ],
+  "instructions": [
+    "Připravte rozkvas smícháním surovin a nechte jej fermentovat do zdvojnásobení objemu.",
+    "V míse důkladně spojte pšeničnou mouku s vodou pro autolýzu a nechte 60 minut odpočívat.",
+    "K autolyzovanému základu přidejte vyzrálý rozkvas, sůl a kmín. Strojově hněťte pouze 4 minuty při nízkých otáčkách do homogenního spojení.",
+    "Během 3 hodin primární fermentace proveďte pouze dvě série překladů s odstupem 60 minut.",
+    "Těsto šetrně stočte do tvaru bochníku a vložte do ošatky kynout po dobu 90 minut.",
+    "Pečte v předehřátém litinovém hrnci se zapařením 30 minut, poté odklopte a dopečte dalších 20 minut pro vytvoření silné kůrky."
+  ],
+  "applianceTips": "Při pečení v litinovém hrnci vložte na dno trouby starší plech, do kterého po vložení chleba vlijete 100 ml vroucí vody pro okamžitý efekt zapaření.",
+  "expertJustification": "Omezení mechanického namáhání a frekvence překládání je klíčové pro stabilitu těsta s vysokým obsahem žita. Kratší fermentační čas v ošatce zabrání překynutí a proteolytickému propadu střídky.",
+  "applianceType": "Trouba s litinovým hrncem",
+  "cookingTime": "750 min",
+  "difficulty": "Střední",
+  "category": "Pečivo",
+  "id": "gen-1783540977144",
+  "updatedAt": "2026-07-14T05:19:36.043Z"
+}
