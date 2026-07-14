@@ -1,30 +1,30 @@
 {
   "title": "Chléb Šumava",
-  "summary": "Pšenično-žitný chléb s optimalizovanou hydratací a minimálním mechanickým namáháním pro dosažení pružné střídky.",
+  "summary": "Tradiční pšenično-žitný chléb s prodlouženou primární fermentací pro maximální rozvoj chuti a enzymatickou stabilitu.",
   "ingredients": [
     "100 g aktivního žitného kvásku (100% hydratace)",
     "200 g žitné chlebové mouky",
-    "200 g vlažné vody (pro rozkvas)",
+    "200 g vlažné vody",
     "500 g pšeničné chlebové mouky",
-    "280 g vlažné vody (pro autolýzu)",
+    "280 g vlažné vody",
     "14 g mořské soli",
     "10 g drceného kmínu"
   ],
   "instructions": [
-    "Smíchejte suroviny na rozkvas a nechte jej v teple pracovat, dokud nezdvojnásobí svůj objem.",
-    "V míse promíchejte pšeničnou mouku s vodou určenou pro autolýzu a nechte hodinu odpočívat, aby se vytvořila správná enzymatická vazba.",
-    "Ke směsi přidejte rozkvas, sůl a kmín. Robotem zpracovávejte jen krátce při nízkých otáčkách, dokud není těsto hladké a sjednocené.",
-    "Během primární fermentace těsto dvakrát přeložte s hodinovým odstupem, aby se jemně zpevnila struktura bez narušení lepkové sítě.",
-    "Z těsta vytvarujte bochník a vložte jej do pomoučené ošatky. Nechte kynout 75–90 minut, dokud se objem viditelně nezvětší, ale těsto neztratí pružnost.",
-    "Pečte v rozpáleném litinovém hrnci pod poklicí se zapařením po dobu 30 minut, poté hrnec odkryjte a pečte dalších 20 minut, dokud kůrka nezíská tmavě kaštanovou barvu."
+    "Nejprve smíchejte suroviny pro rozkvas a vyčkejte na zdvojnásobení jeho objemu.",
+    "Propojte pšeničnou mouku s vodou pro autolýzu a ponechte směs hodinu v klidu pro hydrataci lepku.",
+    "Do autolyzovaného těsta vpracujte hotový rozkvas, sůl a kmín za pomoci kuchyňského robota na nízké otáčky.",
+    "Následuje primární fermentace, která trvá 4 hodiny. Během tohoto času těsto v intervalech jedné hodiny celkem třikrát jemně přeložte pro posílení lepkové struktury.",
+    "Vykynuté těsto vytvarujte do bochníku a umístěte do ošatky. Nechte finálně dokynout, dokud není struktura viditelně provzdušněná a pružná na dotek.",
+    "Pečte v předehřátém litinovém hrnci pod poklicí pro efekt zapaření, v závěru hrnec odkryjte pro dosažení tmavé a křupavé kůrky."
   ],
-  "applianceTips": "Při vkládání do hrnce použijte papír na pečení, který usnadní manipulaci a zabrání přichycení těsta ke dnu při vysokých teplotách.",
-  "expertJustification": "Recept využívá synergii autolýzy a pomalé fermentace. Snížení času finálního kynutí v ošatce zajistí, že chléb bude mít v troubě dostatečný tah (oven spring) a střídka zůstane vláčná.",
-  "applianceType": "Trouba a litinový hrnec",
-  "cookingTime": "450 min",
+  "applianceTips": "Použití litinového hrnce s poklicí simuluje podmínky profesionální parní pece, což je pro dosažení typické šumavské kůrky klíčové.",
+  "expertJustification": "Prodloužení primární fermentace na 4 hodiny umožní komplexní enzymatické štěpení škrobů a bílkovin, což vede k lepší stravitelnosti a hlubší chuti střídky.",
+  "applianceType": "Trouba s funkcí parního pečení nebo litinový hrnec",
+  "cookingTime": "540 min",
   "difficulty": "Střední",
   "category": "Pečivo",
   "id": "gen-1783540977144",
-  "updatedAt": "2026-07-14T05:30:56.473Z",
-  "estimatedCookingTime": "750 min"
+  "updatedAt": "2026-07-14T05:32:22.635Z",
+  "estimatedCookingTime": "50 min"
 }
