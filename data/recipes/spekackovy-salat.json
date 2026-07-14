@@ -15,20 +15,20 @@
     "1 g černého pepře"
   ],
   "instructions": [
-    "Špekáčky zbavte střívka, podélně rozkrojte a nakrájejte na půlměsíčky.",
-    "Cibuli a okurky zpracujte v robotu na stejnoměrné kousky.",
-    "V míse vyšlehejte olej, hořčici, worcester, kečup, ocet, cukr a pepř do hladké emulze.",
-    "Do emulze vložte cibuli a nechte marinovat 20 minut, aby došlo k denaturaci sírných látek.",
-    "Do marinované cibule přidejte nakrájené špekáčky a okurky, vše promíchejte.",
-    "Jako poslední krok vmíchejte majonézu a salát dejte uležet do chladničky na 240 minut pro dokonalé propojení chutí."
+    "Špekáčky zbavte střívka, podélně rozkrojte a nakrájejte na tenké půlměsíčky.",
+    "Cibuli a okurky nakrájejte ručně na drobné kostičky stejné velikosti, aby byla zachována křupavost a salát nepustil příliš mnoho tekutiny.",
+    "V míse vyšlehejte olej, hořčici, worcester, kečup, ocet, cukr a pepř, dokud nevznikne hladká emulze.",
+    "Do připravené emulze vložte nakrájenou cibuli a nechte ji krátce marinovat pro zjemnění její štiplavosti.",
+    "Následně přidejte nakrájené špekáčky a okurky a vše důkladně promíchejte.",
+    "Nakonec do směsi opatrně vmíchejte majonézu a nechte salát v chladu odpočívat, aby se chutě správně propojily."
   ],
-  "applianceTips": "Použijte multifunkční robot s pulzní funkcí pro dosažení přesné textury zeleniny bez vzniku nežádoucí šťávy.",
-  "expertJustification": "Marinování cibule v kyselém prostředí před přidáním majonézy je klíčové pro stravitelnost. Delší odležení v chladu (240 minut) dovoluje osmotickému tlaku vyrovnat koncentraci solí a cukrů mezi masnou složkou a nálevem.",
-  "applianceType": "Multifunkční kuchyňský robot",
+  "applianceTips": "Namísto robotu doporučuji použití ostrého šéfkuchařského nože, který zajistí čisté řezy surovin bez zbytečného drcení vláken.",
+  "expertJustification": "Změna techniky krájení z robotu na ruční zajišťuje integritu surovin, což zabraňuje uvolňování přebytečné vody a zachovává požadovanou viskozitu výsledného salátu.",
+  "applianceType": "Kuchařský nůž a nerezová mísa",
   "cookingTime": "280 min",
   "difficulty": "Snadné",
   "category": "Ostatní",
   "id": "gen-1781777658404",
   "estimatedCookingTime": "20 min",
-  "updatedAt": "2026-07-13T11:41:40.813Z"
+  "updatedAt": "2026-07-14T06:19:14.346Z"
 }
