@@ -6,7 +6,7 @@
     "200 g žitné chlebové mouky",
     "200 g vlažné vody (pro rozkvas)",
     "500 g pšeničné chlebové mouky",
-    "280 g vlažné vody (pro autolýzu)",
+    "250 g vlažné vody (pro autolýzu)",
     "14 g mořské soli",
     "10 g drceného kmínu"
   ],
@@ -25,6 +25,6 @@
   "difficulty": "Střední",
   "category": "Pečivo",
   "id": "gen-1783540977144",
-  "updatedAt": "2026-07-14T05:57:10.703Z",
+  "updatedAt": "2026-07-14T19:43:39.963Z",
   "estimatedCookingTime": "45 min"
 }
