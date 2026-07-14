@@ -2,7 +2,7 @@
   "title": "Chléb Šumava",
   "summary": "Tradiční pšenično-žitný chléb s prodlouženou primární fermentací pro maximální rozvoj chuti a enzymatickou stabilitu.",
   "ingredients": [
-    "100 g aktivního žitného kvásku (100% hydratace)",
+    "30 g aktivního žitného kvásku (100% hydratace)",
     "200 g žitné chlebové mouky",
     "200 g vlažné vody",
     "500 g pšeničné chlebové mouky",
@@ -13,7 +13,7 @@
   "instructions": [
     "Nejprve smíchejte suroviny pro rozkvas a vyčkejte na zdvojnásobení jeho objemu.",
     "Propojte pšeničnou mouku s vodou pro autolýzu a ponechte směs hodinu v klidu pro hydrataci lepku.",
-    "Do autolyzovaného těsta vpracujte hotový rozkvas, sůl a kmín za pomoci kuchyňského robota na nízké otáčky.",
+    "Do autolyzovaného těsta vpracujte hotový rozkvas (400 g, zbytek použij na další kvásek), sůl a kmín za pomoci kuchyňského robota na nízké otáčky.",
     "Následuje primární fermentace, která trvá 4 hodiny. Během tohoto času těsto v intervalech jedné hodiny celkem třikrát jemně přeložte pro posílení lepkové struktury.",
     "Vykynuté těsto vytvarujte do bochníku a umístěte do ošatky. Nechte finálně dokynout, dokud není struktura viditelně provzdušněná a pružná na dotek.",
     "Pečte v předehřátém litinovém hrnci pod poklicí pro efekt zapaření, v závěru hrnec odkryjte pro dosažení tmavé a křupavé kůrky."
@@ -25,6 +25,6 @@
   "difficulty": "Střední",
   "category": "Pečivo",
   "id": "gen-1783540977144",
-  "updatedAt": "2026-07-14T05:32:22.635Z",
+  "updatedAt": "2026-07-14T05:52:03.684Z",
   "estimatedCookingTime": "50 min"
 }
