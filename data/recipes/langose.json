@@ -1,6 +1,6 @@
 {
   "title": "Langoše",
-  "summary": "Tradiční kynuté langoše s precizně řízenou autolýzou a optimální fermentací pro dosažení nadýchané střídky a křupavých okrajů.",
+  "summary": "Tradiční kynuté langoše připravené přímou metodou s postupným zapracováním tuku pro dosažení dokonale vláčného a pružného těsta.",
   "ingredients": [
     "500 g pšeničné mouky typ 00",
     "325 g plnotučného mléka",
@@ -15,22 +15,22 @@
     "150 g zakysané smetany"
   ],
   "instructions": [
-    "V míse planetárního robotu smíchejte mouku s částí mléka, pouze krátce propojte a nechte 20 minut odpočívat jako čistou autolýzu bez přidané soli a droždí.",
-    "Ve zbylém vlažném mléce rozmíchejte sladěnku a čerstvé droždí, nechte 10 minut vzejít na teplém místě.",
-    "K autolyzovanému základu přilijte aktivovaný kvásek a hněťte na první rychlostní stupeň, následně přidejte sůl a pokračujte v hnětení do dosažení hladké konzistence.",
-    "Do těsta za stálého chodu robotu pomalu přilévejte olej a hněťte, dokud není povrch sametově hladký a těsto se nečistí od stěn mísy.",
-    "Těsto přemístěte do vyolejované nádoby, nechte kynout při pokojové teplotě a po první polovině času jednou jemně přeložte pro zpevnění struktury.",
-    "Z vykynutého těsta vytvořte bochánky, nechte je pod utěrkou kynout, dokud nebudou zcela uvolněné a poddajné.",
-    "Bochánky vytahujte na placky s tenkým středem a silnějšími okraji a ihned smažte v rozpáleném oleji dozlatova z obou stran.",
-    "Po vytažení z oleje nechte langoše okapat na papírové utěrce, potřete směsí česneku s vodou a doplňte zakysanou smetanou a strouhaným sýrem."
+    "Do mísy planetárního robotu nalijte vlažné mléko, ve kterém rozmíchejte sladěnku a rozdrobte čerstvé droždí, a nechte krátce aktivovat.",
+    "Na tekutý základ nasypte mouku a navrch přidejte sůl, čímž zamezíte přímému kontaktu soli s kvasinkami.",
+    "Zapněte robot na první rychlostní stupeň a hněťte, dokud se suroviny nespojí do kompaktního a hladkého těsta, které se začne odlepovat od stěn mísy.",
+    "V poslední minutě hnětení za stálého chodu robotu pramínkem přilévejte olej, aby obalil lepková vlákna a dodal těstu finální elasticitu.",
+    "Těsto přemístěte do nádoby a nechte v teple vykynout, dokud nezdvojnásobí svůj objem.",
+    "Vykynuté těsto rozdělte na bochánky, které pod utěrkou necháte krátce odpočinout pro snadnější vytahování.",
+    "Bochánky vytvarujte do tenkých placek a ihned smažte v rozpáleném oleji dozlatova z obou stran.",
+    "Hotové langoše nechte krátce okapat na papírové utěrce, potřete česnekem rozmíchaným ve vodě a podávejte se zakysanou smetanou a strouhaným sýrem."
   ],
-  "applianceTips": "Při hnětení používejte pouze první rychlostní stupeň, aby nedošlo k přehřátí lepkové struktury. Pro smažení udržujte konstantní teplotu 175 °C pro minimální nasákavost tuku.",
-  "expertJustification": "Separace autolýzy od aktivace kvasnic a zkrácení primární fermentace zajišťuje optimální reologii těsta a prevenci nadměrné proteolýzy, což umožňuje bezproblémové vytahování tenkých placek.",
+  "applianceTips": "Při hnětení používejte planetární robot na nízké otáčky, aby se těsto nezahřálo a udrželo si svou viskozitu. Při smažení udržujte teplotu oleje stabilně kolem 175 °C pro dosažení maximální křupavosti.",
+  "expertJustification": "Přímá metoda se separovaným přidáním soli a postupným zapracováním tuku zajišťuje optimální kinetiku fermentace a reologickou stabilitu lepkové sítě, což je klíčové pro snadné vytahování placek.",
   "applianceType": "Planetární robot a fritéza",
-  "cookingTime": "120 min",
+  "cookingTime": "90 min",
   "difficulty": "Střední",
   "category": "Pečivo",
   "id": "gen-1781590909243",
-  "updatedAt": "2026-07-14T06:04:33.626Z",
+  "updatedAt": "2026-07-14T06:07:34.500Z",
   "estimatedCookingTime": "15 min"
 }
