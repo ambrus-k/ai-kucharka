@@ -1,30 +1,30 @@
 {
   "title": "Chléb Šumava",
-  "summary": "Tradiční pšenično-žitný chléb s optimalizovanou dobou fermentace pro dosažení optimální enzymatické aktivity a strukturální stability.",
+  "summary": "Stabilní pšenično-žitný chléb s vyváženou fermentací, který respektuje reologické limity žitné složky a zaručuje křupavou kůrku.",
   "ingredients": [
     "30 g aktivního žitného kvásku (100% hydratace)",
     "200 g žitné chlebové mouky",
-    "200 g vlažné vody",
+    "200 g vlažné vody (pro rozkvas)",
     "500 g pšeničné chlebové mouky",
-    "280 g vlažné vody",
+    "300 g vlažné vody (pro autolýzu)",
     "14 g mořské soli",
     "10 g drceného kmínu"
   ],
   "instructions": [
-    "Smíchejte kvásek s moukou a vodou pro vytvoření rozkvasu a nechte jej při pokojové teplotě pracovat po dobu 6 hodin, dokud nezdvojnásobí svůj objem.",
-    "Promíchejte mouku s vodou určenou pro autolýzu a nechte směs 45 minut odpočívat pro plnou hydrataci lepkových proteinů.",
-    "Do autolyzovaného základu vmíchejte připravený rozkvas (400 g), sůl a kmín. Hnětení provádějte pouze krátce na nízké otáčky, aby došlo k homogenizaci bez narušení struktury.",
-    "Pro primární fermentaci nechte těsto odpočívat 3 hodiny. Během této doby proveďte dvě série překládání v intervalu 90 minut, aby se jemně posílila glutenová síť.",
-    "Vytvarujte bochník, vložte jej do moukou vysypané ošatky a nechte finálně kynout 2 hodiny v teple, až těsto získá požadovanou pružnost.",
-    "Pečte v rozpáleném litinovém hrnci pod poklicí prvních 25 minut, poté poklici odstraňte a dopečte dalších 20 minut pro vytvoření tmavé, křupavé kůrky."
+    "Připravte si rozkvas smícháním kvásku, žitné mouky a vody. Nechte pracovat, dokud zdvojnásobí svůj objem.",
+    "V míse důkladně spojte pšeničnou mouku s vodou určenou pro autolýzu tak, aby nezůstala žádná suchá místa. Nechte odpočívat.",
+    "Do vyzrálého těsta přidejte rozkvas, sůl a kmín. V robotu hněťte na nízký stupeň pouze do okamžiku, kdy se těsto spojí v homogenní celek.",
+    "Těsto nechte zrát při pokojové teplotě. Během první hodiny proveďte dvě série překládání s odstupem 45 minut, poté nechte těsto v klidu dokončit primární fermentaci.",
+    "Vykynuté těsto opatrně vytvarujte do bochníku a vložte do vysypané ošatky. Nechte finálně dokynout, dokud těsto nevykazuje známky napětí a pružnosti.",
+    "Pečte v rozpáleném litinovém hrnci pod poklicí pro zachování páry, následně poklici odstraňte a dopečte do požadované barvy kůrky."
   ],
-  "applianceTips": "Při použití litinového hrnce zajistěte, aby byl hrnec rozpálen na maximum trouby ještě před vložením těsta; to zajistí okamžitý nárůst objemu neboli troubový skok.",
-  "expertJustification": "Zkrácení primární fermentace na 3 hodiny a omezení překládání na dvě série lépe odpovídá reologickým vlastnostem žitného podílu v receptu, čímž se předejde degradaci lepkové sítě a přílišnému okyselení těsta.",
+  "applianceTips": "Při pečení v hrnci přidejte na dno trouby plech s horkými kameny pro dodatečný parní ráz v prvních minutách pečení.",
+  "expertJustification": "Zvýšení hydratace autolýzy na 60 % zlepšilo rozvoj lepkové sítě. Úprava fermentačního profilu zabraňuje nadměrné aktivitě proteáz, které by u 35% podílu rozkvasu mohly narušit střídku.",
   "applianceType": "Trouba s litinovým hrncem",
-  "cookingTime": "450 min",
+  "cookingTime": "420 min",
   "difficulty": "Střední",
   "category": "Pečivo",
   "id": "gen-1783540977144",
-  "updatedAt": "2026-07-14T05:54:52.873Z",
+  "updatedAt": "2026-07-14T05:56:37.149Z",
   "estimatedCookingTime": "45 min"
 }
