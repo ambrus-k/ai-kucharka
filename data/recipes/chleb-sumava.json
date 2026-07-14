@@ -1,5 +1,5 @@
 {
-  "title": "Šumavský bochník mistra pekaře",
+  "title": "Chléb Šumava",
   "summary": "Stabilní receptura s důrazem na šetrné zpracování žitných pentosanů a optimální fermentační křivku.",
   "ingredients": [
     "100 g žitného kvásku (aktivní)",
@@ -25,5 +25,6 @@
   "difficulty": "Střední",
   "category": "Pečivo",
   "id": "gen-1783540977144",
-  "updatedAt": "2026-07-14T05:19:36.043Z"
+  "updatedAt": "2026-07-14T05:28:32.496Z",
+  "estimatedCookingTime": "750 min"
 }
