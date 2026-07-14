@@ -862,6 +862,11 @@ ZÁSADNÍ PRAVIDLA:
 - Časovače jako samostatné odpočítávače u kroků zruš, vůbec na nich netrvej, důležité jsou detailní popisy děje a kulinářské kroky.
 - Tipy pro moderní kuchyni musí konkrétně popsat využití Air Fryeru (horkovzdušné fritézy), kuchyňských robotů (Thermomix), pomalých hrnců, domácích pekáren nebo podobných přístrojů pro tento recept.
 - V odůvodnění 'expertJustification' podrobně vysvětli laickým jazykem, PROČ jsi změnil teploty, časy, postupy nebo poměry na základě zmíněných 5 pilířů (zejména food science a kuchařské chemie).
+- REOLOGICKÉ A CHEMICKO-FYZIKÁLNÍ ALGORITMY PRO PEČIVO A TĚSTA:
+  1. ABSOLUTNÍ MATEMATICKÁ BILANCE & HYDRATACE: Extrahuj veškerou mouku ze všech fází receptu (včetně rozkvasu/kvásku, autolýzy i hlavního těsta) a veškerou vodu. Celková hydratace = (Celková voda / Celková mouka) * 100. Pro pšenično-žitné chleby drž optimum 66-72 %, pro běžné pečivo dle reologie.
+  2. KONTROLA AUTOLÝZY A PEKAŘSKÉ TABU: Hydratace autolýzy musí být alespoň 55 %. Případný deficit vody řeš VŽDY přilitím vody do autolýzy, nikdy přesunem mouky do rozkvasu!
+  3. KINETIKA FERMENTACE (ZKUŠENOST VS. TEORIE): Podíl rozkvasu nad 30 % celkové hmoty kombinovaný s kynutím nad 4 hodiny hrozí fatálním překyselením a zkapalněním těsta. Uprav časy kynutí nebo sniž rozkvas.
+  4. REOLOGICKÝ VÝZNAM MECHANICKÝCH OPERACÍ: Žitná mouka netvoří lepkovou síť, ale viskózní gel. Při podílu žita nad 20 % minimalizuj strojní hnětení (3-5 min jen na homogenizaci) a překládání omez na max 2 série.
 - ODSTRANĚNÍ KONZERVANTŮ: V ŽÁDNÉM RECEPTU (ZEJMÉNA V POLÉVKÁCH COŽ JSOU POLÉVKY) NESMÍ BÝT POUŽITY ŽÁDNÉ KONZERVAČNÍ LÁTKY, KONZERVANTY ANI UMĚLÁ DOCHUCOVADLA. Používej výhradně čerstvé přírodní suroviny.
 `;
 
@@ -967,11 +972,16 @@ Při úpravě receptu MUSÍŠ zachovat stávající strukturu, ale modifikovat o
 5. Inženýrství moderních spotřebičů
 
 ZÁSADNÍ PRAVIDLA:
-- Zkracuj názvy receptů (title) na naprosté kulinářské minimum a jádru věci.
+- NIKDY NEMĚŇ NÁZEV RECEPTU (title)! Musí zůstat přesně: "${recipe.title}".
 - Shrnutí receptu (summary) musí být velmi krátké, věcné a přehledné (cca 1-2 věty).
 - Suroviny upřesni na přesné metrické jednotky.
 - NEOPAKUJ ani nevkládej gramy, mililitry, kusy či jiné konkrétní váhy a množství surovin přímo do kroků postupu (v poli 'instructions')! Postup přípravy má být čitelný, plynulý a přirozený jako v tradiční tištěné kuchařce bez opakování číselných hodnot surovin u každého kroku.
 - ODSTRANĚNÍ KONZERVANTŮ: V ŽÁDNÉM RECEPTU NESMÍ BÝT POUŽITY ŽÁDNÉ KONZERVAČNÍ LÁTKY, KONZERVANTY ANI UMĚLÁ DOCHUCOVADLA.
+- REOLOGICKÉ A CHEMICKO-FYZIKÁLNÍ ALGORITMY PRO PEČIVO A TĚSTA:
+  1. ABSOLUTNÍ MATEMATICKÁ BILANCE & HYDRATACE: Extrahuj veškerou mouku ze všech fází receptu (včetně rozkvasu/kvásku, autolýzy i hlavního těsta) a veškerou vodu. Celková hydratace = (Celková voda / Celková mouka) * 100. Pro pšenično-žitné chleby drž optimum 66-72 %, pro běžné pečivo dle reologie.
+  2. KONTROLA AUTOLÝZY A PEKAŘSKÉ TABU: Hydratace autolýzy musí být alespoň 55 %. Případný deficit vody řeš VŽDY přilitím vody do autolýzy, nikdy přesunem mouky do rozkvasu!
+  3. KINETIKA FERMENTACE (ZKUŠENOST VS. TEORIE): Podíl rozkvasu nad 30 % celkové hmoty kombinovaný s kynutím nad 4 hodiny hrozí fatálním překyselením a zkapalněním těsta. Uprav časy kynutí nebo sniž rozkvas.
+  4. REOLOGICKÝ VÝZNAM MECHANICKÝCH OPERACÍ: Žitná mouka netvoří lepkovou síť, ale viskózní gel. Při podílu žita nad 20 % minimalizuj strojní hnětení (3-5 min jen na homogenizaci) a překládání omez na max 2 série.
 `;
 
     const userPrompt = `
@@ -1025,6 +1035,7 @@ Vytvoř kompletně aktualizovaný recept se všemi poli. Ujisti se, že pokud se
 
     const edited = JSON.parse(outputText.trim());
     edited.id = recipe.id || `gen-${Date.now()}`;
+    edited.title = recipe.title; // NEVER change the basic name of the recipe
     if (!edited.estimatedCookingTime) {
       edited.estimatedCookingTime = recipe.estimatedCookingTime || recipe.cookingTime || "20 min";
     }
@@ -1065,10 +1076,36 @@ app.post(["/api/audit-recipe", "/api/audit-recipe/", "/api/check-recipe", "/api/
     const ai = getAi();
     
     const systemInstruction = `
-Jsi odborný kulinářský simulátor, auditní systém a analyzátor receptů "AI Kuchařka".
-Tvým úkolem je podrobit předložený recept kompletní kulinářské simulaci ("přehrát ho" od začátku do konce), odhalit slabá místa (fyzika, chemie jídla, poměry, časy, teploty) a navrhnout jedno konkrétní významné zlepšení.
+Jsi elitní pekařský technolog, reolog těsta a zároveň mistr pekař s desítkami let praxe z řemeslných pekáren. Tvým úkolem je podrobit jakýkoliv vložený recept přísné kontrole, která kombinuje exaktní vědu (kulinářské inženýrství) s reálnou pekařskou praxí a zkušenostmi stovek kuchařů.
 
-ZÁSADNÍ PRAVIDLO PRO NOVÝ RECEPT (modifiedRecipe):
+Při analýze receptu VŽDY striktně postupuj podle tohoto algoritmu a interního myšlenkového řetězce (Chain of Thought):
+
+1. ABSOLUTNÍ MATEMATICKÁ BILANCE & HYDRATACE:
+- Extrahuj veškerou mouku ze všech fází receptu (včetně mouky v rozkvasu/kvásku, autolýze i hlavním těstě).
+- Extrahuj veškerou vodu ze všech fází receptu (včetně vody v rozkvasu/kvásku, autolýze i hlavním těstě).
+- U startovacího kvásku/rozkvasu automaticky kalkuluj s jeho vnitřní hydratací (při 100% hydrataci rozděl jeho váhu na 50 % mouky a 50 % vody).
+- Vypočítej Celkovou hydrataci receptu podle vzorce: (Celková voda / Celková mouka) * 100.
+- POSOUZENÍ PRAXE: Pro chléb typu Šumava (pšenično-žitný) je optimální celková hydratace 66–72 %. Pokud je nižší, střídka bude hutná a chléb rychle zestárne.
+
+2. KONTROLA AUTOLÝZY A PEKAŘSKÉ TABU:
+- Izolovaně spočítej poměr vody a mouky ve fázi autolýzy. 
+- KRITICKÉ KRITÉRIUM: Pokud je hydratace samotné autolýzy nižší než 55 %, vyhodnoť to jako kritickou chybu (suché hrudky, nefunkční enzymatická aktivita proteázy a amylázy).
+- STRIKTNÍ PEKAŘSKÉ PRAVIDLO (Ochrana lepku): Pokud zjistíš deficit vody v autolýze, NESMÍŠ ho řešit přesunem pšeničné mouky do žitného rozkvasu! U chleba Šumava musí žitný rozkvas zůstat čistě žitný, aby kyselost deaktivovala žitné enzymy rozkládající lepek. Deficit vody VŽDY řeš přilitím vody do autolýzy.
+
+3. KINETIKA FERMENTACE (ZKUŠENOST VS. TEORIE):
+- Porovnej procentuální podíl rozkvasu vůči celkové hmotnosti těsta s časovým schématem kynutí.
+- ZKUŠENOST Z PRAXE: Pokud podíl rozkvasu přesahuje 30 % celkové hmoty a celková doba zrání při pokojové teplotě (primární + sekundární fermentace) přesahuje 4 hodiny, hrozí fatální překyselení, proteolytický rozklad pšeničného lepku a zkapalnění těsta v ošatce. V takovém případě zkrať časy fermentace (např. primární na 120-150 min, sekundární na 60-90 min), nebo sniž množství rozkvasu.
+
+4. REOLOGICKÝ VÝZNAM MECHANICKÝCH OPERACÍ:
+- Zkontroluj instrukce pro hnětení a překládání (stretch & fold).
+- ZKUŠENOST Z PRAXE: Žitná mouka netvoří lepkovou síť, ale viskózní gel (pentosany). Pokud recept obsahuje nad 20 % žita, nadměrné mechanické hnětení v robotu nebo příliš časté překládání (např. každých 45 min po dobu 4 hodin) strukturu potrhá a rozbije. Doporuč strojní hnětení jen do homogenního spojení (3–5 minut) a omez překládání na max 2 série, zbytek práce nechte na čase.
+
+STRUKTURA VÝSTUPU:
+1. TECHNOLOGICKÝ AUDIT: Exaktní výčet chyb a výpočtů (Celková hydratace, hydratace autolýzy, rizika fermentace a hnětení). Mluv k uživateli jako zkušený kolega z pekárny – jasně, vědecky, ale lidsky. Tato zjištění a výpočty vepiš do simulationSteps a proposedChange.
+2. OPTIMALIZOVANÝ RECEPT: Vygeneruj kompletně přepracovaný, technologicky i prakticky stabilní recept s opravenými gramážemi, upravenými časy fermentace a přesnými instrukcemi pro mechanické zpracování do objektu modifiedRecipe.
+
+ZÁSADNÍ PRAVIDLA PRO NOVÝ RECEPT (modifiedRecipe):
+- NIKDY NEMĚŇ NÁZEV RECEPTU (title) v modifiedRecipe! Název musí zůstat přesně stejný jako u původního receptu: "${recipe.title}".
 - V krocích postupu (instructions) v modifiedRecipe NEOPAKUJ ani nevkládej gramy, mililitry, kusy či jiné konkrétní váhy a množství surovin! Postup přípravy má být čitelný, plynulý a přirozený jako v tradiční tištěné kuchařce bez opakování číselných hodnot surovin u každého kroku.
 `;
 
@@ -1134,6 +1171,7 @@ ${JSON.stringify(recipe, null, 2)}
     const auditResult = JSON.parse(outputText.trim());
     if (auditResult.modifiedRecipe) {
       auditResult.modifiedRecipe.id = recipe.id;
+      auditResult.modifiedRecipe.title = recipe.title; // NEVER change the basic name of the recipe
     }
     
     res.json(auditResult);

@@ -29,6 +29,9 @@ import {
   History,
   Info,
   ChevronDown,
+  ChevronUp,
+  Eye,
+  EyeOff,
   ChevronLeft,
   ChevronRight,
   Lock,
@@ -593,6 +596,12 @@ export default function App() {
   const [auditModifiedRecipe, setAuditModifiedRecipe] = useState<Recipe | null>(null);
   const [auditError, setAuditError] = useState<string | null>(null);
   const [activeStepIndex, setActiveStepIndex] = useState(-1);
+  const [acceptAuditParams, setAcceptAuditParams] = useState(true);
+  const [acceptAuditIngredients, setAcceptAuditIngredients] = useState(true);
+  const [acceptAuditInstructions, setAcceptAuditInstructions] = useState(true);
+  const [showParamsDiff, setShowParamsDiff] = useState(false);
+  const [showIngredientsDiff, setShowIngredientsDiff] = useState(false);
+  const [showInstructionsDiff, setShowInstructionsDiff] = useState(false);
 
   // States for Admin Login & Server-side recipes database
   const [showLoginModal, setShowLoginModal] = useState(false);
@@ -938,6 +947,9 @@ export default function App() {
     setProposedChange(null);
     setAuditModifiedRecipe(null);
     setActiveStepIndex(-1);
+    setAcceptAuditParams(true);
+    setAcceptAuditIngredients(true);
+    setAcceptAuditInstructions(true);
 
     try {
       const response = await fetch("/api/check-recipe", {
@@ -1010,7 +1022,36 @@ export default function App() {
   const handleAcceptAuditChange = () => {
     if (!selectedRecipe || !auditModifiedRecipe) return;
     
-    const stampedRecipe = { ...auditModifiedRecipe, updatedAt: new Date().toISOString() };
+    // Create a copy of the selected recipe
+    const stampedRecipe = { 
+      ...selectedRecipe, 
+      updatedAt: new Date().toISOString() 
+    };
+
+    // Apply only the accepted items (metadata/params, ingredients, instructions)
+    if (acceptAuditParams) {
+      stampedRecipe.summary = auditModifiedRecipe.summary;
+      stampedRecipe.cookingTime = auditModifiedRecipe.cookingTime;
+      if (auditModifiedRecipe.estimatedCookingTime) {
+        stampedRecipe.estimatedCookingTime = auditModifiedRecipe.estimatedCookingTime;
+      }
+      stampedRecipe.difficulty = auditModifiedRecipe.difficulty;
+      stampedRecipe.applianceType = auditModifiedRecipe.applianceType;
+      stampedRecipe.applianceTips = auditModifiedRecipe.applianceTips;
+      stampedRecipe.expertJustification = auditModifiedRecipe.expertJustification;
+      if (auditModifiedRecipe.category) {
+        stampedRecipe.category = auditModifiedRecipe.category;
+      }
+    }
+
+    if (acceptAuditIngredients) {
+      stampedRecipe.ingredients = [...auditModifiedRecipe.ingredients];
+    }
+
+    if (acceptAuditInstructions) {
+      stampedRecipe.instructions = [...auditModifiedRecipe.instructions];
+    }
+
     // Replace recipe with the modified one
     const updatedRecipesList = recipes.map(r => r.id === selectedRecipe.id ? stampedRecipe : r);
     saveRecipesToStorage(updatedRecipesList, stampedRecipe);
@@ -1834,9 +1875,14 @@ ${separator}`;
               window.onload = function() {
                 setTimeout(function() {
                   window.print();
-                  window.close();
                 }, 400);
               };
+              window.onafterprint = function() {
+                window.close();
+              };
+              window.addEventListener('afterprint', function() {
+                window.close();
+              });
             </script>
           </body>
         </html>
@@ -1911,10 +1957,17 @@ ${separator}`;
               ${element.innerHTML}
             </div>
             <script>
-              setTimeout(function() {
-                window.print();
+              window.onload = function() {
+                setTimeout(function() {
+                  window.print();
+                }, 400);
+              };
+              window.onafterprint = function() {
                 window.close();
-              }, 300);
+              };
+              window.addEventListener('afterprint', function() {
+                window.close();
+              });
             </script>
           </body>
         </html>
@@ -2751,25 +2804,50 @@ ${separator}`;
             {/* Top Action Bar (Sticky, glassmorphism-paper-blend) */}
             <div className="sticky top-0 bg-[#FDFBF7]/95 backdrop-blur-md border-b border-[#E8E4DB] z-50 px-4 py-3.5 flex flex-wrap items-center justify-between gap-4 select-none no-print shadow-xs">
               
-              {/* Back Button */}
-              <button
-                onClick={() => {
-                  setShowPaperView(false);
-                  setSelectedRecipe(null);
-                  setIsEditing(false);
-                  setShowExportView(false);
-                  setAuditSteps(null);
-                  setProposedChange(null);
-                  setAuditModifiedRecipe(null);
-                  setActiveStepIndex(-1);
-                  setErrorMessage(null);
-                  setSearchQuery(""); // Návrat do výchozího stavu - vymazat vyhledávání
-                }}
-                className="flex items-center gap-1.5 text-[#1B4332] hover:text-[#2D6A4F] font-sans font-bold text-sm transition-all cursor-pointer bg-white px-3 py-1.5 rounded-xl border border-[#E8E4DB] hover:border-[#1B4332]"
-              >
-                <ChevronLeft className="h-4 w-4" />
-                <span>Zpět na úvod kuchařky</span>
-              </button>
+              <div className="flex items-center gap-4 flex-wrap sm:flex-nowrap">
+                {/* Logo & Title */}
+                <button
+                  onClick={() => {
+                    setShowPaperView(false);
+                    setSelectedRecipe(null);
+                    setIsEditing(false);
+                    setSearchQuery("");
+                    setShowExportView(false);
+                    setAuditSteps(null);
+                    setProposedChange(null);
+                    setAuditModifiedRecipe(null);
+                    setActiveStepIndex(-1);
+                    setErrorMessage(null);
+                  }}
+                  className="flex items-center gap-3 hover:opacity-90 active:scale-98 transition-all text-left bg-transparent border-0 p-0 m-0 cursor-pointer group shrink-0"
+                  title="Přejít na hlavní stránku"
+                >
+                  <div className="bg-[#1B4332] text-white p-2 rounded-xl shadow-md group-hover:bg-[#2D6A4F] transition-colors">
+                    <ChefHat className="h-5 w-5 sm:h-6 sm:w-6" />
+                  </div>
+                  <div>
+                    <h1 className="font-serif italic font-semibold text-lg sm:text-2xl text-[#1B4332] flex items-center gap-1.5 sm:gap-2 group-hover:text-[#2D6A4F] transition-colors">
+                      AI Kuchařka
+                      <span className="text-[9px] sm:text-[10px] bg-[#F0F4F1] text-[#2D6A4F] border border-[#2D6A4F]/20 font-bold px-1.5 sm:px-2 py-0.5 rounded-full uppercase tracking-wider font-sans normal-case">
+                        5x Pilířová Syntéza
+                      </span>
+                    </h1>
+                    <p className="text-[10px] sm:text-xs text-[#5C5C50] hidden sm:block font-medium">Vědecky podložená a technologicky vyladěná gastronomie</p>
+                  </div>
+                </button>
+
+                {/* Back Button */}
+                <button
+                  onClick={() => {
+                    setShowPaperView(false);
+                  }}
+                  className="flex items-center gap-1.5 text-[#1B4332] hover:text-[#2D6A4F] font-sans font-bold text-sm transition-all cursor-pointer bg-white px-3 py-1.5 rounded-xl border border-[#E8E4DB] hover:border-[#1B4332] shrink-0 animate-fade-in"
+                  title="Zpět na kulinářský detail receptu"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                  <span>Zpět na detail receptu</span>
+                </button>
+              </div>
 
               {/* Adjusters Group */}
               <div className="flex items-center gap-4 flex-wrap">
@@ -3035,20 +3113,12 @@ ${separator}`;
               <button
                 onClick={() => {
                   setShowPaperView(false);
-                  setSelectedRecipe(null);
-                  setIsEditing(false);
-                  setShowExportView(false);
-                  setAuditSteps(null);
-                  setProposedChange(null);
-                  setAuditModifiedRecipe(null);
-                  setActiveStepIndex(-1);
-                  setErrorMessage(null);
-                  setSearchQuery(""); // Návrat do výchozího stavu - vymazat vyhledávání
                 }}
                 className="bg-[#2D6A4F] hover:bg-[#1B4332] text-white font-bold py-3.5 px-8 rounded-2xl shadow-lg transition-all flex items-center gap-2 cursor-pointer text-base"
+                title="Zpět na kulinářský detail receptu"
               >
                 <BookOpen className="h-5 w-5" />
-                <span>Zavřít kuchařku a zpět na úvod</span>
+                <span>Zavřít kuchařku a zpět na detail receptu</span>
               </button>
             </div>
           </motion.div>
@@ -3068,6 +3138,7 @@ ${separator}`;
             setAuditModifiedRecipe(null);
             setActiveStepIndex(-1);
             setErrorMessage(null);
+            setShowPaperView(false);
           }}
           className="flex items-center gap-3 hover:opacity-90 active:scale-98 transition-all text-left bg-transparent border-0 p-0 m-0 cursor-pointer group shrink-0"
           title="Přejít na hlavní stránku"
@@ -3112,7 +3183,6 @@ ${separator}`;
                     setAuditModifiedRecipe(null);
                     setActiveStepIndex(-1);
                     setErrorMessage(null);
-                    setSearchQuery(""); // Návrat do výchozího stavu - vymazat vyhledávání
                   }}
                   className="bg-[#1B4332] hover:bg-[#2D6A4F] text-white font-bold py-2 px-3 rounded-xl shadow-xs transition-all flex items-center justify-center gap-1.5 text-xs sm:text-sm cursor-pointer hover:shadow-md active:scale-98"
                   title="Zpět na hlavní přehled receptů"
@@ -3882,35 +3952,316 @@ ${separator}`;
                                 </div>
                               </div>
 
-                              <div className="bg-slate-950/70 p-4 rounded-xl border border-slate-800/80 text-[11px] font-mono leading-relaxed text-slate-400 space-y-1.5 shadow-inner">
-                                <div className="text-slate-300 font-bold border-b border-slate-800 pb-1 mb-1.5 text-xs">
-                                  Očekávaný vliv na stávající recept:
+                              {/* THREE-ITEM STRUCTURE FOR SELECTION WITH DETAILED REVIEWS */}
+                              <div className="space-y-3 bg-slate-950/75 p-4 rounded-xl border border-slate-800/80">
+                                <div className="text-slate-300 font-bold border-b border-slate-800/80 pb-1.5 mb-2.5 text-xs flex items-center gap-1.5">
+                                  <Settings className="h-3.5 w-3.5 text-slate-400" />
+                                  <span>Vyberte složky změn, které chcete zapracovat (3 položky):</span>
                                 </div>
-                                {auditModifiedRecipe && (
-                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1">
-                                    <div>• Nová doba: <span className="text-emerald-400 font-bold">{auditModifiedRecipe.cookingTime}</span> (původně: {selectedRecipe.cookingTime})</div>
-                                    <div>• Nová náročnost: <span className="text-emerald-400 font-bold">{auditModifiedRecipe.difficulty}</span></div>
-                                    <div>• Suroviny: <span className="text-emerald-400 font-bold">{auditModifiedRecipe.ingredients.length} položek</span> (původně: {selectedRecipe.ingredients.length})</div>
-                                    <div>• Postup: <span className="text-emerald-400 font-bold">{auditModifiedRecipe.instructions.length} kroků</span> (původně: {selectedRecipe.instructions.length})</div>
+
+                                <div className="grid grid-cols-1 gap-3">
+                                  {/* ITEM 1: Parameters, difficulty, summary */}
+                                  <div 
+                                    className={`p-3 rounded-lg border transition-all select-none ${
+                                      acceptAuditParams 
+                                        ? "bg-emerald-950/25 border-emerald-500/40 text-slate-100" 
+                                        : "bg-slate-900/50 border-slate-800/80 text-slate-500"
+                                    }`} 
+                                  >
+                                    <div 
+                                      className="flex items-start gap-2.5 cursor-pointer"
+                                      onClick={() => setAcceptAuditParams(!acceptAuditParams)}
+                                    >
+                                      <input 
+                                        type="checkbox" 
+                                        checked={acceptAuditParams} 
+                                        onChange={() => {}} // handled by parent click
+                                        className="mt-1 accent-emerald-500 h-4 w-4 shrink-0 rounded cursor-pointer"
+                                      />
+                                      <div className="space-y-1 flex-1">
+                                        <div className="flex items-center justify-between">
+                                          <span className="font-bold text-xs text-slate-200">1. Parametry, obtížnost a shrnutí</span>
+                                          <span className={`text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded ${
+                                            acceptAuditParams ? "bg-emerald-500/15 text-emerald-400" : "bg-slate-800 text-slate-500"
+                                          }`}>
+                                            {acceptAuditParams ? "PŘIJMOUT" : "IGNOROVAT"}
+                                          </span>
+                                        </div>
+                                        <p className="text-[11px] text-slate-400 leading-relaxed">
+                                          Aktualizovat dobu přípravy na <strong className="text-emerald-400">{auditModifiedRecipe?.cookingTime}</strong> (původně: {selectedRecipe.cookingTime}) a náročnost na <strong className="text-emerald-400">{auditModifiedRecipe?.difficulty}</strong>, včetně nového shrnutí a technických rad.
+                                        </p>
+                                      </div>
+                                    </div>
+
+                                    {/* Detailed Review Button */}
+                                    <div className="mt-2 pl-6">
+                                      <button
+                                        type="button"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          setShowParamsDiff(!showParamsDiff);
+                                        }}
+                                        className="text-[10px] font-bold text-emerald-400 hover:text-emerald-300 underline flex items-center gap-1 cursor-pointer bg-transparent border-0 p-0"
+                                      >
+                                        {showParamsDiff ? (
+                                          <>
+                                            <EyeOff className="h-3 w-3" />
+                                            <span>Skrýt srovnání změn</span>
+                                          </>
+                                        ) : (
+                                          <>
+                                            <Eye className="h-3 w-3" />
+                                            <span>Zobrazit detailní srovnání změn</span>
+                                          </>
+                                        )}
+                                      </button>
+                                      
+                                      {/* Detailed Comparison Panel */}
+                                      {showParamsDiff && (
+                                        <div 
+                                          onClick={(e) => e.stopPropagation()}
+                                          className="mt-3 pt-3 border-t border-slate-800/80 text-[11px] space-y-2.5 text-slate-300 select-text"
+                                        >
+                                          <div className="grid grid-cols-2 gap-4">
+                                            <div className="space-y-1 bg-slate-900/60 p-2 rounded-lg border border-slate-800/50">
+                                              <div className="text-slate-500 uppercase tracking-wider font-semibold text-[9px]">Původní hodnoty:</div>
+                                              <div>• Celková doba: <span className="text-slate-400 font-medium">{selectedRecipe.cookingTime}</span></div>
+                                              <div>• Náročnost: <span className="text-slate-400 font-medium">{selectedRecipe.difficulty}</span></div>
+                                              <div>• Spotřebič: <span className="text-slate-400 font-medium">{selectedRecipe.applianceType || "Neuveden"}</span></div>
+                                            </div>
+                                            <div className="space-y-1 bg-emerald-950/20 p-2 rounded-lg border border-emerald-900/40">
+                                              <div className="text-emerald-400/80 uppercase tracking-wider font-semibold text-[9px]">Navržené hodnoty:</div>
+                                              <div>• Celková doba: <span className="text-emerald-400 font-bold">{auditModifiedRecipe?.cookingTime}</span></div>
+                                              <div>• Náročnost: <span className="text-emerald-400 font-bold">{auditModifiedRecipe?.difficulty}</span></div>
+                                              <div>• Spotřebič: <span className="text-emerald-400 font-bold">{auditModifiedRecipe?.applianceType}</span></div>
+                                            </div>
+                                          </div>
+                                          {selectedRecipe.summary !== auditModifiedRecipe?.summary && (
+                                            <div className="space-y-1 bg-slate-900/40 p-2.5 rounded-lg border border-slate-800/50">
+                                              <div className="text-slate-500 uppercase tracking-wider font-semibold text-[9px]">Srovnání shrnutí:</div>
+                                              <div className="text-slate-500 line-through mb-1">Původní: {selectedRecipe.summary}</div>
+                                              <div className="text-emerald-300 font-medium">Nové: {auditModifiedRecipe?.summary}</div>
+                                            </div>
+                                          )}
+                                          {selectedRecipe.applianceTips !== auditModifiedRecipe?.applianceTips && (
+                                            <div className="space-y-1 bg-slate-900/40 p-2.5 rounded-lg border border-slate-800/50">
+                                              <div className="text-slate-500 uppercase tracking-wider font-semibold text-[9px]">Tipy pro moderní spotřebiče:</div>
+                                              <div className="text-emerald-300/90 leading-relaxed font-mono">{auditModifiedRecipe?.applianceTips}</div>
+                                            </div>
+                                          )}
+                                          <div className="space-y-1 bg-slate-900/40 p-2.5 rounded-lg border border-slate-800/50">
+                                            <div className="text-slate-500 uppercase tracking-wider font-semibold text-[9px]">Vědecké kulinářské zdůvodnění:</div>
+                                            <p className="text-slate-300 leading-relaxed italic">{auditModifiedRecipe?.expertJustification}</p>
+                                          </div>
+                                        </div>
+                                      )}
+                                    </div>
                                   </div>
-                                )}
+
+                                  {/* ITEM 2: Ingredients */}
+                                  <div 
+                                    className={`p-3 rounded-lg border transition-all select-none ${
+                                      acceptAuditIngredients 
+                                        ? "bg-emerald-950/25 border-emerald-500/40 text-slate-100" 
+                                        : "bg-slate-900/50 border-slate-800/80 text-slate-500"
+                                    }`} 
+                                  >
+                                    <div 
+                                      className="flex items-start gap-2.5 cursor-pointer"
+                                      onClick={() => setAcceptAuditIngredients(!acceptAuditIngredients)}
+                                    >
+                                      <input 
+                                        type="checkbox" 
+                                        checked={acceptAuditIngredients} 
+                                        onChange={() => {}} // handled by parent click
+                                        className="mt-1 accent-emerald-500 h-4 w-4 shrink-0 rounded cursor-pointer"
+                                      />
+                                      <div className="space-y-1 flex-1">
+                                        <div className="flex items-center justify-between">
+                                          <span className="font-bold text-xs text-slate-200">2. Optimalizované složení a bilance surovin</span>
+                                          <span className={`text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded ${
+                                            acceptAuditIngredients ? "bg-emerald-500/15 text-emerald-400" : "bg-slate-800 text-slate-500"
+                                          }`}>
+                                            {acceptAuditIngredients ? "PŘIJMOUT" : "IGNOROVAT"}
+                                          </span>
+                                        </div>
+                                        <p className="text-[11px] text-slate-400 leading-relaxed">
+                                          Uplatnit matematický přepočet mouky a vody pro optimální hydrataci. Změna počtu ingrediencí na <strong className="text-emerald-400">{auditModifiedRecipe?.ingredients.length}</strong> (původně: {selectedRecipe.ingredients.length}).
+                                        </p>
+                                      </div>
+                                    </div>
+
+                                    {/* Detailed Review Button */}
+                                    <div className="mt-2 pl-6">
+                                      <button
+                                        type="button"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          setShowIngredientsDiff(!showIngredientsDiff);
+                                        }}
+                                        className="text-[10px] font-bold text-emerald-400 hover:text-emerald-300 underline flex items-center gap-1 cursor-pointer bg-transparent border-0 p-0"
+                                      >
+                                        {showIngredientsDiff ? (
+                                          <>
+                                            <EyeOff className="h-3 w-3" />
+                                            <span>Skrýt srovnání surovin</span>
+                                          </>
+                                        ) : (
+                                          <>
+                                            <Eye className="h-3 w-3" />
+                                            <span>Zobrazit detailní srovnání surovin</span>
+                                          </>
+                                        )}
+                                      </button>
+                                      
+                                      {/* Detailed Comparison Panel */}
+                                      {showIngredientsDiff && (
+                                        <div 
+                                          onClick={(e) => e.stopPropagation()}
+                                          className="mt-3 pt-3 border-t border-slate-800/80 text-[11px] space-y-3 select-text"
+                                        >
+                                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                            <div className="bg-slate-900/60 p-2.5 rounded-lg border border-slate-800/50 space-y-1.5">
+                                              <div className="text-slate-500 uppercase tracking-wider font-semibold text-[9px] border-b border-slate-800/80 pb-1 mb-1">Originální suroviny ({selectedRecipe.ingredients.length}):</div>
+                                              <ul className="space-y-1 list-disc list-inside text-slate-400 font-mono">
+                                                {selectedRecipe.ingredients.map((ing, idx) => (
+                                                  <li key={idx} className="truncate">{ing}</li>
+                                                ))}
+                                              </ul>
+                                            </div>
+                                            <div className="bg-emerald-950/20 p-2.5 rounded-lg border border-emerald-900/40 space-y-1.5">
+                                              <div className="text-emerald-400/80 uppercase tracking-wider font-semibold text-[9px] border-b border-emerald-800/40 pb-1 mb-1">Optimalizované složení ({auditModifiedRecipe?.ingredients.length}):</div>
+                                              <ul className="space-y-1 list-disc list-inside text-slate-200 font-mono">
+                                                {auditModifiedRecipe?.ingredients.map((ing, idx) => {
+                                                  const isExactMatch = selectedRecipe.ingredients.includes(ing);
+                                                  return (
+                                                    <li key={idx} className={isExactMatch ? "truncate text-slate-300" : "truncate text-emerald-300 font-bold"}>
+                                                      {ing} {!isExactMatch && <span className="text-[8px] bg-emerald-500/20 text-emerald-400 px-1 py-0.2 rounded font-bold uppercase ml-1">Nová</span>}
+                                                    </li>
+                                                  );
+                                                })}
+                                              </ul>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>
+
+                                  {/* ITEM 3: Instructions */}
+                                  <div 
+                                    className={`p-3 rounded-lg border transition-all select-none ${
+                                      acceptAuditInstructions 
+                                        ? "bg-emerald-950/25 border-emerald-500/40 text-slate-100" 
+                                        : "bg-slate-900/50 border-slate-800/80 text-slate-500"
+                                    }`} 
+                                  >
+                                    <div 
+                                      className="flex items-start gap-2.5 cursor-pointer"
+                                      onClick={() => setAcceptAuditInstructions(!acceptAuditInstructions)}
+                                    >
+                                      <input 
+                                        type="checkbox" 
+                                        checked={acceptAuditInstructions} 
+                                        onChange={() => {}} // handled by parent click
+                                        className="mt-1 accent-emerald-500 h-4 w-4 shrink-0 rounded cursor-pointer"
+                                      />
+                                      <div className="space-y-1 flex-1">
+                                        <div className="flex items-center justify-between">
+                                          <span className="font-bold text-xs text-slate-200">3. Přepracovaný technologický postup</span>
+                                          <span className={`text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded ${
+                                            acceptAuditInstructions ? "bg-emerald-500/15 text-emerald-400" : "bg-slate-800 text-slate-500"
+                                          }`}>
+                                            {acceptAuditInstructions ? "PŘIJMOUT" : "IGNOROVAT"}
+                                          </span>
+                                        </div>
+                                        <p className="text-[11px] text-slate-400 leading-relaxed">
+                                          Zapsat opravené časy fermentace, hnětení a intervaly překládání. Nový postup má <strong className="text-emerald-400">{auditModifiedRecipe?.instructions.length} kroků</strong> (původně: {selectedRecipe.instructions.length}).
+                                        </p>
+                                      </div>
+                                    </div>
+
+                                    {/* Detailed Review Button */}
+                                    <div className="mt-2 pl-6">
+                                      <button
+                                        type="button"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          setShowInstructionsDiff(!showInstructionsDiff);
+                                        }}
+                                        className="text-[10px] font-bold text-emerald-400 hover:text-emerald-300 underline flex items-center gap-1 cursor-pointer bg-transparent border-0 p-0"
+                                      >
+                                        {showInstructionsDiff ? (
+                                          <>
+                                            <EyeOff className="h-3 w-3" />
+                                            <span>Skrýt srovnání postupu</span>
+                                          </>
+                                        ) : (
+                                          <>
+                                            <Eye className="h-3 w-3" />
+                                            <span>Zobrazit detailní srovnání postupu</span>
+                                          </>
+                                        )}
+                                      </button>
+                                      
+                                      {/* Detailed Comparison Panel */}
+                                      {showInstructionsDiff && (
+                                        <div 
+                                          onClick={(e) => e.stopPropagation()}
+                                          className="mt-3 pt-3 border-t border-slate-800/80 text-[11px] space-y-3 select-text"
+                                        >
+                                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                            <div className="bg-slate-900/60 p-2.5 rounded-lg border border-slate-800/50 space-y-2">
+                                              <div className="text-slate-500 uppercase tracking-wider font-semibold text-[9px] border-b border-slate-800/80 pb-1">Originální technologický postup ({selectedRecipe.instructions.length} kroků):</div>
+                                              <div className="space-y-1.5 max-h-48 overflow-y-auto pr-1">
+                                                {selectedRecipe.instructions.map((step, idx) => (
+                                                  <div key={idx} className="text-slate-400 flex gap-1.5 items-start">
+                                                    <span className="font-bold text-slate-500 shrink-0">{idx + 1}.</span>
+                                                    <p className="leading-normal">{step}</p>
+                                                  </div>
+                                                ))}
+                                              </div>
+                                            </div>
+                                            <div className="bg-emerald-950/20 p-2.5 rounded-lg border border-emerald-900/40 space-y-2">
+                                              <div className="text-emerald-400/80 uppercase tracking-wider font-semibold text-[9px] border-b border-emerald-800/40 pb-1">Přepracovaný postup ({auditModifiedRecipe?.instructions.length} kroků):</div>
+                                              <div className="space-y-1.5 max-h-48 overflow-y-auto pr-1">
+                                                {auditModifiedRecipe?.instructions.map((step, idx) => {
+                                                  const isExactMatch = selectedRecipe.instructions.includes(step);
+                                                  return (
+                                                    <div key={idx} className={`flex gap-1.5 items-start ${isExactMatch ? "text-slate-300" : "text-emerald-200 font-medium"}`}>
+                                                      <span className={`font-bold shrink-0 ${isExactMatch ? "text-slate-500" : "text-emerald-400"}`}>{idx + 1}.</span>
+                                                      <p className="leading-normal">
+                                                        {step} {!isExactMatch && <span className="text-[8px] bg-emerald-500/20 text-emerald-400 px-1 py-0.2 rounded font-bold uppercase ml-1 shrink-0 inline-block font-sans">Upraveno</span>}
+                                                      </p>
+                                                    </div>
+                                                  );
+                                                })}
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
                               </div>
 
                               <div className="pt-1 flex items-center gap-3 flex-wrap">
                                 <button
                                   type="button"
                                   onClick={handleAcceptAuditChange}
-                                  className="bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs py-2.5 px-5 rounded-xl shadow-md hover:shadow-lg transition-all flex items-center gap-1.5 cursor-pointer"
+                                  disabled={!acceptAuditParams && !acceptAuditIngredients && !acceptAuditInstructions}
+                                  className="bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-800 disabled:text-slate-500 text-white font-extrabold text-xs py-2.5 px-5 rounded-xl shadow-md hover:shadow-lg transition-all flex items-center gap-1.5 cursor-pointer disabled:cursor-not-allowed"
                                 >
                                   <Check className="h-4 w-4 stroke-[3]" />
-                                  <span>Přijmout změnu a aktualizovat recept</span>
+                                  <span>Uložit vybrané změny do receptu</span>
                                 </button>
                                 <button
                                   type="button"
                                   onClick={handleRejectAuditChange}
                                   className="bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs py-2.5 px-4 rounded-xl transition-all cursor-pointer border border-slate-700"
                                 >
-                                  Odmítnout
+                                  Zrušit
                                 </button>
                               </div>
                             </motion.div>
