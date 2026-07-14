@@ -6,14 +6,14 @@
     "200 g žitné chlebové mouky",
     "200 g vody pro rozkvas",
     "500 g pšeničné chlebové mouky",
-    "250 g vody pro autolýzu",
+    "280 g vody pro autolýzu",
     "14 g mořské soli",
     "10 g drceného kmínu"
   ],
   "instructions": [
     "Smíchejte suroviny na rozkvas a nechte jej při pokojové teplotě fermentovat 8 hodin, dokud nezdvojnásobí svůj objem.",
     "Poté smíchejte mouku s vodou určenou pro autolýzu a nechte směs 60 minut odpočívat pro dokonalou hydrataci lepkových vláken.",
-    "Do autolyzovaného těsta vpracujte vyzrálý rozkvas, sůl a kmín. Hněťte 10 minut, dokud těsto není hladké a vysoce elastické.",
+    "Do autolyzovaného těsta vpracujte vyzrálý rozkvas (400 g, zbytek použij na další kvásek), sůl a kmín. Hněťte 10 minut, dokud těsto není hladké a vysoce elastické.",
     "Během 4 hodin primární fermentace proveďte každých 45 minut sérii překladů, aby těsto získalo pevnou vnitřní strukturu.",
     "Těsto stočte do pevného bochníku a nechte v ošatce kynout dalších 120 minut při pokojové teplotě.",
     "Pečte v prudce vyhřáté troubě s litinovým hrncem po dobu 30 minut se zapařením.",
@@ -26,6 +26,6 @@
   "difficulty": "Střední",
   "category": "Pečivo",
   "id": "gen-1783540977144",
-  "updatedAt": "2026-07-13T12:03:58.775Z",
+  "updatedAt": "2026-07-14T05:10:28.505Z",
   "estimatedCookingTime": "50 min"
 }
