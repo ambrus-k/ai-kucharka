@@ -5,7 +5,7 @@
     "500 g pšeničné mouky typ 00",
     "325 g plnotučného mléka",
     "15 g čerstvého droždí",
-    "10 g ječné sladěnky",
+    "10 g ječné sladěnky nebo cukru",
     "10 g jemné mořské soli",
     "20 g řepkového oleje",
     "1000 ml řepkového oleje na smažení",
@@ -31,6 +31,6 @@
   "difficulty": "Střední",
   "category": "Slaná jídla bez masa",
   "id": "gen-1781590909243",
-  "updatedAt": "2026-07-14T06:14:08.404Z",
+  "updatedAt": "2026-07-15T19:46:14.760Z",
   "estimatedCookingTime": "15 min"
 }
