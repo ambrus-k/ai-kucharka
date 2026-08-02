@@ -1718,7 +1718,7 @@ ${separator}`;
         
         body {
           margin: 0;
-          padding: 20px;
+          padding: 12px;
           background-color: #FFFFFF;
           font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
           color: #2C2C2C;
@@ -1730,11 +1730,32 @@ ${separator}`;
           background-color: #FCF9F2;
           color: #2C2C2C;
           border: 1px solid #E3DDCF;
-          border-radius: 16px;
-          padding: 30px;
+          border-radius: 12px;
+          padding: 20px 24px;
           max-width: 760px;
           margin: 0 auto;
-          box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+          box-shadow: none;
+          page-break-inside: auto;
+          break-inside: auto;
+        }
+
+        .instruction-step, .break-inside-avoid {
+          page-break-inside: avoid !important;
+          break-inside: avoid !important;
+        }
+
+        .page-break-after-avoid, h1, h2, h3, h4 {
+          page-break-after: avoid !important;
+          break-after: avoid !important;
+        }
+
+        .meta-bottom-block {
+          page-break-inside: avoid !important;
+          break-inside: avoid !important;
+        }
+
+        .no-print, button, #calc-container-surovin, .no-pdf {
+          display: none !important;
         }
 
         .border-b {
@@ -1746,7 +1767,7 @@ ${separator}`;
         }
 
         .pb-6 {
-          padding-bottom: 24px;
+          padding-bottom: 16px;
         }
 
         .pb-1 {
@@ -1754,32 +1775,32 @@ ${separator}`;
         }
 
         .pt-4 {
-          padding-top: 16px;
+          padding-top: 12px;
         }
 
         .py-4 {
-          padding-top: 16px;
-          padding-bottom: 16px;
+          padding-top: 12px;
+          padding-bottom: 12px;
         }
 
         .space-y-3 {
-          margin-top: 12px;
+          margin-top: 10px;
         }
 
         .space-y-3 > * + * {
-          margin-top: 12px;
+          margin-top: 10px;
         }
 
         .space-y-4 > * + * {
-          margin-top: 16px;
+          margin-top: 12px;
         }
 
         .space-y-2 > * + * {
-          margin-top: 8px;
+          margin-top: 6px;
         }
 
         .space-y-6 > * + * {
-          margin-top: 24px;
+          margin-top: 16px;
         }
 
         .flex {
@@ -1795,7 +1816,7 @@ ${separator}`;
         }
 
         .gap-3 {
-          gap: 12px;
+          gap: 10px;
         }
 
         .justify-between {
@@ -1839,31 +1860,31 @@ ${separator}`;
         }
 
         .text-\\[10px\\] {
-          font-size: 10px;
+          font-size: 11.5px;
         }
 
         .text-xs {
-          font-size: 11px;
-        }
-
-        .text-sm {
           font-size: 13px;
         }
 
+        .text-sm {
+          font-size: 14.5px;
+        }
+
         .text-base {
-          font-size: 15px;
+          font-size: 16px;
         }
 
         .text-lg {
-          font-size: 18px;
+          font-size: 18.5px;
         }
 
         .text-3xl {
-          font-size: 28px;
+          font-size: 27px;
         }
 
         .text-4xl {
-          font-size: 34px;
+          font-size: 32px;
         }
 
         .text-\\[\\#888172\\] {
@@ -1907,7 +1928,7 @@ ${separator}`;
         }
 
         .gap-4 {
-          gap: 16px;
+          gap: 12px;
         }
 
         .italic {
@@ -1919,17 +1940,16 @@ ${separator}`;
         }
 
         .pl-5 {
-          padding-left: 20px;
+          padding-left: 18px;
         }
 
         .shrink-0 {
           flex-shrink: 0;
         }
 
-        /* Sub-responsive grid handling inside clean container */
         @media (min-width: 500px) {
           .grid-cols-2 {
-            grid-template-columns: repeat(4, minmax(0, 1fr));
+            grid-template-columns: repeat(2, minmax(0, 1fr));
           }
           .flex-col {
             flex-direction: row;
@@ -1986,8 +2006,8 @@ ${separator}`;
         iframeDoc.body.appendChild(script);
       });
 
-      // Avoid "Invalid margin array" by converting array structure into iframeWin array realms (22mm top/bottom, 25mm left/right margins)
-      const safeMargin = iframeWin.JSON.parse("[20, 22, 20, 22]");
+      // Compact margins for A4 (top 12mm, right 14mm, bottom 12mm, left 14mm)
+      const safeMargin = iframeWin.JSON.parse("[12, 14, 12, 14]");
 
       // Adjust height of the iframe so html2pdf layout is entirely visible
       const scrollHeight = Math.max(
@@ -2009,7 +2029,8 @@ ${separator}`;
           logging: false,
           backgroundColor: "#FFFFFF"
         },
-        jsPDF:        { unit: "mm", format: "a4", orientation: "portrait" }
+        jsPDF:        { unit: "mm", format: "a4", orientation: "portrait" },
+        pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
       };
 
       // 5. Generate and download PDF inside parent context as a Blob structure
@@ -2052,13 +2073,13 @@ ${separator}`;
     const applianceTips = selectedRecipe.applianceTips || "";
     const expertJustification = selectedRecipe.expertJustification || "";
 
-    // Ingredients list with scaled quantities
+    // Ingredients list with scaled quantities (rendered in multi-column layout top-to-bottom column 1 then column 2)
     const ingredientsHtml = selectedRecipe.ingredients && selectedRecipe.ingredients.length > 0 
       ? selectedRecipe.ingredients.map(ing => {
           if (isIngredientHeader(ing)) {
             const headerTitle = cleanHeaderTitle(ing);
             return `
-              <li style="list-style: none; padding: 10px 0 4px 0; border-bottom: 2px solid #1B4332; font-weight: 800; font-size: 13.5px; color: #1B4332; text-transform: uppercase; letter-spacing: 0.5px; page-break-after: avoid; break-after: avoid; margin-top: 8px;">
+              <li style="column-span: all; -webkit-column-span: all; list-style: none; padding: 6px 0 2px 0; border-bottom: 1.5px solid #1B4332; font-weight: 800; font-size: 14px; color: #1B4332; text-transform: uppercase; letter-spacing: 0.5px; page-break-after: avoid; break-after: avoid; margin-top: 6px; margin-bottom: 4px;">
                 📌 ${headerTitle}
               </li>
             `;
@@ -2066,22 +2087,34 @@ ${separator}`;
           const parsed = parseIngredientString(ing);
           const displayIng = scaleIngredient(parsed, scaleFactor);
           return `
-            <li style="display: flex; align-items: flex-start; gap: 8px; padding: 5px 0; border-bottom: 1px solid #F0EFEA; font-size: 13.5px; color: #2C2C2C; page-break-inside: avoid; break-inside: avoid;">
-              <span style="display: inline-block; width: 13px; height: 13px; border: 1.5px solid #1B4332; border-radius: 3.5px; margin-top: 3px; flex-shrink: 0;"></span>
-              <span style="line-height: 1.4; font-weight: 500;">${displayIng}</span>
+            <li style="padding: 3px 0; border-bottom: 1px solid #F0EFEA; font-size: 13.5px; color: #2C2C2C; page-break-inside: avoid; break-inside: avoid; line-height: 1.35; font-weight: 500;">
+              ${displayIng}
             </li>
           `;
         }).join("")
-      : `<li style="font-style: italic; color: #666; padding: 6px 0;">Žádné ingredience nejsou zapsány.</li>`;
+      : `<li style="font-style: italic; color: #666; padding: 4px 0; column-span: all; -webkit-column-span: all;">Žádné ingredience nejsou zapsány.</li>`;
 
     // Instructions list
     const instructionsHtml = selectedRecipe.instructions && selectedRecipe.instructions.length > 0
-      ? selectedRecipe.instructions.map((step, idx) => `
-        <div class="instruction-step" style="display: flex; gap: 12px; padding: 7px 0; border-bottom: 1px dashed #E8E5DC; align-items: flex-start; page-break-inside: avoid; break-inside: avoid;">
-          <div style="font-weight: 800; font-size: 12px; color: #FFFFFF; background-color: #1B4332; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px;">${idx + 1}</div>
-          <div style="font-size: 13.5px; line-height: 1.5; color: #2C2C2C; flex: 1;">${step}</div>
-        </div>
-      `).join("")
+      ? selectedRecipe.instructions.map((step, idx) => {
+          const stepIngs = getStepIngredients(step, selectedRecipe.ingredients, scaleFactor).filter(i => i.isMatched);
+          const stepIngsList = stepIngs.map(i => i.display).join(', ');
+          const stepIngsBadges = stepIngs.length > 0
+            ? `<div style="margin-top: 3px; font-size: 12px; color: #1B4332;">
+                <span style="font-weight: 700; font-size: 10.5px; text-transform: uppercase; color: #1B4332; opacity: 0.8; font-family: monospace;">Suroviny pro krok:</span> <span style="font-style: italic; color: #3A3A34;">${stepIngsList}</span>
+               </div>`
+            : '';
+
+          return `
+            <div class="instruction-step" style="display: flex; flex-direction: column; gap: 4px; padding: 7px 10px; margin-bottom: 7px; background-color: #FAF8F3; border: 1px solid #E8E4DB; border-radius: 6px; page-break-inside: avoid !important; break-inside: avoid !important;">
+              <div style="display: flex; gap: 9px; align-items: flex-start;">
+                <div style="font-weight: 800; font-size: 12px; color: #FFFFFF; background-color: #1B4332; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px;">${idx + 1}</div>
+                <div style="font-size: 14px; line-height: 1.45; color: #2C2C2C; flex: 1;">${step}</div>
+              </div>
+              ${stepIngsBadges}
+            </div>
+          `;
+        }).join("")
       : `<p style="font-style: italic; color: #666;">Žádný postup přípravy není zapsán.</p>`;
 
     const htmlContent = `<!DOCTYPE html>
@@ -2096,7 +2129,7 @@ ${separator}`;
   <style>
     @page {
       size: A4 portrait;
-      margin: 18mm 20mm 18mm 20mm;
+      margin: 12mm 14mm 12mm 14mm;
     }
     *, *:before, *:after {
       box-sizing: border-box;
@@ -2107,7 +2140,7 @@ ${separator}`;
       color: #1B4332;
       margin: 0;
       padding: 0;
-      line-height: 1.45;
+      line-height: 1.4;
       -webkit-print-color-adjust: exact;
       print-color-adjust: exact;
     }
@@ -2116,29 +2149,34 @@ ${separator}`;
       max-width: 100%;
       margin: 0 auto;
       background: #FFFFFF;
-      padding: 6mm 8mm;
+      padding: 4mm 4mm;
       box-sizing: border-box;
     }
     .sheet-header {
       border-bottom: 2px solid #E8E5DC;
-      padding-bottom: 10px;
-      margin-bottom: 12px;
+      padding-bottom: 8px;
+      margin-bottom: 10px;
       page-break-inside: avoid;
       break-inside: avoid;
     }
+    .meta-brand-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
     .meta-brand {
-      font-size: 9.5px;
+      font-size: 10.5px;
       font-weight: 800;
       color: #888172;
-      letter-spacing: 1.8px;
+      letter-spacing: 1.5px;
       text-transform: uppercase;
-      margin-bottom: 4px;
     }
     .recipe-title {
       font-family: 'Playfair Display', Georgia, serif;
-      font-size: 24px;
+      font-size: 25px;
       color: #1B4332;
-      margin: 0 0 6px 0;
+      margin: 2px 0 4px 0;
       font-weight: 800;
       line-height: 1.2;
       page-break-after: avoid;
@@ -2146,112 +2184,125 @@ ${separator}`;
     }
     .recipe-category {
       display: inline-block;
-      font-size: 10.5px;
+      font-size: 11.5px;
       font-weight: 700;
       color: #2D6A4F;
       background-color: #E8F5E9;
       padding: 2.5px 9px;
-      border-radius: 10px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    .parameters-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-      margin-bottom: 14px;
-      padding: 10px 12px;
-      background-color: #FDFBF7;
-      border: 1px solid #E8E5DC;
       border-radius: 8px;
-      text-align: center;
-      page-break-inside: avoid;
-      break-inside: avoid;
-    }
-    .param-label {
-      display: block;
-      font-size: 9.5px;
-      font-weight: 700;
-      color: #7A7A70;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      margin-bottom: 2px;
     }
-    .param-value {
-      font-size: 12.5px;
+    .portion-badge {
+      display: inline-block;
+      font-size: 11.5px;
       font-weight: 700;
       color: #1B4332;
+      background-color: #FAF8F3;
+      border: 1px solid #E8E4DB;
+      padding: 2.5px 9px;
+      border-radius: 8px;
     }
     .section-title {
       font-family: 'Playfair Display', Georgia, serif;
-      font-size: 16.5px;
+      font-size: 17px;
       font-weight: 700;
       color: #1B4332;
-      border-bottom: 1px solid #E8E5DC;
-      padding-bottom: 5px;
-      margin: 14px 0 10px 0;
-      page-break-after: avoid;
-      break-after: avoid;
+      border-bottom: 1.5px solid #E8E5DC;
+      padding-bottom: 4px;
+      margin: 12px 0 8px 0;
+      page-break-after: avoid !important;
+      break-after: avoid !important;
     }
-    .ingredients-list {
+    .ingredients-grid {
       list-style: none;
       padding: 0;
       margin: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 1px;
-    }
-    .ingredients-list li {
+      column-count: 2;
+      -webkit-column-count: 2;
+      column-gap: 16px;
+      -webkit-column-gap: 16px;
       page-break-inside: avoid;
       break-inside: avoid;
+    }
+    .ingredients-grid li {
+      page-break-inside: avoid !important;
+      break-inside: avoid !important;
     }
     .summary-text {
       font-style: italic;
       color: #4A4A40;
-      font-size: 12.5px;
-      margin-bottom: 12px;
+      font-size: 13.5px;
+      margin-top: 4px;
       line-height: 1.45;
     }
     .instruction-step {
-      page-break-inside: avoid;
-      break-inside: avoid;
+      page-break-inside: avoid !important;
+      break-inside: avoid !important;
+    }
+    .parameters-bottom-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      margin-top: 6px;
+      padding: 8px 10px;
+      background-color: #FDFBF7;
+      border: 1px solid #E8E5DC;
+      border-radius: 6px;
+      text-align: center;
+    }
+    .param-label {
+      display: block;
+      font-size: 10px;
+      font-weight: 700;
+      color: #7A7A70;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 1px;
+    }
+    .param-value {
+      font-size: 13px;
+      font-weight: 700;
+      color: #1B4332;
     }
     .expert-block {
       background-color: #FDFBF7;
       border: 1px solid #E8E5DC;
       border-radius: 8px;
-      padding: 10px 14px;
+      padding: 10px 12px;
       margin-top: 12px;
-      font-size: 11.5px;
-      page-break-inside: avoid;
-      break-inside: avoid;
+      font-size: 12.5px;
+      page-break-inside: avoid !important;
+      break-inside: avoid !important;
     }
     .expert-block h4 {
       margin: 0 0 4px 0;
-      font-size: 11.5px;
+      font-size: 12.5px;
       color: #1B4332;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
     .footer-stamp {
-      margin-top: 18px;
-      padding-top: 10px;
+      margin-top: 14px;
+      padding-top: 8px;
       border-top: 1px solid #E8E5DC;
       display: flex;
       justify-content: space-between;
-      font-size: 9.5px;
+      font-size: 10.5px;
       font-weight: 700;
       color: #888172;
       text-transform: uppercase;
-      page-break-inside: avoid;
-      break-inside: avoid;
+      page-break-inside: avoid !important;
+      break-inside: avoid !important;
     }
     @media screen {
       body {
         background-color: #F8F6F0;
-        padding: 24px 16px;
+        padding: 20px 12px;
       }
       .recipe-sheet {
         max-width: 190mm;
-        padding: 32px 36px;
+        padding: 24px 28px;
         border: 1px solid #E8E5DC;
         border-radius: 12px;
         box-shadow: 0 4px 20px rgba(0,0,0,0.06);
@@ -2267,7 +2318,7 @@ ${separator}`;
       .recipe-sheet {
         border: none !important;
         border-radius: 0 !important;
-        padding: 6mm 8mm !important;
+        padding: 4mm 4mm !important;
         margin: 0 auto !important;
         max-width: 100% !important;
         width: 100% !important;
@@ -2280,55 +2331,63 @@ ${separator}`;
 <body>
   <div class="recipe-sheet">
     <div class="sheet-header">
-      <div class="meta-brand">AI KUCHAŘKA • 5 PILÍŘOVÁ SYNTÉZA</div>
+      <div class="meta-brand-row">
+        <span class="meta-brand">AI KUCHAŘKA • 5 PILÍŘOVÁ SYNTÉZA</span>
+        <div>
+          <span class="recipe-category">${category}</span>
+          <span class="portion-badge">Porce: ${scaleFactor === 1 ? "1x" : `${formatCzechNumber(scaleFactor)}x`}</span>
+        </div>
+      </div>
       <h1 class="recipe-title">${title}</h1>
-      <span class="recipe-category">${category}</span>
+      ${summary ? `<div class="summary-text">${summary}</div>` : ''}
     </div>
-
-    <div class="parameters-grid">
-      <div>
-        <span class="param-label">Celková doba</span>
-        <span class="param-value">${cookingTime}</span>
-      </div>
-      <div>
-        <span class="param-label">Náročnost</span>
-        <span class="param-value">${difficulty}</span>
-      </div>
-      <div>
-        <span class="param-label">Spotřebič</span>
-        <span class="param-value">${applianceType}</span>
-      </div>
-      <div>
-        <span class="param-label">Měřítko porcí</span>
-        <span class="param-value">${scaleFactor === 1 ? "Výchozí (1x)" : `${formatCzechNumber(scaleFactor)}x`}</span>
-      </div>
-    </div>
-
-    ${summary ? `<div class="summary-text">${summary}</div>` : ''}
 
     <h2 class="section-title">Suroviny a ingredience</h2>
-    <ul class="ingredients-list">
+    <ul class="ingredients-grid">
       ${ingredientsHtml}
     </ul>
 
-    <h2 class="section-title">Postup přípravy</h2>
+    <h2 class="section-title">Postup přípravy (krok za krokem)</h2>
     <div>
       ${instructionsHtml}
     </div>
 
-    ${applianceTips ? `
-      <div class="expert-block">
-        <h4>💡 Tip pro spotřebič (${applianceType})</h4>
-        <div>${applianceTips}</div>
+    <!-- SECONDARY METADATA & PARAMETERS MOVED TO THE END OF RECIPE -->
+    <div class="expert-block">
+      <h4>Doplňující informace a technické parametry</h4>
+      <div class="parameters-bottom-grid">
+        <div>
+          <span class="param-label">Celková doba</span>
+          <span class="param-value">${cookingTime}</span>
+        </div>
+        <div>
+          <span class="param-label">Náročnost</span>
+          <span class="param-value">${difficulty}</span>
+        </div>
+        <div>
+          <span class="param-label">Spotřebič</span>
+          <span class="param-value">${applianceType}</span>
+        </div>
+        <div>
+          <span class="param-label">Porce</span>
+          <span class="param-value">${scaleFactor === 1 ? "1x" : `${formatCzechNumber(scaleFactor)}x`}</span>
+        </div>
       </div>
-    ` : ''}
 
-    ${expertJustification ? `
-      <div class="expert-block">
-        <h4>🔬 Kulinářská chemie a zdůvodnění</h4>
-        <div>${expertJustification}</div>
-      </div>
-    ` : ''}
+      ${applianceTips ? `
+        <div style="margin-top: 8px; padding-top: 6px; border-top: 1px solid #E8E5DC;">
+          <strong>💡 Tip pro spotřebič (${applianceType}):</strong>
+          <div style="margin-top: 2px;">${applianceTips}</div>
+        </div>
+      ` : ''}
+
+      ${expertJustification ? `
+        <div style="margin-top: 8px; padding-top: 6px; border-top: 1px solid #E8E5DC;">
+          <strong>🔬 Kulinářská chemie a zdůvodnění:</strong>
+          <div style="margin-top: 2px;">${expertJustification}</div>
+        </div>
+      ` : ''}
+    </div>
 
     <div class="footer-stamp">
       <span>AI Kuchařka • Moderní gastronomické inženýrství</span>
@@ -4846,64 +4905,46 @@ ${separator}`;
                     </div>
 
                     {/* Paper Sheet Preview Container */}
-                    <div className="printable-recipe-sheet bg-[#FCF9F2] border border-[#E3DDCF] rounded-2xl shadow-sm p-6 sm:p-10 text-[#2C2C2C] space-y-6">
+                    <div className="printable-recipe-sheet bg-[#FCF9F2] border border-[#E3DDCF] rounded-2xl shadow-sm p-5 sm:p-8 text-[#2C2C2C] space-y-5">
                       
                       {/* Monospace Header Typewriter-Like */}
-                      <div className="border-b border-[#D8D2C2] pb-6 space-y-3">
-                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                          <span className="text-[10px] sm:text-xs font-mono tracking-widest text-[#888172] uppercase font-bold">
+                      <div className="border-b border-[#D8D2C2] pb-4 space-y-2 break-inside-avoid">
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <span className="text-xs sm:text-sm font-mono tracking-widest text-[#888172] uppercase font-bold">
                             RECEPT Z AI KUCHAŘKY • 5 PILÍŘOVÁ SYNTÉZA
                           </span>
-                          <span className="text-[10px] sm:text-xs font-mono text-[#888172]">
-                            Kategorie: {selectedRecipe.category || getRecipeCategory(selectedRecipe)}
-                          </span>
+                          <div className="flex items-center gap-2">
+                            {selectedRecipe.category && (
+                              <span className="text-xs font-bold text-[#2D6A4F] bg-[#E8F5E9] px-2.5 py-0.5 rounded-full uppercase">
+                                {selectedRecipe.category}
+                              </span>
+                            )}
+                            <span className="text-xs font-mono bg-[#1B4332]/10 text-[#1B4332] px-2 py-0.5 rounded font-bold">
+                              Porce: {scaleFactor === 1 ? "1x" : `${formatCzechNumber(scaleFactor)}x`}
+                            </span>
+                          </div>
                         </div>
                         <h2 className="text-3xl sm:text-4xl font-serif font-black text-[#1B4332] tracking-tight">
                           {selectedRecipe.title}
                         </h2>
+                        {selectedRecipe.summary && (
+                          <p className="text-sm sm:text-base text-[#46463D] leading-relaxed font-serif italic pt-0.5">
+                            {selectedRecipe.summary}
+                          </p>
+                        )}
                       </div>
 
-                      {/* PARAMETERS SUMMARY GRID */}
-                      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 py-4 border-b border-[#D8D2C2] text-xs sm:text-sm">
-                        <div>
-                          <span className="block text-[10px] font-mono uppercase text-[#888172] font-bold">Celková příprava</span>
-                          <span className="font-extrabold text-[#1B4332] text-sm sm:text-base font-serif mt-0.5">{selectedRecipe.cookingTime}</span>
-                        </div>
-                        <div>
-                          <span className="block text-[10px] font-mono uppercase text-[#888172] font-bold">Tepelná úprava</span>
-                          <span className="font-extrabold text-[#1B4332] text-sm sm:text-base font-serif mt-0.5 text-emerald-800">{selectedRecipe.estimatedCookingTime || "Není uvedeno"}</span>
-                        </div>
-                        <div>
-                          <span className="block text-[10px] font-mono uppercase text-[#888172] font-bold">Náročnost</span>
-                          <span className="font-extrabold text-[#1B4332] text-sm sm:text-base font-serif mt-0.5">{selectedRecipe.difficulty}</span>
-                        </div>
-                        <div>
-                          <span className="block text-[10px] font-mono uppercase text-[#888172] font-bold">Doporučený spotřebič</span>
-                          <span className="font-extrabold text-[#1B4332] text-sm sm:text-base font-serif mt-0.5">{selectedRecipe.applianceType}</span>
-                        </div>
-                        <div>
-                          <span className="block text-[10px] font-mono uppercase text-[#888172] font-bold">Vědecky ověřeno</span>
-                          <span className="font-extrabold text-emerald-800 text-sm sm:text-base font-serif mt-0.5 flex items-center gap-1">✓ 100% Chef-Tech</span>
-                        </div>
-                      </div>
-
-                      {/* DESCRIPTION */}
-                      <div className="space-y-2">
-                        <h3 className="font-serif font-bold text-lg text-[#1B4332] border-b border-[#E8E8E1] pb-1">Shrnutí receptu a chuťových vylepšení</h3>
-                        <p className="text-base text-[#46463D] leading-relaxed font-serif italic">
-                          {selectedRecipe.summary}
-                        </p>
-                      </div>
-
-                      {/* INGREDIENTS LIST */}
-                      <div className="space-y-3">
-                        <h3 className="font-serif font-bold text-lg text-[#1B4332] border-b border-[#E8E8E1] pb-1">Seznam surovin (přesné poměry)</h3>
-                        <ul className="space-y-1.5 text-base font-serif list-disc pl-5">
+                      {/* INGREDIENTS LIST (PAGE 1 DIRECTLY AFTER HEADER) */}
+                      <div className="space-y-2 break-inside-avoid">
+                        <h3 className="font-serif font-bold text-lg text-[#1B4332] border-b border-[#E8E8E1] pb-1 page-break-after-avoid">
+                          Suroviny a ingredience (přesné poměry)
+                        </h3>
+                        <ul className="columns-1 sm:columns-2 gap-x-6 text-sm sm:text-base font-serif">
                           {selectedRecipe.ingredients.map((ing, i) => {
                             if (isIngredientHeader(ing)) {
                               const headerTitle = cleanHeaderTitle(ing);
                               return (
-                                <li key={i} className="list-none pt-4 pb-1 font-bold font-serif text-[#1B4332] text-base border-b border-[#1B4332]/20 uppercase tracking-wide -ml-5 pl-0">
+                                <li key={i} className="[column-span:all] pt-2 pb-0.5 font-bold font-serif text-[#1B4332] text-sm border-b border-[#1B4332]/20 uppercase tracking-wide list-none break-inside-avoid">
                                   📌 {headerTitle}
                                 </li>
                               );
@@ -4911,7 +4952,7 @@ ${separator}`;
                             const parsed = parseIngredientString(ing);
                             const displayIng = scaleIngredient(parsed, scaleFactor);
                             return (
-                              <li key={i} className="text-[#3A3A34]">
+                              <li key={i} className="break-inside-avoid py-1 text-[#3A3A34] border-b border-[#F0EFEA] last:border-0 leading-snug">
                                 {displayIng}
                               </li>
                             );
@@ -4920,27 +4961,29 @@ ${separator}`;
                       </div>
 
                       {/* INSTRUCTIONS */}
-                      <div className="space-y-4">
-                        <h3 className="font-serif font-bold text-lg text-[#1B4332] border-b border-[#E8E8E1] pb-1">Postup přípravy (krok za krokem)</h3>
-                        <div className="space-y-3.5 text-base font-serif">
+                      <div className="space-y-3 pt-1">
+                        <h3 className="font-serif font-bold text-lg text-[#1B4332] border-b border-[#E8E8E1] pb-1 page-break-after-avoid">
+                          Postup přípravy (krok za krokem)
+                        </h3>
+                        <div className="space-y-2.5 text-sm sm:text-base font-serif">
                           {selectedRecipe.instructions.map((step, idx) => {
                             const stepIngs = getStepIngredients(step, selectedRecipe.ingredients, scaleFactor).filter(i => i.isMatched);
                             return (
-                              <div key={idx} className="flex flex-col gap-1.5 leading-relaxed">
-                                <div className="flex gap-3">
-                                  <span className="font-mono text-[#D97706] font-bold text-base shrink-0">{idx + 1}.</span>
-                                  <p className="text-[#3A3A34] flex-1">{step}</p>
+                              <div key={idx} className="instruction-step flex flex-col gap-1 leading-relaxed break-inside-avoid p-3 rounded-lg bg-[#FAF8F3] border border-[#E8E4DB]">
+                                <div className="flex gap-2.5 items-start">
+                                  <span className="font-mono text-[#FFFFFF] bg-[#1B4332] font-bold text-xs w-6 h-6 rounded-full flex items-center justify-center shrink-0 mt-0.5">
+                                    {idx + 1}
+                                  </span>
+                                  <p className="text-[#3A3A34] flex-1 text-sm sm:text-base">{step}</p>
                                 </div>
                                 {stepIngs.length > 0 && (
-                                  <div className="ml-7 flex flex-wrap items-center gap-1.5 text-xs font-sans">
-                                    <span className="font-bold text-[10px] uppercase text-[#1B4332]/60 font-mono tracking-wider">
+                                  <div className="ml-8 text-xs sm:text-sm font-sans pt-1 border-t border-[#E8E4DB]/60">
+                                    <span className="font-bold text-xs uppercase text-[#1B4332]/80 font-mono tracking-wider mr-1.5">
                                       Suroviny pro krok:
                                     </span>
-                                    {stepIngs.map((item, sIdx) => (
-                                      <span key={sIdx} className="bg-[#1B4332]/5 border border-[#1B4332]/15 text-[#1B4332] px-2 py-0.5 rounded-md text-[11px] font-medium font-serif">
-                                        {item.display}
-                                      </span>
-                                    ))}
+                                    <span className="font-serif italic text-[#3A3A34]">
+                                      {stepIngs.map(i => i.display).join(', ')}
+                                    </span>
                                   </div>
                                 )}
                               </div>
@@ -4949,25 +4992,48 @@ ${separator}`;
                         </div>
                       </div>
 
-                      {/* TIPS */}
-                      <div className="space-y-2 pt-4 border-t border-[#D8D2C2]">
-                        <h3 className="font-serif font-bold text-lg text-[#1B4332] border-b border-[#E8E8E1] pb-1">Inženýrství & tip pro spotřebič ({selectedRecipe.applianceType})</h3>
-                        <p className="text-base text-[#3A3A34] leading-relaxed font-serif">
-                          {selectedRecipe.applianceTips}
-                        </p>
-                      </div>
+                      {/* SECONDARY METADATA & PARAMETERS AT THE VERY END */}
+                      <div className="meta-bottom-block bg-[#F7F4EA] border border-[#E3DDCF] rounded-xl p-4 space-y-3 break-inside-avoid text-sm">
+                        <h4 className="font-serif font-bold text-sm text-[#1B4332] border-b border-[#D8D2C2] pb-1 uppercase tracking-wider font-mono">
+                          Doplňující informace a technické parametry
+                        </h4>
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs sm:text-sm font-sans text-slate-700">
+                          <div>
+                            <span className="block text-xs font-mono uppercase text-[#888172] font-bold">Celková doba</span>
+                            <span className="font-bold text-[#1B4332] font-serif text-sm">{selectedRecipe.cookingTime || "Není uvedeno"}</span>
+                          </div>
+                          <div>
+                            <span className="block text-xs font-mono uppercase text-[#888172] font-bold">Náročnost</span>
+                            <span className="font-bold text-[#1B4332] font-serif text-sm">{selectedRecipe.difficulty || "Střední"}</span>
+                          </div>
+                          <div>
+                            <span className="block text-xs font-mono uppercase text-[#888172] font-bold">Spotřebič</span>
+                            <span className="font-bold text-[#1B4332] font-serif text-sm">{selectedRecipe.applianceType || "Sporák"}</span>
+                          </div>
+                          <div>
+                            <span className="block text-xs font-mono uppercase text-[#888172] font-bold">Tepelná úprava</span>
+                            <span className="font-bold text-emerald-800 font-serif text-sm">{selectedRecipe.estimatedCookingTime || "Není uvedeno"}</span>
+                          </div>
+                        </div>
 
-                      {/* EXPERT JUSTIFICATION / METADATA */}
-                      <div className="space-y-2">
-                        <h3 className="font-serif font-bold text-lg text-[#1B4332] border-b border-[#E8E8E1] pb-1">Věda & kuchařská chemie (Odůvodnění receptu)</h3>
-                        <p className="text-base text-[#3A3A34] leading-relaxed font-serif">
-                          {selectedRecipe.expertJustification}
-                        </p>
+                        {selectedRecipe.applianceTips && (
+                          <div className="pt-2 border-t border-[#E3DDCF]">
+                            <span className="font-bold text-[#1B4332] block font-mono text-xs uppercase">Doporučení pro spotřebič ({selectedRecipe.applianceType}):</span>
+                            <p className="text-xs sm:text-sm text-[#3A3A34] font-serif mt-0.5 leading-relaxed">{selectedRecipe.applianceTips}</p>
+                          </div>
+                        )}
+
+                        {selectedRecipe.expertJustification && (
+                          <div className="pt-2 border-t border-[#E3DDCF]">
+                            <span className="font-bold text-[#1B4332] block font-mono text-xs uppercase">Kulinářská chemie & vědecké zdůvodnění:</span>
+                            <p className="text-xs sm:text-sm text-[#3A3A34] font-serif mt-0.5 leading-relaxed">{selectedRecipe.expertJustification}</p>
+                          </div>
+                        )}
                       </div>
 
                       {/* PARCHMENT FEET */}
-                      <div className="border-t border-[#D8D2C2] pt-6 flex flex-col sm:flex-row sm:items-center justify-between text-xs font-mono text-[#888172] gap-2">
-                        <span>Stabilita, přesnost a moderní tech-gastronomie</span>
+                      <div className="border-t border-[#D8D2C2] pt-3 flex flex-col sm:flex-row sm:items-center justify-between text-xs font-mono text-[#888172] gap-2 break-inside-avoid">
+                        <span>AI Kuchařka • Moderní gastronomické inženýrství</span>
                         <span>Vygenerováno dne: {new Date().toLocaleDateString("cs-CZ")}</span>
                       </div>
                     </div>
@@ -5133,23 +5199,10 @@ ${separator}`;
                           </p>
                         )}
 
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3 text-xs font-sans text-slate-600">
-                          <div className="bg-[#F9F8F3] border border-[#E8E8E1] rounded-xl p-2.5">
-                            <span className="text-[10px] uppercase text-[#7A7A70] tracking-wider font-bold block">Celková doba</span>
-                            <span className="font-bold text-[#1B4332] text-sm font-serif">{selectedRecipe.cookingTime || "Není uvedeno"}</span>
-                          </div>
-                          <div className="bg-[#F9F8F3] border border-[#E8E8E1] rounded-xl p-2.5">
-                            <span className="text-[10px] uppercase text-[#7A7A70] tracking-wider font-bold block">Náročnost</span>
-                            <span className="font-bold text-[#1B4332] text-sm font-serif">{selectedRecipe.difficulty || "Střední"}</span>
-                          </div>
-                          <div className="bg-[#F9F8F3] border border-[#E8E8E1] rounded-xl p-2.5">
-                            <span className="text-[10px] uppercase text-[#7A7A70] tracking-wider font-bold block">Zařízení</span>
-                            <span className="font-bold text-[#1B4332] text-sm font-serif">{selectedRecipe.applianceType || "Sporák / Pánev"}</span>
-                          </div>
-                          <div className="bg-[#F9F8F3] border border-[#E8E8E1] rounded-xl p-2.5">
-                            <span className="text-[10px] uppercase text-[#7A7A70] tracking-wider font-bold block">Měřítko porcí</span>
-                            <span className="font-bold text-[#1B4332] text-sm font-serif">{scaleFactor === 1 ? "Výchozí (1x)" : `${formatCzechNumber(scaleFactor)}x`}</span>
-                          </div>
+                        <div className="flex items-center gap-2 pt-2">
+                          <span className="text-xs font-mono bg-[#1B4332]/10 text-[#1B4332] px-2.5 py-1 rounded-md font-bold">
+                            Porce: {scaleFactor === 1 ? "Výchozí (1x)" : `${formatCzechNumber(scaleFactor)}x`}
+                          </span>
                         </div>
                       </div>
 
@@ -5390,7 +5443,7 @@ ${separator}`;
                               <div 
                                 key={index}
                                 onClick={() => toggleInstruction(index)}
-                                className={`p-4 sm:p-5 rounded-2xl border transition-all cursor-pointer flex gap-4 ${
+                                className={`instruction-step p-4 sm:p-5 rounded-2xl border transition-all cursor-pointer flex gap-4 break-inside-avoid ${
                                   isCompleted 
                                   ? "bg-[#F0F4F1]/60 border-emerald-100 text-slate-400 opacity-80" 
                                   : "bg-white hover:bg-[#FDFCF7] border-[#E8E8E1] hover:border-[#1B4332]/30 shadow-2xs"
@@ -5415,19 +5468,13 @@ ${separator}`;
                                   </p>
 
                                   {stepIngs.length > 0 && !isCompleted && (
-                                    <div className="pt-2 border-t border-[#E8E8E1]/60 flex flex-wrap items-center gap-1.5 text-xs" onClick={(e) => e.stopPropagation()}>
-                                      <span className="text-[10px] font-bold text-[#1B4332]/70 uppercase tracking-wider font-mono">
+                                    <div className="pt-2 border-t border-[#E8E8E1]/60 text-xs font-sans" onClick={(e) => e.stopPropagation()}>
+                                      <span className="text-[10px] font-bold text-[#1B4332]/70 uppercase tracking-wider font-mono mr-1.5">
                                         Potřebné suroviny v tomto kroku:
                                       </span>
-                                      {stepIngs.map((item, iIdx) => (
-                                        <span 
-                                          key={iIdx} 
-                                          className="inline-flex items-center gap-1 bg-[#1B4332]/10 text-[#1B4332] px-2 py-0.5 rounded-md font-medium border border-[#1B4332]/15 text-xs font-serif"
-                                        >
-                                          <span className="w-1.5 h-1.5 rounded-full bg-[#2D6A4F]"></span>
-                                          {item.display}
-                                        </span>
-                                      ))}
+                                      <span className="font-serif italic text-[#3A3A34] font-medium">
+                                        {stepIngs.map(i => i.display).join(', ')}
+                                      </span>
                                     </div>
                                   )}
                                 </div>
