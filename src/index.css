@@ -23,16 +23,52 @@
   background: rgba(120, 110, 90, 0.4);
 }
 
-/* Printing styles so the recipe prints beautifully in the kitchen */
+/* Printing styles optimized specifically for standard A4 paper layout */
 @media print {
-  body, html {
+  @page {
+    size: A4 portrait;
+    margin: 18mm 20mm 18mm 20mm;
+  }
+
+  /* Hide non-printable UI elements */
+  body * {
+    visibility: hidden !important;
+  }
+
+  /* Reveal only the printable recipe sheet and its contents */
+  .printable-recipe-sheet,
+  .printable-recipe-sheet * {
+    visibility: visible !important;
+  }
+
+  /* Position printable sheet cleanly on A4 page with proper padding and margins */
+  .printable-recipe-sheet {
+    position: relative !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 8mm 10mm !important;
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    background: white !important;
+    color: #111827 !important;
+    font-size: 10pt !important;
+    line-height: 1.5 !important;
+    box-sizing: border-box !important;
+  }
+
+  html, body, #root, main, div {
+    overflow: visible !important;
+    height: auto !important;
+    max-height: none !important;
     background: white !important;
     color: black !important;
-    width: 100% !important;
-    height: auto !important;
-    overflow: visible !important;
   }
-  .no-print, header, aside, footer, nav, button {
+
+  .no-print, header, aside, footer, nav, button, [class*="no-print"] {
     display: none !important;
     height: 0 !important;
     width: 0 !important;
@@ -40,68 +76,18 @@
     margin: 0 !important;
     padding: 0 !important;
   }
-  .printable-recipe-sheet {
-    display: block !important;
-    position: absolute !important;
-    left: 0 !important;
-    top: 0 !important;
-    width: 100% !important;
-    margin: 0 !important;
-    padding: 40px !important;
-    box-shadow: none !important;
-    border: none !important;
-    background: white !important;
-    color: black !important;
-    font-size: 11pt !important;
-    line-height: 1.6 !important;
-  }
 
-  /* Printing rules for Paper Cookbook Overlay (Zobrazit recept) */
-  body.paper-view-active {
-    background: #FDFBF7 !important;
-    color: #2C2A29 !important;
-  }
-  body.paper-view-active #root > *:not(.paper-cookbook-overlay) {
-    display: none !important;
-  }
-  body.paper-view-active .printable-recipe-sheet {
-    display: none !important;
-  }
-  body.paper-view-active .paper-cookbook-overlay {
-    position: static !important;
-    display: block !important;
-    background: #FDFBF7 !important;
-    color: #2C2A29 !important;
-    width: 100% !important;
-    height: auto !important;
-    overflow: visible !important;
-    padding: 0 !important;
-    margin: 0 !important;
-  }
-  body.paper-view-active .paper-cookbook-sheet-container {
-    background: transparent !important;
-    padding: 0 !important;
-    display: block !important;
-    overflow: visible !important;
-    height: auto !important;
-    width: 100% !important;
-  }
-  body.paper-view-active .paper-cookbook-sheet {
-    box-shadow: none !important;
-    border: none !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    max-width: 100% !important;
-    width: 100% !important;
-    display: block !important;
-    background: transparent !important;
-  }
-
-  /* Page break rules for lists */
-  h1, h2, h3, h4 {
+  /* Page break rules for clean A4 printing */
+  h1, h2, h3, h4, .section-title {
     page-break-after: avoid;
+    break-after: avoid;
   }
-  ul, ol, flex {
+  .parameters-grid, .expert-block, .sheet-header, .footer-stamp {
     page-break-inside: avoid;
+    break-inside: avoid;
+  }
+  li, .instruction-step {
+    page-break-inside: avoid;
+    break-inside: avoid;
   }
 }

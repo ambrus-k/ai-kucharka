@@ -125,6 +125,29 @@ export function formatCzechNumber(val: number): string {
   return rounded.toString().replace(".", ",");
 }
 
+export function isIngredientHeader(ing: string): boolean {
+  if (!ing) return false;
+  const trimmed = ing.trim();
+  if (trimmed.startsWith("[") || trimmed.startsWith("---") || trimmed.startsWith("===") || trimmed.startsWith("###") || trimmed.startsWith("📌") || trimmed.startsWith("• [")) {
+    return true;
+  }
+  if (trimmed.endsWith(":") && !/^\d/.test(trimmed)) {
+    return true;
+  }
+  return false;
+}
+
+export function cleanHeaderTitle(ing: string): string {
+  let text = ing.trim();
+  text = text.replace(/^\[+\s*/, "").replace(/\s*\]+$/, "");
+  text = text.replace(/^--+\s*/, "").replace(/\s*--+$/, "");
+  text = text.replace(/^===+\s*/, "").replace(/\s*===+$/, "");
+  text = text.replace(/^#+\s*/, "");
+  text = text.replace(/^📌\s*/, "");
+  text = text.replace(/:$/, "");
+  return text.trim();
+}
+
 export function parseIngredientString(ing: string): ParsedIngredient {
   const result: ParsedIngredient = {
     original: ing,
@@ -312,7 +335,9 @@ export function getStepIngredients(stepText: string, ingredients: string[], fact
     .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Diacritics
     .replace(/[^a-z0-9\s]/g, " ");
 
-  return ingredients.map((ing) => {
+  return ingredients
+    .filter(ing => !isIngredientHeader(ing))
+    .map((ing) => {
     const parsed = parseIngredientString(ing);
     const displayIng = scaleIngredient(parsed, factor);
     
@@ -470,10 +495,12 @@ export default function App() {
   const handleAddRecipeToCart = () => {
     if (!selectedRecipe) return;
     
-    const scaledIngredients = selectedRecipe.ingredients.map(ing => {
-      const parsed = parseIngredientString(ing);
-      return scaleIngredient(parsed, scaleFactor);
-    });
+    const scaledIngredients = selectedRecipe.ingredients
+      .filter(ing => !isIngredientHeader(ing))
+      .map(ing => {
+        const parsed = parseIngredientString(ing);
+        return scaleIngredient(parsed, scaleFactor);
+      });
 
     const newItems = scaledIngredients.map((displayIng, index) => ({
       id: `${selectedRecipe.id}-${index}-${Date.now()}`,
@@ -543,22 +570,11 @@ export default function App() {
   const diagnosticsAbortRef = useRef<AbortController | null>(null);
   const auditAbortRef = useRef<AbortController | null>(null);
 
-  // States for Paper Cookbook View
-  const [showPaperView, setShowPaperView] = useState(false);
-  const [paperFontSize, setPaperFontSize] = useState<"normal" | "large" | "extra-large">("large");
+  // States for Recipe Controls & Printing
+  const [paperFontSize, setPaperFontSize] = useState<"normal" | "large" | "extra-large">("normal");
   const [printNotice, setPrintNotice] = useState<string | null>(null);
-
-  // Toggle body class when Paper View is active so printing styles target it correctly
-  useEffect(() => {
-    if (showPaperView) {
-      document.body.classList.add("paper-view-active");
-    } else {
-      document.body.classList.remove("paper-view-active");
-    }
-    return () => {
-      document.body.classList.remove("paper-view-active");
-    };
-  }, [showPaperView]);
+  const [activePrintUrl, setActivePrintUrl] = useState<string | null>(null);
+  const [showPrintModal, setShowPrintModal] = useState<boolean>(false);
 
   // States for search and filter
   const [searchQuery, setSearchQuery] = useState("");
@@ -659,6 +675,31 @@ export default function App() {
   // Rename and inline editing states
   const [editingCategoryName, setEditingCategoryName] = useState<string | null>(null);
   const [editingCategoryValue, setEditingCategoryValue] = useState("");
+
+  // States for Add New Recipe Modal Window
+  const [showAddRecipeModal, setShowAddRecipeModal] = useState(false);
+  const [addRecipeTab, setAddRecipeTab] = useState<"manual" | "ai">("manual");
+  const [addTitle, setAddTitle] = useState("");
+  const [addCategory, setAddCategory] = useState("Maso");
+  const [addCookingTime, setAddCookingTime] = useState("");
+  const [addEstimatedTime, setAddEstimatedTime] = useState("");
+  const [addDifficulty, setAddDifficulty] = useState<"Snadné" | "Střední" | "Složité">("Střední");
+  const [addPortions, setAddPortions] = useState<number>(4);
+  const [addAppliance, setAddAppliance] = useState("Sporák");
+  const [addSummary, setAddSummary] = useState("");
+  const [addIngredients, setAddIngredients] = useState<Array<{ amount: string; unit: string; name: string }>>([
+    { amount: "", unit: "g", name: "" },
+    { amount: "", unit: "g", name: "" },
+    { amount: "", unit: "ks", name: "" }
+  ]);
+  const [addRawIngredients, setAddRawIngredients] = useState("");
+  const [useRawIngredientsInput, setUseRawIngredientsInput] = useState(false);
+  const [addInstructions, setAddInstructions] = useState<string[]>(["", "", ""]);
+  const [addApplianceTips, setAddApplianceTips] = useState("");
+  const [addExpertJustification, setAddExpertJustification] = useState("");
+  const [addFormError, setAddFormError] = useState<string | null>(null);
+  const [addAiText, setAddAiText] = useState("");
+  const [isGeneratingAiModal, setIsGeneratingAiModal] = useState(false);
 
   const defaultCategories = useMemo(() => ["Maso", "Pečivo", "Polévky", "Sladká jídla a moučníky", "Ostatní"], []);
 
@@ -1268,6 +1309,184 @@ export default function App() {
     }
   };
 
+  // Handlers for Add Recipe Modal
+  const handleOpenAddRecipeModal = () => {
+    setAddTitle("");
+    setAddCategory("Maso");
+    setAddCookingTime("");
+    setAddEstimatedTime("");
+    setAddDifficulty("Střední");
+    setAddPortions(4);
+    setAddAppliance("Sporák");
+    setAddSummary("");
+    setAddIngredients([
+      { amount: "", unit: "g", name: "" },
+      { amount: "", unit: "g", name: "" },
+      { amount: "", unit: "ks", name: "" }
+    ]);
+    setAddRawIngredients("");
+    setUseRawIngredientsInput(false);
+    setAddInstructions(["", "", ""]);
+    setAddApplianceTips("");
+    setAddExpertJustification("");
+    setAddFormError(null);
+    setAddAiText("");
+    setAddRecipeTab("manual");
+    setShowAddRecipeModal(true);
+  };
+
+  const handleAddIngredientRow = () => {
+    setAddIngredients(prev => [...prev, { amount: "", unit: "g", name: "" }]);
+  };
+
+  const handleRemoveIngredientRow = (index: number) => {
+    setAddIngredients(prev => prev.filter((_, idx) => idx !== index));
+  };
+
+  const handleUpdateIngredientRow = (index: number, field: "amount" | "unit" | "name", value: string) => {
+    setAddIngredients(prev => {
+      const updated = [...prev];
+      updated[index] = { ...updated[index], [field]: value };
+      return updated;
+    });
+  };
+
+  const handleAddInstructionRow = () => {
+    setAddInstructions(prev => [...prev, ""]);
+  };
+
+  const handleRemoveInstructionRow = (index: number) => {
+    setAddInstructions(prev => prev.filter((_, idx) => idx !== index));
+  };
+
+  const handleUpdateInstructionRow = (index: number, value: string) => {
+    setAddInstructions(prev => {
+      const updated = [...prev];
+      updated[index] = value;
+      return updated;
+    });
+  };
+
+  const handleSaveManualRecipe = (e: React.FormEvent) => {
+    e.preventDefault();
+    setAddFormError(null);
+
+    if (!addTitle.trim()) {
+      setAddFormError("Prosím vyplňte název receptu.");
+      return;
+    }
+
+    if (!addCookingTime.trim()) {
+      setAddFormError("Prosím vyplňte celkovou dobu přípravy (např. '45 min' nebo '2 h marinování, 30 min pečení').");
+      return;
+    }
+
+    let finalIngredients: string[] = [];
+    if (useRawIngredientsInput && addRawIngredients.trim()) {
+      finalIngredients = addRawIngredients.split("\n").map(l => l.trim()).filter(Boolean);
+    } else {
+      finalIngredients = addIngredients
+        .filter(i => i.name.trim().length > 0)
+        .map(i => `${i.amount.trim()} ${i.unit.trim()} ${i.name.trim()}`.replace(/\s+/g, " ").trim());
+    }
+
+    if (finalIngredients.length === 0) {
+      setAddFormError("Přidejte prosím alespoň jednu ingredienci.");
+      return;
+    }
+
+    const finalInstructions = addInstructions
+      .map(s => s.trim())
+      .filter(s => s.length > 0);
+
+    if (finalInstructions.length === 0) {
+      setAddFormError("Přidejte prosím alespoň jeden krok postupu.");
+      return;
+    }
+
+    const newRecipe: Recipe = {
+      id: "recipe-" + Date.now(),
+      title: addTitle.trim(),
+      category: addCategory || "Maso",
+      cookingTime: addCookingTime.trim(),
+      estimatedCookingTime: addEstimatedTime.trim() || addCookingTime.trim(),
+      difficulty: addDifficulty || "Střední",
+      applianceType: addAppliance || "Sporák",
+      summary: addSummary.trim() || `${addTitle.trim()} – poctivý domácí recept (doba přípravy: ${addCookingTime.trim()}).`,
+      ingredients: finalIngredients,
+      instructions: finalInstructions,
+      applianceTips: addApplianceTips.trim() || `Při přípravě v zařízení '${addAppliance}' dbejte na dodržení správných časů a teplot.`,
+      expertJustification: addExpertJustification.trim() || "Vědecká kontrola: Použití čerstvých ingrediencí a fázování přípravy zajišťuje optimální chuť i strukturu.",
+      updatedAt: new Date().toISOString()
+    };
+
+    const updatedRecipes = [newRecipe, ...recipes];
+    saveRecipesToStorage(updatedRecipes, newRecipe);
+    setSelectedRecipe(newRecipe);
+    setShowAddRecipeModal(false);
+    setToast({
+      title: "Recept byl vytvořen!",
+      message: `Nový recept "${newRecipe.title}" byl úspěšně uložen do vaší kuchařky.`
+    });
+  };
+
+  const handleGenerateAiModalRecipe = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!addAiText.trim() && !fileData) {
+      setAddFormError("Prosím napište popis receptu nebo vložte soubor.");
+      return;
+    }
+
+    setIsGeneratingAiModal(true);
+    setAddFormError(null);
+
+    try {
+      const response = await fetch("/api/enhance-recipe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          rawText: addAiText,
+          fileData,
+          fileName,
+          mimeType,
+          adminPassword
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Při generování receptu přes AI nastala chyba.");
+      }
+
+      const data = await response.json();
+      if (!data.recipe) {
+        throw new Error("Server nevrátil platný recept.");
+      }
+
+      const newRecipe: Recipe = {
+        ...data.recipe,
+        id: "recipe-ai-" + Date.now(),
+        updatedAt: new Date().toISOString()
+      };
+
+      const updatedRecipes = [newRecipe, ...recipes];
+      saveRecipesToStorage(updatedRecipes, newRecipe);
+      setSelectedRecipe(newRecipe);
+      setShowAddRecipeModal(false);
+      removeFile();
+      setAddAiText("");
+      setToast({
+        title: "AI Recept vytvořen!",
+        message: `Recept "${newRecipe.title}" byl vygenerován a uložen do kuchařky.`
+      });
+    } catch (err: any) {
+      console.error(err);
+      setAddFormError(err.message || "Chyba při komunikaci s AI serverem.");
+    } finally {
+      setIsGeneratingAiModal(false);
+    }
+  };
+
   // Loading generation state
   const [isLoading, setIsLoading] = useState(false);
   const [loadingStep, setLoadingStep] = useState(0);
@@ -1435,7 +1654,7 @@ ${selectedRecipe.summary || "Bez popisu."}
 
 --- SEZNAM INGREDIENCÍ ---
 ${selectedRecipe.ingredients && selectedRecipe.ingredients.length > 0 
-  ? selectedRecipe.ingredients.map(ing => `• ${ing}`).join("\n") 
+  ? selectedRecipe.ingredients.map(ing => isIngredientHeader(ing) ? `\n📌 ${cleanHeaderTitle(ing).toUpperCase()}:` : `• ${ing}`).join("\n").trim() 
   : "Žádné ingredience nejsou zapsány."}
 
 --- POSTUP PŘÍPRAVY ---
@@ -1767,8 +1986,8 @@ ${separator}`;
         iframeDoc.body.appendChild(script);
       });
 
-      // Avoid "Invalid margin array" by converting array structure into iframeWin array realms
-      const safeMargin = iframeWin.JSON.parse("[0.4, 0.4, 0.4, 0.4]");
+      // Avoid "Invalid margin array" by converting array structure into iframeWin array realms (22mm top/bottom, 25mm left/right margins)
+      const safeMargin = iframeWin.JSON.parse("[20, 22, 20, 22]");
 
       // Adjust height of the iframe so html2pdf layout is entirely visible
       const scrollHeight = Math.max(
@@ -1779,7 +1998,7 @@ ${separator}`;
       );
       iframe.style.height = `${scrollHeight + 150}px`;
 
-      // Configure beautiful options for high-quality standard-size PDFs
+      // Configure beautiful options for high-quality standard A4 PDFs
       const opt = {
         margin:       safeMargin,
         filename:     cleanFilename,
@@ -1788,9 +2007,9 @@ ${separator}`;
           scale: 2, 
           useCORS: true, 
           logging: false,
-          backgroundColor: "#FCF9F2"
+          backgroundColor: "#FFFFFF"
         },
-        jsPDF:        { unit: "in", format: "letter", orientation: "portrait" }
+        jsPDF:        { unit: "mm", format: "a4", orientation: "portrait" }
       };
 
       // 5. Generate and download PDF inside parent context as a Blob structure
@@ -1821,163 +2040,341 @@ ${separator}`;
     }
   };
 
-  const triggerNativePrint = () => {
+  const handlePrintRecipe = () => {
     if (!selectedRecipe) return;
 
-    // Grab the beautifully rendered recipe container element present in the document
-    const element = document.querySelector(".printable-recipe-sheet");
-    if (!element) {
+    const title = selectedRecipe.title;
+    const category = selectedRecipe.category || getRecipeCategory(selectedRecipe);
+    const cookingTime = selectedRecipe.cookingTime || "Není specifikováno";
+    const difficulty = selectedRecipe.difficulty || "Střední";
+    const applianceType = selectedRecipe.applianceType || "Standardní spotřebič";
+    const summary = selectedRecipe.summary || "";
+    const applianceTips = selectedRecipe.applianceTips || "";
+    const expertJustification = selectedRecipe.expertJustification || "";
+
+    // Ingredients list with scaled quantities
+    const ingredientsHtml = selectedRecipe.ingredients && selectedRecipe.ingredients.length > 0 
+      ? selectedRecipe.ingredients.map(ing => {
+          if (isIngredientHeader(ing)) {
+            const headerTitle = cleanHeaderTitle(ing);
+            return `
+              <li style="list-style: none; padding: 10px 0 4px 0; border-bottom: 2px solid #1B4332; font-weight: 800; font-size: 13.5px; color: #1B4332; text-transform: uppercase; letter-spacing: 0.5px; page-break-after: avoid; break-after: avoid; margin-top: 8px;">
+                📌 ${headerTitle}
+              </li>
+            `;
+          }
+          const parsed = parseIngredientString(ing);
+          const displayIng = scaleIngredient(parsed, scaleFactor);
+          return `
+            <li style="display: flex; align-items: flex-start; gap: 8px; padding: 5px 0; border-bottom: 1px solid #F0EFEA; font-size: 13.5px; color: #2C2C2C; page-break-inside: avoid; break-inside: avoid;">
+              <span style="display: inline-block; width: 13px; height: 13px; border: 1.5px solid #1B4332; border-radius: 3.5px; margin-top: 3px; flex-shrink: 0;"></span>
+              <span style="line-height: 1.4; font-weight: 500;">${displayIng}</span>
+            </li>
+          `;
+        }).join("")
+      : `<li style="font-style: italic; color: #666; padding: 6px 0;">Žádné ingredience nejsou zapsány.</li>`;
+
+    // Instructions list
+    const instructionsHtml = selectedRecipe.instructions && selectedRecipe.instructions.length > 0
+      ? selectedRecipe.instructions.map((step, idx) => `
+        <div class="instruction-step" style="display: flex; gap: 12px; padding: 7px 0; border-bottom: 1px dashed #E8E5DC; align-items: flex-start; page-break-inside: avoid; break-inside: avoid;">
+          <div style="font-weight: 800; font-size: 12px; color: #FFFFFF; background-color: #1B4332; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px;">${idx + 1}</div>
+          <div style="font-size: 13.5px; line-height: 1.5; color: #2C2C2C; flex: 1;">${step}</div>
+        </div>
+      `).join("")
+      : `<p style="font-style: italic; color: #666;">Žádný postup přípravy není zapsán.</p>`;
+
+    const htmlContent = `<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <title>${title} - AI Kuchařka</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    @page {
+      size: A4 portrait;
+      margin: 18mm 20mm 18mm 20mm;
+    }
+    *, *:before, *:after {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      background-color: #FFFFFF;
+      color: #1B4332;
+      margin: 0;
+      padding: 0;
+      line-height: 1.45;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .recipe-sheet {
+      width: 100%;
+      max-width: 100%;
+      margin: 0 auto;
+      background: #FFFFFF;
+      padding: 6mm 8mm;
+      box-sizing: border-box;
+    }
+    .sheet-header {
+      border-bottom: 2px solid #E8E5DC;
+      padding-bottom: 10px;
+      margin-bottom: 12px;
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+    .meta-brand {
+      font-size: 9.5px;
+      font-weight: 800;
+      color: #888172;
+      letter-spacing: 1.8px;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .recipe-title {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 24px;
+      color: #1B4332;
+      margin: 0 0 6px 0;
+      font-weight: 800;
+      line-height: 1.2;
+      page-break-after: avoid;
+      break-after: avoid;
+    }
+    .recipe-category {
+      display: inline-block;
+      font-size: 10.5px;
+      font-weight: 700;
+      color: #2D6A4F;
+      background-color: #E8F5E9;
+      padding: 2.5px 9px;
+      border-radius: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .parameters-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-bottom: 14px;
+      padding: 10px 12px;
+      background-color: #FDFBF7;
+      border: 1px solid #E8E5DC;
+      border-radius: 8px;
+      text-align: center;
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+    .param-label {
+      display: block;
+      font-size: 9.5px;
+      font-weight: 700;
+      color: #7A7A70;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 2px;
+    }
+    .param-value {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: #1B4332;
+    }
+    .section-title {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 16.5px;
+      font-weight: 700;
+      color: #1B4332;
+      border-bottom: 1px solid #E8E5DC;
+      padding-bottom: 5px;
+      margin: 14px 0 10px 0;
+      page-break-after: avoid;
+      break-after: avoid;
+    }
+    .ingredients-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+    .ingredients-list li {
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+    .summary-text {
+      font-style: italic;
+      color: #4A4A40;
+      font-size: 12.5px;
+      margin-bottom: 12px;
+      line-height: 1.45;
+    }
+    .instruction-step {
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+    .expert-block {
+      background-color: #FDFBF7;
+      border: 1px solid #E8E5DC;
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin-top: 12px;
+      font-size: 11.5px;
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+    .expert-block h4 {
+      margin: 0 0 4px 0;
+      font-size: 11.5px;
+      color: #1B4332;
+    }
+    .footer-stamp {
+      margin-top: 18px;
+      padding-top: 10px;
+      border-top: 1px solid #E8E5DC;
+      display: flex;
+      justify-content: space-between;
+      font-size: 9.5px;
+      font-weight: 700;
+      color: #888172;
+      text-transform: uppercase;
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+    @media screen {
+      body {
+        background-color: #F8F6F0;
+        padding: 24px 16px;
+      }
+      .recipe-sheet {
+        max-width: 190mm;
+        padding: 32px 36px;
+        border: 1px solid #E8E5DC;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+      }
+    }
+    @media print {
+      html, body {
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #FFFFFF !important;
+      }
+      .recipe-sheet {
+        border: none !important;
+        border-radius: 0 !important;
+        padding: 6mm 8mm !important;
+        margin: 0 auto !important;
+        max-width: 100% !important;
+        width: 100% !important;
+        box-shadow: none !important;
+        box-sizing: border-box !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="recipe-sheet">
+    <div class="sheet-header">
+      <div class="meta-brand">AI KUCHAŘKA • 5 PILÍŘOVÁ SYNTÉZA</div>
+      <h1 class="recipe-title">${title}</h1>
+      <span class="recipe-category">${category}</span>
+    </div>
+
+    <div class="parameters-grid">
+      <div>
+        <span class="param-label">Celková doba</span>
+        <span class="param-value">${cookingTime}</span>
+      </div>
+      <div>
+        <span class="param-label">Náročnost</span>
+        <span class="param-value">${difficulty}</span>
+      </div>
+      <div>
+        <span class="param-label">Spotřebič</span>
+        <span class="param-value">${applianceType}</span>
+      </div>
+      <div>
+        <span class="param-label">Měřítko porcí</span>
+        <span class="param-value">${scaleFactor === 1 ? "Výchozí (1x)" : `${formatCzechNumber(scaleFactor)}x`}</span>
+      </div>
+    </div>
+
+    ${summary ? `<div class="summary-text">${summary}</div>` : ''}
+
+    <h2 class="section-title">Suroviny a ingredience</h2>
+    <ul class="ingredients-list">
+      ${ingredientsHtml}
+    </ul>
+
+    <h2 class="section-title">Postup přípravy</h2>
+    <div>
+      ${instructionsHtml}
+    </div>
+
+    ${applianceTips ? `
+      <div class="expert-block">
+        <h4>💡 Tip pro spotřebič (${applianceType})</h4>
+        <div>${applianceTips}</div>
+      </div>
+    ` : ''}
+
+    ${expertJustification ? `
+      <div class="expert-block">
+        <h4>🔬 Kulinářská chemie a zdůvodnění</h4>
+        <div>${expertJustification}</div>
+      </div>
+    ` : ''}
+
+    <div class="footer-stamp">
+      <span>AI Kuchařka • Moderní gastronomické inženýrství</span>
+      <span>Vytisknuto dne: ${new Date().toLocaleDateString("cs-CZ")}</span>
+    </div>
+  </div>
+  <script>
+    window.onload = function() {
+      setTimeout(function() {
+        try { window.print(); } catch(e) {}
+      }, 350);
+    };
+  </script>
+</body>
+</html>`;
+
+    // 1. Create a clean standalone Blob URL for new tab / direct link opening
+    const blob = new Blob([htmlContent], { type: "text/html;charset=utf-8" });
+    const blobUrl = URL.createObjectURL(blob);
+    setActivePrintUrl(blobUrl);
+
+    // 2. Trigger native window.print() directly on main window
+    try {
       window.print();
-      return;
+    } catch (e) {
+      console.warn("Direct window.print call failed:", e);
     }
 
-    const printWindow = window.open("", "_blank");
-    if (printWindow) {
-      const title = selectedRecipe.title;
-      printWindow.document.write(`
-        <!DOCTYPE html>
-        <html>
-          <head>
-            <title>${title} - Tisk</title>
-            <meta charset="utf-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <style>
-              body {
-                font-family: system-ui, -apple-system, sans-serif;
-                background-color: #FFFFFF;
-                color: #2D3748;
-                margin: 0;
-                padding: 40px;
-                line-height: 1.6;
-              }
-              button {
-                display: none !important;
-              }
-              .printable-recipe-sheet {
-                max-width: 820px;
-                margin: 0 auto;
-                background: #FFFFFF;
-              }
-              /* Keep margins very clean */
-              @media print {
-                body {
-                  padding: 0;
-                }
-              }
-            </style>
-            <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-          </head>
-          <body>
-            <div class="printable-recipe-sheet">
-              ${element.innerHTML}
-            </div>
-            <script>
-              window.onload = function() {
-                setTimeout(function() {
-                  window.print();
-                }, 400);
-              };
-              window.onafterprint = function() {
-                window.close();
-              };
-              window.addEventListener('afterprint', function() {
-                window.close();
-              });
-            </script>
-          </body>
-        </html>
-      `);
-      printWindow.document.close();
-    } else {
-      // Fallback if popup is blocked
-      window.print();
+    // 3. Attempt window.open in a new tab (runs unrestricted print outside sandboxed iframe)
+    try {
+      const win = window.open(blobUrl, "_blank");
+      if (win) {
+        win.focus();
+      }
+    } catch (e) {
+      console.warn("window.open call failed:", e);
     }
+
+    // 4. Open interactive Print & PDF Modal so user has instant choices and direct buttons
+    setShowPrintModal(true);
+    setPrintNotice(`Spuštěn tisk receptu „${selectedRecipe.title}“. Připravili jsme pro vás také přímý tiskový list a možnost stažení PDF.`);
+    setTimeout(() => setPrintNotice(null), 6000);
   };
 
-  const triggerPaperPrint = () => {
-    if (!selectedRecipe) return;
-
-    // Grab the beautifully rendered paper cookbook sheet container
-    const element = document.querySelector(".paper-cookbook-sheet");
-    if (!element) {
-      window.print();
-      return;
-    }
-
-    // Capture all style and stylesheet link elements from the parent document
-    const styles = Array.from(document.querySelectorAll("style, link[rel='stylesheet']"))
-      .map(el => el.outerHTML)
-      .join("\n");
-
-    const printWindow = window.open("", "_blank");
-    if (printWindow) {
-      const title = selectedRecipe.title;
-      printWindow.document.write(`
-        <!DOCTYPE html>
-        <html>
-          <head>
-            <title>${title} - Tisk receptu</title>
-            <meta charset="utf-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            ${styles}
-            <style>
-              body {
-                background-color: #FDFBF7 !important;
-                color: #2C2A29 !important;
-                margin: 0 !important;
-                padding: 40px !important;
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-              }
-              .paper-cookbook-sheet {
-                max-width: 820px !important;
-                margin: 0 auto !important;
-                background: #FDFBF7 !important;
-                border: none !important;
-                box-shadow: none !important;
-                padding: 0 !important;
-              }
-              /* Ensure absolute elements like top accent line are printed */
-              .absolute {
-                position: absolute !important;
-              }
-              @media print {
-                body {
-                  padding: 20px !important;
-                  background-color: #FDFBF7 !important;
-                }
-                .no-print {
-                  display: none !important;
-                }
-              }
-            </style>
-          </head>
-          <body class="font-serif paper-view-active">
-            <div class="paper-cookbook-sheet space-y-10 relative">
-              ${element.innerHTML}
-            </div>
-            <script>
-              window.onload = function() {
-                setTimeout(function() {
-                  window.print();
-                }, 400);
-              };
-              window.onafterprint = function() {
-                window.close();
-              };
-              window.addEventListener('afterprint', function() {
-                window.close();
-              });
-            </script>
-          </body>
-        </html>
-      `);
-      printWindow.document.close();
-    } else {
-      // Fallback if popup is blocked
-      window.print();
-    }
-  };
+  const triggerNativePrint = handlePrintRecipe;
+  const triggerPaperPrint = handlePrintRecipe;
 
   const unused_code_wrapper = () => {
     if (!selectedRecipe) return;
@@ -1993,12 +2390,18 @@ ${separator}`;
 
     // Render ingredients as checklist list items
     const ingredientsHtml = selectedRecipe.ingredients && selectedRecipe.ingredients.length > 0 
-      ? selectedRecipe.ingredients.map(ing => `
-        <li class="ingredient-item">
-          <span class="checkbox-box"></span>
-          <span>${ing}</span>
-        </li>
-      `).join("")
+      ? selectedRecipe.ingredients.map(ing => {
+          if (isIngredientHeader(ing)) {
+            const headerTitle = cleanHeaderTitle(ing);
+            return `<li class="ingredient-header-item" style="list-style:none; margin-top:10px; font-weight:bold; color:#1B4332; border-bottom:2px solid #1B4332; text-transform:uppercase;">📌 ${headerTitle}</li>`;
+          }
+          return `
+            <li class="ingredient-item">
+              <span class="checkbox-box"></span>
+              <span>${ing}</span>
+            </li>
+          `;
+        }).join("")
       : `<li class="ingredient-item">Žádné ingredience nejsou zapsány.</li>`;
 
     // Render instructions list
@@ -2771,7 +3174,7 @@ ${separator}`;
             exit={{ opacity: 0, y: -20, scale: 0.95 }}
             transition={{ type: "spring", damping: 25, stiffness: 350 }}
             style={{ zIndex: 99999 }}
-            className="fixed top-6 left-1/2 -translate-x-1/2 w-[90%] max-w-md bg-emerald-900 text-white border border-emerald-800/80 rounded-2xl shadow-xl p-4 flex items-start gap-3 pointer-events-auto"
+            className="fixed top-6 left-1/2 -translate-x-1/2 w-[90%] max-w-md bg-emerald-900 text-white border border-emerald-800/80 rounded-2xl shadow-xl p-4 flex items-start gap-3 pointer-events-auto no-print"
           >
             <div className="bg-emerald-800 text-white p-2 rounded-xl shrink-0">
               <Check className="h-5 w-5 text-emerald-400" />
@@ -2792,338 +3195,122 @@ ${separator}`;
         )}
       </AnimatePresence>
 
-      {/* PAPER COOKBOOK VIEW OVERLAY */}
+      {/* INTERACTIVE PRINT & EXPORT MODAL */}
       <AnimatePresence>
-        {showPaperView && selectedRecipe && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-[#FDFBF7] text-[#2C2A29] flex flex-col font-serif overflow-y-auto selection:bg-[#E8F5E9] paper-cookbook-overlay"
-          >
-            {/* Top Action Bar (Sticky, glassmorphism-paper-blend) */}
-            <div className="sticky top-0 bg-[#FDFBF7]/95 backdrop-blur-md border-b border-[#E8E4DB] z-50 px-4 py-3.5 flex flex-wrap items-center justify-between gap-4 select-none no-print shadow-xs">
-              
-              <div className="flex items-center gap-4 flex-wrap sm:flex-nowrap">
-                {/* Logo & Title */}
-                <button
-                  onClick={() => {
-                    setShowPaperView(false);
-                    setSelectedRecipe(null);
-                    setIsEditing(false);
-                    setSearchQuery("");
-                    setShowExportView(false);
-                    setAuditSteps(null);
-                    setProposedChange(null);
-                    setAuditModifiedRecipe(null);
-                    setActiveStepIndex(-1);
-                    setErrorMessage(null);
-                  }}
-                  className="flex items-center gap-3 hover:opacity-90 active:scale-98 transition-all text-left bg-transparent border-0 p-0 m-0 cursor-pointer group shrink-0"
-                  title="Přejít na hlavní stránku"
-                >
-                  <div className="bg-[#1B4332] text-white p-2 rounded-xl shadow-md group-hover:bg-[#2D6A4F] transition-colors">
-                    <ChefHat className="h-5 w-5 sm:h-6 sm:w-6" />
+        {showPrintModal && selectedRecipe && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fade-in no-print">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+              className="bg-[#FDFCF7] border border-[#E8E8E1] rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col"
+            >
+              {/* Modal Header */}
+              <div className="bg-[#1B4332] text-white p-5 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="bg-[#2D6A4F] p-2 rounded-xl text-white">
+                    <Printer className="h-5 w-5" />
                   </div>
                   <div>
-                    <h1 className="font-serif italic font-semibold text-lg sm:text-2xl text-[#1B4332] flex items-center gap-1.5 sm:gap-2 group-hover:text-[#2D6A4F] transition-colors">
-                      AI Kuchařka
-                      <span className="text-[9px] sm:text-[10px] bg-[#F0F4F1] text-[#2D6A4F] border border-[#2D6A4F]/20 font-bold px-1.5 sm:px-2 py-0.5 rounded-full uppercase tracking-wider font-sans normal-case">
-                        5x Pilířová Syntéza
-                      </span>
-                    </h1>
-                    <p className="text-[10px] sm:text-xs text-[#5C5C50] hidden sm:block font-medium">Vědecky podložená a technologicky vyladěná gastronomie</p>
+                    <h3 className="font-serif font-bold text-lg leading-tight">Možnosti tisku a uložení</h3>
+                    <p className="text-xs text-emerald-200 mt-0.5 line-clamp-1">{selectedRecipe.title}</p>
                   </div>
-                </button>
-
-                {/* Back Button */}
+                </div>
                 <button
-                  onClick={() => {
-                    setShowPaperView(false);
-                  }}
-                  className="flex items-center gap-1.5 text-[#1B4332] hover:text-[#2D6A4F] font-sans font-bold text-sm transition-all cursor-pointer bg-white px-3 py-1.5 rounded-xl border border-[#E8E4DB] hover:border-[#1B4332] shrink-0 animate-fade-in"
-                  title="Zpět na kulinářský detail receptu"
+                  onClick={() => setShowPrintModal(false)}
+                  className="text-slate-300 hover:text-white p-1.5 rounded-lg hover:bg-emerald-800 transition-colors cursor-pointer"
                 >
-                  <ChevronLeft className="h-4 w-4" />
-                  <span>Zpět na detail receptu</span>
+                  <X className="h-5 w-5" />
                 </button>
               </div>
 
-              {/* Adjusters Group */}
-              <div className="flex items-center gap-4 flex-wrap">
-                
-                {/* Servings scale controller */}
-                <div className="flex items-center gap-1.5 bg-white border border-[#E8E4DB] rounded-xl p-1 font-sans text-xs shadow-2xs">
-                  <span className="px-2 font-bold text-[#555] flex items-center gap-1">
-                    Porce:
-                  </span>
-                  <button
-                    onClick={() => setScaleFactor(prev => Math.max(0.25, Number((prev - 0.25).toFixed(2))))}
-                    className="h-7 w-7 rounded-lg bg-[#FDFBF7] text-[#1B4332] hover:bg-[#E8F5E9] font-bold flex items-center justify-center transition-all cursor-pointer border border-[#E8E4DB]"
-                    title="Méně porcí"
-                  >
-                    <Minus className="h-3.5 w-3.5" />
-                  </button>
-                  <span className="w-10 text-center font-bold font-mono text-[#1B4332] text-sm">
-                    {formatCzechNumber(scaleFactor)}x
-                  </span>
-                  <button
-                    onClick={() => setScaleFactor(prev => Number((prev + 0.25).toFixed(2)))}
-                    className="h-7 w-7 rounded-lg bg-[#FDFBF7] text-[#1B4332] hover:bg-[#E8F5E9] font-bold flex items-center justify-center transition-all cursor-pointer border border-[#E8E4DB]"
-                    title="Více porcí"
-                  >
-                    <Plus className="h-3.5 w-3.5" />
-                  </button>
-                  {scaleFactor !== 1 && (
-                    <button
-                      onClick={() => setScaleFactor(1)}
-                      className="px-2 text-[10px] font-black text-amber-750 hover:text-amber-900 cursor-pointer uppercase underline"
-                      title="Obnovit výchozí porce"
-                    >
-                      Původní
-                    </button>
-                  )}
-                </div>
+              {/* Modal Body */}
+              <div className="p-6 space-y-4">
+                <p className="text-sm text-slate-700 leading-relaxed">
+                  Tiskový lístek byl vygenerován. Zvolte preferovaný způsob tisku nebo exportu:
+                </p>
 
-                {/* Font Size Selector */}
-                <div className="flex items-center gap-1 bg-white border border-[#E8E4DB] rounded-xl p-1 font-sans text-xs shadow-2xs">
-                  <span className="px-2 font-bold text-[#555]">Velikost textu:</span>
-                  <div className="flex items-center gap-0.5">
-                    {(["normal", "large", "extra-large"] as const).map((size) => (
-                      <button
-                        key={size}
-                        onClick={() => setPaperFontSize(size)}
-                        className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                          paperFontSize === size
-                            ? "bg-[#2D6A4F] text-white shadow-3xs"
-                            : "bg-[#FDFBF7] text-slate-600 hover:bg-slate-100"
-                        }`}
-                      >
-                        {size === "normal" ? "Standardní" : size === "large" ? "Větší" : "Největší"}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Export Options (TXT, Copy) */}
-                <div className="flex items-center gap-1 bg-white border border-[#E8E4DB] rounded-xl p-1 font-sans text-xs shadow-2xs">
-                  {/* Stáhnout TXT */}
+                <div className="space-y-2.5 pt-1">
+                  {/* Option 1: Direct window.print */}
                   <button
                     onClick={() => {
-                      const element = document.createElement("a");
-                      const file = new Blob([generateRecipeText()], {type: 'text/plain;charset=utf-8'});
-                      element.href = URL.createObjectURL(file);
-                      element.download = `${selectedRecipe.title.toLowerCase().replace(/\s+/g, "_")}_recept.txt`;
-                      document.body.appendChild(element);
-                      element.click();
-                      document.body.removeChild(element);
+                      window.print();
                     }}
-                    className="flex items-center gap-1 hover:bg-slate-50 text-slate-700 hover:text-[#1B4332] px-2.5 py-1 rounded-lg font-bold text-xs transition-all cursor-pointer"
-                    title="Stáhnout recept jako textový soubor (TXT)"
+                    className="w-full bg-[#1B4332] hover:bg-[#2D6A4F] text-white font-bold py-3 px-4 rounded-xl text-sm transition-all flex items-center justify-between cursor-pointer shadow-md active:scale-98"
                   >
-                    <Download className="h-3.5 w-3.5 text-emerald-600 font-bold" />
-                    <span>TXT</span>
+                    <div className="flex items-center gap-2.5">
+                      <Printer className="h-4 w-4 text-emerald-400" />
+                      <span>1. Spustit tiskový dialog prohlížeče</span>
+                    </div>
+                    <span className="text-xs font-mono bg-[#2D6A4F] px-2 py-0.5 rounded text-emerald-100">Ctrl+P</span>
                   </button>
 
-                  {/* Zkopírovat text */}
+                  {/* Option 2: Open standalone printable document in new tab */}
+                  {activePrintUrl && (
+                    <a
+                      href={activePrintUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => {
+                        setTimeout(() => setShowPrintModal(false), 800);
+                      }}
+                      className="w-full bg-white hover:bg-emerald-50 border-2 border-[#1B4332] text-[#1B4332] font-bold py-3 px-4 rounded-xl text-sm transition-all flex items-center justify-between cursor-pointer shadow-xs active:scale-98"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <ExternalLink className="h-4 w-4 text-[#1B4332]" />
+                        <span>2. Otevřít tiskový list v novém okně</span>
+                      </div>
+                      <span className="text-xs font-mono text-[#2D6A4F] font-semibold">Nové okno ↗</span>
+                    </a>
+                  )}
+
+                  {/* Option 3: Download PDF */}
                   <button
-                    onClick={async () => {
-                      const txt = generateRecipeText();
-                      try {
-                        await navigator.clipboard.writeText(txt);
-                        setCopiedText(true);
-                        setTimeout(() => setCopiedText(false), 2000);
-                      } catch (err) {
-                        const textarea = document.createElement("textarea");
-                        textarea.value = txt;
-                        textarea.style.position = "fixed";
-                        document.body.appendChild(textarea);
-                        textarea.focus();
-                        textarea.select();
-                        try {
-                          document.execCommand("copy");
-                          setCopiedText(true);
-                          setTimeout(() => setCopiedText(false), 2000);
-                        } catch (e) {
-                          console.error("Clipboard copy failed", e);
-                        }
-                        document.body.removeChild(textarea);
-                      }
+                    onClick={() => {
+                      setShowPrintModal(false);
+                      downloadRecipePDF();
                     }}
-                    className={`flex items-center gap-1 px-2.5 py-1 rounded-lg font-bold text-xs transition-all cursor-pointer ${
-                      copiedText 
-                        ? "bg-emerald-700 text-white" 
-                        : "hover:bg-slate-50 text-slate-700"
-                    }`}
-                    title="Zkopírovat recept do schránky"
+                    className="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 px-4 rounded-xl text-sm transition-all flex items-center justify-between cursor-pointer shadow-sm active:scale-98"
                   >
-                    <Copy className="h-3.5 w-3.5 text-slate-500 font-bold" />
-                    <span>{copiedText ? "Zkopírováno!" : "Kopírovat"}</span>
+                    <div className="flex items-center gap-2.5">
+                      <FileText className="h-4 w-4" />
+                      <span>3. Stáhnout jako PDF soubor</span>
+                    </div>
+                    <span className="text-xs font-mono bg-amber-700 px-2 py-0.5 rounded text-amber-100">PDF</span>
                   </button>
-                </div>
 
-                {/* Print Button */}
+                  {/* Option 4: Download HTML file for printing */}
+                  {activePrintUrl && (
+                    <a
+                      href={activePrintUrl}
+                      download={`${selectedRecipe.title.replace(/[^a-zA-Z0-9-áčďéěíňóřšťúůýžÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ]/g, "_")}-tisk.html`}
+                      className="w-full bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-700 font-bold py-2.5 px-4 rounded-xl text-xs transition-all flex items-center justify-between cursor-pointer"
+                    >
+                      <div className="flex items-center gap-2">
+                        <Download className="h-3.5 w-3.5 text-slate-500" />
+                        <span>4. Stáhnout samostatný HTML soubor k tisku</span>
+                      </div>
+                      <span className="text-[10px] font-mono text-slate-500">.HTML</span>
+                    </a>
+                  )}
+                </div>
+              </div>
+
+              {/* Modal Footer */}
+              <div className="bg-[#F5F5F0] border-t border-[#E8E8E1] px-6 py-3 flex justify-end">
                 <button
-                  onClick={triggerPaperPrint}
-                  className="flex items-center gap-1.5 bg-[#1B4332] text-white hover:bg-[#2D6A4F] px-3.5 py-1.5 rounded-xl font-sans font-bold text-sm transition-all cursor-pointer shadow-md"
-                  title="Vytisknout recept"
+                  onClick={() => setShowPrintModal(false)}
+                  className="px-4 py-2 bg-white border border-slate-300 hover:bg-slate-50 rounded-xl text-xs font-bold text-slate-700 transition-colors cursor-pointer"
                 >
-                  <Printer className="h-4 w-4" />
-                  <span>Tisk</span>
+                  Zavřít
                 </button>
               </div>
-
-              {/* Close Button */}
-              <button
-                onClick={() => setShowPaperView(false)}
-                className="bg-white border border-[#E8E4DB] hover:bg-red-50 hover:border-red-200 text-slate-400 hover:text-red-600 p-1.5 rounded-xl transition-all cursor-pointer"
-                title="Zavřít"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-
-            {/* Paper Sheet Content Area */}
-            <div className="flex-1 px-4 py-8 md:py-14 bg-[#F5F2EA] flex justify-center items-start overflow-y-auto paper-cookbook-sheet-container">
-              <div className="max-w-3xl w-full bg-[#FDFBF7] border border-[#E3DFD5] rounded-3xl p-6 md:p-14 shadow-xl space-y-10 relative paper-cookbook-sheet">
-                
-                {/* Visual top border accent */}
-                <div className="absolute top-0 left-0 right-0 h-2 bg-[#2D6A4F] rounded-t-3xl" />
-                
-                {/* Header section */}
-                <div className="text-center space-y-4">
-                  {selectedRecipe.category && (
-                    <span className="text-xs uppercase tracking-[0.25em] font-extrabold text-[#2D6A4F] bg-[#E8F5E9] px-4 py-1.5 rounded-full font-sans inline-block">
-                      {selectedRecipe.category}
-                    </span>
-                  )}
-                  <h1 className="font-serif font-black text-3xl md:text-5xl text-[#1B4332] leading-tight tracking-tight">
-                    {selectedRecipe.title}
-                  </h1>
-                  
-                  {selectedRecipe.summary && (
-                    <p className="text-slate-600 font-serif italic max-w-xl mx-auto leading-relaxed text-base md:text-lg">
-                      {selectedRecipe.summary}
-                    </p>
-                  )}
-
-                  {/* Metadata grid */}
-                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 py-5 border-y border-[#E8E4DB] text-center font-sans text-xs uppercase tracking-wider text-slate-500 font-bold mt-6">
-                    <div>
-                      <span className="block text-[#1B4332] font-extrabold text-base md:text-lg normal-case font-serif mb-0.5">
-                        {selectedRecipe.cookingTime || "Není uvedeno"}
-                      </span>
-                      Celková doba
-                    </div>
-                    <div>
-                      <span className="block text-[#1B4332] font-extrabold text-base md:text-lg normal-case font-serif mb-0.5 text-emerald-800">
-                        {selectedRecipe.estimatedCookingTime || "Není uvedeno"}
-                      </span>
-                      Tepelná úprava (expert)
-                    </div>
-                    <div>
-                      <span className="block text-[#1B4332] font-extrabold text-base md:text-lg normal-case font-serif mb-0.5">
-                        {selectedRecipe.difficulty || "Střední"}
-                      </span>
-                      Náročnost
-                    </div>
-                    <div>
-                      <span className="block text-[#1B4332] font-extrabold text-base md:text-lg normal-case font-serif mb-0.5">
-                        {selectedRecipe.applianceType || "Trouba / Pánev"}
-                      </span>
-                      Hlavní zařízení
-                    </div>
-                    <div>
-                      <span className="block text-[#1B4332] font-extrabold text-base md:text-lg normal-case font-serif mb-0.5">
-                        {scaleFactor === 1 ? "Výchozí" : `${formatCzechNumber(scaleFactor)}x`}
-                      </span>
-                      Měřítko porcí
-                    </div>
-                  </div>
-                </div>
-
-                {/* Suroviny (Ingredients) */}
-                <div className="space-y-4">
-                  <h2 className="font-serif font-bold text-xl md:text-2xl italic border-b border-[#E8E4DB] pb-2 text-[#2D6A4F]">
-                    Suroviny a váhy
-                  </h2>
-                  <div className={`grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3 font-sans ${
-                    paperFontSize === "normal" ? "text-sm md:text-base" :
-                    paperFontSize === "large" ? "text-base md:text-lg font-medium" :
-                    "text-lg md:text-xl font-semibold"
-                  }`}>
-                    {selectedRecipe.ingredients && selectedRecipe.ingredients.map((ing, i) => {
-                      const parsed = parseIngredientString(ing);
-                      const displayIng = scaleIngredient(parsed, scaleFactor);
-                      return (
-                        <div key={i} className="flex items-start gap-2 text-[#2C2A29] leading-relaxed py-1.5 border-b border-[#F7F5F0]">
-                          <span className="text-[#2D6A4F] mt-1 shrink-0 font-bold">•</span>
-                          <span>{displayIng}</span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* Postup přípravy (Instructions) */}
-                <div className="space-y-6 pt-2">
-                  <h2 className="font-serif font-bold text-xl md:text-2xl italic border-b border-[#E8E4DB] pb-2 text-[#2D6A4F]">
-                    Postup přípravy
-                  </h2>
-                  <div className="space-y-6">
-                    {selectedRecipe.instructions && selectedRecipe.instructions.map((step, idx) => (
-                      <div key={idx} className="flex items-start gap-4">
-                        <span className="text-2xl md:text-3xl font-serif font-black italic text-[#2D6A4F]/80 select-none shrink-0 w-8 text-right mt-1">
-                          {idx + 1}.
-                        </span>
-                        <p className={`font-serif leading-relaxed text-[#2C2A29] flex-1 ${
-                          paperFontSize === "normal" ? "text-sm md:text-base" :
-                          paperFontSize === "large" ? "text-base md:text-xl md:leading-relaxed" :
-                          "text-lg md:text-2xl md:leading-relaxed"
-                        }`}>
-                          {step}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Additional Tips & Culinary Expert block */}
-                {(selectedRecipe.applianceTips || selectedRecipe.expertJustification) && (
-                  <div className="pt-8 border-t border-[#E8E4DB] space-y-4 font-sans text-xs md:text-sm">
-                    {selectedRecipe.applianceTips && (
-                      <div className="bg-[#FFFBEB] border border-[#FDE68A] p-5 rounded-2xl text-[#B45309]">
-                        <span className="font-bold block uppercase tracking-wider text-[10px] mb-1">Rady pro spotřebiče</span>
-                        <p className="leading-relaxed italic">{selectedRecipe.applianceTips}</p>
-                      </div>
-                    )}
-                    {selectedRecipe.expertJustification && (
-                      <div className="bg-[#F0FDF4] border border-[#DCFCE7] p-5 rounded-2xl text-[#166534]">
-                        <span className="font-bold block uppercase tracking-wider text-[10px] mb-1">Kulinářské odůvodnění expertů</span>
-                        <p className="leading-relaxed italic">{selectedRecipe.expertJustification}</p>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Bottom Footer Go Back Controls */}
-            <div className="bg-[#F5F2EA] pb-10 flex justify-center no-print">
-              <button
-                onClick={() => {
-                  setShowPaperView(false);
-                }}
-                className="bg-[#2D6A4F] hover:bg-[#1B4332] text-white font-bold py-3.5 px-8 rounded-2xl shadow-lg transition-all flex items-center gap-2 cursor-pointer text-base"
-                title="Zpět na kulinářský detail receptu"
-              >
-                <BookOpen className="h-5 w-5" />
-                <span>Zavřít kuchařku a zpět na detail receptu</span>
-              </button>
-            </div>
-          </motion.div>
+            </motion.div>
+          </div>
         )}
       </AnimatePresence>
+
+
 
       {/* HEADER */}
       <header className="no-print bg-white border-b border-[#E8E8E1] py-3.5 px-4 md:px-6 sticky top-0 z-40 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-3">
@@ -3138,7 +3325,6 @@ ${separator}`;
             setAuditModifiedRecipe(null);
             setActiveStepIndex(-1);
             setErrorMessage(null);
-            setShowPaperView(false);
           }}
           className="flex items-center gap-3 hover:opacity-90 active:scale-98 transition-all text-left bg-transparent border-0 p-0 m-0 cursor-pointer group shrink-0"
           title="Přejít na hlavní stránku"
@@ -3309,35 +3495,21 @@ ${separator}`;
                     </button>
                   )}
 
-                  {/* ZOBRAZENÍ KUCHAŘKY */}
-                  <button
-                    onClick={() => setShowPaperView(true)}
-                    className="bg-[#2D6A4F] hover:bg-[#1B4332] text-white font-bold py-2 px-3 rounded-xl shadow-xs hover:shadow-md transition-all flex items-center gap-1.5 text-xs sm:text-sm cursor-pointer"
-                    title="Zobrazit recept jako tištěnou knihu / kuchařku"
-                  >
-                    <BookOpen className="h-4 w-4" />
-                    <span>Zobrazit recept</span>
-                  </button>
+
                 </>
               )}
             </>
           ) : (
             <>
-              {/* HOME VIEW: Show "Nový recept" only if Admin */}
-              {isAdmin && (
-                <button
-                  onClick={() => {
-                    setSelectedRecipe(null);
-                    setErrorMessage(null);
-                    setIsEditing(false);
-                  }}
-                  className="bg-[#D97706] hover:bg-[#C26405] active:scale-95 text-white font-semibold py-2 px-3.5 rounded-xl shadow-sm hover:shadow-md transition-all flex items-center gap-1.5 text-xs sm:text-sm cursor-pointer"
-                  title="Vytvořit zcela nový recept"
-                >
-                  <Plus className="h-4 w-4" />
-                  <span>Nový recept</span>
-                </button>
-              )}
+              {/* HEADER BUTTON: Nový recept */}
+              <button
+                onClick={handleOpenAddRecipeModal}
+                className="bg-[#D97706] hover:bg-[#C26405] active:scale-95 text-white font-bold py-2 px-3.5 rounded-xl shadow-sm hover:shadow-md transition-all flex items-center gap-1.5 text-xs sm:text-sm cursor-pointer"
+                title="Vytvořit zcela nový recept"
+              >
+                <Plus className="h-4 w-4 stroke-[3]" />
+                <span>Nový recept</span>
+              </button>
             </>
           )}
 
@@ -3417,6 +3589,22 @@ ${separator}`;
 
           {/* SEARCH & FILTER CONTROLS */}
           <div className="p-4 border-b border-[#E8E8E1] bg-[#FDFCF7]/60 flex flex-col gap-3">
+            {/* Top row with Title and Nový recept button */}
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-[#1B4332] uppercase tracking-wider font-serif">
+                Recepty ({recipes.length})
+              </span>
+              <button
+                type="button"
+                onClick={handleOpenAddRecipeModal}
+                className="bg-[#D97706] hover:bg-[#C26405] active:scale-95 text-white font-bold py-1.5 px-3 rounded-lg text-xs transition-all flex items-center gap-1 cursor-pointer shadow-xs"
+                title="Vytvořit zcela nový recept"
+              >
+                <Plus className="h-3.5 w-3.5 stroke-[3]" />
+                <span>Nový recept</span>
+              </button>
+            </div>
+
             {/* Kolonka: Hlavní vyhledávání */}
             <div className="space-y-1">
               <label htmlFor="search-main" className="block text-[10px] font-bold text-[#1B4332] uppercase tracking-wider pl-1">
@@ -4125,7 +4313,11 @@ ${separator}`;
                                               <div className="text-slate-500 uppercase tracking-wider font-semibold text-[9px] border-b border-slate-800/80 pb-1 mb-1">Originální suroviny ({selectedRecipe.ingredients.length}):</div>
                                               <ul className="space-y-1 list-disc list-inside text-slate-400 font-mono">
                                                 {selectedRecipe.ingredients.map((ing, idx) => (
-                                                  <li key={idx} className="truncate">{ing}</li>
+                                                  isIngredientHeader(ing) ? (
+                                                    <li key={idx} className="list-none pt-1 font-bold text-amber-400 uppercase text-[10px] -ml-2">📌 {cleanHeaderTitle(ing)}</li>
+                                                  ) : (
+                                                    <li key={idx} className="truncate">{ing}</li>
+                                                  )
                                                 ))}
                                               </ul>
                                             </div>
@@ -4133,6 +4325,11 @@ ${separator}`;
                                               <div className="text-emerald-400/80 uppercase tracking-wider font-semibold text-[9px] border-b border-emerald-800/40 pb-1 mb-1">Optimalizované složení ({auditModifiedRecipe?.ingredients.length}):</div>
                                               <ul className="space-y-1 list-disc list-inside text-slate-200 font-mono">
                                                 {auditModifiedRecipe?.ingredients.map((ing, idx) => {
+                                                  if (isIngredientHeader(ing)) {
+                                                    return (
+                                                      <li key={idx} className="list-none pt-1 font-bold text-emerald-400 uppercase text-[10px] -ml-2">📌 {cleanHeaderTitle(ing)}</li>
+                                                    );
+                                                  }
                                                   const isExactMatch = selectedRecipe.ingredients.includes(ing);
                                                   return (
                                                     <li key={idx} className={isExactMatch ? "truncate text-slate-300" : "truncate text-emerald-300 font-bold"}>
@@ -4427,11 +4624,16 @@ ${separator}`;
 
                         {/* Summary */}
                         <div className="space-y-1 md:col-span-2">
-                          <label className="block text-xs font-bold text-[#1B4332] uppercase tracking-wider">Shrnutí / Podstata vylepšení</label>
+                          <div className="flex items-center justify-between">
+                            <label className="block text-xs font-bold text-[#1B4332] uppercase tracking-wider">
+                              Shrnutí / Podstata vylepšení <span className="text-amber-700 font-normal normal-case">(vždy uveďte časy, např. 2 h marinování v zmesi, 45 min pečení)</span>
+                            </label>
+                          </div>
                           <textarea 
                             rows={2}
                             value={editSummary}
                             onChange={(e) => setEditSummary(e.target.value)}
+                            placeholder="Např. Šťavnaté maso odležené 2 hodiny v marinádě, pečené 45 min v horkovzdušné fritéze."
                             className="w-full text-sm p-3 border border-[#E8E8E1] rounded-lg bg-[#FDFCF7] text-[#2C2C2C] focus:outline-hidden focus:ring-1 focus:ring-[#1B4332]"
                             required
                           />
@@ -4559,7 +4761,7 @@ ${separator}`;
                   </div>
                 ) : showExportView ? (
                   /* 2C. SIMPLE TEXT FORMAT / EXPORT VIEW */
-                  <div className="space-y-6 animate-fade-in print:p-0 print:m-0 print:border-none">
+                  <div className="space-y-6 animate-fade-in print:m-0 print:border-none">
                     {/* Navigation bar (no-print) */}
                     <div className="no-print bg-[#FDFCF7] border border-[#E8E8E1] rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                       <div>
@@ -4698,6 +4900,14 @@ ${separator}`;
                         <h3 className="font-serif font-bold text-lg text-[#1B4332] border-b border-[#E8E8E1] pb-1">Seznam surovin (přesné poměry)</h3>
                         <ul className="space-y-1.5 text-base font-serif list-disc pl-5">
                           {selectedRecipe.ingredients.map((ing, i) => {
+                            if (isIngredientHeader(ing)) {
+                              const headerTitle = cleanHeaderTitle(ing);
+                              return (
+                                <li key={i} className="list-none pt-4 pb-1 font-bold font-serif text-[#1B4332] text-base border-b border-[#1B4332]/20 uppercase tracking-wide -ml-5 pl-0">
+                                  📌 {headerTitle}
+                                </li>
+                              );
+                            }
                             const parsed = parseIngredientString(ing);
                             const displayIng = scaleIngredient(parsed, scaleFactor);
                             return (
@@ -4713,12 +4923,29 @@ ${separator}`;
                       <div className="space-y-4">
                         <h3 className="font-serif font-bold text-lg text-[#1B4332] border-b border-[#E8E8E1] pb-1">Postup přípravy (krok za krokem)</h3>
                         <div className="space-y-3.5 text-base font-serif">
-                          {selectedRecipe.instructions.map((step, idx) => (
-                            <div key={idx} className="flex gap-3 leading-relaxed">
-                              <span className="font-mono text-[#D97706] font-bold text-base shrink-0">{idx + 1}.</span>
-                              <p className="text-[#3A3A34]">{step}</p>
-                            </div>
-                          ))}
+                          {selectedRecipe.instructions.map((step, idx) => {
+                            const stepIngs = getStepIngredients(step, selectedRecipe.ingredients, scaleFactor).filter(i => i.isMatched);
+                            return (
+                              <div key={idx} className="flex flex-col gap-1.5 leading-relaxed">
+                                <div className="flex gap-3">
+                                  <span className="font-mono text-[#D97706] font-bold text-base shrink-0">{idx + 1}.</span>
+                                  <p className="text-[#3A3A34] flex-1">{step}</p>
+                                </div>
+                                {stepIngs.length > 0 && (
+                                  <div className="ml-7 flex flex-wrap items-center gap-1.5 text-xs font-sans">
+                                    <span className="font-bold text-[10px] uppercase text-[#1B4332]/60 font-mono tracking-wider">
+                                      Suroviny pro krok:
+                                    </span>
+                                    {stepIngs.map((item, sIdx) => (
+                                      <span key={sIdx} className="bg-[#1B4332]/5 border border-[#1B4332]/15 text-[#1B4332] px-2 py-0.5 rounded-md text-[11px] font-medium font-serif">
+                                        {item.display}
+                                      </span>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })}
                         </div>
                       </div>
 
@@ -4747,30 +4974,199 @@ ${separator}`;
                   </div>
                 ) : (
                   <>
+                    {/* TOP RECIPE CONTROLS TOOLBAR (Moved from paper view to basic recipe view) */}
+                    <div className="no-print bg-[#FDFBF7] border border-[#E8E4DB] rounded-2xl p-3.5 sm:p-4 shadow-2xs mb-6 flex flex-wrap items-center justify-between gap-3 select-none">
+                      
+                      {/* Adjusters Group: Servings & Font Size */}
+                      <div className="flex items-center gap-3 flex-wrap">
+                        {/* Počet porcí (Servings controller) */}
+                        <div className="flex items-center gap-1.5 bg-white border border-[#E8E4DB] rounded-xl p-1 font-sans text-xs shadow-2xs">
+                          <span className="px-2 font-bold text-[#555] flex items-center gap-1">
+                            Porce:
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => setScaleFactor(prev => Math.max(0.25, Number((prev - 0.25).toFixed(2))))}
+                            className="h-7 w-7 rounded-lg bg-[#FDFBF7] text-[#1B4332] hover:bg-[#E8F5E9] font-bold flex items-center justify-center transition-all cursor-pointer border border-[#E8E4DB] active:scale-95"
+                            title="Méně porcí"
+                          >
+                            <Minus className="h-3.5 w-3.5" />
+                          </button>
+                          <span className="w-10 text-center font-bold font-mono text-[#1B4332] text-sm">
+                            {formatCzechNumber(scaleFactor)}x
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => setScaleFactor(prev => Number((prev + 0.25).toFixed(2)))}
+                            className="h-7 w-7 rounded-lg bg-[#FDFBF7] text-[#1B4332] hover:bg-[#E8F5E9] font-bold flex items-center justify-center transition-all cursor-pointer border border-[#E8E4DB] active:scale-95"
+                            title="Více porcí"
+                          >
+                            <Plus className="h-3.5 w-3.5" />
+                          </button>
+                          {scaleFactor !== 1 && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setScaleFactor(1);
+                                setEditingIngredientIndex(null);
+                                setEditingValue("");
+                              }}
+                              className="px-2 text-[10px] font-black text-amber-750 hover:text-amber-900 cursor-pointer uppercase underline"
+                              title="Obnovit výchozí porce"
+                            >
+                              Původní
+                            </button>
+                          )}
+                        </div>
 
-                    {/* 2A. MAIN RECIPE PAPER CARD WITH SYSTEMATICALLY INCREASED FONT READABILITY */}
-                  <div className="bg-white border border-[#E8E8E1] rounded-2xl shadow-sm overflow-hidden p-6 sm:p-8 space-y-6 print:border-none print:shadow-none print:p-0">
-                    
-                    {/* Simplified Title Header (Only the Recipe Title as requested) */}
-                    <div className="border-b border-[#E8E8E1] pb-5">
-                      <h2 className="text-4xl sm:text-5xl font-serif font-black text-[#1B4332] leading-tight tracking-tight">
-                        {selectedRecipe.title}
-                      </h2>
+                        {/* Velikost textu (Font Size Selector) */}
+                        <div className="flex items-center gap-1 bg-white border border-[#E8E4DB] rounded-xl p-1 font-sans text-xs shadow-2xs">
+                          <span className="px-2 font-bold text-[#555]">Velikost textu:</span>
+                          <div className="flex items-center gap-0.5">
+                            {(["normal", "large", "extra-large"] as const).map((size) => (
+                              <button
+                                type="button"
+                                key={size}
+                                onClick={() => setPaperFontSize(size)}
+                                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                                  paperFontSize === size
+                                    ? "bg-[#2D6A4F] text-white shadow-3xs"
+                                    : "bg-[#FDFBF7] text-slate-600 hover:bg-slate-100"
+                                }`}
+                              >
+                                {size === "normal" ? "Standardní" : size === "large" ? "Větší" : "Největší"}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Right Group: Export & Print Actions */}
+                      <div className="flex items-center gap-2 flex-wrap">
+                        {/* Stáhnout text (TXT) */}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const element = document.createElement("a");
+                            const file = new Blob([generateRecipeText()], {type: 'text/plain;charset=utf-8'});
+                            element.href = URL.createObjectURL(file);
+                            element.download = `${selectedRecipe.title.toLowerCase().replace(/\s+/g, "_")}_recept.txt`;
+                            document.body.appendChild(element);
+                            element.click();
+                            document.body.removeChild(element);
+                          }}
+                          className="flex items-center gap-1.5 bg-white border border-[#E8E4DB] hover:bg-slate-50 text-slate-700 hover:text-[#1B4332] px-3 py-1.5 rounded-xl font-bold text-xs transition-all cursor-pointer shadow-2xs active:scale-95"
+                          title="Stáhnout recept jako textový soubor (TXT)"
+                        >
+                          <Download className="h-4 w-4 text-emerald-600 font-bold" />
+                          <span>Stáhnout text</span>
+                        </button>
+
+                        {/* Kopírovat text */}
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            const txt = generateRecipeText();
+                            try {
+                              await navigator.clipboard.writeText(txt);
+                              setCopiedText(true);
+                              setTimeout(() => setCopiedText(false), 2000);
+                            } catch (err) {
+                              const textarea = document.createElement("textarea");
+                              textarea.value = txt;
+                              textarea.style.position = "fixed";
+                              document.body.appendChild(textarea);
+                              textarea.focus();
+                              textarea.select();
+                              try {
+                                document.execCommand("copy");
+                                setCopiedText(true);
+                                setTimeout(() => setCopiedText(false), 2000);
+                              } catch (e) {
+                                console.error("Clipboard copy failed", e);
+                              }
+                              document.body.removeChild(textarea);
+                            }
+                          }}
+                          className={`flex items-center gap-1.5 border border-[#E8E4DB] px-3 py-1.5 rounded-xl font-bold text-xs transition-all cursor-pointer shadow-2xs active:scale-95 ${
+                            copiedText 
+                              ? "bg-emerald-700 text-white border-emerald-700" 
+                              : "bg-white hover:bg-slate-50 text-slate-700"
+                          }`}
+                          title="Zkopírovat recept do schránky"
+                        >
+                          <Copy className="h-4 w-4 text-slate-500 font-bold" />
+                          <span>{copiedText ? "Zkopírováno!" : "Kopírovat"}</span>
+                        </button>
+
+                        {/* Tisknout (Tisk) */}
+                        <button
+                          type="button"
+                          onClick={triggerPaperPrint}
+                          className="flex items-center gap-1.5 bg-[#1B4332] text-white hover:bg-[#2D6A4F] px-4 py-1.5 rounded-xl font-sans font-bold text-xs sm:text-sm transition-all cursor-pointer shadow-md active:scale-95"
+                          title="Vytisknout recept"
+                        >
+                          <Printer className="h-4 w-4" />
+                          <span>Tisknout</span>
+                        </button>
+                      </div>
+
                     </div>
 
-                    {/* TWO-COLUMN INGREDIENTS AND PREPARATION */}
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 pt-2">
+                    {/* 2A. MAIN RECIPE PRINTABLE CARD */}
+                    <div className="printable-recipe-sheet bg-white border border-[#E8E8E1] rounded-2xl shadow-sm overflow-hidden p-6 sm:p-8 space-y-6 print:border-none print:shadow-none">
                       
-                      {/* Ingredients Check-list */}
-                      <div className="lg:col-span-5 space-y-4">
-                        <h3 className="text-base font-bold uppercase text-[#1B4332] flex items-center gap-2 pb-3 border-b border-[#E8E8E1] tracking-wider">
-                          <UtensilsCrossed className="h-5 w-5 text-[#D97706]" />
-                          <span>Seznam surovin</span>
-                        </h3>
-                        
-                        <p className="text-sm text-[#9A9A8C] italic">
-                          Tip: Suroviny si při přípravě na lince odškrtávejte.
-                        </p>
+                      {/* Title Header and Print Metadata Summary */}
+                      <div className="border-b border-[#E8E8E1] pb-5 space-y-3">
+                        {selectedRecipe.category && (
+                          <span className="text-xs uppercase tracking-[0.2em] font-extrabold text-[#2D6A4F] bg-[#E8F5E9] px-3 py-1 rounded-full font-sans inline-block">
+                            {selectedRecipe.category}
+                          </span>
+                        )}
+                        <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif font-black text-[#1B4332] leading-tight tracking-tight">
+                          {selectedRecipe.title}
+                        </h2>
+
+                        {selectedRecipe.summary && (
+                          <p className="text-slate-600 font-serif italic text-sm sm:text-base leading-relaxed pt-1">
+                            {selectedRecipe.summary}
+                          </p>
+                        )}
+
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3 text-xs font-sans text-slate-600">
+                          <div className="bg-[#F9F8F3] border border-[#E8E8E1] rounded-xl p-2.5">
+                            <span className="text-[10px] uppercase text-[#7A7A70] tracking-wider font-bold block">Celková doba</span>
+                            <span className="font-bold text-[#1B4332] text-sm font-serif">{selectedRecipe.cookingTime || "Není uvedeno"}</span>
+                          </div>
+                          <div className="bg-[#F9F8F3] border border-[#E8E8E1] rounded-xl p-2.5">
+                            <span className="text-[10px] uppercase text-[#7A7A70] tracking-wider font-bold block">Náročnost</span>
+                            <span className="font-bold text-[#1B4332] text-sm font-serif">{selectedRecipe.difficulty || "Střední"}</span>
+                          </div>
+                          <div className="bg-[#F9F8F3] border border-[#E8E8E1] rounded-xl p-2.5">
+                            <span className="text-[10px] uppercase text-[#7A7A70] tracking-wider font-bold block">Zařízení</span>
+                            <span className="font-bold text-[#1B4332] text-sm font-serif">{selectedRecipe.applianceType || "Sporák / Pánev"}</span>
+                          </div>
+                          <div className="bg-[#F9F8F3] border border-[#E8E8E1] rounded-xl p-2.5">
+                            <span className="text-[10px] uppercase text-[#7A7A70] tracking-wider font-bold block">Měřítko porcí</span>
+                            <span className="font-bold text-[#1B4332] text-sm font-serif">{scaleFactor === 1 ? "Výchozí (1x)" : `${formatCzechNumber(scaleFactor)}x`}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                    {/* SINGLE-COLUMN FLOW FOR INGREDIENTS AND PREPARATION (PROCEDURE BELOW INGREDIENTS) */}
+                    <div className="space-y-8 pt-2">
+                      
+                      {/* 1. Ingredients Check-list Section (In one column) */}
+                      <div className="space-y-4">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-[#E8E8E1]">
+                          <h3 className="text-base font-bold uppercase text-[#1B4332] flex items-center gap-2 tracking-wider font-serif">
+                            <UtensilsCrossed className="h-5 w-5 text-[#D97706]" />
+                            <span>Suroviny a ingredience</span>
+                          </h3>
+                          <p className="text-xs text-[#9A9A8C] italic">
+                            Tip: Suroviny si při přípravě na lince odškrtávejte.
+                          </p>
+                        </div>
 
                         {/* Toggle button for scaling calculator */}
                         {selectedRecipe && (() => {
@@ -4825,7 +5221,7 @@ ${separator}`;
                                         Zadejte libovolné množství do políčka u vybrané suroviny. Celý recept se automaticky přepočítá v přesném poměru.
                                       </p>
 
-                                      <div className="grid grid-cols-1 gap-2 max-h-64 overflow-y-auto pr-1">
+                                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 max-h-80 overflow-y-auto pr-1">
                                         {scalable.map((item) => {
                                           const isEditingThis = editingIngredientIndex === item.originalIndex;
                                           const currentDispVal = isEditingThis
@@ -4924,8 +5320,25 @@ ${separator}`;
                           );
                         })()}
 
-                        <div className="space-y-1 bg-white p-4 rounded-xl border border-[#E8E8E1] shadow-xs">
+                        <div className="space-y-1 bg-[#FAF8F5] p-4 sm:p-5 rounded-2xl border border-[#E8E8E1] shadow-2xs">
                           {selectedRecipe.ingredients.map((ing, i) => {
+                            if (isIngredientHeader(ing)) {
+                              const headerTitle = cleanHeaderTitle(ing);
+                              return (
+                                <div 
+                                  key={i} 
+                                  className="mt-5 first:mt-0 mb-2 pt-3 pb-1.5 border-b-2 border-[#1B4332]/25 flex items-center gap-2 select-none"
+                                >
+                                  <span className="text-[10px] sm:text-[11px] bg-[#1B4332] text-white px-2 py-0.5 rounded font-mono font-bold tracking-wider uppercase">
+                                    Sekce
+                                  </span>
+                                  <h4 className="font-serif font-bold text-[#1B4332] text-base sm:text-lg">
+                                    {headerTitle}
+                                  </h4>
+                                </div>
+                              );
+                            }
+
                             const isChecked = !!checkedIngredients[ing];
                             const parsed = parseIngredientString(ing);
                             const displayIng = scaleIngredient(parsed, scaleFactor);
@@ -4933,62 +5346,91 @@ ${separator}`;
                               <div 
                                 key={i}
                                 onClick={() => toggleIngredient(ing)}
-                                className={`flex items-start gap-2.5 p-2 rounded-lg transition-all cursor-pointer select-none border-b border-[#F5F5F0] last:border-0 ${
+                                className={`flex items-start gap-3 p-3 rounded-xl transition-all cursor-pointer select-none border-b border-[#E8E8E1]/60 last:border-0 ${
                                   isChecked 
-                                  ? "bg-[#F5F5F0]/60 text-slate-400 line-through opacity-75" 
-                                  : "hover:bg-[#F0F4F1] text-[#4A4A40]"
+                                  ? "bg-[#EAE8E3]/60 text-slate-400 line-through opacity-75" 
+                                  : "bg-white hover:bg-[#F0F4F1] text-[#2C2C2C] border border-[#E8E8E1]/40 hover:border-[#1B4332]/30 shadow-2xs"
                                 }`}
                               >
-                                <div className={`mt-0.5 w-4 h-4 rounded-md border flex items-center justify-center flex-shrink-0 transition-all ${
+                                <div className={`mt-0.5 w-5 h-5 rounded-md border flex items-center justify-center flex-shrink-0 transition-all ${
                                   isChecked 
                                   ? "bg-[#2D6A4F] border-[#2D6A4F] text-white" 
-                                  : "border-[#E8E8E1] bg-white"
+                                  : "border-[#1B4332]/40 bg-white"
                                 }`}>
-                                  {isChecked && <Check className="h-3 w-3 stroke-[3]" />}
+                                  {isChecked && <Check className="h-3.5 w-3.5 stroke-[3]" />}
                                 </div>
-                                <span className="text-base font-medium leading-relaxed">{displayIng}</span>
+                                <span className={`leading-relaxed ${
+                                  paperFontSize === "normal" ? "text-base font-medium" :
+                                  paperFontSize === "large" ? "text-lg font-semibold" :
+                                  "text-xl font-bold"
+                                }`}>{displayIng}</span>
                               </div>
                             );
                           })}
                         </div>
                       </div>
 
-                      {/* Step-by-Step Instructions */}
-                      <div className="lg:col-span-7 space-y-4">
-                        <h3 className="text-base font-bold uppercase text-[#1B4332] flex items-center gap-2 pb-3 border-b border-[#E8E8E1] tracking-wider">
-                          <ChefHat className="h-5 w-5 text-[#D97706]" />
-                          <span>Postup přípravy</span>
-                        </h3>
+                      {/* 2. Step-by-Step Instructions Section (In second column / block below ingredients) */}
+                      <div className="space-y-4 pt-4 border-t border-[#E8E8E1]">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-[#E8E8E1]">
+                          <h3 className="text-base font-bold uppercase text-[#1B4332] flex items-center gap-2 tracking-wider font-serif">
+                            <ChefHat className="h-5 w-5 text-[#D97706]" />
+                            <span>Postup přípravy</span>
+                          </h3>
+                          <p className="text-xs text-[#9A9A8C] italic">
+                            Tip: Označte si hotové kroky pro snazší orientaci v průběhu.
+                          </p>
+                        </div>
 
-                        <p className="text-sm text-[#9A9A8C] italic">
-                          Tip: Označte si hotové kroky pro snazší orientaci v průběhu.
-                        </p>
-
-                        <div className="space-y-3">
+                        <div className="space-y-3.5">
                           {selectedRecipe.instructions.map((step, index) => {
                             const isCompleted = !!checkedInstructions[index];
+                            const stepIngs = getStepIngredients(step, selectedRecipe.ingredients, scaleFactor).filter(i => i.isMatched);
                             return (
                               <div 
                                 key={index}
                                 onClick={() => toggleInstruction(index)}
-                                className={`p-4 rounded-xl border transition-all cursor-pointer flex gap-3 ${
+                                className={`p-4 sm:p-5 rounded-2xl border transition-all cursor-pointer flex gap-4 ${
                                   isCompleted 
                                   ? "bg-[#F0F4F1]/60 border-emerald-100 text-slate-400 opacity-80" 
-                                  : "bg-white hover:bg-[#FDFCF7] border-[#E8E8E1]"
+                                  : "bg-white hover:bg-[#FDFCF7] border-[#E8E8E1] hover:border-[#1B4332]/30 shadow-2xs"
                                 }`}
                               >
                                 {/* Step Number Badge */}
-                                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 transition-colors ${
+                                <div className={`w-9 h-9 rounded-full flex items-center justify-center text-xs sm:text-sm font-extrabold flex-shrink-0 transition-colors ${
                                   isCompleted 
                                   ? "bg-emerald-50 text-emerald-800 border border-emerald-200" 
-                                  : "bg-[#1B4332] text-white"
+                                  : "bg-[#1B4332] text-white shadow-xs"
                                 }`}>
-                                  {isCompleted ? <Check className="h-4 w-4" /> : index + 1}
+                                  {isCompleted ? <Check className="h-4 w-4 stroke-[3]" /> : index + 1}
                                 </div>
 
-                                <p className={`text-base leading-relaxed ${isCompleted ? 'text-slate-400' : 'text-[#4A4A40] font-medium'}`}>
-                                  {step}
-                                </p>
+                                <div className="space-y-2 flex-1">
+                                  <p className={`leading-relaxed ${
+                                    paperFontSize === "normal" ? "text-base" :
+                                    paperFontSize === "large" ? "text-lg font-medium" :
+                                    "text-xl font-semibold"
+                                  } ${isCompleted ? 'text-slate-400' : 'text-[#2C2C2C]'}`}>
+                                    {step}
+                                  </p>
+
+                                  {stepIngs.length > 0 && !isCompleted && (
+                                    <div className="pt-2 border-t border-[#E8E8E1]/60 flex flex-wrap items-center gap-1.5 text-xs" onClick={(e) => e.stopPropagation()}>
+                                      <span className="text-[10px] font-bold text-[#1B4332]/70 uppercase tracking-wider font-mono">
+                                        Potřebné suroviny v tomto kroku:
+                                      </span>
+                                      {stepIngs.map((item, iIdx) => (
+                                        <span 
+                                          key={iIdx} 
+                                          className="inline-flex items-center gap-1 bg-[#1B4332]/10 text-[#1B4332] px-2 py-0.5 rounded-md font-medium border border-[#1B4332]/15 text-xs font-serif"
+                                        >
+                                          <span className="w-1.5 h-1.5 rounded-full bg-[#2D6A4F]"></span>
+                                          {item.display}
+                                        </span>
+                                      ))}
+                                    </div>
+                                  )}
+                                </div>
                               </div>
                             );
                           })}
@@ -6908,6 +7350,445 @@ ${separator}`;
                 Hotovo / Zavřít
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL OKNO: VYTVOŘIT NOVÝ RECEPT */}
+      {showAddRecipeModal && (
+        <div className="fixed inset-0 z-[9980] flex items-center justify-center p-3 sm:p-5 bg-black/60 backdrop-blur-xs no-print animate-fade-in overflow-y-auto">
+          <div className="bg-[#FDFCF7] border border-[#E8E8E1] rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] my-auto overflow-hidden flex flex-col">
+            
+            {/* Header */}
+            <div className="bg-[#1B4332] p-4 sm:p-5 text-white flex items-center justify-between shrink-0">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-[#D97706] rounded-xl text-white shadow-xs">
+                  <Plus className="h-5 w-5 stroke-[3]" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-base sm:text-lg tracking-tight font-serif">
+                    Vytvořit nový recept
+                  </h3>
+                  <p className="text-xs text-emerald-100/80 font-sans">
+                    Ruční zadání ingrediencí a kroků nebo automatická AI syntéza
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowAddRecipeModal(false)}
+                className="text-white/80 hover:text-white hover:bg-white/10 p-2 rounded-lg transition-all cursor-pointer"
+                title="Zavřít okno"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            {/* Navigation Tabs */}
+            <div className="flex border-b border-[#E8E8E1] bg-[#F4F3EA] px-4 pt-2 shrink-0">
+              <button
+                type="button"
+                onClick={() => {
+                  setAddRecipeTab("manual");
+                  setAddFormError(null);
+                }}
+                className={`px-4 py-2.5 text-xs font-bold rounded-t-xl transition-all cursor-pointer flex items-center gap-2 ${
+                  addRecipeTab === "manual"
+                    ? "bg-[#FDFCF7] text-[#1B4332] border-t border-x border-[#E8E8E1] -mb-[1px] shadow-2xs"
+                    : "text-slate-600 hover:text-slate-900"
+                }`}
+              >
+                <ChefHat className="h-4 w-4 text-[#D97706]" />
+                <span>Ruční vložení (Formulář)</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setAddRecipeTab("ai");
+                  setAddFormError(null);
+                }}
+                className={`px-4 py-2.5 text-xs font-bold rounded-t-xl transition-all cursor-pointer flex items-center gap-2 ${
+                  addRecipeTab === "ai"
+                    ? "bg-[#FDFCF7] text-[#1B4332] border-t border-x border-[#E8E8E1] -mb-[1px] shadow-2xs"
+                    : "text-slate-600 hover:text-slate-900"
+                }`}
+              >
+                <Sparkles className="h-4 w-4 text-[#D97706]" />
+                <span>Pomocí AI (Generátor)</span>
+              </button>
+            </div>
+
+            {/* Error Banner */}
+            {addFormError && (
+              <div className="bg-red-50 border-b border-red-200 text-red-800 p-3.5 px-6 text-xs font-bold flex items-center gap-2 shrink-0 animate-fade-in">
+                <AlertCircle className="h-4 w-4 text-red-600 shrink-0" />
+                <span>{addFormError}</span>
+              </div>
+            )}
+
+            {/* Content Body */}
+            <div className="p-5 sm:p-6 overflow-y-auto flex-1 space-y-5">
+              
+              {/* TAB 1: MANUAL FORM */}
+              {addRecipeTab === "manual" && (
+                <form id="add-recipe-manual-form" onSubmit={handleSaveManualRecipe} className="space-y-6">
+                  
+                  {/* Basic Information Grid */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Title */}
+                    <div className="space-y-1.5 md:col-span-2">
+                      <label className="block text-xs font-bold text-[#1B4332] uppercase tracking-wider">
+                        Název receptu <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={addTitle}
+                        onChange={(e) => setAddTitle(e.target.value)}
+                        placeholder="Např. Pečené kuře na divoko s pórkem"
+                        className="w-full text-sm p-3 border border-[#E8E8E1] rounded-xl bg-white text-[#2C2C2C] focus:outline-hidden focus:ring-1 focus:ring-[#1B4332]"
+                        required
+                      />
+                    </div>
+
+                    {/* Category */}
+                    <div className="space-y-1.5">
+                      <label className="block text-xs font-bold text-[#1B4332] uppercase tracking-wider">
+                        Kategorie pokrmu
+                      </label>
+                      <select
+                        value={addCategory}
+                        onChange={(e) => setAddCategory(e.target.value)}
+                        className="w-full text-sm p-3 border border-[#E8E8E1] rounded-xl bg-white text-[#2C2C2C] focus:outline-hidden focus:ring-1 focus:ring-[#1B4332]"
+                      >
+                        {Array.from(allUsedCategories).map(cat => (
+                          <option key={cat} value={cat}>{cat}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Appliance */}
+                    <div className="space-y-1.5">
+                      <label className="block text-xs font-bold text-[#1B4332] uppercase tracking-wider">
+                        Cílový spotřebič
+                      </label>
+                      <select
+                        value={addAppliance}
+                        onChange={(e) => setAddAppliance(e.target.value)}
+                        className="w-full text-sm p-3 border border-[#E8E8E1] rounded-xl bg-white text-[#2C2C2C] focus:outline-hidden focus:ring-1 focus:ring-[#1B4332]"
+                      >
+                        <option value="Sporák">Sporák / Rendlík / Pánev</option>
+                        <option value="Horkovzdušná fritéza">Horkovzdušná fritéza</option>
+                        <option value="Tlakový hrnec / Multifunkční hrnec">Tlakový / Multifunkční hrnec</option>
+                        <option value="Klasická trouba">Klasická trouba</option>
+                        <option value="Remoska">Remoska</option>
+                        <option value="Pomalý hrnec">Pomalý hrnec</option>
+                        <option value="Pekárna chleba">Pekárna chleba</option>
+                      </select>
+                    </div>
+
+                    {/* Cooking Time */}
+                    <div className="space-y-1.5">
+                      <label className="block text-xs font-bold text-[#1B4332] uppercase tracking-wider">
+                        Celková doba celého procesu <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={addCookingTime}
+                        onChange={(e) => setAddCookingTime(e.target.value)}
+                        placeholder="Např. 2 h marinování, 45 min pečení"
+                        className="w-full text-sm p-3 border border-[#E8E8E1] rounded-xl bg-white text-[#2C2C2C] focus:outline-hidden focus:ring-1 focus:ring-[#1B4332]"
+                        required
+                      />
+                      <p className="text-[11px] text-amber-800 font-medium">
+                        Vždy uveďte přesné časové údaje (např. '30 min kynutí, 40 min pečení').
+                      </p>
+                    </div>
+
+                    {/* Estimated Active Time */}
+                    <div className="space-y-1.5">
+                      <label className="block text-xs font-bold text-[#1B4332] uppercase tracking-wider">
+                        Čas aktivního vaření
+                      </label>
+                      <input
+                        type="text"
+                        value={addEstimatedTime}
+                        onChange={(e) => setAddEstimatedTime(e.target.value)}
+                        placeholder="Např. 20 min"
+                        className="w-full text-sm p-3 border border-[#E8E8E1] rounded-xl bg-white text-[#2C2C2C] focus:outline-hidden focus:ring-1 focus:ring-[#1B4332]"
+                      />
+                    </div>
+
+                    {/* Difficulty */}
+                    <div className="space-y-1.5">
+                      <label className="block text-xs font-bold text-[#1B4332] uppercase tracking-wider">
+                        Náročnost
+                      </label>
+                      <select
+                        value={addDifficulty}
+                        onChange={(e) => setAddDifficulty(e.target.value as any)}
+                        className="w-full text-sm p-3 border border-[#E8E8E1] rounded-xl bg-white text-[#2C2C2C] focus:outline-hidden focus:ring-1 focus:ring-[#1B4332]"
+                      >
+                        <option value="Snadné">Snadné</option>
+                        <option value="Střední">Střední</option>
+                        <option value="Složité">Složité</option>
+                      </select>
+                    </div>
+
+                    {/* Portions */}
+                    <div className="space-y-1.5">
+                      <label className="block text-xs font-bold text-[#1B4332] uppercase tracking-wider">
+                        Počet porcí
+                      </label>
+                      <input
+                        type="number"
+                        min={1}
+                        max={50}
+                        value={addPortions}
+                        onChange={(e) => setAddPortions(parseInt(e.target.value) || 1)}
+                        className="w-full text-sm p-3 border border-[#E8E8E1] rounded-xl bg-white text-[#2C2C2C] focus:outline-hidden focus:ring-1 focus:ring-[#1B4332]"
+                      />
+                    </div>
+
+                    {/* Summary */}
+                    <div className="space-y-1.5 md:col-span-2">
+                      <label className="block text-xs font-bold text-[#1B4332] uppercase tracking-wider">
+                        Stručné shrnutí receptu
+                      </label>
+                      <textarea
+                        rows={2}
+                        value={addSummary}
+                        onChange={(e) => setAddSummary(e.target.value)}
+                        placeholder="Např. Šťavnatý bůček s křupavou kůrkou (35 min pečení na 160 °C, 20 min do křupava na 200 °C)."
+                        className="w-full text-sm p-3 border border-[#E8E8E1] rounded-xl bg-white text-[#2C2C2C] focus:outline-hidden focus:ring-1 focus:ring-[#1B4332]"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Ingredients Section */}
+                  <div className="space-y-3 bg-[#F0F4F1]/60 p-4 sm:p-5 rounded-2xl border border-[#2D6A4F]/20">
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-extrabold text-[#1B4332] uppercase tracking-wider flex items-center gap-2">
+                        <UtensilsCrossed className="h-4 w-4 text-[#D97706]" />
+                        <span>Suroviny & Ingredience <span className="text-red-500">*</span></span>
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => setUseRawIngredientsInput(!useRawIngredientsInput)}
+                        className="text-[11px] font-bold text-[#D97706] hover:underline cursor-pointer"
+                      >
+                        {useRawIngredientsInput ? "Zpět na položkový seznam" : "Vložit jako souvislý text"}
+                      </button>
+                    </div>
+
+                    {useRawIngredientsInput ? (
+                      <div className="space-y-1.5">
+                        <textarea
+                          rows={6}
+                          value={addRawIngredients}
+                          onChange={(e) => setAddRawIngredients(e.target.value)}
+                          placeholder="Každý řádek = jedna surovina, např:&#10;500 g hladká mouka&#10;200 ml smetana&#10;2 ks žloutky"
+                          className="w-full text-sm p-3 border border-[#E8E8E1] rounded-xl bg-white text-[#2C2C2C] focus:outline-hidden focus:ring-1 focus:ring-[#1B4332] font-mono"
+                        />
+                        <p className="text-[10px] text-[#5C5C50]">
+                          Formát: [množství] [jednotka] [název suroviny]
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="space-y-2">
+                        {addIngredients.map((ing, idx) => (
+                          <div key={idx} className="flex items-center gap-2">
+                            <input
+                              type="text"
+                              value={ing.amount}
+                              onChange={(e) => handleUpdateIngredientRow(idx, "amount", e.target.value)}
+                              placeholder="Množství (500)"
+                              className="w-24 text-xs p-2.5 border border-[#E8E8E1] rounded-lg bg-white text-[#2C2C2C] focus:outline-hidden"
+                            />
+                            <input
+                              type="text"
+                              value={ing.unit}
+                              onChange={(e) => handleUpdateIngredientRow(idx, "unit", e.target.value)}
+                              placeholder="Jednotka (g/ml/ks)"
+                              className="w-28 text-xs p-2.5 border border-[#E8E8E1] rounded-lg bg-white text-[#2C2C2C] focus:outline-hidden"
+                            />
+                            <input
+                              type="text"
+                              value={ing.name}
+                              onChange={(e) => handleUpdateIngredientRow(idx, "name", e.target.value)}
+                              placeholder="Název suroviny (např. mouka)"
+                              className="flex-1 text-xs p-2.5 border border-[#E8E8E1] rounded-lg bg-white text-[#2C2C2C] focus:outline-hidden"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveIngredientRow(idx)}
+                              disabled={addIngredients.length <= 1}
+                              className="p-2 text-slate-400 hover:text-red-600 disabled:opacity-30 cursor-pointer transition-colors"
+                              title="Odebrat surovinu"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          </div>
+                        ))}
+
+                        <button
+                          type="button"
+                          onClick={handleAddIngredientRow}
+                          className="mt-2 text-xs font-bold text-[#1B4332] hover:text-[#2D6A4F] bg-white border border-[#2D6A4F]/30 hover:bg-emerald-50 px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs"
+                        >
+                          <Plus className="h-3.5 w-3.5 text-[#D97706]" />
+                          <span>Přidat další surovinu</span>
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Instructions Section */}
+                  <div className="space-y-3 bg-[#FDFCF7] p-4 sm:p-5 rounded-2xl border border-[#E8E8E1]">
+                    <label className="text-xs font-extrabold text-[#1B4332] uppercase tracking-wider flex items-center gap-2">
+                      <Check className="h-4 w-4 text-[#2D6A4F]" />
+                      <span>Kroky postupu přípravy <span className="text-red-500">*</span></span>
+                    </label>
+
+                    <div className="space-y-2.5">
+                      {addInstructions.map((step, idx) => (
+                        <div key={idx} className="flex items-start gap-2">
+                          <span className="w-6 h-6 rounded-full bg-[#1B4332] text-white text-[10px] font-bold flex items-center justify-center shrink-0 mt-2">
+                            {idx + 1}
+                          </span>
+                          <textarea
+                            rows={2}
+                            value={step}
+                            onChange={(e) => handleUpdateInstructionRow(idx, e.target.value)}
+                            placeholder={`Popište krok ${idx + 1}...`}
+                            className="flex-1 text-xs p-2.5 border border-[#E8E8E1] rounded-xl bg-white text-[#2C2C2C] focus:outline-hidden"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveInstructionRow(idx)}
+                            disabled={addInstructions.length <= 1}
+                            className="p-2 text-slate-400 hover:text-red-600 disabled:opacity-30 cursor-pointer transition-colors mt-1"
+                            title="Odebrat krok"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+                      ))}
+
+                      <button
+                        type="button"
+                        onClick={handleAddInstructionRow}
+                        className="mt-2 text-xs font-bold text-[#1B4332] hover:text-[#2D6A4F] bg-white border border-[#1B4332]/30 hover:bg-emerald-50 px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs"
+                      >
+                        <Plus className="h-3.5 w-3.5 text-[#D97706]" />
+                        <span>Přidat další krok postupu</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Extra Tips & Food Science */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <label className="block text-xs font-bold text-[#1B4332] uppercase tracking-wider">
+                        Tip pro vybraný spotřebič
+                      </label>
+                      <textarea
+                        rows={2}
+                        value={addApplianceTips}
+                        onChange={(e) => setAddApplianceTips(e.target.value)}
+                        placeholder="Tipy pro nastavení teploty, programu či nádoby..."
+                        className="w-full text-xs p-3 border border-[#E8E8E1] rounded-xl bg-white text-[#2C2C2C] focus:outline-hidden"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="block text-xs font-bold text-[#1B4332] uppercase tracking-wider">
+                        Vědecké zdůvodnění (Food Science)
+                      </label>
+                      <textarea
+                        rows={2}
+                        value={addExpertJustification}
+                        onChange={(e) => setAddExpertJustification(e.target.value)}
+                        placeholder="Vysvětlení fyziky/chemie přípravy..."
+                        className="w-full text-xs p-3 border border-[#E8E8E1] rounded-xl bg-white text-[#2C2C2C] focus:outline-hidden"
+                      />
+                    </div>
+                  </div>
+
+                </form>
+              )}
+
+              {/* TAB 2: AI GENERATOR */}
+              {addRecipeTab === "ai" && (
+                <form id="add-recipe-ai-form" onSubmit={handleGenerateAiModalRecipe} className="space-y-5">
+                  <div className="bg-amber-50/60 border border-amber-200/80 rounded-2xl p-4 sm:p-5 text-amber-900 text-xs space-y-2">
+                    <div className="flex items-center gap-2 font-bold text-sm text-[#D97706]">
+                      <Sparkles className="h-4 w-4" />
+                      <span>Kulinářský AI generátor receptů</span>
+                    </div>
+                    <p className="leading-relaxed text-slate-700">
+                      Napište jakékoliv neuspořádané zápisky, seznam surovin nebo myšlenku. Umělá inteligence z nich vytvoří kompletní, vědecky ověřený recept se všemi náležitostmi a časovými údaji.
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="block text-xs font-bold text-[#1B4332] uppercase tracking-wider">
+                      Zadejte popis nebo zápisky receptu
+                    </label>
+                    <textarea
+                      rows={6}
+                      value={addAiText}
+                      onChange={(e) => setAddAiText(e.target.value)}
+                      placeholder="Např.: 'Mám vepřovou panenku, sušenou šunku, šalvěj a bílé víno. Chci připravit rychlou večeři v remosce nebo na pánvi.'"
+                      className="w-full text-sm p-4 border border-[#E8E8E1] rounded-xl bg-white text-[#2C2C2C] focus:outline-hidden focus:ring-1 focus:ring-[#1B4332]"
+                    />
+                  </div>
+                </form>
+              )}
+
+            </div>
+
+            {/* Footer Buttons */}
+            <div className="bg-[#F4F3EA] p-4 border-t border-[#E8E8E1] flex items-center justify-between gap-3 shrink-0">
+              <button
+                type="button"
+                onClick={() => setShowAddRecipeModal(false)}
+                className="px-4 py-2.5 bg-white hover:bg-slate-100 text-slate-700 border border-[#E8E8E1] text-xs font-bold rounded-xl transition-all cursor-pointer shadow-2xs"
+              >
+                Zrušit
+              </button>
+
+              {addRecipeTab === "manual" ? (
+                <button
+                  type="submit"
+                  form="add-recipe-manual-form"
+                  className="px-6 py-2.5 bg-[#D97706] hover:bg-[#C26405] active:scale-95 text-white text-xs font-bold rounded-xl shadow-sm transition-all cursor-pointer flex items-center gap-2"
+                >
+                  <Plus className="h-4 w-4 stroke-[3]" />
+                  <span>Uložit nový recept</span>
+                </button>
+              ) : (
+                <button
+                  type="submit"
+                  form="add-recipe-ai-form"
+                  disabled={isGeneratingAiModal}
+                  className="px-6 py-2.5 bg-[#1B4332] hover:bg-[#2D6A4F] disabled:bg-slate-300 active:scale-95 text-white text-xs font-bold rounded-xl shadow-sm transition-all cursor-pointer flex items-center gap-2"
+                >
+                  {isGeneratingAiModal ? (
+                    <>
+                      <Sparkles className="h-4 w-4 animate-spin text-amber-400" />
+                      <span>Generuji recept přes AI...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="h-4 w-4 text-amber-400" />
+                      <span>Vygenerovat a uložit recept</span>
+                    </>
+                  )}
+                </button>
+              )}
+            </div>
+
           </div>
         </div>
       )}

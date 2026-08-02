@@ -855,8 +855,9 @@ Při syntéze a úpravě receptu MUSÍŠ kombinovat přesně těchto pět zdrojo
 
 ZÁSADNÍ PRAVIDLA:
 - Zkracuj názvy receptů (title) na naprosté kulinářské minimum a jádru věci. Nepoužívej zbytečné přívlastky.
-- Shrnutí receptu (summary) musí být velmi krátké, věcné a přehledné (cca 1-2 věty), žádné plané vycpávky ani přemíra marketingu.
+- Shrnutí receptu (summary) musí být velmi krátké, věcné a přehledné (cca 1-2 věty) a MUSÍ VŽDY POVINNĚ OBSAHOVAT PŘESNÉ ČASOVÉ ÚDAJE A INTERVALY pro všechny fáze přípravy a vaření (např. '2 hodiny odležování/marinování v směsi, 45 min pečení při 180 °C'). Při každé úpravě či přidání receptu uváděj v popisu tyto časové údaje.
 - Suroviny upřesni na přesné metrické jednotky vhodné pro domácnost.
+- SEZNAM SUROVIN (ingredients): VŽDY POVINNĚ ROZDĚL SUROVINY DO LOGICKÝCH SEKCÍ/BLOKŮ v hranatých závorkách podle toho, k jaké části receptu patří! Například: '[Papriky a masová náplň]', '[Základ rajské omáčky]', '[Koření a dochucení]', '[Těsto a kvásek]', '[Ovocná náplň]', '[Drobenka]', '[Na podávání]'. Každá sekce začíná v poli ingredients novým samostatným prvkem ve tvaru '[Název bloku]'. Tím zajistíš absolutní přehlednost, ke které části přípravy ingredience patří.
 - Krok za krokem postup (instructions) rozepiš do velmi podrobných, detailních a popsaných vět. Popiš přesné kulinářské nebo mechanické úkony s kuchyňským náčiním.
 - NEOPAKUJ ani nevkládej gramy, mililitry, kusy či jiné konkrétní váhy a množství surovin přímo do kroků postupu (v poli 'instructions')! Suroviny s přesným množstvím jsou již uvedeny v samostatném poli 'ingredients'. Postup přípravy má být čitelný, plynulý a přirozený jako v tradiční tištěné kuchařce (např. 'Změklé máslo utřete s cukrem a žloutky', nikoliv 'Utřete 120 g změklého másla s 50 g cukru a 2 ks žloutků'). Popisuj techniky a děje bez otravného plevelení číselnými údaji.
 - Časovače jako samostatné odpočítávače u kroků zruš, vůbec na nich netrvej, důležité jsou detailní popisy děje a kulinářské kroky.
@@ -973,7 +974,7 @@ Při úpravě receptu MUSÍŠ zachovat stávající strukturu, ale modifikovat o
 
 ZÁSADNÍ PRAVIDLA:
 - NIKDY NEMĚŇ NÁZEV RECEPTU (title)! Musí zůstat přesně: "${recipe.title}".
-- Shrnutí receptu (summary) musí být velmi krátké, věcné a přehledné (cca 1-2 věty).
+- Shrnutí receptu (summary) musí být velmi krátké, věcné a přehledné (cca 1-2 věty) a MUSÍ VŽDY POVINNĚ OBSAHOVAT PŘESNÉ ČASOVÉ ÚDAJE A INTERVALY (např. '2 hodiny marinování v směsi, 45 min pečení'). Při každé úpravě či přidání receptu uváděj v popisu tyto časové údaje.
 - Suroviny upřesni na přesné metrické jednotky.
 - NEOPAKUJ ani nevkládej gramy, mililitry, kusy či jiné konkrétní váhy a množství surovin přímo do kroků postupu (v poli 'instructions')! Postup přípravy má být čitelný, plynulý a přirozený jako v tradiční tištěné kuchařce bez opakování číselných hodnot surovin u každého kroku.
 - ODSTRANĚNÍ KONZERVANTŮ: V ŽÁDNÉM RECEPTU NESMÍ BÝT POUŽITY ŽÁDNÉ KONZERVAČNÍ LÁTKY, KONZERVANTY ANI UMĚLÁ DOCHUCOVADLA.
@@ -1106,6 +1107,7 @@ STRUKTURA VÝSTUPU:
 
 ZÁSADNÍ PRAVIDLA PRO NOVÝ RECEPT (modifiedRecipe):
 - NIKDY NEMĚŇ NÁZEV RECEPTU (title) v modifiedRecipe! Název musí zůstat přesně stejný jako u původního receptu: "${recipe.title}".
+- Shrnutí receptu (summary) v modifiedRecipe MUSÍ VŽDY POVINNĚ OBSAHOVAT PŘESNÉ ČASOVÉ ÚDAJE A INTERVALY (např. '2 hodiny odležování v směsi, 60 min kynutí, 45 min pečení'). Při každé úpravě či přidání receptu uváděj v popisu tyto časové údaje.
 - V krocích postupu (instructions) v modifiedRecipe NEOPAKUJ ani nevkládej gramy, mililitry, kusy či jiné konkrétní váhy a množství surovin! Postup přípravy má být čitelný, plynulý a přirozený jako v tradiční tištěné kuchařce bez opakování číselných hodnot surovin u každého kroku.
 `;
 
