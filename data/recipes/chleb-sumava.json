@@ -1,30 +1,32 @@
 {
   "title": "Chléb Šumava",
-  "summary": "Stabilní pšenično-žitný chléb s vyváženou fermentací, který respektuje reologické limity žitné složky a zaručuje křupavou kůrku.",
+  "summary": "Tradiční řemeslný pšenično-žitný chléb s vyváženým kvasným stupněm a bezpečnou hydratací pro pevný bochník s nadýchanou střídou.",
   "ingredients": [
-    "30 g aktivního žitného kvásku (100% hydratace)",
-    "200 g žitné chlebové mouky",
-    "200 g vlažné vody (pro rozkvas)",
-    "500 g pšeničné chlebové mouky",
-    "250 g vlažné vody (pro autolýzu)",
-    "14 g mořské soli",
-    "10 g drceného kmínu"
+    "100 g žitné chlebové mouky (T930) na rozkvas",
+    "100 g vlažné vody (25 °C) na rozkvas",
+    "20 g aktivního žitného kvásku",
+    "500 g pšeničné chlebové mouky (T650)",
+    "100 g žitné chlebové mouky (T930) pro hlavní těsto",
+    "350 g vlažné vody (25 °C) pro hlavní těsto",
+    "14 g jemné mořské soli",
+    "10 g celého kmínu",
+    "20 g rýžové nebo žitné mouky na vysypání ošatky"
   ],
   "instructions": [
-    "Připravte si rozkvas smícháním kvásku, žitné mouky a vody. Nechte pracovat, dokud zdvojnásobí svůj objem.",
-    "V míse důkladně spojte pšeničnou mouku s vodou určenou pro autolýzu tak, aby nezůstala žádná suchá místa. Nechte odpočívat.",
-    "Do vyzrálého těsta přidejte rozkvas (400 g), sůl a kmín. V robotu hněťte na nízký stupeň pouze do okamžiku, kdy se těsto spojí v homogenní celek.",
-    "Těsto nechte zrát při pokojové teplotě. Během první hodiny proveďte dvě série překládání s odstupem 45 minut, poté nechte těsto v klidu dokončit primární fermentaci.",
-    "Vykynuté těsto opatrně vytvarujte do bochníku a vložte do vysypané ošatky. Nechte finálně dokynout, dokud těsto nevykazuje známky napětí a pružnosti.",
-    "Pečte v rozpáleném litinovém hrnci pod poklicí pro zachování páry, následně poklici odstraňte a dopečte do požadované barvy kůrky."
+    "Příprava rozkvasu: V nádobě smíchejte žitný kvásek, žitnou mouku a vlažnou vodu. Nechte přikryté zrát při pokojové teplotě, dokud nezdvojnásobí až ztrojnásobí svůj objem.",
+    "Autolýza: V míse robotu smíchejte pšeničnou chlebovou mouku, žitnou chlebovou mouku a vlažnou vodu pouze do spojení surovin, aby nezůstala žádná suchá místa. Nechte odpočívat pro plnou hydrataci lepku.",
+    "Hnětení: K autolyzovanému těstu přidejte vyzrálý rozkvas, jemnou mořskou sůl a celý kmín. Hněťte v robotu hákem na nejnižší rychlost, dokud nevznikne hladké a elastické těsto.",
+    "První fermentace: Těsto nechte přikryté kynout v míse. Během kynutí proveďte v pravidelných intervalech dvě série šetrných překladů pro zpevnění lepkové struktury.",
+    "Tvarování a kynutí v ošatce: Těsto vyklopte na lehce pomoučený vál, stočte do pevného bochníku s důkladně utaženým povrchovým napětím a vložte spojem nahoru do vysypané ošatky. Nechte kynout při pokojové teplotě, dokud se testovací důlek po stlačení prstem nevrací pomalu zpět.",
+    "Pečení: Bochník opatrně vyklopte na pečicí papír. Pečte v předehřáté troubě se zapařením, po úvodní fázi troubu vyvětrejte, snižte teplotu a dopečte do požadované barvy kůrky. Chlaďte na mřížce."
   ],
-  "applianceTips": "Při pečení v hrnci přidejte na dno trouby plech s horkými kameny pro dodatečný parní ráz v prvních minutách pečení.",
-  "expertJustification": "Zvýšení hydratace autolýzy na 60 % zlepšilo rozvoj lepkové sítě. Úprava fermentačního profilu zabraňuje nadměrné aktivitě proteáz, které by u 35% podílu rozkvasu mohly narušit střídku.",
-  "applianceType": "Trouba s litinovým hrncem",
-  "cookingTime": "420 min",
+  "applianceTips": "Pro optimální kůrku využijte pečení v troubě s automatickým parním rázem v první fázi, případně využijte automatický program pro chléb se studeným startem, který řídí vlhkost a nárůst teploty za vás.",
+  "expertJustification": "Receptura byla upravena na celkových 700 g mouky s celkovou hydratací kolem 64 %, což odpovídá optimu pro ideální střídu a dobrou manipulaci. Hydratace autolýzy na úrovni 58 % zajišťuje dostatečné bobtnání bílkovin pšenice před přidáním žitného rozkvasu a soli. Kvůli obsahu žitné mouky nad dvacet procent bylo hnětení a počet překladů optimalizovány tak, aby se zabránilo poškození vznikající gelové struktury těsta.",
+  "applianceType": "Trouba s funkcí páry nebo automatickým programem",
+  "cookingTime": "16 hodin",
   "difficulty": "Střední",
   "category": "Pečivo",
   "id": "gen-1783540977144",
-  "updatedAt": "2026-07-14T19:44:02.991Z",
+  "updatedAt": "2026-08-02T21:30:25.934Z",
   "estimatedCookingTime": "45 min"
 }
