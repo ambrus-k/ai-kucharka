@@ -1,0 +1,37 @@
+{
+  "title": "Houskový knedlík z parní trouby",
+  "summary": "Dokonale nadýchaný kynutý knedlík připravený metodou stoprocentně nasycené páry, která eliminuje riziko rozvaření střídy. Celková příprava vyžaduje 15 minut aktivace kvásku, 60 minut prvního kynutí, 20 minut druhého kynutí a 22 minut samotného vaření v páře.",
+  "ingredients": [
+    "[Kynuté těsto]",
+    "250 g hrubé mouky",
+    "250 g polohrubé mouky",
+    "250 ml vlažného plnotučného mléka",
+    "21 g čerstvého droždí",
+    "5 g cukru krupice",
+    "8 g jemné soli",
+    "1 ks vejce (velikost M)",
+    "[Vložka a dokončení]",
+    "80 g žemlí nebo starších rohlíků",
+    "15 g přepuštěného másla"
+  ],
+  "instructions": [
+    "V malé misce rozdrobte čerstvé droždí, přidejte cukr krupice a zalijte částí odměřeného vlažného plnotučného mléka. Zaprašte lžící mouky odebrané z celkového množství, promíchejte a nechte na teplém místě vzejít hustý, pěnivý kvásek.",
+    "Mezitím nakrájejte žemle na pravidelné drobné kostičky. Na pánvi rozpusťte přepuštěné máslo, nasypte na něj nakrájené pečivo a opečte ho dozlatova. Opečené kostičky nechte zcela vychladnout na pokojovou teplotu.",
+    "Do mísy kuchyňského robotu prosejte obě mouky a důkladně je promíchejte s jemnou solí. Přidejte vzejitý kvásek, zbylé vlažné mléko a rozšlehané vejce.",
+    "Pomocí hnětacího háku zpracovávejte těsto nejprve na nízkou rychlost, poté rychlost mírně zvyšte a hněťte tak dlouho, dokud nevznikne hladké, polotuhé a elastické těsto, které se čistě odděluje od stěn mísy. Teprve v poslední minutě do těsta na nejnižší rychlost zlehka zapracujte zchladlé opečené kostičky žemlí.",
+    "Mísu s těstem přikryjte fólií nebo navlhčenou utěrkou a nechte na teplém místě kynout, dokud těsto viditelně nezdvojnásobí svůj objem.",
+    "Vykynuté těsto opatrně vyklopte na lehce pomoučený pracovní vál. Rozdělte jej na dvě stejné poloviny a z každé jemnými pohyby dlaní vytvarujte hladkou, souměrnou šišku. Dbejte na to, aby uvnitř těsta nezůstaly velké vzduchové kapsy.",
+    "Šišky položte na pečicí papír, přikryjte suchou utěrkou a nechte je znovu odpočívat a dokynout, aby se uvolnila lepková síť a knedlíky získaly maximální lehkost.",
+    "Parní troubu předehřejte na režim plné páry. Děrovaný parní plech vyložte perforovaným pečicím papírem, který propustí stoupající vlhkost. Nakynuté šišky opatrně přeneste na plech, přičemž mezi nimi nechte dostatečné rozestupy, protože během vaření výrazně zvětší svůj objem. Plech vložte do trouby a vařte v plné páře při stanovené teplotě.",
+    "Po uvaření plech vyjměte z trouby. Knedlíky ihned na povrchu potřete zbylým rozpuštěným máslem, což zabrání vzniku tuhé kožovité kůrky a vysychání střídy. Nechte krátce ustálit a poté krájejte na plátky pomocí režné nitě nebo ostrého pilkového nože."
+  ],
+  "applianceTips": "Pokud vaše parní trouba disponuje speciálním kynutím těsta s podporou vlhkosti, nechte těsto kynout při 35 °C – první fáze se tím zkrátí na 35 minut. V robotu typu Thermomix zpracujte suroviny na těsto (mimo opečeného pečiva) v režimu 'Těsto' po dobu 4 minut.",
+  "expertJustification": "Použití kombinace hrubé a polohrubé mouky zajišťuje optimální distribuci velikosti škrobových zrn. Hrubá mouka poskytuje pevnou kostru, která drží tvar, zatímco polohrubá mouka uvolňuje dostatek škrobu pro jemnost střídy. Opečení kostiček žemle na přepuštěném másle vytvoří na jejich povrchu hydrofobní tukovou bariéru, což zabrání tomu, aby během hnětení a kynutí absorbovaly vlhkost z těsta a rozblátily se. Vaření v nasycené páře při 100 °C zajišťuje okamžitou želatinizaci povrchových škrobů, čímž se vytvoří ochranná membrána, která uvnitř uzamkne vlhkost. Na rozdíl od vaření ve vodě nedochází k vyluhování živin a škrobů a těsto neabsorbuje žádnou nadbytečnou vodu, což eliminuje nutnost knedlíky po vytažení propichovat.",
+  "applianceType": "Parní trouba",
+  "cookingTime": "1 hod 57 min",
+  "estimatedCookingTime": "22 min",
+  "difficulty": "Střední",
+  "category": "Pečivo",
+  "id": "recipe-ai-1785788044620",
+  "updatedAt": "2026-08-03T20:14:04.620Z"
+}
