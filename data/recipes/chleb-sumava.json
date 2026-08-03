@@ -2,21 +2,24 @@
   "title": "Chléb Šumava",
   "summary": "Tradiční řemeslný pšenično-žitný chléb s vyváženým kvasným stupněm a bezpečnou hydratací pro pevný bochník s nadýchanou střídou.",
   "ingredients": [
-    "100 g žitné chlebové mouky (T930) na rozkvas",
-    "100 g vlažné vody (25 °C) na rozkvas",
-    "20 g aktivního žitného kvásku",
-    "500 g pšeničné chlebové mouky (T650)",
-    "100 g žitné chlebové mouky (T930) pro hlavní těsto",
-    "350 g vlažné vody (25 °C) pro hlavní těsto",
-    "14 g jemné mořské soli",
-    "10 g celého kmínu",
-    "20 g rýžové nebo žitné mouky na vysypání ošatky"
+    "[Žitný rozkvas]",
+    "150 g žitného kvasu",
+    "150 g žitné chlebové mouky",
+    "150 ml vody",
+    "[Hlavní chlebové těsto]",
+    "350 g pšeničné chlebové mouky (T650)",
+    "210 ml vlažné vody",
+    "12 g jemné mořské soli",
+    "8 g drceného kmínu"
   ],
   "instructions": [
+    "[Rozkvas a autolýza]",
     "Příprava rozkvasu: V nádobě smíchejte žitný kvásek, žitnou mouku a vlažnou vodu. Nechte přikryté zrát při pokojové teplotě, dokud nezdvojnásobí až ztrojnásobí svůj objem.",
     "Autolýza: V míse robotu smíchejte pšeničnou chlebovou mouku, žitnou chlebovou mouku a vlažnou vodu pouze do spojení surovin, aby nezůstala žádná suchá místa. Nechte odpočívat pro plnou hydrataci lepku.",
+    "[Hnětení a první fermentace]",
     "Hnětení: K autolyzovanému těstu přidejte vyzrálý rozkvas, jemnou mořskou sůl a celý kmín. Hněťte v robotu hákem na nejnižší rychlost, dokud nevznikne hladké a elastické těsto.",
     "První fermentace: Těsto nechte přikryté kynout v míse. Během kynutí proveďte v pravidelných intervalech dvě série šetrných překladů pro zpevnění lepkové struktury.",
+    "[Tvarování v ošatce a pečení]",
     "Tvarování a kynutí v ošatce: Těsto vyklopte na lehce pomoučený vál, stočte do pevného bochníku s důkladně utaženým povrchovým napětím a vložte spojem nahoru do vysypané ošatky. Nechte kynout při pokojové teplotě, dokud se testovací důlek po stlačení prstem nevrací pomalu zpět.",
     "Pečení: Bochník opatrně vyklopte na pečicí papír. Pečte v předehřáté troubě se zapařením, po úvodní fázi troubu vyvětrejte, snižte teplotu a dopečte do požadované barvy kůrky. Chlaďte na mřížce."
   ],

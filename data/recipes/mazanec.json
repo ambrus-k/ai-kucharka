@@ -2,6 +2,7 @@
   "title": "Mazanec",
   "summary": "Tradiční kynuté bohaté těsto připravené procesem dlouhé fermentace pro dosažení maximální vláčnosti a struktury střídky.",
   "ingredients": [
+    "[Těsto]",
     "250 g hladké mouky typ 00",
     "250 g polohrubé mouky",
     "210 ml plnotučného mléka",
@@ -11,16 +12,21 @@
     "30 g čerstvého droždí",
     "5 g soli",
     "5 g citronové kůry",
+    "[Přísady do těsta]",
     "50 g rozinek",
     "20 ml rumu",
+    "[Posyp]",
     "30 g mandlových plátků"
   ],
   "instructions": [
+    "[Kvásek a příprava těsta]",
     "Aktivujte kvásek smícháním droždí s vlažným mlékem a špetkou cukru, nechte pracovat 20 minut.",
     "Do mísy robotu prosejte oba druhy mouky, přidejte zbytek cukru, sůl, citronovou kůru a žloutky. Přilijte aktivovaný kvásek a hněťte 10 minut na nízký stupeň.",
     "Do vypracovaného těsta postupně zapracujte změklé máslo a hněťte dalších 12 minut, dokud není těsto elastické a nelepí se.",
+    "[Zapracování přísad a kynutí]",
     "Do hotového těsta ručně vmíchejte rozinky předem namočené v rumu a nechte v teple kynout 90 minut.",
     "Vykynuté těsto přeneste na vál, vytvarujte pevný bochník a přemístěte na plech s pečicím papírem.",
+    "[Tvarování, potření a pečení]",
     "Nechte bochník dokynout dalších 60 minut pod utěrkou.",
     "Povrch potřete rozšlehaným žloutkem, posypte mandlemi a vložte do trouby.",
     "Pečte 10 minut při teplotě 180 °C, poté snižte teplotu na 160 °C a dopečte po dobu 35 minut do vnitřní teploty 92 °C."

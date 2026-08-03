@@ -2,6 +2,7 @@
   "title": "Třená bábovka",
   "summary": "Tradiční bábovka s precizně vypracovanou strukturou díky emulgaci tuků a mechanickému provzdušnění těsta.",
   "ingredients": [
+    "[Těsto]",
     "420 g polohrubé mouky",
     "320 g krupicového cukru",
     "5 ks vajec",
@@ -9,15 +10,18 @@
     "20 g vanilkového cukru",
     "180 g změklého másla",
     "250 ml plnotučného mléka",
-    "20 g holandského kakaa",
-    "5 g citronové kůry"
+    "5 g citronové kůry",
+    "[Kakaová část]",
+    "20 g holandského kakaa"
   ],
   "instructions": [
+    "[Příprava třeného základu a sněhu]",
     "Při teplotě 22 °C vyšlehejte změklé máslo s cukrem a vanilkovým cukrem po dobu 8 minut, dokud směs nezíská světlou barvu a krémovou konzistenci.",
     "Postupně do směsi zašlehávejte žloutky po dobu 3 minut, čímž vytvoříte stabilní emulzi.",
     "Bílky vyšlehejte se špetkou soli po dobu 5 minut na pevný, nikoliv však vysušený sníh.",
     "Do máslového základu opatrně stěrkou vmíchejte mouku prosátou s kypřicím práškem a mléko tak, aby byla směs homogenní.",
     "Na závěr jemně zapracujte sníh z bílků a citronovou kůru pomocí techniky překládání, aby nedošlo ke zhroucení struktury.",
+    "[Mramorování a pečení]",
     "Do třetiny připraveného těsta vmíchejte kakao a následně střídavě vrstvěte světlé a tmavé těsto do vymazané a vysypané formy.",
     "Vložte do předehřáté trouby a pečte 50 minut při teplotě 170 °C, přičemž po 40 minutách provedete test špejlí pro kontrolu propečení středu."
   ],

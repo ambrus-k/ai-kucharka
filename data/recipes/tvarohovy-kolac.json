@@ -2,21 +2,24 @@
   "title": "Tvarohový koláč",
   "summary": "Vláčný tvarohový dezert připravený pomocí šetrného pečení, který využívá přirozenou emulgaci vajec pro dosažení nadýchané struktury.",
   "ingredients": [
+    "[Tvarohová hmota]",
+    "500 g plnotučný hrudkovitý tvaroh",
     "150 g vejce (3 kusy velikosti M)",
     "65 g máslo",
     "150 g moučkový cukr",
     "10 g vanilkový cukr",
-    "500 g plnotučný hrudkovitý tvaroh",
     "45 g dětská krupička",
     "8 g kypřicí prášek do pečiva",
     "1 g sůl"
   ],
   "instructions": [
+    "[Příprava vaječné pěny a tvarohové hmoty]",
     "Troubu předehřejte na 170 °C a dortovou formu ošetřete tukem a krupičkou pro zajištění rovnoměrné kůrky.",
     "V kuchyňském robotu šlehejte vejce s oběma druhy cukru po dobu 8 minut, dokud směs nezíská hustou, světlou konzistenci s vysokým objemem.",
     "Během šlehání vajec za stálého míchání vlijte zchladlé rozpuštěné máslo, aby se emulze stabilizovala.",
     "V samostatné míse krátce promíchejte tvaroh s krupičkou, kypřicím práškem a solí tak, aby suroviny vytvořily homogenní základ.",
     "Tvarohovou směs opatrně vmíchejte pomocí silikonové stěrky do vyšlehané vaječné pěny, postupujte krouživými pohyby zdola nahoru, aby nedošlo k degradaci vzduchových bublin.",
+    "[Pečení a chladnutí]",
     "Těsto rovnoměrně vlijte do připravené formy a pečte 40 minut, dokud koláč na povrchu nezíská zlatavou barvu a není na dotek pružný.",
     "Po upečení nechte koláč 10 minut chladnout ve formě a následně jej vyjměte na mřížku pro dokončení procesu stabilizace struktury před krájením."
   ],

@@ -2,6 +2,7 @@
   "title": "Škvarkové placky",
   "summary": "Tradiční vrstvené pečivo s obsahem sádla a škvarků připravené technikou studené laminace pro dosažení maximální křehkosti.",
   "ingredients": [
+    "[Těsto]",
     "500 g pšeničné hladké mouky",
     "230 ml vlažného mléka",
     "20 g čerstvého droždí",
@@ -12,15 +13,19 @@
     "180 g vepřového sádla",
     "2 g mletého černého pepře",
     "5 g drceného kmínu",
+    "[Na posypání]",
     "5 g hrubozrnné soli",
     "3 g celého kmínu"
   ],
   "instructions": [
+    "[Kvásek a kynuté těsto]",
     "Aktivujte kvasinky v mléce s cukrem po dobu 15 minut, dokud se nevytvoří stabilní pěna.",
     "Ve hnětači spojte mouku, sůl, pepř, drcený kmín, vejce, kvásek a rozpuštěné sádlo. Hněťte 10 minut do dosažení pružné konzistence.",
     "Nechte těsto fermentovat v teple 60 minut.",
     "Během kynutí zpracujte škvarky se sádlem na homogenní směs a nechte ztuhnout v chladu.",
+    "[Lístkování se škvarkovou směsí]",
     "Rozválejte těsto, naneste tukovou směs a proveďte překlady typu kniha celkem 3x, přičemž mezi každým překladem nechte těsto odpočívat 20 minut v chladu.",
+    "[Vykrajování, kynutí a pečení]",
     "Rozválejte na finální výšku, vykrojte tvary, vyznačte mřížku a nechte 20 minut finálně kynout.",
     "Povrch potřete rozšlehaným vejcem, posypte hrubou solí a kmínem a pečte 20 minut při 190 °C."
   ],

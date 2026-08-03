@@ -2,6 +2,7 @@
   "title": "Linecké cukroví",
   "summary": "Křehké máslové cukroví s ovocnou náplní, připravené s důrazem na dokonalou texturu a stabilitu těsta.",
   "ingredients": [
+    "[Linecké těsto]",
     "210 g hladké pšeničné mouky",
     "140 g studeného másla",
     "70 g moučkového cukru",
@@ -9,13 +10,17 @@
     "3 g kypřicího prášku bez fosfátů",
     "5 g citronové kůry",
     "1 g soli",
+    "[Slepování]",
     "150 g rybízového džemu"
   ],
   "instructions": [
+    "[Příprava a chlazení těsta]",
     "V míse prosejte mouku, moučkový cukr, sůl a kypřicí prášek.",
     "Do suché směsi zapracujte na kostičky nakrájené studené máslo a citronovou kůru pomocí kuchyňského robota s metlou typu K, dokud nevznikne jemná drobenka.",
+    "[Vykrajování a pečení]",
     "Přidejte žloutky a bleskově zpracujte v hladké, homogenní těsto.",
     "Těsto zabalte do fólie a ponechte v chladu odležet 720 minut.",
+    "[Slepování džemem]",
     "Vychlazené těsto vyválejte na pomoučeném vále na plát o tloušťce 3 mm.",
     "Vykrájejte požadované tvary, přičemž u poloviny z nich vykrojte středový otvor.",
     "Tvary rozložte na plech s pečicím papírem a pečte 8 minut při 170 °C v horkovzdušné troubě.",

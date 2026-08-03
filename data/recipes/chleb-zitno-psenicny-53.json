@@ -2,18 +2,24 @@
   "title": "Chléb žitno-pšeničný 5:3",
   "summary": "Technicky zdokonalený recept s využitím řízené autolýzy a dvoufázového kynutí pro dosažení maximální objemové stability a textury střídy.",
   "ingredients": [
-    "200 g aktivního žitného kvásku",
-    "400 g žitné mouky chlebové T930",
-    "300 g pšeničné mouky chlebové T650",
-    "480 g vlažné vody",
-    "16 g soli",
-    "11 g celého kmínu"
+    "[Žitný rozkvas]",
+    "200 g žitného kvasu",
+    "200 g žitné mouky",
+    "200 ml vody",
+    "[Těsto]",
+    "300 g pšeničné chlebové mouky",
+    "160 ml vody",
+    "12 g soli",
+    "8 g kmínu"
   ],
   "instructions": [
+    "[Autolýza a hnětení]",
     "Smíchejte žitnou a pšeničnou mouku s vodou a nechte směs odpočívat 60 minut při pokojové teplotě pro zahájení enzymatické autolýzy.",
     "Do autolyzovaného základu vpracujte aktivní kvásek, sůl a kmín. Hněťte 10 minut do dosažení střední elasticity těsta.",
+    "[Fermentace a chladové kynutí]",
     "Nechte těsto fermentovat 180 minut, během nichž proveďte 3 cykly překládání v intervalech 45 minut pro vybudování struktury lepkové sítě.",
     "Vytvarujte bochník s vysokým napětím povrchové vrstvy a přemístěte jej do ošatky. Následuje 600 minut kynutí v chladu při teplotě 5 °C.",
+    "[Pečení se zapařením]",
     "Pečte v předehřáté troubě prvních 15 minut při 250 °C se silným zapařením, poté snižte teplotu na 210 °C a pečte 20 minut, následně dopékejte 15 minut při 180 °C bez páry."
   ],
   "applianceTips": "Pro dosažení ideální krusty využijte funkci parního rázu v první fázi pečení a v závěrečné fázi odvětrejte vlhkost krátkým otevřením dvířek trouby.",

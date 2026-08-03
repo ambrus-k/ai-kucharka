@@ -2,6 +2,7 @@
   "title": "Loupáky",
   "summary": "Tradiční sladké pečivo s vláčnou strukturou díky kombinaci másla a sádla a preciznímu procesu kynutí.",
   "ingredients": [
+    "[Kynuté těsto]",
     "500 g hladké pšeničné mouky",
     "250 ml plnotučného mléka",
     "40 g másla",
@@ -11,14 +12,18 @@
     "2 žloutky",
     "21 g čerstvého droždí",
     "5 g citronové kůry",
+    "[Dohotovení a posyp]",
     "1 vejce",
     "20 g máku"
   ],
   "instructions": [
+    "[Příprava kvásku a těsta]",
     "Aktivujte droždí ve vlažném mléce s malým množstvím cukru po dobu 15 minut, aby se vytvořil silný kvásek.",
     "Do mísy prosejte mouku, přidejte sůl, zbylý cukr, citronovou kůru, žloutky, kvásek a směs másla se sádlem.",
     "Hněťte těsto mechanicky 10 minut, dokud není hladké, pružné a nelepí se na stěny nádoby.",
+    "[Tvarování loupáků]",
     "Nechte těsto kynout v teple pod utěrkou 60 minut, dokud nezdvojnásobí svůj objem.",
+    "[Pečení a posyp]",
     "Vykynuté těsto rozdělte na stejné díly a vyválejte do tenkých trojúhelníků, které srolujete od základny ke špičce do tvaru podkovy.",
     "Tvarované pečivo vyskládejte na plech a nechte finálně kynout 40 minut.",
     "Potřete rozšlehaným vejcem, posypte mákem a pečte v předehřáté troubě na 180 °C po dobu 15 minut do dosažení zlatohnědého povrchu."

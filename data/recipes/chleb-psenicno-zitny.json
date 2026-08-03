@@ -2,19 +2,24 @@
   "title": "Chléb pšenično-žitný",
   "summary": "Tradiční kváskový bochník s vysokou hydratací, připravený pomocí autolýzy pro maximální rozvoj lepkové sítě a bohatou chuť.",
   "ingredients": [
-    "250 g pšeničné mouky hladké",
-    "250 g pšeničné chlebové mouky",
-    "100 g žitné mouky",
-    "380 ml vlažné vody",
-    "200 g aktivního žitného kvásku",
-    "14 g soli",
-    "10 g drceného kmínu"
+    "[Rozkvas]",
+    "150 g žitného kvasu",
+    "150 g žitné chlebové mouky",
+    "150 ml vody",
+    "[Těsto]",
+    "350 g pšeničné chlebové mouky",
+    "210 ml vody",
+    "12 g soli",
+    "8 g drceného kmínu"
   ],
   "instructions": [
+    "[Autolýza a mísení těsta]",
     "Smíchejte pšeničné i žitnou mouku s většinou vody a nechte směs odpočívat půl hodiny, čímž dojde k hydrataci škrobů a startu autolýzy.",
     "Do autolyzovaného těsta přidejte aktivní kvásek a zbylou část vody; hněťte v robotu při nízké rychlosti, dokud těsto nezačne vykazovat první známky elasticity.",
     "Přidejte sůl a drcený kmín a pokračujte v hnětení, dokud není těsto hladké, pružné a neodlepuje se od stěn mísy.",
+    "[Fermentace a překládání]",
     "Nechte těsto fermentovat v teple přibližně tři hodiny, přičemž v průběhu procesu proveďte tři série překládání v hodinových intervalech pro zpevnění struktury.",
+    "[Tvarování, kynutí a pečení]",
     "Vykynuté těsto opatrně vyklopte na pomoučený vál, vytvarujte do napnutého bochníku a vložte do ošatky vysypané moukou k finálnímu kynutí.",
     "Rozpalte troubu společně s litinovým hrncem na vysokou teplotu; následně bochník nařežte, vložte do nádoby a pečte pod poklicí pro vytvoření páry.",
     "Po úvodní fázi odstraňte poklici, snižte teplotu a dopečte do sytě zlatavé barvy a charakteristického zvuku při poklepu na spodní stranu."

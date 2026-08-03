@@ -2,18 +2,27 @@
   "title": "Kynuté ovocné knedlíky",
   "summary": "Nadýchané kynuté knedlíky vařené v páře, využívající metodu prodloužené fermentace pro maximální lehkost a chuť.",
   "ingredients": [
-    "250 ml plnotučného mléka",
-    "2 ks vajec",
+    "[Těsto a kvásek]",
     "350 g hladké mouky",
     "200 g hrubé mouky",
+    "250 ml plnotučného mléka",
+    "2 ks vajec",
     "15 g cukru",
     "10 g čerstvého droždí",
-    "5 g soli"
+    "5 g soli",
+    "[Ovocná náplň]",
+    "400 g čerstvého ovocného plnění (jahody, meruňky, borůvky)",
+    "[Na posypání a přelití]",
+    "100 g rozpuštěného másla",
+    "Strouhaný tvrdý tvaroh",
+    "Moučkový cukr"
   ],
   "instructions": [
+    "[Kvásek a těsto]",
     "V teplém mléce rozmíchejte droždí se špetkou cukru a nechte 20 minut pracovat na vlažném místě.",
     "Do mísy prosejte obě mouky, přidejte sůl, zbylý cukr, vejce a vzešlý kvásek. Vše propracujte v pružné těsto, které nechte v teple kynout 60 minut do zdvojnásobení objemu.",
     "Vykynuté těsto rozdělte na stejné díly, vytvarujte placky a vložte ovoce. Pevně uzavřete a nechte na válu 20 minut kynout.",
+    "[Plnění ovocem a kynutí]",
     "Připravte si parní lázeň. Knedlíky vkládejte do napařovače a vařte 10 minut. Ihned po vyjmutí propíchněte vidlicí, aby unikla pára."
   ],
   "applianceTips": "Použití parní konvekce nebo parního hrnce zajistí rovnoměrný nárůst těsta bez rizika rozmočení, které hrozí při klasickém varu ve vodě.",

@@ -2,19 +2,24 @@
   "title": "Chléb pšeničný kváskový",
   "summary": "Profesionálně vedený pšeničný chléb využívající techniky autolýzy a řízené chladové fermentace pro dosažení maximální vzdušnosti střídky a komplexní chuti.",
   "ingredients": [
-    "350 g pšeničné hladké mouky (protein 12 %)",
-    "200 g pšeničné chlebové mouky",
-    "350 g filtrované vody (24 °C)",
-    "200 g aktivního žitného kvásku (100% hydratace)",
-    "13 g jemné mořské soli",
-    "6 g celého kmínu"
+    "[Rozkvas]",
+    "100 g pšeničného kvasu",
+    "100 g pšeničné mouky",
+    "100 ml vody",
+    "[Těsto]",
+    "400 g pšeničné chlebové mouky",
+    "250 ml vody",
+    "11 g soli"
   ],
   "instructions": [
+    "[Autolýza a hnětení těsta]",
     "V míse důkladně promíchejte obě mouky s vlažnou vodou tak, aby v těstě nezůstala žádná suchá místa. Nechte směs odpočívat, aby proběhla autolýza a přirozeně se rozvinula lepková síť.",
     "Do autolyzovaného základu vmíchejte aktivní kvásek. Následně přidejte sůl a kmín. Těsto hněťte v robotu při nízkých otáčkách, dokud není hladké, elastické a neodlepuje se od stěn nádoby.",
+    "[Zrání a chladová fermentace]",
     "Těsto přemístěte do nádoby a nechte jej zrát při pokojové teplotě. V prvních devadesáti minutách proveďte pravidelné série překladů, které zajistí potřebnou strukturu a pevnost střídky.",
     "Po dokončení kynutí těsto opatrně vyklopte na lehce pomoučenou plochu, proveďte jemné předtvarování a nechte krátce odpočinout. Následně vytvořte pevný bochník a vložte jej do ošatky vysypané rýžovou moukou.",
     "Ošatku s těstem umístěte do chladničky pro pomalou fermentaci, která prohloubí chuťový profil a zajistí lepší stravitelnost.",
+    "[Pečení v litinovém hrnci]",
     "Troubu s litinovým hrncem uvnitř rozpalte na vysokou teplotu. Chléb vyklopte na pečicí papír, proveďte hluboký řez a vložte do rozpáleného hrnce. Pečte nejprve pod poklicí pro vytvoření páry, poté dopečte odkryté do tmavě zlaté barvy."
   ],
   "applianceTips": "Klíčem k úspěchu je maximální předehřátí litinového hrnce. Parní ráz v uzavřeném prostoru během prvních minut pečení umožní maximální nárůst objemu (tzv. oven spring).",
