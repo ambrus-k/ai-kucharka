@@ -20,6 +20,7 @@ export const DEFAULT_RECIPES: Recipe[] = [
       "50 g hořké čokolády (nasekané)"
     ],
     "instructions": [
+      "[Příprava těsta a pečení]",
       "Smíchejte kypřicí složky s tekutou bází pro optimální chemickou reakci a nechte směs předem odpočinout.",
       "Předehřejte troubu na sto sedmdesát pět stupňů Celsia a formu na chlebíček vymažte máslem a vysypejte moukou nebo vyložte pečicím papírem.",
       "V míse vyšlehejte změklé máslo s třtinovým cukrem do světlé a nadýchané pěny.",
@@ -63,13 +64,16 @@ export const DEFAULT_RECIPES: Recipe[] = [
       "150 g zakysané smetany nebo šlehačky"
     ],
     "instructions": [
+      "[Kvásek a kynuté těsto]",
       "V misce rozdrobte droždí, přelijte částí vlažného mléka, přidejte špetku cukru a nechte na teplém místě vzejít kvásek, dokud se na hladině nevytvoří bohatá pěna.",
       "Do mísy kuchyňského robotu prosejte mouku se solí, přidejte zbylý cukr, aktivovaný kvásek, celé vejce, žloutek, rum a vlahé rozpuštěné máslo.",
       "Pomocí hnětacího háku hněťte těsto na nízkou rychlost po dobu deseti minut, dokud nevznikne hladká, elastická hmota, která se nelepí na stěny. Mísu zakryjte fólií a nechte kynout při pokojové teplotě do zdvojnásobení objemu.",
+      "[Tvarování a smažení]",
       "Vykynuté těsto vyklopte na pomoučněný vál, jemně ho prohněťte pro uvolnění přebytečných plynů a rozválejte na rovnoměrný plát.",
       "Pomocí kulatého vykrajovátka vytvarujte jednotlivé vdolečky, rozložte je na pomoučněnou plochu, přikryjte utěrkou a nechte podstoupit finální dokynutí.",
       "V hluboké pánvi rozehřejte dostatečné množství oleje na stabilní teplotu vhodnou pro smažení. Těsně před smažením vytvořte ve středu každého vdolečku prsty hluboký důlek.",
       "Vdolečky vkládejte do horkého oleje nejprve stranou s důlkem dolů, pánev zakryjte pokličkou a smažte dozlatova. Poté je otočte, dosmažte již odkryté a nechte okapat na papírovém ubrousku.",
+      "[Zdobení a podávání]",
       "Teplé vdolečky ozdobte povidly nanesenými do důlku, přidejte zakysanou smetanu a bohatě posypejte jemně nastrouhaným tvarohem."
     ],
     "applianceTips": "Při smažení na indukční varné desce využijte funkci přesného nastavení teploty na stupeň určený pro smažení (ideálně 170-175 °C). Tím zabráníte přepalování tuku a zajistíte rovnoměrné propečení střídky bez nadměrné absorpce oleje.",
@@ -101,8 +105,10 @@ export const DEFAULT_RECIPES: Recipe[] = [
       "1 lžička kukuřičného škrobu"
     ],
     "instructions": [
+      "[Příprava masa a dehydratace kůže]",
       "Povrch kůže nařežte do husté mřížky tak, abyste nezasáhli hluboko do masité části.",
       "Do spodní a bočních stran masa důkladně vetřete sůl, kmín a utřený česnek. Kůži ponechte suchou a čistou.",
+      "[Pečení a odpočinek]",
       "Povrch kůže potřete jablečným octem a následně lehce poprašte směsí soli a kukuřičného škrobu pro dosažení optimální dehydratace povrchu.",
       "Vložte bůček do fritézy kůží dolů a zahřívejte při 150 °C po dobu 45 minut, aby došlo k pozvolnému uvolnění tuku a jemnému prohřátí struktury masa.",
       "Po uplynutí času bůček opatrně otočte kůží nahoru a zvyšte teplotu na 200 °C po dobu 20 minut, dokud povrch nevytvoří rovnoměrně křupavou krustu.",
@@ -135,10 +141,13 @@ export const DEFAULT_RECIPES: Recipe[] = [
       "Sůl a čerstvě mletý pepř"
     ],
     "instructions": [
+      "[Příprava uzeniny a zeleniny]",
       "Špekáčky oloupejte a nakrájejte na půlkolečka, brambory na stejně velké kostky a cibuli nadrobno. Česnek utřete se špetkou soli.",
+      "[Cibulový základ a jíška]",
       "V těžkém litinovém hrnci rozpusťte vepřové sádlo, přidejte nakrájené špekáčky a opékejte je na středním plameni přibližně pět až sedm minut, dokud nepustí tuk a na povrchu jemně nezkaramelizují.",
       "K opečené uzenině přidejte cibuli. Snižte teplotu a za občasného míchání ji pomalu restujte deset až patnáct minut do sytě zlatavé barvy. V závěru přidejte drcený kmín a utřený česnek a nechte je minutu rozvonět.",
       "Celou směs zaprašte hladkou moukou a za stálého míchání opékejte dvě minuty, aby se potlačila syrová chuť škrobu. Hrnec následně odstavte z plamene, vmíchejte sladkou i pálivou papriku a nechte ji v horkém tuku zhruba třicet sekund zpěnit, aby se uvolnilo barvivo a aroma bez rizika zhořknutí.",
+      "[Vaření a zahuštění]",
       "Základ okamžitě zalijte studeným domácím hovězím vývarem a metličkou důkladně odškrábněte všechny karamelizované přípečky ode dna. Vraťte hrnec na plamen, přiveďte k varu, vložte nakrájené brambory a pod pokličkou nechte mírně bublat dvacet až dvacet pět minut, dokud brambory nezměknou a omáčka se přirozeně nezahustí.",
       "Do hotového základu vlijte smetanu ke šlehání a nechte dvě minuty mírně provřít pro dokonalé propojení chutí a emulgaci. Hrnec odstavte z tepla, vmíchejte v dlaních rozemnutou sušenou majoránku, podle chuti dolaďte solí a čerstvě mletým černým pepřem a nechte před podáváním pět minut odpočívat."
     ],
@@ -167,9 +176,12 @@ export const DEFAULT_RECIPES: Recipe[] = [
       "8 g drceného kmínu"
     ],
     "instructions": [
+      "[Rozkvas a autolýza]",
       "Smíchejte aktivní kvásek s vlažnou vodou a oběma druhy mouky. Nechte směs odpočívat pro proces autolýzy, který iniciuje enzymatický rozklad škrobů a bílkovin.",
+      "[Hnětení a překládání těsta]",
       "Po dokončení autolýzy vmíchejte sůl a kmín. Těsto krátce prohněťte, dokud není homogenní a pružné.",
       "Během hlavního kynutí při pokojové teplotě provádějte pravidelné překládání těsta v hodinových intervalech pro zpevnění lepkové struktury.",
+      "[Tvarování, fermentace a pečení]",
       "Vytvarujte bochník a vložte jej do ošatky důkladně vysypané rýžovou moukou, aby nedošlo k přilepení.",
       "Ošatku s těstem umístěte do chladného prostředí pro dlouhou fermentaci, která rozvine hlubokou chuť a aroma.",
       "Troubu s prázdným litinovým hrncem rozpalte na vysokou teplotu. Do rozpáleného hrnce opatrně vyklopte těsto, přiklopte poklicí pro vytvoření páry a pečte. Následně poklici sejměte a dopečte do tmavě zlaté barvy pro dosažení křupavé kůrky."
@@ -200,11 +212,14 @@ export const DEFAULT_RECIPES: Recipe[] = [
       "15 g oleje"
     ],
     "instructions": [
+      "[Kvásek a příprava těsta]",
       "V misce důkladně rozpustíme droždí a ječný slad v části vlažné vody. Směs necháme na teplém místě vzejít, dokud se na hladině nevytvoří stabilní pěna.",
       "V míse kuchyňského robotu promícháme pšeničnou chlebovou mouku, žitnou chlebovou mouku, jemnou sůl a celý kmín.",
       "K suché směsi přilijeme vzešlý kvásek, zbývající vlažnou vodu a jablečný ocet. Těsto hněteme hnětacím hákem na nízkou rychlost, dokud se suroviny nespojí a nezačne se vyvíjet lepková struktura.",
+      "[Kynutí a tvarování bochníku]",
       "Uhnětené těsto vytvarujeme do hladké koule, vložíme do mísy, zakryjeme fólií a necháme kynout při pokojové teplotě, dokud nezdvojnásobí svůj objem.",
       "Vykynuté těsto vyklopíme na pomoučněnou plochu, jemně stočíme do pevného bochníku a vložíme do vysypané ošatky k finálnímu kynutí pod utěrkou.",
+      "[Pečení s párou]",
       "Vykynutý bochník vyklopíme na sázecí lopatu, nařízneme ostrým nožem a sesuneme na rozpálený kámen v troubě předehřáté na nejvyšší výkon. Na dno trouby okamžitě vlijeme horkou vodu pro vytvoření páry, po deseti minutách troubu odvětráme, snížíme teplotu a chléb dopékáme dozlatova."
     ],
     "applianceTips": "Pro nejlepší možný vývoj kůrky použijte litinový hrnec s poklicí předehřátý na maximum. Pečení v uzavřeném prostoru dokonale zadrží přirozenou vlhkost těsta a simuluje profesionální parní pec bez nutnosti externího zapařování.",
@@ -232,10 +247,13 @@ export const DEFAULT_RECIPES: Recipe[] = [
       "8 g drceného kmínu"
     ],
     "instructions": [
+      "[Autolýza a mísení těsta]",
       "Smíchejte pšeničné i žitnou mouku s většinou vody a nechte směs odpočívat půl hodiny, čímž dojde k hydrataci škrobů a startu autolýzy.",
       "Do autolyzovaného těsta přidejte aktivní kvásek a zbylou část vody; hněťte v robotu při nízké rychlosti, dokud těsto nezačne vykazovat první známky elasticity.",
       "Přidejte sůl a drcený kmín a pokračujte v hnětení, dokud není těsto hladké, pružné a neodlepuje se od stěn mísy.",
+      "[Fermentace a překládání]",
       "Nechte těsto fermentovat v teple přibližně tři hodiny, přičemž v průběhu procesu proveďte tři série překládání v hodinových intervalech pro zpevnění struktury.",
+      "[Tvarování, kynutí a pečení]",
       "Vykynuté těsto opatrně vyklopte na pomoučený vál, vytvarujte do napnutého bochníku a vložte do ošatky vysypané moukou k finálnímu kynutí.",
       "Rozpalte troubu společně s litinovým hrncem na vysokou teplotu; následně bochník nařežte, vložte do nádoby a pečte pod poklicí pro vytvoření páry.",
       "Po úvodní fázi odstraňte poklici, snižte teplotu a dopečte do sytě zlatavé barvy a charakteristického zvuku při poklepu na spodní stranu."
@@ -264,11 +282,14 @@ export const DEFAULT_RECIPES: Recipe[] = [
       "11 g soli"
     ],
     "instructions": [
+      "[Autolýza a hnětení těsta]",
       "V míse důkladně promíchejte obě mouky s vlažnou vodou tak, aby v těstě nezůstala žádná suchá místa. Nechte směs odpočívat, aby proběhla autolýza a přirozeně se rozvinula lepková síť.",
       "Do autolyzovaného základu vmíchejte aktivní kvásek. Následně přidejte sůl a kmín. Těsto hněťte v robotu při nízkých otáčkách, dokud není hladké, elastické a neodlepuje se od stěn nádoby.",
+      "[Zrání a chladová fermentace]",
       "Těsto přemístěte do nádoby a nechte jej zrát při pokojové teplotě. V prvních devadesáti minutách proveďte pravidelné série překladů, které zajistí potřebnou strukturu a pevnost střídky.",
       "Po dokončení kynutí těsto opatrně vyklopte na lehce pomoučenou plochu, proveďte jemné předtvarování a nechte krátce odpočinout. Následně vytvořte pevný bochník a vložte jej do ošatky vysypané rýžovou moukou.",
       "Ošatku s těstem umístěte do chladničky pro pomalou fermentaci, která prohloubí chuťový profil a zajistí lepší stravitelnost.",
+      "[Pečení v litinovém hrnci]",
       "Troubu s litinovým hrncem uvnitř rozpalte na vysokou teplotu. Chléb vyklopte na pečicí papír, proveďte hluboký řez a vložte do rozpáleného hrnce. Pečte nejprve pod poklicí pro vytvoření páry, poté dopečte odkryté do tmavě zlaté barvy."
     ],
     "applianceTips": "Klíčem k úspěchu je maximální předehřátí litinového hrnce. Parní ráz v uzavřeném prostoru během prvních minut pečení umožní maximální nárůst objemu (tzv. oven spring).",
@@ -296,10 +317,13 @@ export const DEFAULT_RECIPES: Recipe[] = [
       "8 g drceného kmínu"
     ],
     "instructions": [
+      "[Rozkvas a autolýza]",
       "Příprava rozkvasu: V nádobě smíchejte žitný kvásek, žitnou mouku a vlažnou vodu. Nechte přikryté zrát při pokojové teplotě, dokud nezdvojnásobí až ztrojnásobí svůj objem.",
       "Autolýza: V míse robotu smíchejte pšeničnou chlebovou mouku, žitnou chlebovou mouku a vlažnou vodu pouze do spojení surovin, aby nezůstala žádná suchá místa. Nechte odpočívat pro plnou hydrataci lepku.",
+      "[Hnětení a první fermentace]",
       "Hnětení: K autolyzovanému těstu přidejte vyzrálý rozkvas, jemnou mořskou sůl a celý kmín. Hněťte v robotu hákem na nejnižší rychlost, dokud nevznikne hladké a elastické těsto.",
       "První fermentace: Těsto nechte přikryté kynout v míse. Během kynutí proveďte v pravidelných intervalech dvě série šetrných překladů pro zpevnění lepkové struktury.",
+      "[Tvarování v ošatce a pečení]",
       "Tvarování a kynutí v ošatce: Těsto vyklopte na lehce pomoučený vál, stočte do pevného bochníku s důkladně utaženým povrchovým napětím a vložte spojem nahoru do vysypané ošatky. Nechte kynout při pokojové teplotě, dokud se testovací důlek po stlačení prstem nevrací pomalu zpět.",
       "Pečení: Bochník opatrně vyklopte na pečicí papír. Pečte v předehřáté troubě se zapařením, po úvodní fázi troubu vyvětrejte, snižte teplotu a dopečte do požadované barvy kůrky. Chlaďte na mřížce."
     ],
@@ -328,10 +352,13 @@ export const DEFAULT_RECIPES: Recipe[] = [
       "8 g kmínu"
     ],
     "instructions": [
+      "[Autolýza a hnětení]",
       "Smíchejte žitnou a pšeničnou mouku s vodou a nechte směs odpočívat 60 minut při pokojové teplotě pro zahájení enzymatické autolýzy.",
       "Do autolyzovaného základu vpracujte aktivní kvásek, sůl a kmín. Hněťte 10 minut do dosažení střední elasticity těsta.",
+      "[Fermentace a chladové kynutí]",
       "Nechte těsto fermentovat 180 minut, během nichž proveďte 3 cykly překládání v intervalech 45 minut pro vybudování struktury lepkové sítě.",
       "Vytvarujte bochník s vysokým napětím povrchové vrstvy a přemístěte jej do ošatky. Následuje 600 minut kynutí v chladu při teplotě 5 °C.",
+      "[Pečení se zapařením]",
       "Pečte v předehřáté troubě prvních 15 minut při 250 °C se silným zapařením, poté snižte teplotu na 210 °C a pečte 20 minut, následně dopékejte 15 minut při 180 °C bez páry."
     ],
     "applianceTips": "Pro dosažení ideální krusty využijte funkci parního rázu v první fázi pečení a v závěrečné fázi odvětrejte vlhkost krátkým otevřením dvířek trouby.",
@@ -362,9 +389,11 @@ export const DEFAULT_RECIPES: Recipe[] = [
       "2 g mletého černého pepře"
     ],
     "instructions": [
+      "[Příprava a osmóza zeleniny]",
       "Zelí nakrouhejte na tenké nudličky, v míse ho promíchejte se solí a nechte 20 min odpočívat pro zahájení procesu osmózy.",
       "Během odpočinku zelí nastrouhejte mrkev a celer, šalotku nasekejte nadrobno a připravte si dresink smícháním octa, hořčice, cukru a pepře v homogenní tekutinu.",
       "Po uplynutí 20 min zelí důkladně promačkejte a v utěrce nebo odstředivce vymačkejte veškerou uvolněnou tekutinu, aby salát zůstal křupavý.",
+      "[Příprava dresinku a chlazení]",
       "Do připravené tekuté směsi vmíchejte majonézu a smetanu, čímž vznikne stabilní emulze, kterou následně důkladně zapracujte do zeleninové směsi.",
       "Salát dejte odležet do chladničky na 120 min, aby došlo k hloubkové harmonizaci chutí a stabilizaci dresinku na surovinách."
     ],
@@ -393,9 +422,11 @@ export const DEFAULT_RECIPES: Recipe[] = [
       "Hrubozrnná sůl a celý kmín na posyp"
     ],
     "instructions": [
+      "[Kvásek a hnětení těsta]",
       "Droždí rozmíchejte v části vlažné vody se sladem a nechte 15 minut vzejít kvásek při teplotě 28 °C.",
       "Do mísy prosejte obě mouky, přidejte sůl, kmín, zbytek vody, jablečný ocet a vzešlý kvásek.",
       "Pomocí hnětacího stroje vypracujte elastické těsto. Proces by měl trvat 8 minut na nízký rychlostní stupeň, aby se vytvořila správná lepková vazba bez zbytečného zahřátí.",
+      "[Kynutí, tvarování a pečení]",
       "Těsto nechte 60 minut kynout v uzavřené nádobě při teplotě 24 °C, dokud zdvojnásobí svůj objem.",
       "Vykynuté těsto rozdělte na stejné bochánky a vytvarujte pevné oválné tvary.",
       "Na plechu nechte bochánky 30 minut finálně kynout pod utěrkou. Povrch nařízněte žiletkou pro kontrolovaný růst během pečení.",
@@ -432,11 +463,13 @@ export const DEFAULT_RECIPES: Recipe[] = [
       "25 g kukuřičného škrobu"
     ],
     "instructions": [
+      "[Příprava a pečení buchtiček]",
       "Aktivujte kvásek smícháním droždí s částí vlažného mléka a nechte v teple 20 minut pracovat, dokud nevzejde hustá pěna.",
       "Do mísy prosejte mouku se solí, přidejte vzešlý kvásek, zbytek vlažného mléka a směs vyšlehaných žloutků s cukrem a máslem.",
       "Hněťte těsto v robotu 10 minut na nízkou rychlost, dokud není hladké a elastické, poté jej nechte 60 minut kynout v teple.",
       "Vykynuté těsto rozdělte na díly, vytvarujte malé kuličky, naskládejte je do máslem vymazaného pekáče a každou kuličku důkladně potřete rozpuštěným máslem.",
       "Nechte buchtičky v pekáči finálně kynout 30 minut a následně pečte v předehřáté troubě na 180 °C po dobu 25 minut.",
+      "[Příprava vanilkového krému (Šodó)]",
       "Pro přípravu krému zahřejte mléko s vanilkovým luskem k bodu varu, nechte 10 minut louhovat a poté vyjměte lusk.",
       "Vyšlehejte žloutky s cukrem a škrobem, opatrně přilijte horké mléko a za stálého míchání zahřívejte 8 minut do zhoustnutí, nakonec zašlehejte rum."
     ],
@@ -469,8 +502,10 @@ export const DEFAULT_RECIPES: Recipe[] = [
       "200 g sádla nebo oleje na smažení"
     ],
     "instructions": [
+      "[Příprava masové emulze se sýrem]",
       "V robotu spojte mleté maso, sůl, pepř a vejce. Pomocí K-metly šlehejte 8 min, přičemž postupně přilévejte mléko, dokud nevznikne kompaktní, lepivá emulze.",
       "Do masového základu jemně zapracujte nastrouhaný sýr a směs nechte odpočívat v chladu 60 min, aby se stabilizovaly proteiny.",
+      "[Obalování, smažení a dopečení]",
       "Ze směsi tvarujte oválné karbanátky a postupně je obalte v mouce, rozšlehaných vejcích a strouhance, přičemž dbejte na důkladné uzavření obalu.",
       "Obalené řízky smažte v rozpáleném sádle z obou stran 4 min do zlatavé barvy.",
       "Následně řízky přemístěte do trouby předehřáté na 140 °C a dopečte je 15 min, dokud vnitřní teplota neodpovídá standardům pro vepřové maso."
@@ -504,11 +539,14 @@ export const DEFAULT_RECIPES: Recipe[] = [
       "1 střídka staršího chleba na zahuštění"
     ],
     "instructions": [
+      "[Cibulový a paprikový základ]",
       "V těžkém hrnci rozpusťte sádlo, přidejte jemně nakrájenou cibuli a restujte ji na mírném ohni za stálého míchání do tmavě hnědé barvy.",
       "K osmažené cibuli přidejte celý kmín, polovinu prolisovaného česneku a rajský protlak. Směs krátce orestujte, dokud protlak nezvoní a neztratí kyselost.",
       "Hrnec na chvíli odstavte z plamene a vmíchejte sladkou i pálivou mletou papriku. Nechte ji v teplém tuku rozpustit, aby uvolnila barvu a vůni.",
+      "[Restování masa a dušení]",
       "Vraťte hrnec na sporák, přidejte nakrájené hovězí maso, osolte, opepřete a zprudka opékejte, dokud se maso nezatáhne a nevydusí se vlastní šťáva.",
       "Zalijte směs horkým hovězím vývarem, hrnec přikryjte poklicí a duste na mírném ohni do poloměkka.",
+      "[Zahuštění chlebem a dochucení]",
       "Přisypte nastrouhanou chlebovou střídku, promíchejte a nechte bez poklice zvolna vařit, dokud maso zcela nezměkne a omáčka se přirozeně nezahustí.",
       "Na závěr přidejte zbývající prolisovaný česnek a v dlaních promnutou sušenou majoránku. Krátce provařte, stáhněte z ohně a nechte chvíli odležet."
     ],
@@ -541,11 +579,14 @@ export const DEFAULT_RECIPES: Recipe[] = [
       "150 ml zakysané smetany nebo šlehačky"
     ],
     "instructions": [
+      "[Kvasový a polévkový základ]",
       "Aktivní žitný kvásek důkladně rozšlehejte ve vlažné vodě a nechte krátce v teple nastartovat.",
       "Brambory uvařte v osolené vodě ve slupce do měkka, poté je nechte zchladnout, oloupejte a nakrájejte na úhledné kostky.",
       "Do hrnce s horkým zeleninovým vývarem přidejte předem namočené sušené houby včetně tekutiny, ve které se máčely, a drcený kmín.",
       "Do teplého vývaru za stálého šlehání metličkou pomalu vlévejte připravený kvásek, přiveďte k varu, ihned snižte teplotu a za občasného míchání nechte mírně probublávat, aby se škroby plně provařily a polévka ztratila syrovou moučnou chuť.",
+      "[Příprava míchaných vajec na másle]",
       "Na pánvi rozpusťte máslo a pomalu na něm orestujte nadrobno nakrájenou žlutou cibuli dosklovata.",
+      "[Zjemnění smetanou a podávání]",
       "K cibuli přidejte vyklepnutá vejce, jemně osolte a na mírném ohni umíchejte do sametové, krémové konzistence.",
       "Do řádně provařené polévky vlijte smetanu ke šlehání, podle chuti dosolte a nechte již jen krátce přejít varem pro spojení chutí.",
       "Do hlubokých talířů rozdělte teplé nakrájené brambory, přelijte je horkým kyselem a navrch položte čerstvou porci krémových míchaných vajec."
@@ -578,11 +619,14 @@ export const DEFAULT_RECIPES: Recipe[] = [
       "2 g čerstvě mletého černého pepře"
     ],
     "instructions": [
+      "[Opečení masa a cibulový základ]",
       "Maso očistěte, osušte a z obou stran okořeňte solí a pepřem.",
       "V hrnci rozpalte přepuštěné máslo a maso orestujte ze všech stran 8 minut do zlatavé barvy, poté vyjměte.",
       "Do výpeku přidejte najemno nakrájenou cibuli a restujte 10 minut za občasného míchání, dokud není sklovitá a zlatavá.",
       "Hrnec sejměte z tepelného zdroje, vmíchejte papriku a nechte 30 sekund rozvonět.",
+      "[Pomalé dušení]",
       "Zalijte vývarem, vraťte maso do hrnce a duste pod poklicí při nízké teplotě 60 minut.",
+      "[Dokončení a zjemnění omáčky]",
       "Maso vyjměte a v misce prošlehejte smetanu ke šlehání s moukou na hladkou směs.",
       "Smetanovou směs vlijte do hrnce a provařte 15 minut za občasného míchání.",
       "Omáčku stáhněte z ohně, vmíchejte zakysanou smetanu a pomocí ponorného mixéru rozmixujte do hladké textury.",
@@ -626,9 +670,12 @@ export const DEFAULT_RECIPES: Recipe[] = [
       "0.5 lžičky čerstvě mletý černý pepř"
     ],
     "instructions": [
+      "[Slaný nálev a naložení masa]",
       "V hrnci smíchejte studenou vodu, sůl, nové koření, černý pepř a bobkový list pro přípravu nálevu. Směs přiveďte k varu, dokud se krystaly soli zcela nerozpustí a koření neuvolní své aromatické silice. Poté lák nechte úplně vychladnout na pokojovou teplotu.",
+      "[Příprava brambor a marinády]",
       "Do zcela studeného slaného nálevu ponořte očištěná kuřecí stehna. Nádobu zakryjte fólií a uložte do chladničky na čtyři hodiny, aby proces osmózy rovnoměrně prosolil maso až ke kosti.",
       "Po uplynutí doby stehna vyjměte z láku, odstraňte ulpělé koření a povrch masa důkladně vysušte papírovou utěrkou. Položte je kůží nahoru na mřížku a nechte v chladničce volně oschnout bez zakrytí po dobu jedné hodiny, což dokonale dehydratuje kůži.",
+      "[Společné pečení v pekáči]",
       "Troubu předehřejte na 180 °C na režim horkého vzduchu s přidanou párou. Brambory nakrájejte na měsíčky a cibuli na klínky. V pekáči je promíchejte s řepkovým olejem, solí a drceným kmínem a rovnoměrně rozprostřete.",
       "Na připravené brambory s cibulí položte oschlá kuřecí stehna kůží nahoru. Kůži lehce potřete trochou řepkového oleje a vložte pekáč do předehřáté trouby. Pečte nejprve s aktivní párou při 180 °C po dobu 35 minut pro zachování šťavnatosti, a poté zvyšte teplotu na 200 °C na suchý horký vzduch a pečte dalších 10 minut, aby se začal vytavovat podkožní tuk.",
       "V malé misce metličkou vyšlehejte slunečnicový olej, med, přírodně fermentovanou sójovou omáčku, citronovou šťávu, utřený česnek, mletou sladkou papriku a mletý černý pepř do hladké emulze.",
@@ -664,9 +711,11 @@ export const DEFAULT_RECIPES: Recipe[] = [
       "Moučkový cukr"
     ],
     "instructions": [
+      "[Kvásek a těsto]",
       "V teplém mléce rozmíchejte droždí se špetkou cukru a nechte 20 minut pracovat na vlažném místě.",
       "Do mísy prosejte obě mouky, přidejte sůl, zbylý cukr, vejce a vzešlý kvásek. Vše propracujte v pružné těsto, které nechte v teple kynout 60 minut do zdvojnásobení objemu.",
       "Vykynuté těsto rozdělte na stejné díly, vytvarujte placky a vložte ovoce. Pevně uzavřete a nechte na válu 20 minut kynout.",
+      "[Plnění ovocem a kynutí]",
       "Připravte si parní lázeň. Knedlíky vkládejte do napařovače a vařte 10 minut. Ihned po vyjmutí propíchněte vidlicí, aby unikla pára."
     ],
     "applianceTips": "Použití parní konvekce nebo parního hrnce zajistí rovnoměrný nárůst těsta bez rizika rozmočení, které hrozí při klasickém varu ve vodě.",
@@ -699,12 +748,15 @@ export const DEFAULT_RECIPES: Recipe[] = [
       "150 g zakysané smetany"
     ],
     "instructions": [
+      "[Příprava a kynutí těsta]",
       "Do mísy planetárního robotu nalijte vlažné mléko, ve kterém rozmíchejte sladěnku a rozdrobte čerstvé droždí, a nechte krátce aktivovat.",
       "Na tekutý základ nasypte mouku a navrch přidejte sůl, čímž zamezíte přímému kontaktu soli s kvasinkami.",
       "Zapněte robot na první rychlostní stupeň a hněťte, dokud se suroviny nespojí do kompaktního a hladkého těsta, které se začne odlepovat od stěn mísy.",
       "V poslední minutě hnětení za stálého chodu robotu pramínkem přilévejte olej, aby obalil lepková vlákna a dodal těstu finální elasticitu.",
+      "[Smažení langošů]",
       "Těsto přemístěte do nádoby a nechte v teple vykynout 60 min, dokud nezdvojnásobí svůj objem.",
       "Vykynuté těsto rozdělte na bochánky, které pod utěrkou necháte krátce cca 30 min odpočinout pro snadnější vytahování.",
+      "[Dokončení a podávání]",
       "Bochánky vytvarujte do tenkých placek a ihned smažte v rozpáleném oleji dozlatova z obou stran.",
       "Hotové langoše nechte krátce okapat na papírové utěrce, potřete česnekem rozmíchaným ve vodě a podávejte se zakysanou smetanou a strouhaným sýrem."
     ],
@@ -734,10 +786,13 @@ export const DEFAULT_RECIPES: Recipe[] = [
       "150 g rybízového džemu"
     ],
     "instructions": [
+      "[Příprava a chlazení těsta]",
       "V míse prosejte mouku, moučkový cukr, sůl a kypřicí prášek.",
       "Do suché směsi zapracujte na kostičky nakrájené studené máslo a citronovou kůru pomocí kuchyňského robota s metlou typu K, dokud nevznikne jemná drobenka.",
+      "[Vykrajování a pečení]",
       "Přidejte žloutky a bleskově zpracujte v hladké, homogenní těsto.",
       "Těsto zabalte do fólie a ponechte v chladu odležet 720 minut.",
+      "[Slepování džemem]",
       "Vychlazené těsto vyválejte na pomoučeném vále na plát o tloušťce 3 mm.",
       "Vykrájejte požadované tvary, přičemž u poloviny z nich vykrojte středový otvor.",
       "Tvary rozložte na plech s pečicím papírem a pečte 8 minut při 170 °C v horkovzdušné troubě.",
@@ -773,10 +828,13 @@ export const DEFAULT_RECIPES: Recipe[] = [
       "20 g máku"
     ],
     "instructions": [
+      "[Příprava kvásku a těsta]",
       "Aktivujte droždí ve vlažném mléce s malým množstvím cukru po dobu 15 minut, aby se vytvořil silný kvásek.",
       "Do mísy prosejte mouku, přidejte sůl, zbylý cukr, citronovou kůru, žloutky, kvásek a směs másla se sádlem.",
       "Hněťte těsto mechanicky 10 minut, dokud není hladké, pružné a nelepí se na stěny nádoby.",
+      "[Tvarování loupáků]",
       "Nechte těsto kynout v teple pod utěrkou 60 minut, dokud nezdvojnásobí svůj objem.",
+      "[Pečení a posyp]",
       "Vykynuté těsto rozdělte na stejné díly a vyválejte do tenkých trojúhelníků, které srolujete od základny ke špičce do tvaru podkovy.",
       "Tvarované pečivo vyskládejte na plech a nechte finálně kynout 40 minut.",
       "Potřete rozšlehaným vejcem, posypte mákem a pečte v předehřáté troubě na 180 °C po dobu 15 minut do dosažení zlatohnědého povrchu."
@@ -823,12 +881,15 @@ export const DEFAULT_RECIPES: Recipe[] = [
       "20 ml tuzemského rumu"
     ],
     "instructions": [
+      "[Příprava kynutého těsta]",
       "Droždí rozmíchejte v mléce ohřátém na 32 °C. Nechte 15 minut stát, dokud nevzejde aktivní kvásek.",
       "Během čekání připravte náplň: v rendlíku svařte mák s mlékem, cukrem, máslem a skořicí. Vařte 8 minut do zhoustnutí, vmíchejte rum a nechte vychladnout.",
       "Do mísy robotu prosejte mouku, přidejte cukr, sůl, citronovou kůru, žloutek a kvásek. Hněťte 5 minut na nízkou rychlost.",
       "Přidejte změklé máslo a hněťte dalších 7 minut, dokud není těsto dokonale elastické a odděluje se od stěn mísy.",
+      "[Příprava makové náplně, drobenky a švestek]",
       "Těsto nechte 60 minut kynout pod utěrkou v teple na dvojnásobný objem.",
       "Ingredience na drobenku zpracujte konečky prstů do sypké konzistence a dejte na 15 minut vychladit do lednice.",
+      "[Sestavení koláče, pečení a glazování]",
       "Vykynuté těsto rozprostřete do vymazané formy, rozetřete makovou náplň a poklaďte rozčtvrcenými švestkami.",
       "Povrch zasypejte drobenkou a nechte 20 minut finálně dokynout přímo ve formě.",
       "Pečte v předehřáté troubě na 180 °C po dobu 30 minut do zlatavé barvy.",
@@ -856,9 +917,11 @@ export const DEFAULT_RECIPES: Recipe[] = [
       "6 g instantního droždí"
     ],
     "instructions": [
+      "[Příprava a hnětení těsta]",
       "Smíchejte droždí s vlažným mlékem a nechte 15 minut aktivovat v teplém prostředí.",
       "Do mísy prosejte mouku, přidejte sůl, aktivovaný kvásek a změklé máslo.",
       "Hněťte těsto pomocí kuchyňského robota 12 minut, dokud není hladké, elastické a nelepí se na stěny nádoby.",
+      "[Tvarování veky a pečení]",
       "Nechte těsto kynout v uzavřené nádobě 60 minut, dokud nezdvojnásobí svůj objem.",
       "Vykynuté těsto rozdělte na dva stejné díly a nechte 10 minut odpočinout.",
       "Každý díl rozválejte a srolujte do pevného válečku, přičemž sváry důkladně utěsněte.",
@@ -897,11 +960,14 @@ export const DEFAULT_RECIPES: Recipe[] = [
       "30 g mandlových plátků"
     ],
     "instructions": [
+      "[Kvásek a příprava těsta]",
       "Aktivujte kvásek smícháním droždí s vlažným mlékem a špetkou cukru, nechte pracovat 20 minut.",
       "Do mísy robotu prosejte oba druhy mouky, přidejte zbytek cukru, sůl, citronovou kůru a žloutky. Přilijte aktivovaný kvásek a hněťte 10 minut na nízký stupeň.",
       "Do vypracovaného těsta postupně zapracujte změklé máslo a hněťte dalších 12 minut, dokud není těsto elastické a nelepí se.",
+      "[Zapracování přísad a kynutí]",
       "Do hotového těsta ručně vmíchejte rozinky předem namočené v rumu a nechte v teple kynout 90 minut.",
       "Vykynuté těsto přeneste na vál, vytvarujte pevný bochník a přemístěte na plech s pečicím papírem.",
+      "[Tvarování, potření a pečení]",
       "Nechte bochník dokynout dalších 60 minut pod utěrkou.",
       "Povrch potřete rozšlehaným žloutkem, posypte mandlemi a vložte do trouby.",
       "Pečte 10 minut při teplotě 180 °C, poté snižte teplotu na 160 °C a dopečte po dobu 35 minut do vnitřní teploty 92 °C."
@@ -941,10 +1007,13 @@ export const DEFAULT_RECIPES: Recipe[] = [
       "50 g cukru krystal"
     ],
     "instructions": [
+      "[Příprava kynutého těsta]",
       "Z vlažného mléka, části cukru a droždí vytvořte kvásek a nechte jej v teple vzejít.",
       "Do mísy prosejte mouku, přidejte sůl, zbytek cukru, žloutky, změklé máslo a vzešlý kvásek, poté vypracujte hladké nelepivé těsto a nechte vykynout.",
+      "[Příprava tvarohové a povidlové náplně a drobenky]",
       "Během kynutí vyšlehejte tvaroh se žloutky, moučkovým cukrem a vanilkovým extraktem do hladké konzistence.",
       "Promnutím másla s moukou a krystalovým cukrem připravte sypkou drobenku.",
+      "[Plnění koláčků, zdobení a pečení]",
       "Z vykynutého těsta vytvořte stejnoměrné kuličky, vyskládejte je na plech a vytvořte v nich důlky.",
       "Okraje těsta potřete vejcem, středy naplňte tvarohovou směsí a povidly, posypte drobenkou a nechte krátce dokynout.",
       "Pečte v předehřáté troubě do zlatavého zbarvení okrajů."
@@ -982,10 +1051,13 @@ export const DEFAULT_RECIPES: Recipe[] = [
       "Moučkový cukr na posypání"
     ],
     "instructions": [
+      "[Kvásek a příprava těsta]",
       "Rozmíchejte droždí ve vlažném mléce s cukrem a nechte na teplém místě vzejít aktivní kvásek.",
       "Do mísy kuchyňského robota přidejte mouku, žloutek, špetku soli a vzešlý kvásek. Pomocí hnětacího háku vypracujte hladké, elastické těsto, které se nelepí na stěny nádoby.",
       "Těsto zakryjte utěrkou a nechte v teple kynout, dokud nezdvojnásobí svůj objem.",
+      "[Plnění borůvkami a kynutí]",
       "Vykynuté těsto rozdělte na stejné díly. Každý kousek dlaní zploštěte, naplňte borůvkami, pečlivě zabalte do kuličky a spoj důkladně utěsněte.",
+      "[Vaření v páře a servírování]",
       "Vytvarované knedlíky položte spojem dolů na pomoučenou plochu, zakryjte a nechte ještě chvíli dokynout, aby se stabilizovala jejich struktura.",
       "Do nádoby robota nalijte vodu. Parní nástavec vymažte rozpuštěným máslem a rozložte do něj knedlíky s dostatečnými rozestupy.",
       "Spusťte program parního vaření a vařte v intenzivní páře pod pokličkou. Během vaření poklici neodklápějte.",
@@ -1012,10 +1084,13 @@ export const DEFAULT_RECIPES: Recipe[] = [
       "15 g moučkového cukru"
     ],
     "instructions": [
+      "[Příprava piškotového těsta]",
       "Troubu předehřejte na 200 °C. Plech vyložte kvalitním pečicím papírem.",
       "Bílky se solí šlehejte na střední výkon, dokud nevznikne měkká pěna. Poté postupně zašlehávejte cukr, dokud není sníh pevný, lesklý a tvoří špičky, což trvá přibližně 8 minut.",
+      "[Pečení a stáčení rolády]",
       "Do sněhu krátce zašlehejte žloutky při nízkých otáčkách, jen aby se spojily.",
       "Prosetou mouku jemně vmíchejte do vaječné směsi ručně silikonovou stěrkou, abyste zachovali objem těsta.",
+      "[Plnění džemem a dohotovení]",
       "Těsto rozetřete na plech do stejnoměrné vrstvy a pečte 8 minut dozlatova.",
       "Ihned po upečení piškot vyklopte na utěrku posypanou moučkovým cukrem, opatrně stáhněte papír a těsto i s utěrkou zamotejte. Nechte rolovat 15 minut.",
       "Vychladlý korpus rozviňte, potřete džemem, pevně stočte a před podáváním nechte v chladu 20 minut odpočinout."
@@ -1043,9 +1118,11 @@ export const DEFAULT_RECIPES: Recipe[] = [
       "12 g mořské soli"
     ],
     "instructions": [
+      "[Mísení a kynutí těsta]",
       "Ve vodě rozmíchejte droždí se sladěnkou. Tuto směs vlijte k prosáté mouce a začněte hníst na nízký stupeň.",
       "Po zapracování všech tekutin přidejte sůl a olej. Hněťte při střední rychlosti, dokud není těsto hladké, lesklé a nejeví známky silné lepkové sítě.",
       "Těsto přikryjte a nechte 60 minut odpočívat při pokojové teplotě, následně jej přeložte (technika stretch and fold) a nechte dalších 60 minut kynout.",
+      "[Tvarování a pečení]",
       "Zpracované těsto rozdělte na bochníky, vložte do uzavřené nádoby a nechte zrát 12 hodin v chladu, což zajistí komplexní chuťový profil.",
       "Před pečením nechte bochníky 120 minut temperovat při pokojové teplotě, poté vytvarujte pizzy, doplňte ingrediencemi a pečte při maximální možné teplotě do zlatova."
     ],
@@ -1092,12 +1169,15 @@ export const DEFAULT_RECIPES: Recipe[] = [
       "35 g studeného másla"
     ],
     "instructions": [
+      "[Příprava masové náplně a plnění paprik]",
       "Žemle nakrájejte na drobné kostičky, v misce je zalijte vlažným mlékem a nechte důkladně prosáknout. Následně přebytečnou tekutinu z pečiva lehce vymačkejte rukama.",
       "Na pánvi rozpusťte část připraveného sádla a nadrobno nakrájenou část cibule orestujte dosklovata. Poté ji nechte krátce zchladnout na pokojovou teplotu.",
+      "[Základ rajské omáčky]",
       "Do hluboké mísy vložte mleté hovězí a vepřové maso. Přidejte vymačkané pečivo, zchladlou orestovanou cibuli, rozšlehaná vejce, utřený česnek, mletou sladkou papriku, drcenou majoránku, sůl a čerstvě mletý pepř. Směs rukama důkladně propracujte, dokud se neuvolní masové bílkoviny a nevznikne kompaktní, mírně lepivá hmota.",
       "Z omytých paprik odřízněte vršky se stopkou, opatrně vyjměte semeníky a odstraňte vnitřní žebra. Do vyčištěných paprik natlačte masovou směs. Plňte pevně, ale ne příliš silou, aby papriky při tepelné úpravě nepopraskaly. Ze zbylého masového těsta vytvarujte pevné kuličky.",
       "V silnostěnném hrnci vhodném do trouby rozpusťte zbylé sádlo, přidejte zbývající jemně nakrájenou cibuli a opečte ji dozlatova. Zaprašte hladkou moukou a za stálého míchání připravte světlou jíšku.",
       "Do jíšky přidejte rajčatový protlak a krátce ho zarestujte, aby ztratil syrovou kyselost a příjemně ztmavl. Poté za stálého šlehání metlou postupně přilévejte studená pasírovaná rajčata a teplý hovězí vývar, čímž zabráníte tvorbě nežádoucích hrudek.",
+      "[Společné vaření a zjemnění omáčky]",
       "Do základu omáčky vložte skořici, hřebíček, nové koření a bobkové listy, ideálně uzavřené v nerezovém sítku na koření. Přiveďte k varu a opatrně do hrnce naskládejte naplněné papriky i připravené masové kuličky.",
       "Hrnec přikryjte poklicí a vložte do trouby předehřáté na statický ohřev. Pečte, dokud maso i papriky zcela nezměknou. Na posledních několik minut poklici sejměte, aby papriky získaly pěknou barvu.",
       "Uvařené papriky a kuličky opatrně vyjměte z hrnce a uchovejte v teple. Z omáčky vyndejte koření. Omáčku propasírujte přes jemné síto pro docílení sametově hladké textury. Dochuťte cukrem, solí a čerstvou citronovou šťávou. Nakonec mimo plotýnku vmíchejte kostičky ledového studeného másla, které omáčku zjemní a dodá jí nádherný lesk."
@@ -1127,9 +1207,11 @@ export const DEFAULT_RECIPES: Recipe[] = [
       "50 g máku a hrubozrnné soli na posyp"
     ],
     "instructions": [
+      "[Příprava a kynutí těsta]",
       "Droždí rozmíchejte ve vlažném mléce a nechte krátce aktivovat, aby se vytvořil kvásek.",
       "Do mísy prosejte mouku se solí, přidejte sádlo a připravený kvásek.",
       "Hněťte těsto tak dlouho, dokud není pružné, hladké a zcela nelepivé.",
+      "[Tvarování preclíků, potření a pečení]",
       "Zakryté těsto nechte v teple kynout, dokud zdvojnásobí svůj objem.",
       "Vykynuté těsto rozdělte na stejné části, ze kterých vyválejte prameny a vytvarujte preclíky.",
       "Preclíky vyskládejte na plech a nechte krátce dokynout před pečením.",
@@ -1158,9 +1240,11 @@ export const DEFAULT_RECIPES: Recipe[] = [
       "30 g vepřového sádla"
     ],
     "instructions": [
+      "[Kvásek a hnětení těsta]",
       "Ve vlažné vodě rozmíchejte cukr a droždí a nechte 15 minut aktivovat.",
       "Mouku smíchejte se zbytkem vody a nechte 30 minut proběhnout proces autolýzy pro lepší rozvoj lepku.",
       "Ke směsi přidejte aktivovaný kvásek a hněťte 5 minut na nízké otáčky.",
+      "[Kynutí, motání a pečení]",
       "Přidejte sůl a změklé sádlo a pokračujte v hnětení dalších 8 minut, dokud není těsto hladké a elastické.",
       "Těsto nechte 60 minut kynout v teple, přičemž po 30 minutách proveďte překlad pro zpevnění struktury.",
       "Vykynuté těsto rozdělte na stejné díly a vytvarujte bochánky, které nechte 10 minut odpočívat pod utěrkou.",
@@ -1192,9 +1276,11 @@ export const DEFAULT_RECIPES: Recipe[] = [
       "30 g vepřového sádla"
     ],
     "instructions": [
+      "[Příprava těsta a kynutí]",
       "Droždí rozmíchejte v části vlažné tekutiny a nechte 15 minut aktivovat v teplém prostředí pro vytvoření startovací kultury.",
       "Mouku smíchejte se zbylou tekutinou a sladovým výtažkem. Nechte směs 20 minut autolýzovat pro lepší hydrataci lepkových vláken.",
       "Přidejte aktivovaný kvásek a hněťte v robotu 8 minut při nízké rychlosti, dokud není těsto kompaktní.",
+      "[Motání rohlíků a pečení]",
       "Přidejte sůl a zapracujte sádlo. Pokračujte v hnětení dalších 7 minut, dokud těsto není elastické a nelepí se na stěny mísy.",
       "Těsto nechte 60 minut kynout v uzavřené nádobě, přičemž po 30 minutách proveďte překlad pro zpevnění struktury.",
       "Vykynuté těsto rozdělte na stejné díly a vytvarujte bochánky, které nechte 10 minut odpočinout.",
@@ -1225,9 +1311,11 @@ export const DEFAULT_RECIPES: Recipe[] = [
       "5 g medu"
     ],
     "instructions": [
+      "[Příprava těsta a kynutí]",
       "Droždí rozpusťte ve vlažné vodě s medem a nechte vzejít, dokud nevznikne aktivní kvásek.",
       "Do mísy prosejte oba druhy mouky, přidejte sůl, připravený kvásek a rozpuštěné sádlo.",
       "Hněťte hákem na nízkou rychlost, dokud těsto není hladké a přestane se lepit na stěny mísy.",
+      "[Tvarování a pečení]",
       "Zakryté těsto nechte v teple kynout, dokud nezdvojnásobí svůj objem.",
       "Těsto rozdělte na stejnoměrné díly, vytvarujte bochánky a nechte je krátce odpočinout pod utěrkou.",
       "Vytvarujte výsledné tvary, přeneste na plech a nechte finálně nakynout.",
@@ -1264,9 +1352,11 @@ export const DEFAULT_RECIPES: Recipe[] = [
       "50 ml ledové vody"
     ],
     "instructions": [
+      "[Příprava masové směsi]",
       "Smíchejte mleté maso se solí a kořením. Zakryjte nádobu a nechte směs odpočívat v chladu po dobu 30 min až 2 h, čímž zahájíte proces solné filtrace a zvýšíte vaznost masné emulze.",
       "Bílé rohlíky nakrájejte na drobné kostičky, vložte do mísy, zalijte plnotučným mlékem a nechte 10 min zcela nasáknout.",
       "Na pánvi rozpusťte vepřové sádlo a nechte na něm po dobu 5 min zesklovatět nadrobno nakrájenou cibuli. Těsně před koncem přidejte utřený česnek, nechte jej 1 min rozvonět a směs ihned stáhněte, aby zchladla pod 15 °C.",
+      "[Tvarování šišky a pečení]",
       "K namočenému pečivu přidejte odpočinuté maso, vejce, zchladlou cibuli s česnekem a kořením. Sušenou majoránku před vhozením promněte v dlaních pro uvolnění silic.",
       "Směs začněte intenzivně hnětat. Během hnětení trvajícího 10 min až 15 min postupně přilévejte ledovou vodu, přičemž teplota masa nesmí překročit 4 °C. Hněťte, dokud se neobjeví jemná bílkovinná vlákna značící uvolnění myosinu.",
       "Masové dílo několikrát silou vyzdvihněte a uhoďte s ním o dno mísy po dobu 2 min, čímž spolehlivě vytěsníte vzduchové kapsy.",
@@ -1303,11 +1393,14 @@ export const DEFAULT_RECIPES: Recipe[] = [
       "3 g celého kmínu"
     ],
     "instructions": [
+      "[Kvásek a kynuté těsto]",
       "Aktivujte kvasinky v mléce s cukrem po dobu 15 minut, dokud se nevytvoří stabilní pěna.",
       "Ve hnětači spojte mouku, sůl, pepř, drcený kmín, vejce, kvásek a rozpuštěné sádlo. Hněťte 10 minut do dosažení pružné konzistence.",
       "Nechte těsto fermentovat v teple 60 minut.",
       "Během kynutí zpracujte škvarky se sádlem na homogenní směs a nechte ztuhnout v chladu.",
+      "[Lístkování se škvarkovou směsí]",
       "Rozválejte těsto, naneste tukovou směs a proveďte překlady typu kniha celkem 3x, přičemž mezi každým překladem nechte těsto odpočívat 20 minut v chladu.",
+      "[Vykrajování, kynutí a pečení]",
       "Rozválejte na finální výšku, vykrojte tvary, vyznačte mřížku a nechte 20 minut finálně kynout.",
       "Povrch potřete rozšlehaným vejcem, posypte hrubou solí a kmínem a pečte 20 minut při 190 °C."
     ],
@@ -1340,8 +1433,10 @@ export const DEFAULT_RECIPES: Recipe[] = [
       "1 g černého pepře"
     ],
     "instructions": [
+      "[Příprava uzeniny a zeleniny]",
       "Špekáčky zbavte střívka, podélně rozkrojte a nakrájejte na tenké půlměsíčky.",
       "Cibuli a okurky nakrájejte ručně na drobné kostičky stejné velikosti, aby byla zachována křupavost a salát nepustil příliš mnoho tekutiny.",
+      "[Příprava emulze a namíchání salátu]",
       "V míse vyšlehejte olej, hořčici, worcester, kečup, ocet, cukr a pepř, dokud nevznikne hladká emulze.",
       "Do připravené emulze vložte nakrájenou cibuli a nechte ji krátce marinovat pro zjemnění její štiplavosti.",
       "Následně přidejte nakrájené špekáčky a okurky a vše důkladně promíchejte.",
@@ -1388,14 +1483,18 @@ export const DEFAULT_RECIPES: Recipe[] = [
       "citrónová šťáva"
     ],
     "instructions": [
+      "[Příprava a zatáhnutí masa]",
       "Hovězí maso prošpikujte úzkými hranolky špeku, osolte a opepřete.",
       "V multifunkčním hrnci na programu restování rozehřejte máslo a maso ze všech stran zatáhněte, dokud nevznikne tmavá krusta, poté maso vyjměte.",
+      "[Zeleninový základ, karamel a zastříknutí octem]",
       "Do výpeku vložte nastrouhanou zeleninu a restujte 12 minut do tmavě zlaté barvy.",
       "Přidejte cibuli, restujte další 5 minut, následně přisypte cukr a nechte ho 3 minuty karamelizovat.",
       "Vmíchejte hořčici, zastříkněte octem a nechte 2 minuty vyvařit kyselost.",
+      "[Tlakové vaření]",
       "Vraťte maso do hrnce, přidejte koření v plátěném sáčku a zalijte vývarem.",
       "Uzavřete hrnec a vařte pod tlakem 60 minut.",
       "Po ukončení nechte tlak přirozeně klesat po dobu 20 minut.",
+      "[Mixování omáčky a zjemnění smetanou a máslem]",
       "Vyjměte maso a koření, zeleninový základ rozmixujte dohladka.",
       "Vmíchejte smetanu, nechte 5 minut provařit a na závěr vmíchejte studené máslo pro finální emulzi, dochuťte solí a citrónovou šťávou."
     ],
@@ -1423,11 +1522,13 @@ export const DEFAULT_RECIPES: Recipe[] = [
       "20 g holandského kakaa"
     ],
     "instructions": [
+      "[Příprava třeného základu a sněhu]",
       "Při teplotě 22 °C vyšlehejte změklé máslo s cukrem a vanilkovým cukrem po dobu 8 minut, dokud směs nezíská světlou barvu a krémovou konzistenci.",
       "Postupně do směsi zašlehávejte žloutky po dobu 3 minut, čímž vytvoříte stabilní emulzi.",
       "Bílky vyšlehejte se špetkou soli po dobu 5 minut na pevný, nikoliv však vysušený sníh.",
       "Do máslového základu opatrně stěrkou vmíchejte mouku prosátou s kypřicím práškem a mléko tak, aby byla směs homogenní.",
       "Na závěr jemně zapracujte sníh z bílků a citronovou kůru pomocí techniky překládání, aby nedošlo ke zhroucení struktury.",
+      "[Mramorování a pečení]",
       "Do třetiny připraveného těsta vmíchejte kakao a následně střídavě vrstvěte světlé a tmavé těsto do vymazané a vysypané formy.",
       "Vložte do předehřáté trouby a pečte 50 minut při teplotě 170 °C, přičemž po 40 minutách provedete test špejlí pro kontrolu propečení středu."
     ],
@@ -1456,11 +1557,13 @@ export const DEFAULT_RECIPES: Recipe[] = [
       "1 g sůl"
     ],
     "instructions": [
+      "[Příprava vaječné pěny a tvarohové hmoty]",
       "Troubu předehřejte na 170 °C a dortovou formu ošetřete tukem a krupičkou pro zajištění rovnoměrné kůrky.",
       "V kuchyňském robotu šlehejte vejce s oběma druhy cukru po dobu 8 minut, dokud směs nezíská hustou, světlou konzistenci s vysokým objemem.",
       "Během šlehání vajec za stálého míchání vlijte zchladlé rozpuštěné máslo, aby se emulze stabilizovala.",
       "V samostatné míse krátce promíchejte tvaroh s krupičkou, kypřicím práškem a solí tak, aby suroviny vytvořily homogenní základ.",
       "Tvarohovou směs opatrně vmíchejte pomocí silikonové stěrky do vyšlehané vaječné pěny, postupujte krouživými pohyby zdola nahoru, aby nedošlo k degradaci vzduchových bublin.",
+      "[Pečení a chladnutí]",
       "Těsto rovnoměrně vlijte do připravené formy a pečte 40 minut, dokud koláč na povrchu nezíská zlatavou barvu a není na dotek pružný.",
       "Po upečení nechte koláč 10 minut chladnout ve formě a následně jej vyjměte na mřížku pro dokončení procesu stabilizace struktury před krájením."
     ],
@@ -1496,10 +1599,13 @@ export const DEFAULT_RECIPES: Recipe[] = [
       "30 g plátkových mandlí"
     ],
     "instructions": [
+      "[Kvásek a hnětení těsta]",
       "Smíchejte droždí s vlažným mlékem a trochou cukru. Nechte aktivovat 20 minut na teplém místě, dokud nevzejde kvásek.",
       "Do mísy robota prosejte mouku, přidejte zbytek cukru, sůl, citronovou kůru, žloutky, rum z rozinek a připravený kvásek.",
       "Hněťte 10 minut na nízkou rychlost, následně za stálého hnětení postupně přidávejte změklé máslo, dokud se těsto zcela neoddělí od stěn mísy.",
+      "[Zapracování rozinek a kynutí]",
       "Do hotového těsta zapracujte namočené rozinky a nechte v zakryté nádobě kynout 90 minut, během čehož jednou těsto přeložte.",
+      "[Pletení vánočky, kynutí a pečení]",
       "Vykynuté těsto rozdělte na díly, vyválejte prameny a upleťte vánočku z devíti pramenů v patrech.",
       "Upletenou vánočku přeneste na plech a nechte kynout 60 minut pod utěrkou při pokojové teplotě.",
       "Povrch potřete rozšlehaným vejcem, posypte mandlemi a pečte 10 minut při teplotě 180 °C, poté snižte teplotu na 160 °C a dopečte 35 minut do dosažení vnitřní teploty 92 °C."

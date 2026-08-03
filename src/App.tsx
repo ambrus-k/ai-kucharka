@@ -1659,7 +1659,13 @@ ${selectedRecipe.ingredients && selectedRecipe.ingredients.length > 0
 
 --- POSTUP PŘÍPRAVY ---
 ${selectedRecipe.instructions && selectedRecipe.instructions.length > 0 
-  ? selectedRecipe.instructions.map((step, idx) => `${idx + 1}. ${step}`).join("\n\n") 
+  ? (() => {
+      let num = 1;
+      return selectedRecipe.instructions.map((step) => {
+        if (isIngredientHeader(step)) return `\n📌 ${cleanHeaderTitle(step).toUpperCase()}:`;
+        return `${num++}. ${step}`;
+      }).join("\n\n");
+    })()
   : "Žádný postup přípravy není zapsán."}
 
 --- TIP PRO MODERNÍ SPOTŘEBIČ (${selectedRecipe.applianceType}) ---
@@ -2095,23 +2101,24 @@ ${separator}`;
       : `<li style="font-style: italic; color: #666; padding: 4px 0; column-span: all; -webkit-column-span: all;">Žádné ingredience nejsou zapsány.</li>`;
 
     // Instructions list
+    let pdfStepNum = 1;
     const instructionsHtml = selectedRecipe.instructions && selectedRecipe.instructions.length > 0
-      ? selectedRecipe.instructions.map((step, idx) => {
-          const stepIngs = getStepIngredients(step, selectedRecipe.ingredients, scaleFactor).filter(i => i.isMatched);
-          const stepIngsList = stepIngs.map(i => i.display).join(', ');
-          const stepIngsBadges = stepIngs.length > 0
-            ? `<div style="margin-top: 3px; font-size: 12px; color: #1B4332;">
-                <span style="font-weight: 700; font-size: 10.5px; text-transform: uppercase; color: #1B4332; opacity: 0.8; font-family: monospace;">Suroviny pro krok:</span> <span style="font-style: italic; color: #3A3A34;">${stepIngsList}</span>
-               </div>`
-            : '';
-
+      ? selectedRecipe.instructions.map((step) => {
+          if (isIngredientHeader(step)) {
+            const headerTitle = cleanHeaderTitle(step);
+            return `
+              <div style="font-weight: 800; font-size: 13.5px; color: #1B4332; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1.5px solid #1B4332; padding: 6px 0 2px 0; margin-top: 10px; margin-bottom: 6px; page-break-after: avoid; break-after: avoid;">
+                📌 ${headerTitle}
+              </div>
+            `;
+          }
+          const currentNum = pdfStepNum++;
           return `
             <div class="instruction-step" style="display: flex; flex-direction: column; gap: 4px; padding: 7px 10px; margin-bottom: 7px; background-color: #FAF8F3; border: 1px solid #E8E4DB; border-radius: 6px; page-break-inside: avoid !important; break-inside: avoid !important;">
               <div style="display: flex; gap: 9px; align-items: flex-start;">
-                <div style="font-weight: 800; font-size: 12px; color: #FFFFFF; background-color: #1B4332; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px;">${idx + 1}</div>
+                <div style="font-weight: 800; font-size: 12px; color: #FFFFFF; background-color: #1B4332; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px;">${currentNum}</div>
                 <div style="font-size: 14px; line-height: 1.45; color: #2C2C2C; flex: 1;">${step}</div>
               </div>
-              ${stepIngsBadges}
             </div>
           `;
         }).join("")
@@ -2464,13 +2471,25 @@ ${separator}`;
       : `<li class="ingredient-item">Žádné ingredience nejsou zapsány.</li>`;
 
     // Render instructions list
+    let printStepNum = 1;
     const instructionsHtml = selectedRecipe.instructions && selectedRecipe.instructions.length > 0
-      ? selectedRecipe.instructions.map((step, idx) => `
-        <div class="step-card">
-          <div class="step-number">${idx + 1}</div>
-          <div class="step-text">${step}</div>
-        </div>
-      `).join("")
+      ? selectedRecipe.instructions.map((step) => {
+          if (isIngredientHeader(step)) {
+            const headerTitle = cleanHeaderTitle(step);
+            return `
+              <div style="font-weight: 800; font-size: 14px; color: #1B4332; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1.5px solid #1B4332; padding: 6px 0 2px 0; margin-top: 10px; margin-bottom: 6px; page-break-after: avoid; break-after: avoid;">
+                📌 ${headerTitle}
+              </div>
+            `;
+          }
+          const currentNum = printStepNum++;
+          return `
+            <div class="step-card">
+              <div class="step-number">${currentNum}</div>
+              <div class="step-text">${step}</div>
+            </div>
+          `;
+        }).join("")
       : `<p>Žádný postup přípravy není zapsán.</p>`;
 
     const htmlContent = `<!DOCTYPE html>
@@ -2941,8 +2960,28 @@ ${separator}`;
         console.log("Seznam receptů je prázdný, načítám výchozí recepty.");
       }
 
+      // Upgrade loaded recipes with instruction headers from DEFAULT_RECIPES if missing
+      const defaultMap = new Map(DEFAULT_RECIPES.map(r => [r.title, r]));
+      const upgradedList = loadedList.map(loadedRecipe => {
+        const def = defaultMap.get(loadedRecipe.title);
+        if (def) {
+          const defHasHeaders = (def.instructions || []).some(i => isIngredientHeader(i));
+          const loadedHasHeaders = (loadedRecipe.instructions || []).some(i => isIngredientHeader(i));
+          if (defHasHeaders && !loadedHasHeaders) {
+            return {
+              ...loadedRecipe,
+              instructions: [...def.instructions],
+              ingredients: (def.ingredients && def.ingredients.some(i => isIngredientHeader(i))) 
+                ? [...def.ingredients] 
+                : loadedRecipe.ingredients
+            };
+          }
+        }
+        return loadedRecipe;
+      });
+
       // Save and set
-      const cleaned = loadedList.map(removePreservativesFromSoup);
+      const cleaned = upgradedList.map(removePreservativesFromSoup);
       setRecipes(cleaned);
       setSelectedRecipe(prev => {
         if (prev) {
@@ -4966,29 +5005,32 @@ ${separator}`;
                           Postup přípravy (krok za krokem)
                         </h3>
                         <div className="space-y-2.5 text-sm sm:text-base font-serif">
-                          {selectedRecipe.instructions.map((step, idx) => {
-                            const stepIngs = getStepIngredients(step, selectedRecipe.ingredients, scaleFactor).filter(i => i.isMatched);
-                            return (
-                              <div key={idx} className="instruction-step flex flex-col gap-1 leading-relaxed break-inside-avoid p-3 rounded-lg bg-[#FAF8F3] border border-[#E8E4DB]">
-                                <div className="flex gap-2.5 items-start">
-                                  <span className="font-mono text-[#FFFFFF] bg-[#1B4332] font-bold text-xs w-6 h-6 rounded-full flex items-center justify-center shrink-0 mt-0.5">
-                                    {idx + 1}
-                                  </span>
-                                  <p className="text-[#3A3A34] flex-1 text-sm sm:text-base">{step}</p>
-                                </div>
-                                {stepIngs.length > 0 && (
-                                  <div className="ml-8 text-xs sm:text-sm font-sans pt-1 border-t border-[#E8E4DB]/60">
-                                    <span className="font-bold text-xs uppercase text-[#1B4332]/80 font-mono tracking-wider mr-1.5">
-                                      Suroviny pro krok:
-                                    </span>
-                                    <span className="font-serif italic text-[#3A3A34]">
-                                      {stepIngs.map(i => i.display).join(', ')}
-                                    </span>
+                          {(() => {
+                            let previewStepNum = 1;
+                            return selectedRecipe.instructions.map((step, idx) => {
+                              if (isIngredientHeader(step)) {
+                                const headerTitle = cleanHeaderTitle(step);
+                                return (
+                                  <div key={idx} className="pt-3 pb-1 border-b-2 border-[#1B4332] mt-4 mb-2 page-break-after-avoid">
+                                    <h4 className="font-serif font-bold text-sm sm:text-base text-[#1B4332] uppercase tracking-wide flex items-center gap-2">
+                                      <span>📌</span> {headerTitle}
+                                    </h4>
                                   </div>
-                                )}
-                              </div>
-                            );
-                          })}
+                                );
+                              }
+                              const currentNum = previewStepNum++;
+                              return (
+                                <div key={idx} className="instruction-step flex flex-col gap-1 leading-relaxed break-inside-avoid p-3 rounded-lg bg-[#FAF8F3] border border-[#E8E4DB]">
+                                  <div className="flex gap-2.5 items-start">
+                                    <span className="font-mono text-[#FFFFFF] bg-[#1B4332] font-bold text-xs w-6 h-6 rounded-full flex items-center justify-center shrink-0 mt-0.5">
+                                      {currentNum}
+                                    </span>
+                                    <p className="text-[#3A3A34] flex-1 text-sm sm:text-base">{step}</p>
+                                  </div>
+                                </div>
+                              );
+                            });
+                          })()}
                         </div>
                       </div>
 
@@ -5040,34 +5082,34 @@ ${separator}`;
                   </div>
                 ) : (
                   <>
-                    {/* TOP RECIPE CONTROLS TOOLBAR (Moved from paper view to basic recipe view) */}
-                    <div className="no-print bg-[#FDFBF7] border border-[#E8E4DB] rounded-2xl p-3.5 sm:p-4 shadow-2xs mb-6 flex flex-wrap items-center justify-between gap-3 select-none">
+                    {/* TOP RECIPE CONTROLS TOOLBAR (Single horizontal row) */}
+                    <div className="no-print bg-[#FDFBF7] border border-[#E8E4DB] rounded-2xl p-2.5 sm:p-3 shadow-2xs mb-6 flex flex-row items-center justify-between gap-2 overflow-x-auto select-none no-scrollbar">
                       
-                      {/* Adjusters Group: Servings & Font Size */}
-                      <div className="flex items-center gap-3 flex-wrap">
+                      {/* Left Group: Servings & Font Size */}
+                      <div className="flex items-center gap-2 shrink-0">
                         {/* Počet porcí (Servings controller) */}
-                        <div className="flex items-center gap-1.5 bg-white border border-[#E8E4DB] rounded-xl p-1 font-sans text-xs shadow-2xs">
-                          <span className="px-2 font-bold text-[#555] flex items-center gap-1">
+                        <div className="flex items-center gap-1 bg-white border border-[#E8E4DB] rounded-xl p-1 font-sans text-xs shadow-2xs shrink-0">
+                          <span className="px-1.5 font-bold text-[#555] flex items-center gap-1 whitespace-nowrap">
                             Porce:
                           </span>
                           <button
                             type="button"
                             onClick={() => setScaleFactor(prev => Math.max(0.25, Number((prev - 0.25).toFixed(2))))}
-                            className="h-7 w-7 rounded-lg bg-[#FDFBF7] text-[#1B4332] hover:bg-[#E8F5E9] font-bold flex items-center justify-center transition-all cursor-pointer border border-[#E8E4DB] active:scale-95"
+                            className="h-6 w-6 rounded-lg bg-[#FDFBF7] text-[#1B4332] hover:bg-[#E8F5E9] font-bold flex items-center justify-center transition-all cursor-pointer border border-[#E8E4DB] active:scale-95"
                             title="Méně porcí"
                           >
-                            <Minus className="h-3.5 w-3.5" />
+                            <Minus className="h-3 w-3" />
                           </button>
-                          <span className="w-10 text-center font-bold font-mono text-[#1B4332] text-sm">
+                          <span className="w-8 text-center font-bold font-mono text-[#1B4332] text-xs">
                             {formatCzechNumber(scaleFactor)}x
                           </span>
                           <button
                             type="button"
                             onClick={() => setScaleFactor(prev => Number((prev + 0.25).toFixed(2)))}
-                            className="h-7 w-7 rounded-lg bg-[#FDFBF7] text-[#1B4332] hover:bg-[#E8F5E9] font-bold flex items-center justify-center transition-all cursor-pointer border border-[#E8E4DB] active:scale-95"
+                            className="h-6 w-6 rounded-lg bg-[#FDFBF7] text-[#1B4332] hover:bg-[#E8F5E9] font-bold flex items-center justify-center transition-all cursor-pointer border border-[#E8E4DB] active:scale-95"
                             title="Více porcí"
                           >
-                            <Plus className="h-3.5 w-3.5" />
+                            <Plus className="h-3 w-3" />
                           </button>
                           {scaleFactor !== 1 && (
                             <button
@@ -5077,7 +5119,7 @@ ${separator}`;
                                 setEditingIngredientIndex(null);
                                 setEditingValue("");
                               }}
-                              className="px-2 text-[10px] font-black text-amber-750 hover:text-amber-900 cursor-pointer uppercase underline"
+                              className="px-1.5 text-[10px] font-black text-amber-750 hover:text-amber-900 cursor-pointer uppercase underline"
                               title="Obnovit výchozí porce"
                             >
                               Původní
@@ -5086,15 +5128,15 @@ ${separator}`;
                         </div>
 
                         {/* Velikost textu (Font Size Selector) */}
-                        <div className="flex items-center gap-1 bg-white border border-[#E8E4DB] rounded-xl p-1 font-sans text-xs shadow-2xs">
-                          <span className="px-2 font-bold text-[#555]">Velikost textu:</span>
+                        <div className="flex items-center gap-1 bg-white border border-[#E8E4DB] rounded-xl p-1 font-sans text-xs shadow-2xs shrink-0">
+                          <span className="px-1.5 font-bold text-[#555] whitespace-nowrap">Velikost textu:</span>
                           <div className="flex items-center gap-0.5">
                             {(["normal", "large", "extra-large"] as const).map((size) => (
                               <button
                                 type="button"
                                 key={size}
                                 onClick={() => setPaperFontSize(size)}
-                                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                                className={`px-2 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
                                   paperFontSize === size
                                     ? "bg-[#2D6A4F] text-white shadow-3xs"
                                     : "bg-[#FDFBF7] text-slate-600 hover:bg-slate-100"
@@ -5108,7 +5150,7 @@ ${separator}`;
                       </div>
 
                       {/* Right Group: Export & Print Actions */}
-                      <div className="flex items-center gap-2 flex-wrap">
+                      <div className="flex items-center gap-1.5 shrink-0">
                         {/* Stáhnout text (TXT) */}
                         <button
                           type="button"
@@ -5121,10 +5163,10 @@ ${separator}`;
                             element.click();
                             document.body.removeChild(element);
                           }}
-                          className="flex items-center gap-1.5 bg-white border border-[#E8E4DB] hover:bg-slate-50 text-slate-700 hover:text-[#1B4332] px-3 py-1.5 rounded-xl font-bold text-xs transition-all cursor-pointer shadow-2xs active:scale-95"
+                          className="flex items-center gap-1.5 bg-white border border-[#E8E4DB] hover:bg-slate-50 text-slate-700 hover:text-[#1B4332] px-2.5 py-1.5 rounded-xl font-bold text-xs transition-all cursor-pointer shadow-2xs active:scale-95 whitespace-nowrap"
                           title="Stáhnout recept jako textový soubor (TXT)"
                         >
-                          <Download className="h-4 w-4 text-emerald-600 font-bold" />
+                          <Download className="h-3.5 w-3.5 text-emerald-600 font-bold" />
                           <span>Stáhnout text</span>
                         </button>
 
@@ -5154,14 +5196,14 @@ ${separator}`;
                               document.body.removeChild(textarea);
                             }
                           }}
-                          className={`flex items-center gap-1.5 border border-[#E8E4DB] px-3 py-1.5 rounded-xl font-bold text-xs transition-all cursor-pointer shadow-2xs active:scale-95 ${
+                          className={`flex items-center gap-1.5 border border-[#E8E4DB] px-2.5 py-1.5 rounded-xl font-bold text-xs transition-all cursor-pointer shadow-2xs active:scale-95 whitespace-nowrap ${
                             copiedText 
                               ? "bg-emerald-700 text-white border-emerald-700" 
                               : "bg-white hover:bg-slate-50 text-slate-700"
                           }`}
                           title="Zkopírovat recept do schránky"
                         >
-                          <Copy className="h-4 w-4 text-slate-500 font-bold" />
+                          <Copy className="h-3.5 w-3.5 text-slate-500 font-bold" />
                           <span>{copiedText ? "Zkopírováno!" : "Kopírovat"}</span>
                         </button>
 
@@ -5169,10 +5211,10 @@ ${separator}`;
                         <button
                           type="button"
                           onClick={triggerPaperPrint}
-                          className="flex items-center gap-1.5 bg-[#1B4332] text-white hover:bg-[#2D6A4F] px-4 py-1.5 rounded-xl font-sans font-bold text-xs sm:text-sm transition-all cursor-pointer shadow-md active:scale-95"
+                          className="flex items-center gap-1.5 bg-[#1B4332] text-white hover:bg-[#2D6A4F] px-3 py-1.5 rounded-xl font-sans font-bold text-xs transition-all cursor-pointer shadow-md active:scale-95 whitespace-nowrap"
                           title="Vytisknout recept"
                         >
-                          <Printer className="h-4 w-4" />
+                          <Printer className="h-3.5 w-3.5" />
                           <span>Tisknout</span>
                         </button>
                       </div>
@@ -5436,51 +5478,54 @@ ${separator}`;
                         </div>
 
                         <div className="space-y-3.5">
-                          {selectedRecipe.instructions.map((step, index) => {
-                            const isCompleted = !!checkedInstructions[index];
-                            const stepIngs = getStepIngredients(step, selectedRecipe.ingredients, scaleFactor).filter(i => i.isMatched);
-                            return (
-                              <div 
-                                key={index}
-                                onClick={() => toggleInstruction(index)}
-                                className={`instruction-step p-4 sm:p-5 rounded-2xl border transition-all cursor-pointer flex gap-4 break-inside-avoid ${
-                                  isCompleted 
-                                  ? "bg-[#F0F4F1]/60 border-emerald-100 text-slate-400 opacity-80" 
-                                  : "bg-white hover:bg-[#FDFCF7] border-[#E8E8E1] hover:border-[#1B4332]/30 shadow-2xs"
-                                }`}
-                              >
-                                {/* Step Number Badge */}
-                                <div className={`w-9 h-9 rounded-full flex items-center justify-center text-xs sm:text-sm font-extrabold flex-shrink-0 transition-colors ${
-                                  isCompleted 
-                                  ? "bg-emerald-50 text-emerald-800 border border-emerald-200" 
-                                  : "bg-[#1B4332] text-white shadow-xs"
-                                }`}>
-                                  {isCompleted ? <Check className="h-4 w-4 stroke-[3]" /> : index + 1}
-                                </div>
+                          {(() => {
+                            let mainStepNum = 1;
+                            return selectedRecipe.instructions.map((step, index) => {
+                              if (isIngredientHeader(step)) {
+                                const headerTitle = cleanHeaderTitle(step);
+                                return (
+                                  <div key={index} className="pt-4 pb-1.5 border-b-2 border-[#1B4332] mt-6 mb-3 first:mt-0">
+                                    <h4 className="font-serif font-bold text-base sm:text-lg text-[#1B4332] uppercase tracking-wider flex items-center gap-2">
+                                      <span className="text-emerald-700">📌</span> {headerTitle}
+                                    </h4>
+                                  </div>
+                                );
+                              }
 
-                                <div className="space-y-2 flex-1">
-                                  <p className={`leading-relaxed ${
-                                    paperFontSize === "normal" ? "text-base" :
-                                    paperFontSize === "large" ? "text-lg font-medium" :
-                                    "text-xl font-semibold"
-                                  } ${isCompleted ? 'text-slate-400' : 'text-[#2C2C2C]'}`}>
-                                    {step}
-                                  </p>
+                              const currentNum = mainStepNum++;
+                              const isCompleted = !!checkedInstructions[index];
+                              return (
+                                <div 
+                                  key={index}
+                                  onClick={() => toggleInstruction(index)}
+                                  className={`instruction-step p-4 sm:p-5 rounded-2xl border transition-all cursor-pointer flex gap-4 break-inside-avoid ${
+                                    isCompleted 
+                                    ? "bg-[#F0F4F1]/60 border-emerald-100 text-slate-400 opacity-80" 
+                                    : "bg-white hover:bg-[#FDFCF7] border-[#E8E8E1] hover:border-[#1B4332]/30 shadow-2xs"
+                                  }`}
+                                >
+                                  {/* Step Number Badge */}
+                                  <div className={`w-9 h-9 rounded-full flex items-center justify-center text-xs sm:text-sm font-extrabold flex-shrink-0 transition-colors ${
+                                    isCompleted 
+                                    ? "bg-emerald-50 text-emerald-800 border border-emerald-200" 
+                                    : "bg-[#1B4332] text-white shadow-xs"
+                                  }`}>
+                                    {isCompleted ? <Check className="h-4 w-4 stroke-[3]" /> : currentNum}
+                                  </div>
 
-                                  {stepIngs.length > 0 && !isCompleted && (
-                                    <div className="pt-2 border-t border-[#E8E8E1]/60 text-xs font-sans" onClick={(e) => e.stopPropagation()}>
-                                      <span className="text-[10px] font-bold text-[#1B4332]/70 uppercase tracking-wider font-mono mr-1.5">
-                                        Potřebné suroviny v tomto kroku:
-                                      </span>
-                                      <span className="font-serif italic text-[#3A3A34] font-medium">
-                                        {stepIngs.map(i => i.display).join(', ')}
-                                      </span>
-                                    </div>
-                                  )}
+                                  <div className="space-y-2 flex-1">
+                                    <p className={`leading-relaxed ${
+                                      paperFontSize === "normal" ? "text-base" :
+                                      paperFontSize === "large" ? "text-lg font-medium" :
+                                      "text-xl font-semibold"
+                                    } ${isCompleted ? 'text-slate-400' : 'text-[#2C2C2C]'}`}>
+                                      {step}
+                                    </p>
+                                  </div>
                                 </div>
-                              </div>
-                            );
-                          })}
+                              );
+                            });
+                          })()}
                         </div>
                       </div>
 
