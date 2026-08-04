@@ -306,11 +306,11 @@ function getAi(): GoogleGenAI {
 
 // Model fallback retry wrapper to handle transient 503/429 errors gracefully
 async function generateContentWithRetry(ai: GoogleGenAI, options: any, maxRetries = 5, initialDelayMs = 1500) {
-  const originalModel = options.model || "gemini-3.5-flash";
+  const originalModel = options.model || "gemini-3.6-flash";
   const modelFallbackSequence = Array.from(new Set([
     originalModel,
+    "gemini-3.6-flash",
     "gemini-3.1-pro-preview",
-    "gemini-3.5-flash",
     "gemini-flash-latest",
     "gemini-3.1-flash-lite"
   ]));
@@ -804,7 +804,7 @@ app.post("/api/test-diagnostics", async (req, res) => {
       } else {
         const ai = getAi();
         const response = await generateContentWithRetry(ai, {
-          model: "gemini-3.5-flash",
+          model: "gemini-3.6-flash",
           contents: "Ahoj, odpověz jedním slovem: 'Ano'.",
         });
         if (response && response.text) {
@@ -859,7 +859,8 @@ ZÁSADNÍ PRAVIDLA:
 - Suroviny upřesni na přesné metrické jednotky vhodné pro domácnost.
 - SEZNAM SUROVIN (ingredients): VŽDY POVINNĚ ROZDĚL SUROVINY DO LOGICKÝCH SEKCÍ/BLOKŮ v hranatých závorkách podle toho, k jaké části receptu patří! Například: '[Papriky a masová náplň]', '[Základ rajské omáčky]', '[Koření a dochucení]', '[Těsto a kvásek]', '[Ovocná náplň]', '[Drobenka]', '[Na podávání]'. Každá sekce začíná v poli ingredients novým samostatným prvkem ve tvaru '[Název bloku]'. Tím zajistíš absolutní přehlednost, ke které části přípravy ingredience patří.
 - Krok za krokem postup (instructions) rozepiš do velmi podrobných, detailních a popsaných vět. Popiš přesné kulinářské nebo mechanické úkony s kuchyňským náčiním.
-- NEOPAKUJ ani nevkládej gramy, mililitry, kusy či jiné konkrétní váhy a množství surovin přímo do kroků postupu (v poli 'instructions')! Suroviny s přesným množstvím jsou již uvedeny v samostatném poli 'ingredients'. Postup přípravy má být čitelný, plynulý a přirozený jako v tradiční tištěné kuchařce (např. 'Změklé máslo utřete s cukrem a žloutky', nikoliv 'Utřete 120 g změklého másla s 50 g cukru a 2 ks žloutků'). Popisuj techniky a děje bez otravného plevelení číselnými údaji.
+- NEOPAKUJ ani nevkládej gramy, mililitry, kusy či jiné konkrétní váhy a množství surovin přímo do kroků postupu (v poli 'instructions')! Suroviny s přesným množstvím jsou již uvedeny v samostatném poli 'ingredients'. Postup přípravy má být čitelný, plynulý a přirozený jako v tradiční tištěné kuchařce (např. 'Změklé máslo utřete s cukrem a žloutky', nikoliv 'Utřete 120 g změklého másla s 50 g cukru a 2 ks žloutků').
+- POVINNOST ČASOVÝCH ÚDAJŮ U VŠECH PROCESNÍCH KROKŮ: V krocích postupu ('instructions') VŽDY UVÁDĚJ KONKRÉTNÍ ČASY a trvání u všech procesních a technických kroků, jako je autolýza, fermentace, kynutí, rozkvas, klíčení, namáčení, odležení, pečení, smažení, vaření, chlazení atd. (např. 'nechte autolyzovat po dobu 30 minut', 'kynutí 60 minut při pokojové teplotě', 'odležet v chladničce 4 hodiny', 'pečení 45 minut při 200 °C', 'hněťte po dobu 10 minut'). Každá procesní či tepelná fáze MUSÍ obsahovat přesný časový údaj.
 - Časovače jako samostatné odpočítávače u kroků zruš, vůbec na nich netrvej, důležité jsou detailní popisy děje a kulinářské kroky.
 - Tipy pro moderní kuchyni musí konkrétně popsat využití Air Fryeru (horkovzdušné fritézy), kuchyňských robotů (Thermomix), pomalých hrnců, domácích pekáren nebo podobných přístrojů pro tento recept.
 - V odůvodnění 'expertJustification' podrobně vysvětli laickým jazykem, PROČ jsi změnil teploty, časy, postupy nebo poměry na základě zmíněných 5 pilířů (zejména food science a kuchařské chemie).
@@ -890,7 +891,7 @@ ZÁSADNÍ PRAVIDLA:
     parts.push({ text: userPrompt });
 
     const response = await generateContentWithRetry(ai, {
-      model: "gemini-3.5-flash",
+      model: "gemini-3.6-flash",
       contents: [
         {
           role: "user",
@@ -977,6 +978,7 @@ ZÁSADNÍ PRAVIDLA:
 - Shrnutí receptu (summary) musí být velmi krátké, věcné a přehledné (cca 1-2 věty) a MUSÍ VŽDY POVINNĚ OBSAHOVAT PŘESNÉ ČASOVÉ ÚDAJE A INTERVALY (např. '2 hodiny marinování v směsi, 45 min pečení'). Při každé úpravě či přidání receptu uváděj v popisu tyto časové údaje.
 - Suroviny upřesni na přesné metrické jednotky.
 - NEOPAKUJ ani nevkládej gramy, mililitry, kusy či jiné konkrétní váhy a množství surovin přímo do kroků postupu (v poli 'instructions')! Postup přípravy má být čitelný, plynulý a přirozený jako v tradiční tištěné kuchařce bez opakování číselných hodnot surovin u každého kroku.
+- POVINNOST ČASOVÝCH ÚDAJŮ U VŠECH PROCESNÍCH KROKŮ: V krocích postupu ('instructions') VŽDY UVÁDĚJ KONKRÉTNÍ ČASY a trvání u všech procesních a technických kroků (autolýza, fermentace, kynutí, rozkvas, klíčení, namáčení, odležení, pečení, smažení, vaření, chlazení atd.). Každá procesní či tepelná fáze MUSÍ obsahovat přesný časový údaj.
 - ODSTRANĚNÍ KONZERVANTŮ: V ŽÁDNÉM RECEPTU NESMÍ BÝT POUŽITY ŽÁDNÉ KONZERVAČNÍ LÁTKY, KONZERVANTY ANI UMĚLÁ DOCHUCOVADLA.
 - REOLOGICKÉ A CHEMICKO-FYZIKÁLNÍ ALGORITMY PRO PEČIVO A TĚSTA:
   1. ABSOLUTNÍ MATEMATICKÁ BILANCE & HYDRATACE: Extrahuj veškerou mouku ze všech fází receptu (včetně rozkvasu/kvásku, autolýzy i hlavního těsta) a veškerou vodu. Celková hydratace = (Celková voda / Celková mouka) * 100. Pro pšenično-žitné chleby drž optimum 66-72 %, pro běžné pečivo dle reologie.
@@ -996,7 +998,7 @@ Vytvoř kompletně aktualizovaný recept se všemi poli. Ujisti se, že pokud se
 `;
 
     const response = await generateContentWithRetry(ai, {
-      model: "gemini-3.5-flash",
+      model: "gemini-3.6-flash",
       contents: [
         {
           role: "user",
@@ -1043,10 +1045,10 @@ Vytvoř kompletně aktualizovaný recept se všemi poli. Ujisti se, že pokud se
     
     const logs = [
       `[INFO] Navázáno spojení s Gemini API`,
-      `[INFO] Vybrán kulinářský model: Gemini 3.5 Flash`,
+      `[INFO] Vybrán kulinářský model: Gemini 3.6 Flash`,
       `[INFO] Odeslány pokyny uživatele s AI rolí: "${modificationPrompt}"`,
-      `[INFO] Model Gemini 3.5 Flash provedl chemicko-fyzikální analýzu ingrediencí a tepelné úpravy`,
-      `[SUCCESS] Recept byl úspěšně vygenerován pomocí Gemini 3.5 Flash (${outputText.length} znaků JSON)`
+      `[INFO] Model Gemini 3.6 Flash provedl chemicko-fyzikální analýzu ingrediencí a tepelné úpravy`,
+      `[SUCCESS] Recept byl úspěšně vygenerován pomocí Gemini 3.6 Flash (${outputText.length} znaků JSON)`
     ];
 
     res.json({ recipe: edited, logs });
@@ -1109,6 +1111,7 @@ ZÁSADNÍ PRAVIDLA PRO NOVÝ RECEPT (modifiedRecipe):
 - NIKDY NEMĚŇ NÁZEV RECEPTU (title) v modifiedRecipe! Název musí zůstat přesně stejný jako u původního receptu: "${recipe.title}".
 - Shrnutí receptu (summary) v modifiedRecipe MUSÍ VŽDY POVINNĚ OBSAHOVAT PŘESNÉ ČASOVÉ ÚDAJE A INTERVALY (např. '2 hodiny odležování v směsi, 60 min kynutí, 45 min pečení'). Při každé úpravě či přidání receptu uváděj v popisu tyto časové údaje.
 - V krocích postupu (instructions) v modifiedRecipe NEOPAKUJ ani nevkládej gramy, mililitry, kusy či jiné konkrétní váhy a množství surovin! Postup přípravy má být čitelný, plynulý a přirozený jako v tradiční tištěné kuchařce bez opakování číselných hodnot surovin u každého kroku.
+- POVINNOST ČASOVÝCH ÚDAJŮ U VŠECH PROCESNÍCH KROKŮ: V krocích postupu (instructions) v modifiedRecipe VŽDY UVÁDĚJ KONKRÉTNÍ ČASY a trvání u všech procesních a technických kroků (autolýza, fermentace, kynutí, rozkvas, klíčení, namáčení, odležení, pečení, smažení, vaření, chlazení atd.). Každá procesní či tepelná fáze MUSÍ obsahovat přesný časový údaj.
 `;
 
     const userPrompt = `
@@ -1117,7 +1120,7 @@ ${JSON.stringify(recipe, null, 2)}
 `;
 
     const response = await generateContentWithRetry(ai, {
-      model: "gemini-3.5-flash",
+      model: "gemini-3.6-flash",
       contents: [
         {
           role: "user",

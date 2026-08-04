@@ -700,6 +700,8 @@ export default function App() {
   const [addFormError, setAddFormError] = useState<string | null>(null);
   const [addAiText, setAddAiText] = useState("");
   const [isGeneratingAiModal, setIsGeneratingAiModal] = useState(false);
+  const [aiModalProgressPercent, setAiModalProgressPercent] = useState(0);
+  const [aiModalProgressText, setAiModalProgressText] = useState("");
 
   const defaultCategories = useMemo(() => ["Maso", "Pečivo", "Polévky", "Sladká jídla a moučníky", "Ostatní"], []);
 
@@ -1036,7 +1038,7 @@ export default function App() {
 
       sendWorkFinishedNotification(
         "Vědecká kontrola dokončena",
-        `Rozbor receptu "${selectedRecipe.title}" pomocí Gemini 3.5 Flash proběhl úspěšně.`
+        `Rozbor receptu "${selectedRecipe.title}" pomocí Gemini 3.6 Flash proběhl úspěšně.`
       );
 
     } catch (err: any) {
@@ -1133,6 +1135,7 @@ export default function App() {
   const [isEditLoading, setIsEditLoading] = useState(false);
   const [editError, setEditError] = useState<string | null>(null);
   const [editLogs, setEditLogs] = useState<string[]>([]);
+  const [editProgressPercent, setEditProgressPercent] = useState(0);
 
   const startEditingRecipe = () => {
     if (!selectedRecipe) return;
@@ -1188,6 +1191,7 @@ export default function App() {
     setIsEditLoading(true);
     setEditError(null);
     setEditLogs([]); // Clean previous logs
+    setEditProgressPercent(10);
 
     const nowStr = () => {
       const d = new Date();
@@ -1200,7 +1204,7 @@ export default function App() {
       `[PROCESS] Parsování vašich pokynů: "${editPrompt}"`,
       "[PROCESS] Spojení s kulinářským AI jádrem (Pilíř 1, 2, 3, 4 & 5)...",
       "[PROCESS] Vyhodnocování chemických vazeb a gastronomických vztahů surovin...",
-      "[PROCESS] Validace nepřítomnosti konzervačních a umělých přísad...",
+      "[PROCESS] Validace pravidla pro postupy přípravy (časy u procesních kroků)...",
       "[PROCESS] Optimalizace tepelného profilu a teploty moderních spotřebičů...",
       "[PROCESS] Syntéza upraveného popisu, surovin a nového postupu v češtině...",
       "[PROCESS] Generování odborného kuchařského zdůvodnění expertJustification..."
@@ -1218,6 +1222,8 @@ export default function App() {
         const timeStr = now.toTimeString().split(' ')[0];
         setEditLogs(prev => [...prev, `[${timeStr}] [${level}] ${msg}`]);
         currentStep++;
+        const pct = Math.min(92, Math.round((currentStep / logStepsTemplates.length) * 85) + 10);
+        setEditProgressPercent(pct);
       }
     }, 700);
 
@@ -1286,6 +1292,7 @@ export default function App() {
       setEditDifficulty(editedRecipe.difficulty || "Střední");
       setEditCategory(editedRecipe.category || getRecipeCategory(editedRecipe));
       setEditPrompt(""); // Clear prompt after success
+      setEditProgressPercent(100);
 
       const timeStrSuccess = new Date().toTimeString().split(' ')[0];
       setEditLogs(prev => [...prev, `[${timeStrSuccess}] [SUCCESS] Recept byl úspěšně zrekonstruován a načten do formuláře!`]);
@@ -1439,6 +1446,25 @@ export default function App() {
 
     setIsGeneratingAiModal(true);
     setAddFormError(null);
+    setAiModalProgressPercent(12);
+    setAiModalProgressText("Iniciace spojení s Google Gemini 3.6 Flash...");
+
+    const aiModalSteps = [
+      { p: 25, t: "Skenování surovin a rozpoznávání textu/dokumentu..." },
+      { p: 48, t: "Kontrola a dopočítání přesných časů u všech kulinářských kroků..." },
+      { p: 72, t: "Aplikace pravidla pro postupy přípravy (časy u procesních kroků)..." },
+      { p: 88, t: "Chemicko-fyzikální kulinářská kontrola a syntéza..." },
+      { p: 96, t: "Sestavování finální struktury receptu..." }
+    ];
+
+    let modalStepIdx = 0;
+    const modalInterval = setInterval(() => {
+      if (modalStepIdx < aiModalSteps.length) {
+        setAiModalProgressPercent(aiModalSteps[modalStepIdx].p);
+        setAiModalProgressText(aiModalSteps[modalStepIdx].t);
+        modalStepIdx++;
+      }
+    }, 1100);
 
     try {
       const response = await fetch("/api/enhance-recipe", {
@@ -1453,6 +1479,8 @@ export default function App() {
         })
       });
 
+      clearInterval(modalInterval);
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || "Při generování receptu přes AI nastala chyba.");
@@ -1462,6 +1490,9 @@ export default function App() {
       if (!data.recipe) {
         throw new Error("Server nevrátil platný recept.");
       }
+
+      setAiModalProgressPercent(100);
+      setAiModalProgressText("Recept byl úspěšně vygenerován!");
 
       const newRecipe: Recipe = {
         ...data.recipe,
@@ -1574,7 +1605,7 @@ export default function App() {
       setDiagnosticsStepIndex(1);
       await sleep(700);
 
-      setDiagnosticsProgressText("Navazování spojení s Google Gemini AI (gemini-3.5-flash)...");
+      setDiagnosticsProgressText("Navazování spojení s Google Gemini AI (gemini-3.6-flash)...");
       setDiagnosticsProgressPercent(60);
       setDiagnosticsStepIndex(2);
 
@@ -4137,14 +4168,14 @@ ${separator}`;
                           <div className="text-center space-y-3">
                             <p className="text-sm font-bold text-emerald-400 flex items-center justify-center gap-1.5">
                               <span className="inline-block h-2 w-2 bg-emerald-500 rounded-full animate-ping"></span>
-                              Zpracovávám pomocí Gemini 3.5 Flash...
+                              Zpracovávám pomocí Gemini 3.6 Flash...
                             </p>
                             <p className="text-xs text-slate-400 max-w-md mx-auto leading-relaxed">
-                              Právě probíhá kompletní kulinářský audit s vědeckým kulinářským modelem <strong className="text-emerald-300">Gemini 3.5 Flash</strong>. Recept prochází chemickou simulací reakcí surovin, vyvažováním chutí a eliminací konzervantů.
+                              Právě probíhá kompletní kulinářský audit s vědeckým kulinářským modelem <strong className="text-emerald-300">Gemini 3.6 Flash</strong>. Recept prochází chemickou simulací reakcí surovin, vyvažováním chutí a eliminací konzervantů.
                             </p>
                             <div className="text-[10px] text-slate-500 font-mono flex items-center justify-center gap-1 bg-slate-950 p-2 rounded-lg max-w-sm mx-auto border border-slate-800">
                               <span>🚀 Aktivní relace: </span>
-                              <span className="text-emerald-400 font-bold">gemini-3.5-flash</span>
+                              <span className="text-emerald-400 font-bold">gemini-3.6-flash</span>
                             </div>
                             <button
                               type="button"
@@ -4654,7 +4685,7 @@ ${separator}`;
                         </div>
                         <div className="text-[10px] text-[#92400E] font-mono font-bold bg-amber-50 px-2 py-1 rounded-lg border border-amber-200/40 flex items-center gap-1">
                           <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                          Aktivní model: Gemini 3.5 Flash
+                          Aktivní model: Gemini 3.6 Flash
                         </div>
                       </div>
                       {editError && (
@@ -4665,17 +4696,32 @@ ${separator}`;
                       )}
 
                       {editLogs.length > 0 && (
-                        <div className="mt-3 bg-[#1E1E1C] border border-[#2D2D2A] rounded-xl p-3.5 font-mono text-[11px] leading-relaxed text-[#DCD1BA] shadow-inner max-h-56 overflow-y-auto space-y-1">
-                          <div className="flex items-center justify-between border-b border-[#3A3A34] pb-1.5 mb-2 text-[10px] text-[#8C8273] uppercase tracking-wider font-bold">
-                            <span>📡 Průběh kulinářské analýzy (živý log)</span>
-                            {isEditLoading && (
-                              <span className="flex h-2 w-2 relative">
-                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-                                <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
-                              </span>
-                            )}
+                        <div className="mt-3 bg-[#1E1E1C] border border-[#2D2D2A] rounded-xl p-3.5 font-mono text-[11px] leading-relaxed text-[#DCD1BA] shadow-inner space-y-2.5">
+                          <div className="flex items-center justify-between border-b border-[#3A3A34] pb-1.5 text-[10px] text-[#8C8273] uppercase tracking-wider font-bold">
+                            <span className="flex items-center gap-1.5 text-amber-400">
+                              <Sparkles className="h-3.5 w-3.5" />
+                              Průběh kulinářské analýzy (živý log)
+                            </span>
+                            <div className="flex items-center gap-2">
+                              <span className="text-amber-400 font-bold">{editProgressPercent}%</span>
+                              {isEditLoading && (
+                                <span className="flex h-2 w-2 relative">
+                                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                                  <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+                                </span>
+                              )}
+                            </div>
                           </div>
-                          <div className="space-y-1 select-text">
+
+                          {/* Progress bar */}
+                          <div className="w-full bg-[#2D2D2A] h-1.5 rounded-full overflow-hidden">
+                            <div 
+                              className="bg-gradient-to-r from-amber-500 via-amber-400 to-emerald-400 h-full transition-all duration-300 ease-out"
+                              style={{ width: `${editProgressPercent}%` }}
+                            />
+                          </div>
+
+                          <div className="max-h-48 overflow-y-auto space-y-1 select-text pt-0.5">
                             {editLogs.map((log, idx) => {
                               let colorClass = "text-[#DCD1BA]";
                               if (log.includes("[SUCCESS]")) {
@@ -7823,18 +7869,56 @@ ${separator}`;
                     </p>
                   </div>
 
-                  <div className="space-y-2">
-                    <label className="block text-xs font-bold text-[#1B4332] uppercase tracking-wider">
-                      Zadejte popis nebo zápisky receptu
-                    </label>
-                    <textarea
-                      rows={6}
-                      value={addAiText}
-                      onChange={(e) => setAddAiText(e.target.value)}
-                      placeholder="Např.: 'Mám vepřovou panenku, sušenou šunku, šalvěj a bílé víno. Chci připravit rychlou večeři v remosce nebo na pánvi.'"
-                      className="w-full text-sm p-4 border border-[#E8E8E1] rounded-xl bg-white text-[#2C2C2C] focus:outline-hidden focus:ring-1 focus:ring-[#1B4332]"
-                    />
-                  </div>
+                  {isGeneratingAiModal ? (
+                    <div className="bg-[#1B4332] text-white border border-[#2D6A4F] rounded-2xl p-6 shadow-lg space-y-4 text-center my-2 animate-fadeIn">
+                      <div className="relative mx-auto w-14 h-14 flex items-center justify-center">
+                        <div className="w-14 h-14 rounded-full border-4 border-emerald-900 border-t-amber-400 animate-spin absolute inset-0" />
+                        <ChefHat className="h-6 w-6 text-amber-400 animate-pulse relative z-10" />
+                      </div>
+
+                      <div>
+                        <h4 className="font-extrabold text-sm text-emerald-200 uppercase tracking-wider">
+                          Probíhá generování receptu přes AI
+                        </h4>
+                        <p className="text-xs text-emerald-100/80 mt-1 font-medium max-w-sm mx-auto">
+                          Kulinářský model Gemini 3.6 Flash zpracovává zadání a dopočítává časy u všech kroků postupu.
+                        </p>
+                      </div>
+
+                      {/* Live Step Text */}
+                      <div className="bg-emerald-950/80 border border-emerald-800/80 rounded-xl p-3 text-xs text-amber-300 font-semibold flex items-center justify-center gap-2">
+                        <Sparkles className="h-4 w-4 text-amber-400 animate-bounce shrink-0" />
+                        <span>{aiModalProgressText || "Generuji recept..."}</span>
+                      </div>
+
+                      {/* Progress bar */}
+                      <div className="space-y-1.5 pt-1">
+                        <div className="flex items-center justify-between text-[11px] text-emerald-300 font-mono font-bold px-1">
+                          <span>Průběh zpracování:</span>
+                          <span className="text-amber-400">{aiModalProgressPercent}%</span>
+                        </div>
+                        <div className="w-full bg-emerald-950 h-2 rounded-full overflow-hidden border border-emerald-800">
+                          <div
+                            className="bg-gradient-to-r from-amber-500 via-amber-400 to-emerald-400 h-full transition-all duration-300 ease-out"
+                            style={{ width: `${aiModalProgressPercent}%` }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      <label className="block text-xs font-bold text-[#1B4332] uppercase tracking-wider">
+                        Zadejte popis nebo zápisky receptu
+                      </label>
+                      <textarea
+                        rows={6}
+                        value={addAiText}
+                        onChange={(e) => setAddAiText(e.target.value)}
+                        placeholder="Např.: 'Mám vepřovou panenku, sušenou šunku, šalvěj a bílé víno. Chci připravit rychlou večeři v remosce nebo na pánvi.'"
+                        className="w-full text-sm p-4 border border-[#E8E8E1] rounded-xl bg-white text-[#2C2C2C] focus:outline-hidden focus:ring-1 focus:ring-[#1B4332]"
+                      />
+                    </div>
+                  )}
                 </form>
               )}
 
