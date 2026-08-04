@@ -1,6 +1,6 @@
 {
   "title": "Houskový knedlík z parní trouby",
-  "summary": "Tradiční kynutý knedlík vařený v nasycené páře. Recept zahrnuje 15 min aktivace kvásku, 5 min opékání žemlí, 8 min hnětení těsta, 60 min primárního kynutí, 20 min dokynutí šišek a 22 min vaření v páře.",
+  "summary": "Tradiční kynutý houskový knedlík vařený v parní troubě. Zahrnuje 15 min aktivace kvásku, 5 min opékání žemlí, 8 min hnětení těsta, 50 min primárního kynutí, 20 min dokynutí šišek a 20 min vaření v páře.",
   "ingredients": [
     "250 g hrubé mouky",
     "250 g polohrubé mouky",
@@ -13,23 +13,22 @@
     "15 g přepuštěného másla"
   ],
   "instructions": [
-    "V malé misce rozdrobte čerstvé droždí, přidejte cukr krupice a zalijte částí vlažného plnotučného mléka. Zaprašte trochou mouky odebrané z celkového množství, promíchejte a nechte na teplém místě po dobu 15 minut vzejít pěnivý kvásek.",
-    "Nakrájejte žemle na drobné kostičky. Na pánvi rozpusťte přepuštěné máslo, nasypte pečivo a opečte ho dozlatova po dobu 5 minut. Opečené kostičky nechte chladnout na pokojovou teplotu po dobu 10 minut.",
-    "Do mísy hnětacího robotu prosejte obě mouky a promíchejte je s jemnou solí. Přidejte vzejitý kvásek, zbylé vlažné mléko a rozšlehané vejce.",
-    "Zpracovávejte těsto hnětacím hákem po dobu 8 minut, dokud nezíska hladkou a elastickou strukturu. V poslední 1 minutě do těsta na nejnižší rychlost zapracujte zchladlé kostičky žemlí.",
-    "Mísu přikryjte utěrkou a nechte na teplém místě kynout po dobu 60 minut, dokud těsto nezdvojnásobí svůj objem.",
-    "Těsto vyklopte na pomoučený vál, rozdělte na dvě poloviny a z každé vytvarujte souměrnou šišku během 2 minut.",
-    "Šišky položte na pečicí papír, přikryjte utěrkou a nechte dokynout po dobu 20 minut.",
-    "Parní troubu rozpalte na režim plné páry na sto stupňů. Šišky přeneste na děrovaný plech a vařte v plné páře po dobu 22 minut.",
+    "V malé misce rozdrobte čerstvé droždí, přidejte cukr krupice a zalijte částí vlažného plnotučného mléka. Zaprašte trochou odebrané mouky, promíchejte a nechte na teplém místě po dobu 15 minut vzejít pěnivý kvásek.",
+    "Nakrájejte žemle na drobné kostičky. Na pánvi rozpusťte přepuštěné máslo, nasypte nakrájené pečivo a opečte ho dozlatova po dobu 5 minut. Opečené kostičky nechte chladnout na pokojovou teplotu po dobu 10 minut.",
+    "Do mísy hnětacího robotu prosejte obě mouky a promíchejte je s jemnou solí. Přidejte vzejitý kvásek, zbylé vlažné mléko a rozšlehané vejce. Zpracovávejte těsto hnětacím hákem po dobu 8 minut, dokud nezíská hladkou a elastickou strukturu.",
+    "Do vytvořeného těsta zapracujte na nejnižší rychlost zchladlé kostičky žemlí po dobu 1 minuty. Mísu přikryjte utěrkou a nechte na teplém místě kynout po dobu 50 minut.",
+    "Těsto vyklopte na pomoučený vál, rozdělte napůl a z každé části vytvarujte souměrnou šišku po dobu 2 minut.",
+    "Vytvarované šišky položte na pečicí papír, přikryjte utěrkou a nechte na teplém místě dokynout po dobu 20 minut.",
+    "Parní troubu předehřejte na režim plné páry na sto stupňů. Šišky přeneste na děrovaný plech a vařte v nasycené páře po dobu 20 minut.",
     "Po uvaření knedlíky ihned potřete rozpuštěným máslem, nechte odpočívat po dobu 3 minut a poté krájejte režnou nití nebo pilkovým nožem."
   ],
-  "applianceTips": "Pokud vaše parní trouba disponuje funkcí kynutí s podporou vlhkosti při 35 °C, zkrátí se primární fáze kynutí na 35 minut. Při vaření používejte výhradně perforovaný plech vyložený pečicím papírem s otvory.",
-  "expertJustification": "Přesné dodržení časových intervalů hnětení a kynutí garantuje ideální vývoj lepkové sítě bez rizika překyselení nebo kolapsu střídy. Opečení žemlí na másle vytvoří tukovou bariéru zabraňující vsakování tekutiny z těsta. Použití nasycené páry při sto stupních fixuje povrchové škroby bez nutnosti propichování po uvaření.",
+  "applianceTips": "Při vaření v parní troubě používejte děrovaný plech vyložený pečicím papírem, do kterého uděludete malé otvory pro volný průchod páry. Pokud vaše trouba nabízí kynutí při 35 °C, zkrátí se primární kynutí na 30 minut.",
+  "expertJustification": "Úprava primárního kynutí na 50 minut zabraňuje narušení lepkové sítě v důsledku nadměrné tvorby oxidu uhličitého. Úprava vaření na 20 minut při 100 °C v nasycené páře garantuje plnou želatinizaci škrobů bez rizika vrásnění povrchu po vytažení.",
   "applianceType": "Parní trouba",
-  "cookingTime": "1 hod 57 min",
+  "cookingTime": "1 hod 50 min",
   "estimatedCookingTime": "22 min",
   "difficulty": "Střední",
   "category": "Pečivo",
   "id": "recipe-ai-1785788044620",
-  "updatedAt": "2026-08-04T12:17:54.051Z"
+  "updatedAt": "2026-08-04T12:18:47.763Z"
 }
