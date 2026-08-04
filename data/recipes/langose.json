@@ -1,6 +1,6 @@
 {
   "title": "Langoše",
-  "summary": "Tradiční kynuté langoše připravené přímou metodou s postupným zapracováním tuku pro dosažení dokonale vláčného a pružného těsta.",
+  "summary": "Tradiční nadýchané langoše s česnekem, zakysanou smetanou a sýrem vyžadují 15 min aktivace kvásku, 60 min kynutí těsta, 30 min odpočinku bochánků a 4 minuty smažení.",
   "ingredients": [
     "[Těsto]",
     "500 g pšeničné mouky typ 00",
@@ -19,24 +19,26 @@
   ],
   "instructions": [
     "[Příprava a kynutí těsta]",
-    "Do mísy planetárního robotu nalijte vlažné mléko, ve kterém rozmíchejte sladěnku a rozdrobte čerstvé droždí, a nechte krátce aktivovat.",
-    "Na tekutý základ nasypte mouku a navrch přidejte sůl, čímž zamezíte přímému kontaktu soli s kvasinkami.",
-    "Zapněte robot na první rychlostní stupeň a hněťte, dokud se suroviny nespojí do kompaktního a hladkého těsta, které se začne odlepovat od stěn mísy.",
-    "V poslední minutě hnětení za stálého chodu robotu pramínkem přilévejte olej, aby obalil lepková vlákna a dodal těstu finální elasticitu.",
-    "[Smažení langošů]",
-    "Těsto přemístěte do nádoby a nechte v teple vykynout 60 min, dokud nezdvojnásobí svůj objem.",
-    "Vykynuté těsto rozdělte na bochánky, které pod utěrkou necháte krátce cca 30 min odpočinout pro snadnější vytahování.",
-    "[Dokončení a podávání]",
-    "Bochánky vytvarujte do tenkých placek a ihned smažte v rozpáleném oleji dozlatova z obou stran.",
-    "Hotové langoše nechte krátce okapat na papírové utěrce, potřete česnekem rozmíchaným ve vodě a podávejte se zakysanou smetanou a strouhaným sýrem."
+    "Do mísy planetárního robotu nalijte vlažné mléko, rozmíchejte v něm sladěnku, rozdrobte čerstvé droždí a nechte 15 minut aktivovat kvásek.",
+    "Na tekutý základ nasypte mouku a navrch přidejte sůl, čímž zabráníte přímému kontaktu soli s kvasinkami.",
+    "Hněťte v robotu na první rychlostní stupeň po dobu 8 minut, dokud se ingredience nespojí do hladkého těsta.",
+    "Během posledních 2 minut hnětení za stálého chodu robotu přilejte tenkým pramínkem olej a zapracujte ho do těsta.",
+    "Těsto v míse zakryjte a nechte v teple kynout 60 minut, dokud nezdvojnásobí svůj objem.",
+    "[Tvarování a smažení]",
+    "Vykynuté těsto rozdělejte na rovnocenné bochánky a nechte je pod utěrkou odpočívat 30 minut, aby se uvolnil lepek a placky se lépe vytahovaly.",
+    "Rozpalte olej ve fritéze nebo hluboké pánvi na požadovanou teplotu.",
+    "Bochánky ručně vytvarujte od středu ke krajům do tenkých placek a smažte 2 minuty z jedné strany a 2 minuty z druhé strany, celkem tedy 4 minuty dozlatova.",
+    "[Dokončení a servírování]",
+    "Smažené langoše nechte 2 minuty okapat na papírové utěrce.",
+    "Česnek utřete s vodou a mašlovačkou jím potřete horké langoše, potom je potřete zakysanou smetanou a zasypte strouhaným sýrem."
   ],
-  "applianceTips": "Při hnětení používejte planetární robot na nízké otáčky, aby se těsto nezahřálo a udrželo si svou viskozitu. Při smažení udržujte teplotu oleje stabilně kolem 175 °C pro dosažení maximální křupavosti.",
-  "expertJustification": "Přímá metoda se separovaným přidáním soli a postupným zapracováním tuku zajišťuje optimální kinetiku fermentace a reologickou stabilitu lepkové sítě, což je klíčové pro snadné vytahování placek.",
+  "applianceTips": "Při hnětení v planetárním robotu udržujte nízkou rychlost po celých 10 minut hnětení, aby se těsto nezahřálo nad 26 °C. Ve fritéze udržujte stabilní teplotu 175 °C.",
+  "expertJustification": "Dodržení přesných časových prodlev (15 min aktivace, 60 min kynutí, 30 min relaxace lepku) zajišťuje skvělou tažnost těsta bez nežádoucího smršťování. Smažení po dobu 4 minut garantuje křupavou kůrku a propečenou střídku.",
   "applianceType": "Planetární robot a fritéza",
-  "cookingTime": "90 min",
+  "cookingTime": "110 min",
   "difficulty": "Střední",
   "category": "Slaná jídla bez masa",
   "id": "gen-1781590909243",
-  "updatedAt": "2026-07-15T19:46:14.760Z",
+  "updatedAt": "2026-08-04T12:21:05.879Z",
   "estimatedCookingTime": "15 min"
 }
