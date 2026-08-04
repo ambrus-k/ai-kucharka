@@ -1,6 +1,6 @@
 {
   "title": "Chléb Šumava",
-  "summary": "Tradiční pšenično-žitný chléb s vyváženým kvasným stupněm a optimalizovanou hydratací pro nadýchanou střídu. Celkový proces zahrnuje 8–10 hodin zrání rozkvasu, 40 minut autolýzy, 2 hodiny fermentace, 60–90 minut kynutí v ošatce a 45 minut pečení.",
+  "summary": "Tradiční pšenično-žitný chléb s vyváženým kvasným stupněm. Recept zahrnuje 8–10 hodin zrání rozkvasu, 40 minut autolýzy, 2 hodiny fermentace, 60–90 minut kynutí v ošatce a 45 minut pečení.",
   "ingredients": [
     "[Rozkvas]",
     "100 g žitné chlebové mouky (T930)",
@@ -19,17 +19,17 @@
     "V zakryté nádobě smíchejte žitný kvásek, žitnou chlebovou mouku a vlažnou vodu. Nechte přikryté zrát při pokojové teplotě, dokud rozkvas nezdvojnásobí až neztrojnásobí svůj objem.",
     "V míse kuchyňského robotu smíchejte pšeničnou chlebovou mouku, žitnou chlebovou mouku a většinu vlažné vody určené na autolýzu. Krátce promíchejte jen do homogenizace surovin a nechte těsto zakryté odpočívat pro plnou hydrataci lepkového pletiva a aktivaci přirozených enzymů.",
     "K autolyzovanému těstu přidejte vyzrálý žitný rozkvas, mořskou sůl a celý kmín. Hněťte hákem na nízkou rychlost a během míchání po částech přilévejte zbylou část vlažné vody pro úpravu hydratace. Hněťte pouze krátce, dokud těsto nedosáhne tvárné a elastické struktury.",
-    "Těsto přesuňte do lehce vyolejované mísy a nechte kynout. Během kynutí proveďte pouze dvě šetrné série překládání namočenýma rukama v první polovině fermentace a v druhé polovině nechte těsto nerušeně zrát, aby se neporušila vnitřní struktura plynových bublin.",
+    "Těsto přesuňte do lehce vyolejované mísy a nechte kynout. Během kynutí proveďte pouze šetrné série překládání namočenýma rukama v první polovině fermentace a v druhé polovině nechte těsto nerušeně zrát, aby se neporušila vnitřní struktura plynových bublin.",
     "Vykynuté těsto opatrně vyklopte na lehce pomoučenou pracovní plochu, stočte do pevného bochníku se správným povrchovým napětím a vložte jej spojem nahoru do ošatky vysypané rýžovou nebo žitnou moukou. Nechte kynout pod utěrkou, dokud stlačený důlek v těstě nevrací svoji polohu pouze velmi líně.",
-    "Pečicí troubu předehřejte spolu s pečicím kamenem nebo litinovým hrncem na vysokou teplotu. Vykynutý bochník opatrně vyklopte na sázecí lopatu s pečicím papírem, prořízněte ostrou žiletkou a pečte prvních deset minut se silným zapařením trouby nebo v zakrytém hrnci. Poté troubu vyvětrejte, snižte teplotu a dopékejte do tmavě zlatavé kůrky a dutého zvuku při poklepu na spodní stranu bochníku."
+    "Pečicí troubu předehřejte spolu s pečicím kamenem nebo litinovým hrncem na vysokou teplotu. Vykynutý bochník opatrně vyklopte na sázecí lopatu s pečicím papírem, prořízněte ostrou žiletkou a pečte se silným zapařením trouby nebo v zakrytém hrnci. Poté troubu vyvětrejte, snižte teplotu a dopékejte do tmavě zlatavé kůrky a dutého zvuku při poklepu na spodní stranu bochníku."
   ],
   "applianceTips": "Při použití parní trouby pečte prvních 10 minut na program s maximálním vstřikováním páry při 250 °C, poté páru odsajte a dokončete pečení při 200 °C. Pro přípravu v robotu typu Thermomix hněťte těsto v režimu Kynuté těsto maximálně 3 až 4 minuty, aby nedošlo k mechanickému poškození žitných slizových látek a přehřátí těsta.",
-  "expertJustification": "Hydratace celkového těsta na úrovni 68,5 % přesně odpovídá potřebám vysokosavých chlebových muk T650 a T930. Autolýza s hydratací nad 55 % rozvíjí lepkovou síť bez chemického či mechanického namáhání ještě před přidáním soli. Vzhledem k tomu, že podíl žitné mouky dosahuje téměř 29 %, dochází k tvorbě viskózních arabinoxylanových gelů namísto pružného lepku. Z toho důvodu je mechanické hnětení zkráceno a překládání je omezeno na pouhé 2 série, čímž se zabrání zkapalnění a překyselení struktury střídy.",
+  "expertJustification": "Hydratace celkového těsta na úrovni 69,0 % přesně odpovídá nárokům muk T650 a T930. Autolýza s hydratací nad 58 % optimálně zakládá lepkovou síť. Vzhledem k vysokému podílu žitné mouky (29,6 %) zabraňuje omezené mechanické zpracování roztrhání arabinoxylanové struktury a zkapalnění střídy. Instrukce byly zbaveny číselných hmotností pro lepší čitelnost v praxi.",
   "applianceType": "Trouba s parní funkcí / Litinový hrnec",
   "cookingTime": "14 hodin",
   "estimatedCookingTime": "45 min",
   "difficulty": "Střední",
   "category": "Pečivo",
   "id": "recipe-ai-1785841655036",
-  "updatedAt": "2026-08-04T11:07:35.036Z"
+  "updatedAt": "2026-08-04T11:10:24.085Z"
 }
