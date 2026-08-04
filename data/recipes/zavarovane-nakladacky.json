@@ -1,6 +1,6 @@
 {
   "title": "Zavařované nakládačky",
-  "summary": "Křupavé nakládačky připravené s využitím přírodní kořenící směsi v stylu Deko bez obsahu chemických konzervantů. Postup zahrnuje 120 minut namáčení v ledové lázni, 5 minut vaření nálevu, 30 minut chladnutí, 10 minut sterilace sklenic, 20 minut pasterizace a 12 hodin pozvolného chlazení.",
+  "summary": "Křupavé nakládačky připravené v tradičním nálevu s využitím směsi Deko od výrobce Alibona. Postup zahrnuje 120 minut namáčení okurek v ledové lázni, 5 minut vaření nálevu, 30 minut chladnutí nálevu, 10 minut sterilace sklenic, 20 minut pasterizace a 12 hodin chlazení.",
   "ingredients": [
     "[Zelenina a aromata]",
     "Okurky nakládačky (velikost 7–9 cm) 2000 g",
@@ -8,35 +8,28 @@
     "Cibule 150 g",
     "Čerstvý kvetoucí kopr 4 stonky",
     "Čerstvé vinné nebo křenové listy 4 ks",
-    "[Přírodní kořenicí směs typu Deko (bez konzervantů)]",
-    "Hořčičné semínko žluté 15 g",
-    "Koriandr celý 5 g",
-    "Nové koření drcené 3 g",
-    "Pepř černý drcený 4 g",
-    "Bobkový list drcený 2 g",
-    "Kyselina citronová 5 g",
-    "[Nálevová báze]",
+    "[Kořeněný nálev]",
+    "Kořenicí přípravek Deko Alibona 100 g",
     "Voda 1750 ml",
     "Kvasný lihový ocet 8% 500 ml",
-    "Cukr krupice 150 g",
-    "Mořská sůl (nejodovaná) 60 g"
+    "Cukr krupice 120 g"
   ],
   "instructions": [
-    "Okurky důkladně operte v jemném kartáčku pod tekoucí studenou vodou a nechte je namočené v ledové vodní lázni po dobu 120 minut pro obnovení buněčného turgoru a dosažení křupavosti.",
-    "Do nerezového hrnce odměřte vodu, kvasný lihový ocet, cukr krupici, nejodovanou mořskou sůl a připravenou přírodní kořenicí směs typu Deko. Nálev přiveďte k varu a povařte po dobu 5 minut pro uvolnění éterických olejů z koření. Poté nálev odstavte a nechte chladnout po dobu 30 minut.",
+    "Okurky důkladně operte jemným kartáčkem pod tekoucí studenou vodou a nechte je namočené v ledové vodní lázni po dobu 120 minut pro obnovení buněčného turgoru a dosažení maximální křupavosti.",
+    "Do nerezového hrnce odměřte vodu, kvasný lihový ocet, cukr krupici a kořenicí přípravek Deko Alibona. Nálev přiveďte k varu a povařte po dobu 5 minut pro důkladné rozpuštění složek a uvolnění aroma. Poté nálev odstavte a nechte chladnout po dobu 30 minut.",
     "Očištěnou mrkev a cibuli nakrájejte na tenká kolečka. Zavařovací sklenice i s víčky sterilujte v parní lázni po dobu 10 minut.",
     "Na dno sterilních sklenic vložte vinné listy a část kvetoucího kopru. Okurky skládejte do sklenic svisle a těsně vedle sebe a průběžně je prokládejte kolečky mrkve a cibule.",
-    "Zeleninu zalijte vlažným kořeněným nálevem s vyváženým poměrem koření tak, aby byla zcela ponořená a pod okrajem sklenice zůstal volný prostor. Hrdla sklenic otřete do sucha a upevňujte víčka po dobu 2 minut důkladného ručního utahování.",
-    "Sklenice vložte do zavařovacího hrnce s temperovanou vodou a sterilujte při konstantní teplotě 85 °C po dobu 20 minut.",
+    "Zeleninu zalijte vlažným nálevem se směsí Deko tak, aby byla zcela ponořená a pod okrajem sklenice zůstal volný prostor. Hrdla sklenic otřete do sucha a upevňujte víčka po dobu 2 minut důkladného ručního utahování.",
+    "Sklenice vložte do zavařovacího hrnce s temperovanou vodou a sterilujte při konstantní teplote 85 °C po dobu 20 minut.",
     "Po dokončení pasterizace sklenice vyjměte, otočte dnem vzhůru a nechte pozvolna chladnout po dobu 12 hodin při pokojové teplotě."
   ],
-  "applianceTips": "V multifunkčním nebo zavařovacím hrnci nastavte režim pasterizace přesně na 85 °C s časem 20 minut. Konstantní teplota bez skokového přehřátí udrží okurky dokonale pevné a křupavé.",
-  "expertJustification": "Na základě striktních pravidel pro vyloučení syntetických konzervantů byla z receptury vynechána komerční směs Deko obsahující benzoan sodný. Namísto toho byla vytvořena čistě přírodní suchá kořeněná směs kopírující chuťový profil Deka (hořčice, koriandr, nové koření, pepř, bobkový list a kyselina citronová pro optimální pH). Konzervace je dosažena synergií octové kyseliny, soli, cukru a přesně řízené pasterizace při 85 °C po dobu 20 minut.",
+  "applianceTips": "V zavařovacím hrnci nebo parní troubě nastavte přesný pasterační režim na 85 °C s časem 20 minut. Konstantní teplota zabrání změknutí okurek a zaručí jejich perfektní křupavost.",
+  "expertJustification": "Recept byl upraven dle požadavku uživatele nahrazením jednotlivých druhů koření hotovým kořenicím přípravkem Deko od výrobce Alibona. Tato směs již obsahuje přesně vyvážený podíl hořčičného semínka, soli a aromatických látek, což usnadňuje přípravu nálevu a garantuje charakteristický tradiční chuťový profil nálevu.",
   "applianceType": "Parní trouba / Zavařovací hrnec",
   "cookingTime": "2 hod 55 min",
   "estimatedCookingTime": "20 min",
   "difficulty": "Střední",
   "category": "Ostatní",
   "id": "recipe-ai-1785842606699",
-  "updatedAt": "2026-08-04T11:26:29.565Z"
+  "updatedAt": "2026-08-04T11:27:52.995Z"
 }
