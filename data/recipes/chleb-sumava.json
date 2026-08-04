@@ -1,6 +1,6 @@
 {
   "title": "Chléb Šumava",
-  "summary": "Tradiční pšenično-žitný chléb s vyváženým kvasným stupněm. Recept zahrnuje 8–10 hodin zrání rozkvasu, 40 minut autolýzy, 2 hodiny fermentace, 60–90 minut kynutí v ošatce a 45 minut pečení.",
+  "summary": "Tradiční pšenično-žitný kváskový chléb. Příprava zahrnuje 8–10 hodin zrání rozkvasu, 40 minut autolýzy, 2 hodiny fermentace s překládáním, 60–90 minut kynutí v ošatce a 45 minut pečení.",
   "ingredients": [
     "[Rozkvas]",
     "100 g žitné chlebové mouky (T930)",
@@ -9,27 +9,27 @@
     "[Hlavní těsto]",
     "500 g pšeničné chlebové mouky (T650)",
     "100 g žitné chlebové mouky (T930)",
-    "380 ml vlažné vody (25 °C)",
+    "380 ml vlažné vody (25 °C, rozděleno na 350 ml + 30 ml bassinage)",
     "14 g jemné mořské soli",
     "10 g celého kmínu",
     "[Tvarování a vysypání ošatky]",
     "20 g rýžové nebo žitné mouky"
   ],
   "instructions": [
-    "V zakryté nádobě smíchejte žitný kvásek, žitnou chlebovou mouku a vlažnou vodu. Nechte přikryté zrát při pokojové teplotě, dokud rozkvas nezdvojnásobí až neztrojnásobí svůj objem.",
-    "V míse kuchyňského robotu smíchejte pšeničnou chlebovou mouku, žitnou chlebovou mouku a většinu vlažné vody určené na autolýzu. Krátce promíchejte jen do homogenizace surovin a nechte těsto zakryté odpočívat pro plnou hydrataci lepkového pletiva a aktivaci přirozených enzymů.",
-    "K autolyzovanému těstu přidejte vyzrálý žitný rozkvas, mořskou sůl a celý kmín. Hněťte hákem na nízkou rychlost a během míchání po částech přilévejte zbylou část vlažné vody pro úpravu hydratace. Hněťte pouze krátce, dokud těsto nedosáhne tvárné a elastické struktury.",
-    "Těsto přesuňte do lehce vyolejované mísy a nechte kynout. Během kynutí proveďte pouze šetrné série překládání namočenýma rukama v první polovině fermentace a v druhé polovině nechte těsto nerušeně zrát, aby se neporušila vnitřní struktura plynových bublin.",
-    "Vykynuté těsto opatrně vyklopte na lehce pomoučenou pracovní plochu, stočte do pevného bochníku se správným povrchovým napětím a vložte jej spojem nahoru do ošatky vysypané rýžovou nebo žitnou moukou. Nechte kynout pod utěrkou, dokud stlačený důlek v těstě nevrací svoji polohu pouze velmi líně.",
-    "Pečicí troubu předehřejte spolu s pečicím kamenem nebo litinovým hrncem na vysokou teplotu. Vykynutý bochník opatrně vyklopte na sázecí lopatu s pečicím papírem, prořízněte ostrou žiletkou a pečte se silným zapařením trouby nebo v zakrytém hrnci. Poté troubu vyvětrejte, snižte teplotu a dopékejte do tmavě zlatavé kůrky a dutého zvuku při poklepu na spodní stranu bochníku."
+    "V zakryté nádobě smíchejte žitný kvásek, žitnou chlebovou mouku a vlažnou vodu. Nechte přikryté zrát při pokojové teplotě do zdvojnásobení až ztrojnásobení objemu.",
+    "V míse robotu smíchejte pšeničnou chlebovou mouku, žitnou chlebovou mouku a větší část vlažné vody určené na autolýzu. Míchejte pouze krátce do spojení surovin a nechte těsto odpočívat pro plnou hydrataci lepkového pletiva.",
+    "K autolyzovanému těstu přidejte vyzrálý rozkvas, mořskou sůl a celý kmín. Hněťte hákem na nízkou rychlost a během hnětení po částech přilijte zbylou vlažnou vodu pro úpravu hydratace metodou bassinage, dokud nevznikne tvárné a elastické těsto.",
+    "Těsto nechte přikryté kynout v míse. Během kynutí proveďte pouze dvě šetrné série překladů namočenýma rukama a v závěrečné fázi nechte těsto zcela v klidu zrát, abyste neporušili vnitřní strukturu plynových bublin.",
+    "Těsto opatrně vyklopte na pomoučený vál, vytvarujte pevný bochník s dostatečným povrchovým napětím a vložte jej spojem nahoru do ošatky vysypané moukou. Nechte kynout při pokojové teplotě, dokud se po zatlačení prstem důlek nevrací líně.",
+    "Vykynutý bochník opatrně vyklopte na pečicí papír. Pečte v předehřáté troubě se silným zapařením nebo na automatický parní program ze studeného startu. Po úvodní fázi troubu vyvětrejte, snižte teplotu a dopékejte do tmavě zlatavé kůrky."
   ],
-  "applianceTips": "Při použití parní trouby pečte prvních 10 minut na program s maximálním vstřikováním páry při 250 °C, poté páru odsajte a dokončete pečení při 200 °C. Pro přípravu v robotu typu Thermomix hněťte těsto v režimu Kynuté těsto maximálně 3 až 4 minuty, aby nedošlo k mechanickému poškození žitných slizových látek a přehřátí těsta.",
-  "expertJustification": "Hydratace celkového těsta na úrovni 69,0 % přesně odpovídá nárokům muk T650 a T930. Autolýza s hydratací nad 58 % optimálně zakládá lepkovou síť. Vzhledem k vysokému podílu žitné mouky (29,6 %) zabraňuje omezené mechanické zpracování roztrhání arabinoxylanové struktury a zkapalnění střídy. Instrukce byly zbaveny číselných hmotností pro lepší čitelnost v praxi.",
-  "applianceType": "Trouba s parní funkcí / Litinový hrnec",
+  "applianceTips": "Při použití parní trouby zvolte na začátku pečení maximální vstřikovávání páry při 250 °C, poté páru odvětrejte a dokončete pečení při 200 °C. Pro zadělání v kuchyňském robotu hněťte těsto na nízký stupeň krátce, aby nedošlo k poškození viskózních žitných gelů.",
+  "expertJustification": "Celková hydratace receptu dosahuje 68,6 %, což je ideální hodnota pro směs muk T650 a T930. Hydratace autolýzy na úrovni 58,3 % plně vyhovuje reologickým požadavkům na bobtnání lepku. Omezení na maximálně 2 série překládání chrání arabinoxylany v žitné mouce před mechanickým přetížením. Postup neobsahuje žádné gramáže ani mililitry v instrukcích.",
+  "applianceType": "Trouba s parní funkcí / Litinový hrnec / Kuchyňský robot",
   "cookingTime": "14 hodin",
   "estimatedCookingTime": "45 min",
   "difficulty": "Střední",
   "category": "Pečivo",
   "id": "recipe-ai-1785841655036",
-  "updatedAt": "2026-08-04T11:10:24.085Z"
+  "updatedAt": "2026-08-04T11:11:55.818Z"
 }
