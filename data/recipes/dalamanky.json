@@ -1,10 +1,10 @@
 {
   "title": "Dalamánky",
-  "summary": "Tradiční žitno-pšeničné dalamánky s procesem 15 min vzejití omládku, 30 min autolýzy, 45 min primárního kynutí, 35 min kynutí na plechu a 20 min pečení pro křupavou kůrku a vláčnou střídku.",
+  "summary": "Tradiční žitno-pšeničné dalamánky s procesem 15 min vzejití omládku, 30 min autolýzy, 45 min primárního kynutí, 10 min odpočinku, 35 min kynutí na plechu a 20 min pečení pro dokonalý tvar a křupavou kůrku.",
   "ingredients": [
     "300 g pšeničné chlebové mouky T1050",
     "200 g žitné chlebové mouky T930",
-    "370 ml vlažné vody",
+    "350 ml vlažné vody",
     "15 g čerstvého droždí",
     "10 g ječného sladového výtažku",
     "10 g jablečného octa",
@@ -14,26 +14,22 @@
     "Celý kmín na posyp"
   ],
   "instructions": [
-    "[Příprava omládku a autolýza]",
-    "V malé misce rozmíchejte čerstvé droždí s menší částí vlažné vody a ječným sladovým výtažkem a nechte 15 minut vzejít omládek při pokojové teplotě.",
+    "V malé misce rozmíchejte čerstvé droždí s částí vlažné vody a ječným sladovým výtažkem a nechte 15 minut vzejít omládek při pokojové teplotě.",
     "Ve velké míse smíchejte pšeničnou chlebovou mouku a žitnou chlebovou mouku se zbývající vlažnou vodou a nechte 30 minut odpočívat v režimu autolýzy pro důkladné nasáknutí vody a aktivaci enzymů.",
-    "[Hnětení a primární fermentace]",
-    "K autolytickému těstu přidejte vzešlý omládek, jablečný ocet, drcený kmín a mořskou sůl. Hněťte hnětacím hákem 4 minuty na nejnižší rychlostní stupeň, aby se suroviny spojily bez poškození lepkové struktury.",
+    "K autolytickému těstu přidejte vzešlý omládek, jablečný ocet, drcený kmín a jemnou mořskou sůl. Hněťte v robotu hnětacím hákem 4 minuty na nejnižší rychlost, aby se suroviny homogenně spojily bez narušení viskózního gelu žitných pentosanů.",
     "Mísu zakryjte utěrkou a nechte těsto 45 minut primárně kynout při pokojové teplotě.",
-    "[Tvarování a sekundární fermentace]",
-    "Vykynuté těsto rozdělejte na pomoučeném vále na stejné díly, vytvarujte pevné oválné dalamánky a nechte 10 minut odpočinout.",
+    "Vykynuté těsto rozdělejte na pomoučeném vále na stejné bochánky, vytvarujte pevné oválné dalamánky a nechte je 10 minut odpočívat na vále.",
     "Přemístěte dalamánky na plech s pečicím papírem, povrch hluboce nařízněte žiletkou, posypte hrubozrnnou solí i celým kmínem a nechte 35 minut finálně kynout pod utěrkou.",
-    "[Pečení]",
-    "Vložte plech do trouby předehřáté s parním zárazem a pečte 8 minut při vysoké teplě.",
+    "Vložte plech do trouby předehřáté s parním zárazem na vysokou teplotu a pečte 8 minut.",
     "Troubu na pár sekund vyvětrejte pro únik páry, snižte teplotu a dopečte 12 minut dozlatova."
   ],
-  "applianceTips": "Při pečení bez parní trouby vložte na dno spodní rošt starý plech a při vkládání dalamánků na něj vlejte 100 ml vroucí vody. Po 8 minutách plech s vodou vyjměte, aby kůrka krásně zkřupatěla.",
-  "expertJustification": "Navýšením celkové vody na 370 ml jsme zvedli hydrataci autolýzy na 64 %, čímž jsme odstranili riziko suchých hrudek v těstě a umožnili pentosanům správně bobtnat. Zkrácení hnětení na 4 minuty chrání citlivou strukturu žitné mouky před rozpadem.",
+  "applianceTips": "Při pečení bez parní trouby vložte na dno trouby starý plech a při vkládání dalamánků na něj vlejte 100 ml vroucí vody. Po 8 minutách plech s vodou opatrně vyjměte, aby kůrka krásně zkřupatěla.",
+  "expertJustification": "Snížením vody na 350 ml jsme upravili celkovou hydrataci na optimálních 70 % pro volně pečené dalamánky. Autolýza s 60% hydratací zajišťuje bezchybnou proteolytickou aktivitu bez rizika lepivosti těsta a šetrné hnětení v délce 4 minut chrání střídku s 40% podílem žita před rozpadem.",
   "applianceType": "Horkovzdušná trouba s možností připařování",
-  "cookingTime": "157 min",
+  "cookingTime": "154 min",
   "difficulty": "Střední",
   "category": "Pečivo",
   "id": "gen-1783722072636",
-  "updatedAt": "2026-08-06T07:48:08.626Z",
+  "updatedAt": "2026-08-06T07:53:08.243Z",
   "estimatedCookingTime": "20 min"
 }
