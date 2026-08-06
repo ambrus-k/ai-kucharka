@@ -4,7 +4,7 @@
   "ingredients": [
     "300 g pšeničné chlebové mouky T1050",
     "200 g žitné chlebové mouky T930",
-    "350 ml vlažné vody",
+    "370 ml vlažné vody",
     "15 g čerstvého droždí",
     "10 g ječného sladového výtažku",
     "10 g jablečného octa",
@@ -15,25 +15,25 @@
   ],
   "instructions": [
     "[Příprava omládku a autolýza]",
-    "V malé misce rozmíchejte čerstvé droždí s částí vlažné vody a ječným sladovým výtažkem a nechte 15 minut vzejít omládek při pokojové teplotě.",
+    "V malé misce rozmíchejte čerstvé droždí s menší částí vlažné vody a ječným sladovým výtažkem a nechte 15 minut vzejít omládek při pokojové teplotě.",
     "Ve velké míse smíchejte pšeničnou chlebovou mouku a žitnou chlebovou mouku se zbývající vlažnou vodou a nechte 30 minut odpočívat v režimu autolýzy pro důkladné nasáknutí vody a aktivaci enzymů.",
     "[Hnětení a primární fermentace]",
-    "K autolytickému těstu přidejte vzešlý omládek, jablečný ocet, drcený kmín a mořskou sůl. Hněťte hnětacím hákem pouhé 4 minuty na nejnižší rychlostní stupeň, aby se suroviny spojily bez poškození lepkové struktury.",
+    "K autolytickému těstu přidejte vzešlý omládek, jablečný ocet, drcený kmín a mořskou sůl. Hněťte hnětacím hákem 4 minuty na nejnižší rychlostní stupeň, aby se suroviny spojily bez poškození lepkové struktury.",
     "Mísu zakryjte utěrkou a nechte těsto 45 minut primárně kynout při pokojové teplotě.",
     "[Tvarování a sekundární fermentace]",
     "Vykynuté těsto rozdělejte na pomoučeném vále na stejné díly, vytvarujte pevné oválné dalamánky a nechte 10 minut odpočinout.",
     "Přemístěte dalamánky na plech s pečicím papírem, povrch hluboce nařízněte žiletkou, posypte hrubozrnnou solí i celým kmínem a nechte 35 minut finálně kynout pod utěrkou.",
     "[Pečení]",
-    "Vložte plech do trouby předehřáté s parním zárazem a pečte 8 minut při vysoké teplotě 230 °C.",
-    "Troubu na pár sekund vyvětrejte pro únik páry, snižte teplotu na 200 °C a dopečte 12 minut dozlatova."
+    "Vložte plech do trouby předehřáté s parním zárazem a pečte 8 minut při vysoké teplě.",
+    "Troubu na pár sekund vyvětrejte pro únik páry, snižte teplotu a dopečte 12 minut dozlatova."
   ],
   "applianceTips": "Při pečení bez parní trouby vložte na dno spodní rošt starý plech a při vkládání dalamánků na něj vlejte 100 ml vroucí vody. Po 8 minutách plech s vodou vyjměte, aby kůrka krásně zkřupatěla.",
-  "expertJustification": "Zvýšením hydratace na 70 % v kombinaci s autolýzou získají žitné pentosany potřebný čas na nabobtnání. Zkrácení hnětení na 4 minuty zabrání rozpadu struktury střídky. Jablečný ocet snižuje pH a chránítěsto před enzymatickým lepením, zatímco slad zajistí rychlý start fermentace a pěkné barvení kůrky.",
+  "expertJustification": "Navýšením celkové vody na 370 ml jsme zvedli hydrataci autolýzy na 64 %, čímž jsme odstranili riziko suchých hrudek v těstě a umožnili pentosanům správně bobtnat. Zkrácení hnětení na 4 minuty chrání citlivou strukturu žitné mouky před rozpadem.",
   "applianceType": "Horkovzdušná trouba s možností připařování",
   "cookingTime": "157 min",
   "difficulty": "Střední",
   "category": "Pečivo",
   "id": "gen-1783722072636",
-  "updatedAt": "2026-08-06T07:46:18.852Z",
+  "updatedAt": "2026-08-06T07:48:08.626Z",
   "estimatedCookingTime": "20 min"
 }
