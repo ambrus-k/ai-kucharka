@@ -1,0 +1,41 @@
+{
+  "title": "Kmínové dalamánky",
+  "summary": "Tradiční hutné dalamánky s přídavkem žitné mouky a sladu. Příprava zahrnuje 90 minut hnětení a primárního kynutí v pekárně, 35 minut sekundárního kynutí na plechu a 20 minut pečení v troubě s parním nárazem (8 minut při 230 °C a 12 minut při 200 °C).",
+  "ingredients": [
+    "[Těsto]",
+    "300 g pšeničné chlebové mouky T1050",
+    "200 g žitné chlebové mouky T930",
+    "330 ml vlažné vody",
+    "10 g jablečného octa",
+    "10 g sypkého sladového výtažku",
+    "15 g čerstvého droždí",
+    "10 g mořské soli",
+    "8 g drceného kmínu",
+    "[Na dohotovení a posyp]",
+    "15 g celého kmínu",
+    "10 g hrubozrnné soli",
+    "30 ml vody na potření"
+  ],
+  "instructions": [
+    "Do nádoby domácí pekárny nalijte vlažnou vodu a jablečný ocet a následně zasypte pšeničnou chlebovou moukou, žitnou chlebovou moukou, drceným kmínem a sypkým sladovým výtažkem.",
+    "Do jednoho rohu nádoby nasypte mořskou sůl a uprostřed mouky vytvořte malý důlek, do kterého rozdrobte čerstvé droždí tak, aby před zapnutím nepřišlo do kontaktu se solí ani tekutinou.",
+    "Nádobu vložte do pekárny a zapněte program Těsto na hnětení a kynutí v celkové délce 90 minut.",
+    "Vykynuté těsto vyklopte na pomoučenou pracovní plochu a nechte 5 minut odpočinout pro uvolnění lepkové sítě.",
+    "Těsto rozdělte na osm až ten stejných dílů a jemným stočením vytvarujte pevné oválné dalamánky, které rozložte na plech vyložený pečicím papírem.",
+    "Povrch každého dalamánku podélně hluboce nařízněte žiletkou, potřete vodou a posypte celým kmínem s hrubozrnnou solí.",
+    "Plech zakryjte čistou utěrkou a nechte probíhat sekundární kynutí po dobu 35 minut při pokojové teplotě.",
+    "Během kynutí předehřejte troubu se spodním pečicím plechem na 230 °C po dobu 20 minut.",
+    "Dalamánky vložte do vyhřáté trouby, na spodní hotový plech vlijte vroucí vodu pro vytvoření intenzivní páry a pečte 8 minut při 230 °C.",
+    "Troubu na několik sekund vyvětrejte pro odchod zbývající páry, snižte teplotu na 200 °C a dopečte 12 minut dozlatova a prokřupava.",
+    "Upečené dalamánky přeneste na chladicí mřížku a nechte chladnout po dobu 30 minut."
+  ],
+  "applianceTips": "Domácí pekárna zajistí ideální konstantní teplotu pro kynutí žitno-pšeničného těsta. Pečení v klasické troubie s parním nárazem ze spodního rozpáleného plechu vykouzlí dokonalou křupavou kůrku, které samotná pekárna dosáhnout nedokáže.",
+  "expertJustification": "Hydratace těsta 66 % je přesně vypočítaná pro kombinaci pšeničné chlebové mouky T1050 a žitné T930, čímž drží dalamánky tvar i bez formy. Sypký sladový výtažek dodává jednoduché cukry pro enzymatickou aktivitu kvasinek a zajišťuje typickou sladovo-chlebovou vůni i karamelizaci kůrky. Jablečný ocet mírně zakyseluje prostředí, což podporuje žitný škrob k tvorbě viskózního gelu a stabilizuje střídku bez použití umělých zlepšujících přípravků.",
+  "applianceType": "Domácí pekárna a pečicí trouba",
+  "cookingTime": "2 hod 25 min",
+  "estimatedCookingTime": "20 min",
+  "difficulty": "Střední",
+  "category": "Pečivo",
+  "id": "recipe-ai-1786003383349",
+  "updatedAt": "2026-08-06T08:03:03.349Z"
+}
