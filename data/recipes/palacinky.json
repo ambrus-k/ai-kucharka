@@ -1,9 +1,10 @@
 {
   "title": "Palačinky",
-  "summary": "Jemné a elastické palačinky s vyváženým poměrem surovin pro snadné otáčení bez trhání. Recept vyžaduje 30 minut odležení těsta a 15 minut smažení na rozpalené pánvi při střední teplotě.",
+  "summary": "Jemné a zároveň pevné palačinky díky vyvážené kombinaci hladké a polohrubé mouky. Recept vyžaduje 30 minut odležení těsta v chladu a 15 minut smažení na rozpalené pánvi.",
   "ingredients": [
     "[Těsto na palačinky]",
-    "Hladká pšeničná mouka 380 g",
+    "Hladká pšeničná mouka 260 g",
+    "Polohrubá pšeničná mouka 120 g",
     "Plnotučné mléko 1 l",
     "Vejce (velikost M) 4 ks",
     "Rozpuštěné máslo 30 g",
@@ -14,19 +15,19 @@
   ],
   "instructions": [
     "V hluboké míse vyšlehejte plnotučné mléko, vejce, cukr moučka a sůl po dobu 2 minut do homogenní tekuté směsi.",
-    "Do tekutého základu postupně za stálého šlehání prosívejte hladkou pšeničnou mouku a šlehejte po dobu 2 minut, dokud nevznikne hladké těsto bez hrudek. Na závěr všlehejte vlažné rozpuštěné máslo po dobu 1 minuty.",
-    "Přikryté těsto dejte odležet do chladničky na dobu 30 minut pro správnou hydrataci škrobu a uvolnění lepku.",
-    "Rozpalte pánev na palačinky na středně vysokou teplotu a mašlovačkou ji lehce potřete přepuštěným máslem.",
-    "Naběračkou nalijte těsto do středu pánve a krouživým pohybem ho rozlijte po celé ploše. Smažte z první strany po dobu 90 sekund, dokud okraje nezezlátnou.",
+    "Do tekutého základu postupně za stálého šlehání prosívejte směs hladké a polohrubé pšeničné mouky a šlehejte po dobu 3 minut, dokud nevznikne hladké těsto bez hrudek. Na závěr všlehejte vlažné rozpuštěné máslo po dobu 1 minuty.",
+    "Přikryté těsto dejte odležet do chladničky na dobu 30 minut pro správnou hydrataci škrobových zrn a uvolnění lepku.",
+    "Rozpalte pánev na palačinky na středně vysokou teplotu po dobu 2 minut a mašlovačkou ji lehce potřete přepuštěným máslem.",
+    "Naběračkou nalijte těsto do středu pánve a krouživým pohybem ho rozlijte po celé ploše. Smažte z první strany po dobu 90 sekund, dokud okraje nezezlátnou a těsto nezpevní.",
     "Palačinku obraťte a opékejte z druhé strany po dobu 40 sekund. Tento postup opakujte se zbytkem těsta po celkovou dobu 15 minut."
   ],
-  "applianceTips": "Pro dokonalé těsto bez hrudek použijte stolní mixér nebo Thermomix (míchání 30 sekund na rychlost 4). Pro usnadnění smažení bez připalování je ideální elektrický palačinkovač nastavený na 200 °C.",
-  "expertJustification": "Použití výhradně hladké mouky namísto polohrubé zajišťuje lepší tvorbu lepkové sítě a jemnější texturu. Odležení těsta v chladu po dobu 30 minut je kritické z hlediska potravinářské chemie – dochází k plnému naboptnání škrobových zrn a relaxaci tenze lepku, což zabraňuje trhání a smršťování palačinek při smažení. Všlehání rozpuštěného másla přímo do těsta vytváří emulzi, která zlepšuje vláčnost a snižuje přichytávání k pánvi. Přepuštěné máslo (ghí) na smažení má vysoký kouřový bod, díky čemuž se nepřepaluje a nevytváří hořké tóny ani škodlivé látky.",
+  "applianceTips": "Pro dokonalé těsto bez hrudek použijte stolní mixér nebo Thermomix (míchání 1 minutu na střední rychlost). Pro usnadnění smažení bez připalování je ideální elektrický palačinkovač nastavený na 200 °C.",
+  "expertJustification": "Nahrazení části hladké mouky moukou polohrubou přináší do těsta větší granulometrické částice škrobu a bílkovin, což zvyšuje pevnost v tahu a elasticitu upečené palačinky. Těsto se díky tomu netrhá a lépe se s ním manipuluje při otáčení i motání s bohatšími náplněmi. Odležení po dobu 30 minut je u polohrubé mouky ještě důležitější, aby hrubší částice stihly absorbovat mléčnou tekutinu a plně naboptnat.",
   "applianceType": "Stolní mixér a pánev na palačinky",
   "cookingTime": "45 min",
   "estimatedCookingTime": "15 min",
   "difficulty": "Snadné",
   "category": "Sladká jídla a moučníky",
   "id": "recipe-ai-1786297803754",
-  "updatedAt": "2026-08-09T17:50:30.274Z"
+  "updatedAt": "2026-08-09T17:52:42.622Z"
 }
