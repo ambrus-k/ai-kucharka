@@ -1,0 +1,36 @@
+{
+  "title": "Chléb Šumava",
+  "summary": "Tradiční pšenično-žitný chléb s vyváženou 68,5% hydratací. Příprava zahrnuje 8–10 hodin zrání rozkvasu, 40 minut autolýzy, 2 hodiny fermentace a 45 minut pečení při 250 °C a 200 °C.",
+  "ingredients": [
+    "[Žitný rozkvas]",
+    "100 g žitné chlebové mouky (T930)",
+    "100 ml vlažné vody (25 °C)",
+    "20 g aktivního žitného kvásku",
+    "[Hlavní těsto]",
+    "500 g pšeničné chlebové mouky (T650)",
+    "100 g žitné chlebové mouky (T930)",
+    "350 ml vlažné vody (25 °C) na autolýzu",
+    "30 ml vlažné vody (25 °C) na bassinage",
+    "14 g mořské soli",
+    "10 g celého kmínu",
+    "[Na vysypání ošatky]",
+    "20 g rýžové nebo žitné mouky"
+  ],
+  "instructions": [
+    "V misce smíchejte žitný kvásek s moukou a vlažnou vodou na rozkvas. Zabalte a nechte zrát při pokojové teplotě po dobu 8–10 hodin, dokud rozkvas nezdvojnásobí až neztrojnásobí svůj objem.",
+    "Do mísy nasypte pšeničnou i žitnou chlebovou mouku na hlavní těsto a zalijte určeným množstvím vlažné vody. Krátce míchejte po dobu 1–2 minut do propojení a nechte autolyzovat po dobu 40 minut pro plnou hydrataci lepkové sítě.",
+    "K autolyzovanému těstu přidejte vyzrálý rozkvas, sůl a celý kmín. Hněťte v robotu hákem na nízkou rychlost po dobu 6–8 minut, přičemž během hnětení po částech přilévejte zbývající odraženou vodu pro úpravu konzistence těsta.",
+    "Mísu přikryjte a nechte těsto podstoupit první fermentaci po dobu 2 hodin. Během kynutí proveďte pouze 2 šetrné série překládání namočenýma rukama: první v 35.–40. minutě a druhou v 75.–80. minutě. Zbylých 40 minut nechte těsto zcela v klidu zrát.",
+    "Vykynuté těsto vyklopte na pomoučený vál, stočte do pevného bochníku a vložte spojem nahoru do ošatky vysypané moukou. Nechte finálně kynout při pokojové teplotě po dobu 60–90 minut, dokud test prstem nevykáže líné vracení důlku.",
+    "Vykynutý bochník opatrně vyklopte na pečicí papír. Pečte v předehřáté troubě se zapařením při 250 °C po dobu 10 minut, poté troubu vyvětrejte, snižte teplotu na 200 °C a dopékejte po dobu 35 minut. Po upečení nechte chléb chladnout na mřížce po dobu 2 hodin."
+  ],
+  "applianceTips": "Pro hnětení lze využít kuchyňský robot s hákem nebo Thermomix (míchání 3 minuty na režim Těsto). Pečení je nejvhodnější v parní troubě s ručně zadanou intenzitou páry na prvních 10 minut při 250 °C a následným pečením horkovzduchem bez páry při 200 °C.",
+  "expertJustification": "Zařazení 40minutové autolýzy před přidáním soli a rozkvasu umožňuje plné rozvinutí lepkové sítě pšeničné mouky. Vzhledem k téměř 29% podílu žitné mouky, která obsahuje viskózní pentosany a netvoří klasický lepek, je doba hnětení zkrácena na 6–8 minut a počet překladů omezen na 2 série. Tím nedojde k roztrhání střídy. Technika bassinage (postupné přilévání vody) bezpečně zapracuje celkovou 68,5% hydrataci.",
+  "applianceType": "Trouba s parní funkcí / Kuchyňský robot",
+  "cookingTime": "16 hodin",
+  "estimatedCookingTime": "45 min",
+  "difficulty": "Střední",
+  "category": "Pečivo",
+  "id": "recipe-ai-1786282213789",
+  "updatedAt": "2026-08-09T13:30:13.789Z"
+}
