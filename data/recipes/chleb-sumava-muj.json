@@ -1,0 +1,36 @@
+{
+  "title": "Chléb Šumava - můj",
+  "summary": "Tradiční pšenično-žitný chléb s hydratací 68,5 % a vyváženým kvasným stupněm pro optimální vláčnost střídy. Proces zahrnuje 8–10 hodin zrání rozkvasu, 40 minut autolýzy, 2 hodiny fermentace, 60–90 minut kynutí v ošatce a 45 minut pečení.",
+  "ingredients": [
+    "[Žitný rozkvas]",
+    "100 g žitné chlebové mouky T930",
+    "100 ml vlažné vody (25 °C)",
+    "20 g aktivního žitného kvásku",
+    "[Hlavní těsto]",
+    "500 g pšeničné chlebové mouky T650",
+    "100 g žitné chlebové mouky T930",
+    "350 ml vlažné vody (25 °C) na autolýzu",
+    "30 ml vlažné vody (25 °C) na dokončení (bassinage)",
+    "14 g jemné mořské soli",
+    "10 g celého kmínu",
+    "[Na tvarování a ošatku]",
+    "20 g rýžové nebo žitné mouky na vysypání ošatky"
+  ],
+  "instructions": [
+    "Příprava rozkvasu (zrání 8–10 hodin): V nádobě smíchejte žitný kvásek s žitnou moukou a vlažnou vodou. Přikryjte víkem či fólií a nechte zrát při pokojové teplotě po dobu 8 až 10 hodin, dokud rozkvas nezdvojnásobí až neztrojnásobí svůj objem.",
+    "Autolýza (40 minut): Do mísy robotu odvažte pšeničnou i žitnou mouku a přilijte vlažnou vodu určenou na autolýzu. Hněťte hákem na nejnižší rychlost po dobu 1 až 2 minut pouze do hrubého propojení. Nechte těsto zakryté odpočívat po dobu 40 minut pro plnou rehydrataci mouky a přirozené rozvinutí lepkové sítě.",
+    "Hnětení a úprava hydratace (6–8 minut): K autolyzovanému těstu přidejte vyzrálý rozkvas, sůl a celý kmín. Spusťte hnětení na nízké rychlosti s hnětacím hákem. Během hnětení po dobu 6 až 8 minut postupně po troškách přilévejte zbývající vlažnou vodu (metoda bassinage), dokud nevznikne hladké, poddajné a elastické těsto.",
+    "První fermentace a překládání (2 hodiny): Těsto přemístěte do lehce vyolejované nádoby a nechte kynout po dobu 2 hodin. Proveďte pouze 2 šetrné série překladů namočenýma rukama: poprvé po 35 až 40 minutách a podruhé po 75 až 80 minutách kynutí. Zbývajících 40 minut nechte těsto zcela v klidu odpočívat pro akumulaci kvasných plynů.",
+    "Tvarování a druhé kynutí (60–90 minut): Vykynuté těsto opatrně stočte na lehce pomoučeném vále do pevného bochníku s utaženým povrchovým napětím. Vložte jej spojem nahoru do ošatky vysypané rýžovou nebo žitnou moukou. Nechte kynout při pokojové teplotě po dobu 60 až 90 minut, dokud se po jemném stlačení prstem důlek nevrací líně zpět.",
+    "Pečení (45 minut): Bochník vyklopte z ošatky na pečicí papír. Chléb pečte v troubě předehřáté na 250 °C s intenzivním zapařením po dobu 10 minut. Poté troubu krátce vyvětrejte, snižte teplotu na 200 °C a doplňte pečení bez páry po dobu 35 minut do znějícího poklepu na spodní stranu bochníku. Po upečení nechte chléb chladnout na mřížce po dobu 2 hodin."
+  ],
+  "applianceTips": "V kuchyňském robotu s hnětacím hákem používejte nejnižší rychlostní stupeň, aby nedošlo k přehřátí těsta a poškození žitných pentosanů. V parní troubě využijte automatický plynulý program zapaření na prvních 10 minut pečení při 250 °C pro maximální popekový skok a lesklou křupavou kůrku.",
+  "expertJustification": "Zařazení autolýzy po dobu 40 minut bez soli a kvásku umožňuje plnou nabotnavost pšeničných bílkovin a žitných slizů (pentosanů), čímž se zkracuje doba mechanického hnětení na 6–8 minut a předchází se oxidaci těsta. Použití techniky bassinage (přilévání zbylé vody během hnětení) zapracuje vyšší hydrataci 68,5 % bez oslabení lepkem spojené struktury. Omezení na 2 série překládání zabraňuje narušení křehkého žitného gelu a udržuje vytvořený CO2 uvnitř střídy.",
+  "applianceType": "Parní trouba / Kuchyňský robot",
+  "cookingTime": "14 hodin",
+  "estimatedCookingTime": "45 min",
+  "difficulty": "Střední",
+  "category": "Pečivo",
+  "id": "recipe-ai-1786282476743",
+  "updatedAt": "2026-08-09T13:35:49.818Z"
+}
