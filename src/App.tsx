@@ -573,8 +573,6 @@ export default function App() {
   // States for Recipe Controls & Printing
   const [paperFontSize, setPaperFontSize] = useState<"normal" | "large" | "extra-large">("normal");
   const [printNotice, setPrintNotice] = useState<string | null>(null);
-  const [activePrintUrl, setActivePrintUrl] = useState<string | null>(null);
-  const [showPrintModal, setShowPrintModal] = useState<boolean>(false);
 
   // States for search and filter
   const [searchQuery, setSearchQuery] = useState("");
@@ -1136,6 +1134,307 @@ export default function App() {
   const [editError, setEditError] = useState<string | null>(null);
   const [editLogs, setEditLogs] = useState<string[]>([]);
   const [editProgressPercent, setEditProgressPercent] = useState(0);
+
+  // -------------------------------------------------------------
+  // BROWSER HISTORY & NAVIGATION STATE SYSTEM
+  // -------------------------------------------------------------
+  const isPoppingStateRef = useRef(false);
+  const historyStepCountRef = useRef(0);
+
+  const hasBackStep = Boolean(
+    selectedRecipe ||
+    isEditing ||
+    showAddRecipeModal ||
+    isCartOpen ||
+    showAdminSettingsModal ||
+    showCategoryEditorModal ||
+    showLoginModal ||
+    showExportView ||
+    mobileActiveTab === "list" ||
+    searchQuery
+  );
+
+  const navigateHome = (pushHistory = true) => {
+    if (pushHistory && !isPoppingStateRef.current) {
+      if (window.history.state?.type && window.history.state?.type !== "home") {
+        window.history.pushState({ type: "home", stepIdx: ++historyStepCountRef.current }, "", window.location.pathname);
+      }
+    }
+    setSelectedRecipe(null);
+    setIsEditing(false);
+    setShowExportView(false);
+    setShowAddRecipeModal(false);
+    setIsCartOpen(false);
+    setShowAdminSettingsModal(false);
+    setShowCategoryEditorModal(false);
+    setShowLoginModal(false);
+    setMobileActiveTab("home");
+    setSearchQuery("");
+    setAuditSteps(null);
+    setProposedChange(null);
+    setAuditModifiedRecipe(null);
+    setActiveStepIndex(-1);
+    setErrorMessage(null);
+  };
+
+  const navigateToRecipe = (recipe: Recipe, pushHistory = true) => {
+    if (pushHistory && !isPoppingStateRef.current) {
+      window.history.pushState(
+        { type: "recipe", recipeId: recipe.id, stepIdx: ++historyStepCountRef.current },
+        "",
+        `#recept-${recipe.id}`
+      );
+    }
+    setSelectedRecipe(recipe);
+    setIsEditing(false);
+    setShowExportView(false);
+    setShowAddRecipeModal(false);
+    setIsCartOpen(false);
+    setShowAdminSettingsModal(false);
+    setShowCategoryEditorModal(false);
+    setShowLoginModal(false);
+    setCheckedIngredients({});
+    setCheckedInstructions({});
+    setAuditSteps(null);
+    setProposedChange(null);
+    setAuditModifiedRecipe(null);
+    setActiveStepIndex(-1);
+    setErrorMessage(null);
+  };
+
+  const navigateToEditRecipe = (pushHistory = true) => {
+    if (!selectedRecipe) return;
+    if (pushHistory && !isPoppingStateRef.current) {
+      window.history.pushState(
+        { type: "edit-recipe", recipeId: selectedRecipe.id, stepIdx: ++historyStepCountRef.current },
+        "",
+        `#upravit-${selectedRecipe.id}`
+      );
+    }
+    startEditingRecipe();
+    setIsEditing(true);
+  };
+
+  const navigateToAddRecipeModal = (pushHistory = true) => {
+    if (pushHistory && !isPoppingStateRef.current) {
+      window.history.pushState({ type: "add-recipe", stepIdx: ++historyStepCountRef.current }, "", "#novy-recept");
+    }
+    handleOpenAddRecipeModal();
+  };
+
+  const navigateToCartModal = (pushHistory = true) => {
+    if (pushHistory && !isPoppingStateRef.current) {
+      window.history.pushState({ type: "cart", stepIdx: ++historyStepCountRef.current }, "", "#kosik");
+    }
+    setIsCartOpen(true);
+  };
+
+  const navigateToAdminSettingsModal = (pushHistory = true) => {
+    if (pushHistory && !isPoppingStateRef.current) {
+      window.history.pushState({ type: "admin", stepIdx: ++historyStepCountRef.current }, "", "#administrace");
+    }
+    setActiveAdminTab("backup");
+    setShowAdminSettingsModal(true);
+  };
+
+  const navigateToCategoryEditorModal = (pushHistory = true) => {
+    if (pushHistory && !isPoppingStateRef.current) {
+      window.history.pushState({ type: "categories", stepIdx: ++historyStepCountRef.current }, "", "#kategorie");
+    }
+    setShowCategoryEditorModal(true);
+  };
+
+  const navigateToLoginModal = (pushHistory = true) => {
+    if (pushHistory && !isPoppingStateRef.current) {
+      window.history.pushState({ type: "login", stepIdx: ++historyStepCountRef.current }, "", "#prihlaseni");
+    }
+    setShowLoginModal(true);
+  };
+
+  const navigateToExportView = (pushHistory = true) => {
+    if (pushHistory && !isPoppingStateRef.current) {
+      window.history.pushState({ type: "export", stepIdx: ++historyStepCountRef.current }, "", "#export");
+    }
+    setShowExportView(true);
+  };
+
+  const navigateToMobileTab = (tab: "list" | "home", pushHistory = true) => {
+    if (pushHistory && !isPoppingStateRef.current) {
+      window.history.pushState(
+        { type: tab === "list" ? "mobile-list" : "home", stepIdx: ++historyStepCountRef.current },
+        "",
+        tab === "list" ? "#seznam" : window.location.pathname
+      );
+    }
+    setMobileActiveTab(tab);
+  };
+
+  const handleGoBack = () => {
+    if (window.history.state && window.history.state.type && window.history.state.type !== "home") {
+      window.history.back();
+      return;
+    }
+
+    // Direct fallback if no history state was recorded
+    if (isCartOpen) {
+      setIsCartOpen(false);
+      return;
+    }
+    if (showAddRecipeModal) {
+      setShowAddRecipeModal(false);
+      return;
+    }
+    if (showAdminSettingsModal) {
+      setShowAdminSettingsModal(false);
+      return;
+    }
+    if (showCategoryEditorModal) {
+      setShowCategoryEditorModal(false);
+      return;
+    }
+    if (showLoginModal) {
+      setShowLoginModal(false);
+      return;
+    }
+    if (showExportView) {
+      setShowExportView(false);
+      return;
+    }
+    if (isEditing) {
+      setIsEditing(false);
+      return;
+    }
+    if (selectedRecipe) {
+      setSelectedRecipe(null);
+      return;
+    }
+    if (mobileActiveTab === "list") {
+      setMobileActiveTab("home");
+      return;
+    }
+    if (searchQuery) {
+      setSearchQuery("");
+      return;
+    }
+  };
+
+  // Synchronize state when browser back/forward or mobile gesture is pressed
+  useEffect(() => {
+    const handlePopState = (event: PopStateEvent) => {
+      isPoppingStateRef.current = true;
+      const state = event.state;
+
+      if (!state || state.type === "home") {
+        setSelectedRecipe(null);
+        setIsEditing(false);
+        setShowExportView(false);
+        setShowAddRecipeModal(false);
+        setIsCartOpen(false);
+        setShowAdminSettingsModal(false);
+        setShowCategoryEditorModal(false);
+        setShowLoginModal(false);
+        setMobileActiveTab("home");
+        setSearchQuery("");
+      } else if (state.type === "recipe" && state.recipeId) {
+        const found = recipes.find(r => r.id === state.recipeId);
+        if (found) {
+          setSelectedRecipe(found);
+          setIsEditing(false);
+          setShowExportView(false);
+          setShowAddRecipeModal(false);
+          setIsCartOpen(false);
+          setShowAdminSettingsModal(false);
+          setShowCategoryEditorModal(false);
+          setShowLoginModal(false);
+        } else {
+          setSelectedRecipe(null);
+        }
+      } else if (state.type === "edit-recipe" && state.recipeId) {
+        const found = recipes.find(r => r.id === state.recipeId);
+        if (found) {
+          setSelectedRecipe(found);
+          startEditingRecipe();
+          setIsEditing(true);
+          setShowExportView(false);
+          setShowAddRecipeModal(false);
+          setIsCartOpen(false);
+          setShowAdminSettingsModal(false);
+          setShowCategoryEditorModal(false);
+          setShowLoginModal(false);
+        }
+      } else if (state.type === "add-recipe") {
+        setShowAddRecipeModal(true);
+        setIsCartOpen(false);
+        setShowAdminSettingsModal(false);
+        setShowCategoryEditorModal(false);
+        setShowLoginModal(false);
+      } else if (state.type === "cart") {
+        setIsCartOpen(true);
+        setShowAddRecipeModal(false);
+        setShowAdminSettingsModal(false);
+        setShowCategoryEditorModal(false);
+        setShowLoginModal(false);
+      } else if (state.type === "admin") {
+        setShowAdminSettingsModal(true);
+        setShowAddRecipeModal(false);
+        setIsCartOpen(false);
+        setShowCategoryEditorModal(false);
+        setShowLoginModal(false);
+      } else if (state.type === "categories") {
+        setShowCategoryEditorModal(true);
+        setShowAddRecipeModal(false);
+        setIsCartOpen(false);
+        setShowAdminSettingsModal(false);
+        setShowLoginModal(false);
+      } else if (state.type === "login") {
+        setShowLoginModal(true);
+        setShowAddRecipeModal(false);
+        setIsCartOpen(false);
+        setShowAdminSettingsModal(false);
+        setShowCategoryEditorModal(false);
+      } else if (state.type === "export") {
+        setShowExportView(true);
+      } else if (state.type === "mobile-list") {
+        setSelectedRecipe(null);
+        setMobileActiveTab("list");
+        setShowAddRecipeModal(false);
+        setIsCartOpen(false);
+        setShowAdminSettingsModal(false);
+        setShowCategoryEditorModal(false);
+        setShowLoginModal(false);
+      }
+
+      setTimeout(() => {
+        isPoppingStateRef.current = false;
+      }, 50);
+    };
+
+    window.addEventListener("popstate", handlePopState);
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+    };
+  }, [recipes]);
+
+  // Handle startup initialization - ALWAYS start on home screen ("Vítejte v AI Kuchařce")
+  useEffect(() => {
+    setSelectedRecipe(null);
+    setIsEditing(false);
+    setShowExportView(false);
+    setShowAddRecipeModal(false);
+    setIsCartOpen(false);
+    setShowAdminSettingsModal(false);
+    setShowCategoryEditorModal(false);
+    setShowLoginModal(false);
+    setMobileActiveTab("home");
+    setSearchQuery("");
+
+    // Ensure clean state without automatic popup on reload
+    if (window.location.hash) {
+      window.history.replaceState({ type: "home" }, "", window.location.pathname);
+    } else if (!window.history.state) {
+      window.history.replaceState({ type: "home" }, "", window.location.pathname);
+    }
+  }, []);
 
   const startEditingRecipe = () => {
     if (!selectedRecipe) return;
@@ -1767,8 +2066,8 @@ ${separator}`;
           background-color: #FCF9F2;
           color: #2C2C2C;
           border: 1px solid #E3DDCF;
-          border-radius: 12px;
-          padding: 20px 24px;
+          border-radius: 8px;
+          padding: 12px 16px;
           max-width: 760px;
           margin: 0 auto;
           box-shadow: none;
@@ -2043,8 +2342,8 @@ ${separator}`;
         iframeDoc.body.appendChild(script);
       });
 
-      // Compact margins for A4 (top 12mm, right 14mm, bottom 12mm, left 14mm)
-      const safeMargin = iframeWin.JSON.parse("[12, 14, 12, 14]");
+      // Compact margins for standard A4 (12mm on all sides)
+      const safeMargin = iframeWin.JSON.parse("[12, 12, 12, 12]");
 
       // Adjust height of the iframe so html2pdf layout is entirely visible
       const scrollHeight = Math.max(
@@ -2110,13 +2409,13 @@ ${separator}`;
     const applianceTips = selectedRecipe.applianceTips || "";
     const expertJustification = selectedRecipe.expertJustification || "";
 
-    // Ingredients list with scaled quantities (rendered in multi-column layout top-to-bottom column 1 then column 2)
+    // Ingredients list with scaled quantities
     const ingredientsHtml = selectedRecipe.ingredients && selectedRecipe.ingredients.length > 0 
       ? selectedRecipe.ingredients.map(ing => {
           if (isIngredientHeader(ing)) {
             const headerTitle = cleanHeaderTitle(ing);
             return `
-              <li style="column-span: all; -webkit-column-span: all; list-style: none; padding: 6px 0 2px 0; border-bottom: 1.5px solid #1B4332; font-weight: 800; font-size: 14px; color: #1B4332; text-transform: uppercase; letter-spacing: 0.5px; page-break-after: avoid; break-after: avoid; margin-top: 6px; margin-bottom: 4px;">
+              <li style="column-span: all; -webkit-column-span: all; list-style: none; padding: 4px 0 1px 0; border-bottom: 1.5px solid #1B4332; font-weight: 800; font-size: 12px; color: #1B4332; text-transform: uppercase; letter-spacing: 0.5px; page-break-after: avoid; break-after: avoid; margin-top: 5px; margin-bottom: 2px;">
                 📌 ${headerTitle}
               </li>
             `;
@@ -2124,12 +2423,13 @@ ${separator}`;
           const parsed = parseIngredientString(ing);
           const displayIng = scaleIngredient(parsed, scaleFactor);
           return `
-            <li style="padding: 3px 0; border-bottom: 1px solid #F0EFEA; font-size: 13.5px; color: #2C2C2C; page-break-inside: avoid; break-inside: avoid; line-height: 1.35; font-weight: 500;">
-              ${displayIng}
+            <li style="padding: 1.5px 0; border-bottom: 1px solid #EBE8E0; font-size: 12px; color: #2C2C2C; page-break-inside: avoid; break-inside: avoid; line-height: 1.3; font-weight: 500; display: flex; align-items: center; gap: 6px;">
+              <span style="display:inline-block; width:10px; height:10px; border:1.5px solid #1B4332; border-radius:2px; flex-shrink:0;"></span>
+              <span>${displayIng}</span>
             </li>
           `;
         }).join("")
-      : `<li style="font-style: italic; color: #666; padding: 4px 0; column-span: all; -webkit-column-span: all;">Žádné ingredience nejsou zapsány.</li>`;
+      : `<li style="font-style: italic; color: #666; padding: 2px 0; column-span: all; -webkit-column-span: all;">Žádné ingredience nejsou zapsány.</li>`;
 
     // Instructions list
     let pdfStepNum = 1;
@@ -2138,18 +2438,16 @@ ${separator}`;
           if (isIngredientHeader(step)) {
             const headerTitle = cleanHeaderTitle(step);
             return `
-              <div style="font-weight: 800; font-size: 13.5px; color: #1B4332; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1.5px solid #1B4332; padding: 6px 0 2px 0; margin-top: 10px; margin-bottom: 6px; page-break-after: avoid; break-after: avoid;">
+              <div style="font-weight: 800; font-size: 12px; color: #1B4332; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1.5px solid #1B4332; padding: 4px 0 1px 0; margin-top: 6px; margin-bottom: 3px; page-break-after: avoid; break-after: avoid;">
                 📌 ${headerTitle}
               </div>
             `;
           }
           const currentNum = pdfStepNum++;
           return `
-            <div class="instruction-step" style="display: flex; flex-direction: column; gap: 4px; padding: 7px 10px; margin-bottom: 7px; background-color: #FAF8F3; border: 1px solid #E8E4DB; border-radius: 6px; page-break-inside: avoid !important; break-inside: avoid !important;">
-              <div style="display: flex; gap: 9px; align-items: flex-start;">
-                <div style="font-weight: 800; font-size: 12px; color: #FFFFFF; background-color: #1B4332; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px;">${currentNum}</div>
-                <div style="font-size: 14px; line-height: 1.45; color: #2C2C2C; flex: 1;">${step}</div>
-              </div>
+            <div class="instruction-step" style="display: flex; gap: 8px; align-items: flex-start; padding: 3px 0; margin-bottom: 3px; border-bottom: 1px dotted #DCD8CE; page-break-inside: avoid !important; break-inside: avoid !important;">
+              <div style="font-weight: 700; font-size: 11px; color: #FFFFFF; background-color: #1B4332; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px;">${currentNum}</div>
+              <div style="font-size: 12px; line-height: 1.35; color: #2C2C2C; flex: 1;">${step}</div>
             </div>
           `;
         }).join("")
@@ -2159,7 +2457,7 @@ ${separator}`;
 <html lang="cs">
 <head>
   <meta charset="UTF-8">
-  <title>${title} - AI Kuchařka</title>
+  <title>Tisk receptu: ${title} - AI Kuchařka</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -2167,88 +2465,118 @@ ${separator}`;
   <style>
     @page {
       size: A4 portrait;
-      margin: 12mm 14mm 12mm 14mm;
+      margin: 12mm 12mm 12mm 12mm;
     }
     *, *:before, *:after {
       box-sizing: border-box;
     }
     body {
       font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-      background-color: #FFFFFF;
+      background-color: #F8F6F0;
       color: #1B4332;
       margin: 0;
-      padding: 0;
-      line-height: 1.4;
+      padding: 10px 6px;
+      line-height: 1.3;
       -webkit-print-color-adjust: exact;
       print-color-adjust: exact;
     }
+    .print-control-banner {
+      max-width: 800px;
+      margin: 0 auto 10px auto;
+      background-color: #1B4332;
+      color: #FFFFFF;
+      padding: 8px 14px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 4px 12px rgba(27,67,50,0.15);
+    }
+    .print-control-title {
+      font-weight: 700;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-print-now {
+      background-color: #D97706;
+      color: #FFFFFF;
+      border: none;
+      font-weight: 800;
+      padding: 5px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      transition: background 0.2s;
+    }
+    .btn-print-now:hover {
+      background-color: #C26405;
+    }
     .recipe-sheet {
-      width: 100%;
-      max-width: 100%;
+      max-width: 800px;
       margin: 0 auto;
       background: #FFFFFF;
-      padding: 4mm 4mm;
-      box-sizing: border-box;
+      padding: 12px 16px;
+      border-radius: 8px;
+      border: 1px solid #E8E5DC;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.04);
     }
     .sheet-header {
-      border-bottom: 2px solid #E8E5DC;
-      padding-bottom: 8px;
-      margin-bottom: 10px;
-      page-break-inside: avoid;
-      break-inside: avoid;
+      border-bottom: 1.5px solid #E8E5DC;
+      padding-bottom: 6px;
+      margin-bottom: 6px;
     }
     .meta-brand-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 4px;
+      margin-bottom: 2px;
     }
     .meta-brand {
-      font-size: 10.5px;
+      font-size: 9.5px;
       font-weight: 800;
       color: #888172;
-      letter-spacing: 1.5px;
+      letter-spacing: 1px;
       text-transform: uppercase;
     }
     .recipe-title {
       font-family: 'Playfair Display', Georgia, serif;
-      font-size: 25px;
+      font-size: 20px;
       color: #1B4332;
-      margin: 2px 0 4px 0;
+      margin: 1px 0 2px 0;
       font-weight: 800;
       line-height: 1.2;
-      page-break-after: avoid;
-      break-after: avoid;
     }
     .recipe-category {
       display: inline-block;
-      font-size: 11.5px;
+      font-size: 9.5px;
       font-weight: 700;
       color: #2D6A4F;
       background-color: #E8F5E9;
-      padding: 2.5px 9px;
-      border-radius: 8px;
+      padding: 1px 6px;
+      border-radius: 4px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
     .portion-badge {
       display: inline-block;
-      font-size: 11.5px;
+      font-size: 9.5px;
       font-weight: 700;
       color: #1B4332;
       background-color: #FAF8F3;
       border: 1px solid #E8E4DB;
-      padding: 2.5px 9px;
-      border-radius: 8px;
+      padding: 1px 6px;
+      border-radius: 4px;
     }
     .section-title {
       font-family: 'Playfair Display', Georgia, serif;
-      font-size: 17px;
+      font-size: 13.5px;
       font-weight: 700;
       color: #1B4332;
       border-bottom: 1.5px solid #E8E5DC;
-      padding-bottom: 4px;
-      margin: 12px 0 8px 0;
+      padding-bottom: 2px;
+      margin: 6px 0 3px 0;
       page-break-after: avoid !important;
       break-after: avoid !important;
     }
@@ -2258,40 +2586,30 @@ ${separator}`;
       margin: 0;
       column-count: 2;
       -webkit-column-count: 2;
-      column-gap: 16px;
-      -webkit-column-gap: 16px;
-      page-break-inside: avoid;
-      break-inside: avoid;
-    }
-    .ingredients-grid li {
-      page-break-inside: avoid !important;
-      break-inside: avoid !important;
+      column-gap: 20px;
+      -webkit-column-gap: 20px;
     }
     .summary-text {
       font-style: italic;
       color: #4A4A40;
-      font-size: 13.5px;
-      margin-top: 4px;
-      line-height: 1.45;
-    }
-    .instruction-step {
-      page-break-inside: avoid !important;
-      break-inside: avoid !important;
+      font-size: 11px;
+      margin-top: 2px;
+      line-height: 1.35;
     }
     .parameters-bottom-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 6px;
-      margin-top: 6px;
-      padding: 8px 10px;
+      gap: 4px;
+      margin-top: 3px;
+      padding: 4px 6px;
       background-color: #FDFBF7;
       border: 1px solid #E8E5DC;
-      border-radius: 6px;
+      border-radius: 4px;
       text-align: center;
     }
     .param-label {
       display: block;
-      font-size: 10px;
+      font-size: 8.5px;
       font-weight: 700;
       color: #7A7A70;
       text-transform: uppercase;
@@ -2299,79 +2617,76 @@ ${separator}`;
       margin-bottom: 1px;
     }
     .param-value {
-      font-size: 13px;
+      font-size: 11.5px;
       font-weight: 700;
       color: #1B4332;
     }
     .expert-block {
       background-color: #FDFBF7;
       border: 1px solid #E8E5DC;
-      border-radius: 8px;
-      padding: 10px 12px;
-      margin-top: 12px;
-      font-size: 12.5px;
+      border-radius: 6px;
+      padding: 5px 8px;
+      margin-top: 6px;
+      font-size: 10.5px;
       page-break-inside: avoid !important;
       break-inside: avoid !important;
     }
     .expert-block h4 {
-      margin: 0 0 4px 0;
-      font-size: 12.5px;
+      margin: 0 0 2px 0;
+      font-size: 10.5px;
       color: #1B4332;
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
     .footer-stamp {
-      margin-top: 14px;
-      padding-top: 8px;
+      margin-top: 6px;
+      padding-top: 3px;
       border-top: 1px solid #E8E5DC;
       display: flex;
       justify-content: space-between;
-      font-size: 10.5px;
+      font-size: 9px;
       font-weight: 700;
       color: #888172;
       text-transform: uppercase;
       page-break-inside: avoid !important;
       break-inside: avoid !important;
     }
-    @media screen {
-      body {
-        background-color: #F8F6F0;
-        padding: 20px 12px;
-      }
-      .recipe-sheet {
-        max-width: 190mm;
-        padding: 24px 28px;
-        border: 1px solid #E8E5DC;
-        border-radius: 12px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.06);
-      }
-    }
     @media print {
-      html, body {
-        width: 100% !important;
-        margin: 0 !important;
+      body {
+        background-color: #FFFFFF !important;
         padding: 0 !important;
-        background: #FFFFFF !important;
+      }
+      .no-print {
+        display: none !important;
       }
       .recipe-sheet {
         border: none !important;
         border-radius: 0 !important;
-        padding: 4mm 4mm !important;
-        margin: 0 auto !important;
+        padding: 0 !important;
+        margin: 0 !important;
         max-width: 100% !important;
         width: 100% !important;
         box-shadow: none !important;
-        box-sizing: border-box !important;
       }
     }
   </style>
 </head>
 <body>
+  <div class="no-print print-control-banner">
+    <div class="print-control-title">
+      <span>🖨️ Tiskový lístek s receptem připraven</span>
+    </div>
+    <div style="display: flex; gap: 8px;">
+      <button class="btn-print-now" onclick="window.print()">Vytisknout / Uložit do PDF</button>
+      <button class="btn-print-now" style="background-color: #4A5568;" onclick="window.close()">Zavřít</button>
+    </div>
+  </div>
+
   <div class="recipe-sheet">
     <div class="sheet-header">
       <div class="meta-brand-row">
         <span class="meta-brand">AI KUCHAŘKA • 5 PILÍŘOVÁ SYNTÉZA</span>
-        <div>
+        <div style="display: flex; gap: 6px;">
           <span class="recipe-category">${category}</span>
           <span class="portion-badge">Porce: ${scaleFactor === 1 ? "1x" : `${formatCzechNumber(scaleFactor)}x`}</span>
         </div>
@@ -2390,7 +2705,6 @@ ${separator}`;
       ${instructionsHtml}
     </div>
 
-    <!-- SECONDARY METADATA & PARAMETERS MOVED TO THE END OF RECIPE -->
     <div class="expert-block">
       <h4>Doplňující informace a technické parametry</h4>
       <div class="parameters-bottom-grid">
@@ -2413,16 +2727,16 @@ ${separator}`;
       </div>
 
       ${applianceTips ? `
-        <div style="margin-top: 8px; padding-top: 6px; border-top: 1px solid #E8E5DC;">
+        <div style="margin-top: 5px; padding-top: 4px; border-top: 1px solid #E8E5DC;">
           <strong>💡 Tip pro spotřebič (${applianceType}):</strong>
-          <div style="margin-top: 2px;">${applianceTips}</div>
+          <div style="margin-top: 1px;">${applianceTips}</div>
         </div>
       ` : ''}
 
       ${expertJustification ? `
-        <div style="margin-top: 8px; padding-top: 6px; border-top: 1px solid #E8E5DC;">
+        <div style="margin-top: 5px; padding-top: 4px; border-top: 1px solid #E8E5DC;">
           <strong>🔬 Kulinářská chemie a zdůvodnění:</strong>
-          <div style="margin-top: 2px;">${expertJustification}</div>
+          <div style="margin-top: 1px;">${expertJustification}</div>
         </div>
       ` : ''}
     </div>
@@ -2432,6 +2746,7 @@ ${separator}`;
       <span>Vytisknuto dne: ${new Date().toLocaleDateString("cs-CZ")}</span>
     </div>
   </div>
+
   <script>
     window.onload = function() {
       setTimeout(function() {
@@ -2442,474 +2757,40 @@ ${separator}`;
 </body>
 </html>`;
 
-    // 1. Create a clean standalone Blob URL for new tab / direct link opening
-    const blob = new Blob([htmlContent], { type: "text/html;charset=utf-8" });
-    const blobUrl = URL.createObjectURL(blob);
-    setActivePrintUrl(blobUrl);
-
-    // 2. Trigger native window.print() directly on main window
+    let opened = false;
     try {
-      window.print();
-    } catch (e) {
-      console.warn("Direct window.print call failed:", e);
-    }
-
-    // 3. Attempt window.open in a new tab (runs unrestricted print outside sandboxed iframe)
-    try {
-      const win = window.open(blobUrl, "_blank");
-      if (win) {
-        win.focus();
+      const printWin = window.open("", "_blank", "width=850,height=1000,scrollbars=yes,resizable=yes");
+      if (printWin) {
+        printWin.document.open();
+        printWin.document.write(htmlContent);
+        printWin.document.close();
+        printWin.focus();
+        opened = true;
       }
     } catch (e) {
-      console.warn("window.open call failed:", e);
+      console.warn("window.open failed:", e);
     }
 
-    // 4. Open interactive Print & PDF Modal so user has instant choices and direct buttons
-    setShowPrintModal(true);
-    setPrintNotice(`Spuštěn tisk receptu „${selectedRecipe.title}“. Připravili jsme pro vás také přímý tiskový list a možnost stažení PDF.`);
-    setTimeout(() => setPrintNotice(null), 6000);
+    if (!opened) {
+      try {
+        const blob = new Blob([htmlContent], { type: "text/html;charset=utf-8" });
+        const blobUrl = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = blobUrl;
+        link.target = "_blank";
+        link.click();
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
+      } catch (err) {
+        console.error("Blob fallback failed:", err);
+        window.print();
+      }
+    }
   };
 
   const triggerNativePrint = handlePrintRecipe;
   const triggerPaperPrint = handlePrintRecipe;
 
-  const unused_code_wrapper = () => {
-    if (!selectedRecipe) return;
 
-    const title = selectedRecipe.title;
-    const category = selectedRecipe.category || getRecipeCategory(selectedRecipe);
-    const cookingTime = selectedRecipe.cookingTime || "Není specifikováno";
-    const difficulty = selectedRecipe.difficulty || "Střední";
-    const applianceType = selectedRecipe.applianceType || "Standardní spotřebič";
-    const summary = selectedRecipe.summary || "Bez popisu.";
-    const applianceTips = selectedRecipe.applianceTips || "Bez speciálních inženýrských tipů.";
-    const expertJustification = selectedRecipe.expertJustification || "Bez doplňujících vědeckých odůvodnění chuti a struktury.";
-
-    // Render ingredients as checklist list items
-    const ingredientsHtml = selectedRecipe.ingredients && selectedRecipe.ingredients.length > 0 
-      ? selectedRecipe.ingredients.map(ing => {
-          if (isIngredientHeader(ing)) {
-            const headerTitle = cleanHeaderTitle(ing);
-            return `<li class="ingredient-header-item" style="list-style:none; margin-top:10px; font-weight:bold; color:#1B4332; border-bottom:2px solid #1B4332; text-transform:uppercase;">📌 ${headerTitle}</li>`;
-          }
-          return `
-            <li class="ingredient-item">
-              <span class="checkbox-box"></span>
-              <span>${ing}</span>
-            </li>
-          `;
-        }).join("")
-      : `<li class="ingredient-item">Žádné ingredience nejsou zapsány.</li>`;
-
-    // Render instructions list
-    let printStepNum = 1;
-    const instructionsHtml = selectedRecipe.instructions && selectedRecipe.instructions.length > 0
-      ? selectedRecipe.instructions.map((step) => {
-          if (isIngredientHeader(step)) {
-            const headerTitle = cleanHeaderTitle(step);
-            return `
-              <div style="font-weight: 800; font-size: 14px; color: #1B4332; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1.5px solid #1B4332; padding: 6px 0 2px 0; margin-top: 10px; margin-bottom: 6px; page-break-after: avoid; break-after: avoid;">
-                📌 ${headerTitle}
-              </div>
-            `;
-          }
-          const currentNum = printStepNum++;
-          return `
-            <div class="step-card">
-              <div class="step-number">${currentNum}</div>
-              <div class="step-text">${step}</div>
-            </div>
-          `;
-        }).join("")
-      : `<p>Žádný postup přípravy není zapsán.</p>`;
-
-    const htmlContent = `<!DOCTYPE html>
-<html lang="cs">
-<head>
-  <meta charset="UTF-8">
-  <title>${title} - AI Kuchařka</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <style>
-    body {
-      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-      background-color: #FAF8F5;
-      color: #2E2E2A;
-      margin: 0;
-      padding: 40px 20px;
-      line-height: 1.6;
-      -webkit-font-smoothing: antialiased;
-    }
-    
-    .print-dialog-wrapper {
-      max-width: 820px;
-      margin: 0 auto 30px auto;
-      background: #FFFBEB;
-      border: 1px solid #FDE68A;
-      border-radius: 16px;
-      padding: 16px 24px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
-      box-shadow: 0 4px 15px rgba(217, 119, 6, 0.05);
-      text-align: center;
-    }
-    
-    .print-dialog-text {
-      font-size: 14px;
-      color: #B45309;
-      font-weight: 600;
-    }
-    
-    .print-dialog-text strong {
-      color: #78350F;
-    }
-
-    .btn-print {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      background-color: #D97706;
-      color: #FFFFFF;
-      font-weight: 800;
-      border: none;
-      padding: 12px 28px;
-      font-size: 14px;
-      border-radius: 12px;
-      cursor: pointer;
-      box-shadow: 0 4px 12px rgba(217, 119, 6, 0.2);
-      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    
-    .btn-print:hover {
-      background-color: #C26405;
-      transform: translateY(-1px);
-    }
-    
-    .btn-print:active {
-      transform: translateY(0);
-    }
-
-    .recipe-sheet {
-      max-width: 820px;
-      margin: 0 auto;
-      background: #FFFFFF;
-      border: 1.5px solid #E8E5DC;
-      border-radius: 24px;
-      padding: 50px;
-      box-shadow: 0 10px 40px rgba(44, 44, 40, 0.04);
-      position: relative;
-    }
-
-    .sheet-header {
-      border-bottom: 2px solid #E8E5DC;
-      padding-bottom: 24px;
-      margin-bottom: 28px;
-    }
-
-    .meta-brand {
-      font-size: 11px;
-      font-weight: 800;
-      color: #888172;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      margin-bottom: 10px;
-    }
-
-    .recipe-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 42px;
-      color: #1B4332;
-      margin: 0;
-      font-weight: 800;
-      line-height: 1.15;
-    }
-
-    .recipe-category {
-      display: inline-block;
-      font-size: 12px;
-      font-weight: 700;
-      color: #D97706;
-      background-color: #FFFBEB;
-      padding: 4px 12px;
-      border-radius: 20px;
-      margin-top: 10px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .parameters-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 20px;
-      padding: 20px 0;
-      border-top: 1px solid #E8E5DC;
-      border-bottom: 1px solid #E8E5DC;
-      margin-bottom: 35px;
-    }
-
-    @media (max-width: 640px) {
-      .parameters-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 16px;
-      }
-    }
-
-    .param-item {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .param-label {
-      font-size: 10px;
-      font-weight: 800;
-      color: #888172;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-bottom: 5px;
-    }
-
-    .param-value {
-      font-family: 'Playfair Display', serif;
-      font-size: 16px;
-      font-weight: 800;
-      color: #1B4332;
-    }
-
-    .section-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 22px;
-      color: #1B4332;
-      border-bottom: 2px solid #E8E8E1;
-      padding-bottom: 8px;
-      margin-top: 35px;
-      margin-bottom: 20px;
-      font-weight: 700;
-      page-break-after: avoid;
-    }
-
-    .summary-text {
-      font-family: 'Playfair Display', serif;
-      font-size: 17px;
-      font-style: italic;
-      color: #4A4A45;
-      line-height: 1.6;
-      margin-bottom: 30px;
-    }
-
-    .ingredients-list {
-      padding-left: 0;
-      margin: 0;
-    }
-
-    .ingredient-item {
-      padding: 8px 0;
-      border-bottom: 1px solid #F3F1EC;
-      list-style: none;
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-      font-size: 15px;
-      page-break-inside: avoid;
-    }
-
-    .checkbox-box {
-      display: inline-block;
-      width: 16px;
-      height: 16px;
-      border: 2px solid #1B4332;
-      border-radius: 4px;
-      margin-top: 3px;
-      flex-shrink: 0;
-    }
-
-    .step-card {
-      display: flex;
-      gap: 16px;
-      align-items: flex-start;
-      margin-bottom: 22px;
-      page-break-inside: avoid;
-    }
-
-    .step-number {
-      background-color: #1B4332;
-      color: #FFFFFF;
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
-      font-weight: 800;
-      flex-shrink: 0;
-    }
-
-    .step-text {
-      font-size: 15px;
-      color: #3A3A34;
-      line-height: 1.6;
-      padding-top: 3px;
-    }
-
-    .expert-block {
-      background-color: #FDFCEF;
-      border: 1px solid #ECE7D9;
-      border-radius: 16px;
-      padding: 24px;
-      margin-top: 20px;
-      color: #3A3A34;
-      font-size: 14.5px;
-      page-break-inside: avoid;
-    }
-
-    .expert-block h4 {
-      margin-top: 0;
-      margin-bottom: 8px;
-      color: #D97706;
-      font-family: 'Playfair Display', serif;
-      font-size: 15px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .footer-stamp {
-      margin-top: 50px;
-      border-top: 1px solid #E8E5DC;
-      padding-top: 20px;
-      display: flex;
-      justify-content: space-between;
-      font-size: 10px;
-      font-weight: 700;
-      color: #888172;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    @media print {
-      body {
-        background-color: #FFFFFF;
-        padding: 0;
-      }
-      .recipe-sheet {
-        border: none;
-        box-shadow: none;
-        padding: 0;
-        max-width: 100%;
-      }
-      .no-print {
-        display: none !important;
-      }
-    }
-  </style>
-</head>
-<body>
-
-  <div class="no-print print-dialog-wrapper">
-    <div class="print-dialog-text">
-       📄 <strong>Tiskový lístek s receptem připraven!</strong> Okno pro uložení do <strong>PDF</strong> se otevře automaticky. Pokud ne, klikněte na tlačítko níže.
-    </div>
-    <button class="btn-print" onclick="window.print()">
-      <span>🖨️ Spustit tisk / Uložit jako PDF</span>
-    </button>
-  </div>
-
-  <div class="recipe-sheet">
-    <div class="recipe-sheet-wrapper">
-      <div class="sheet-header">
-        <div class="meta-brand">AI KUCHAŘKA • 5 PILÍŘOVÁ SYNTÉZA VĚDY A GASTRONOMIE</div>
-        <h1 class="recipe-title">${title}</h1>
-        <span class="recipe-category">${category}</span>
-      </div>
-
-      <div class="parameters-grid">
-        <div class="param-item">
-          <span class="param-label">Doba přípravy</span>
-          <span class="param-value">${cookingTime}</span>
-        </div>
-        <div class="param-item">
-          <span class="param-label">Náročnost</span>
-          <span class="param-value">${difficulty}</span>
-        </div>
-        <div class="param-item">
-          <span class="param-label">Spotřebič</span>
-          <span class="param-value">${applianceType}</span>
-        </div>
-        <div class="param-item">
-          <span class="param-label">Vědecká kvalita</span>
-          <span class="param-value" style="color: #10B981;">100% Chef-Tech ✓</span>
-        </div>
-      </div>
-
-      <div class="summary-text">
-        ${summary}
-      </div>
-
-      <h2 class="section-title">Seznam ingrediencí</h2>
-      <ul class="ingredients-list">
-        ${ingredientsHtml}
-      </ul>
-
-      <h2 class="section-title">Postup přípravy kuchařské chemie</h2>
-      <div style="margin-bottom: 30px;">
-        ${instructionsHtml}
-      </div>
-
-      <div class="expert-block">
-        <h4>💡 Chytrá technologie & Tip pro ${applianceType}</h4>
-        <div style="line-height:1.55;">${applianceTips}</div>
-      </div>
-
-      <div class="expert-block" style="background-color: #EBF7F2; border-color: #D3EFEB;">
-        <h4 style="color: #026C52;">🔬 Kulinářská chemie & Vědecká syntéza</h4>
-        <div style="line-height:1.55; color: #164E41;">${expertJustification}</div>
-      </div>
-
-      <div class="footer-stamp">
-        <span>AI Kuchařka • Stabilita, chuť a gastronomické inženýrství</span>
-        <span>Generováno dne: ${new Date().toLocaleDateString("cs-CZ")}</span>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    // Automatically trigger the browser's printing dialog after load
-    window.onload = function() {
-      setTimeout(function() {
-        window.print();
-      }, 500);
-    };
-  </script>
-</body>
-</html>`;
-
-    // Download the self-printing template
-    const blob = new Blob([htmlContent], { type: "text/html;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-recept.html`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-
-    // Provide premium UI feedback
-    setPrintNotice("Tiskový lístek byl stažen! Pro tisk / uložení do PDF stačí otevřít stažený soubor.");
-    setTimeout(() => {
-      setPrintNotice(null);
-    }, 7000);
-  };
-
-  // Safe compiler checklist for local wrapped function reference
-  if (false as any) {
-    unused_code_wrapper();
-  }
 
   // Loading steps animation texts
   const loadingSteps = [
@@ -3324,153 +3205,45 @@ ${separator}`;
         )}
       </AnimatePresence>
 
-      {/* INTERACTIVE PRINT & EXPORT MODAL */}
-      <AnimatePresence>
-        {showPrintModal && selectedRecipe && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fade-in no-print">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 10 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              className="bg-[#FDFCF7] border border-[#E8E8E1] rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col"
-            >
-              {/* Modal Header */}
-              <div className="bg-[#1B4332] text-white p-5 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="bg-[#2D6A4F] p-2 rounded-xl text-white">
-                    <Printer className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <h3 className="font-serif font-bold text-lg leading-tight">Možnosti tisku a uložení</h3>
-                    <p className="text-xs text-emerald-200 mt-0.5 line-clamp-1">{selectedRecipe.title}</p>
-                  </div>
-                </div>
-                <button
-                  onClick={() => setShowPrintModal(false)}
-                  className="text-slate-300 hover:text-white p-1.5 rounded-lg hover:bg-emerald-800 transition-colors cursor-pointer"
-                >
-                  <X className="h-5 w-5" />
-                </button>
-              </div>
 
-              {/* Modal Body */}
-              <div className="p-6 space-y-4">
-                <p className="text-sm text-slate-700 leading-relaxed">
-                  Tiskový lístek byl vygenerován. Zvolte preferovaný způsob tisku nebo exportu:
-                </p>
-
-                <div className="space-y-2.5 pt-1">
-                  {/* Option 1: Direct window.print */}
-                  <button
-                    onClick={() => {
-                      window.print();
-                    }}
-                    className="w-full bg-[#1B4332] hover:bg-[#2D6A4F] text-white font-bold py-3 px-4 rounded-xl text-sm transition-all flex items-center justify-between cursor-pointer shadow-md active:scale-98"
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <Printer className="h-4 w-4 text-emerald-400" />
-                      <span>1. Spustit tiskový dialog prohlížeče</span>
-                    </div>
-                    <span className="text-xs font-mono bg-[#2D6A4F] px-2 py-0.5 rounded text-emerald-100">Ctrl+P</span>
-                  </button>
-
-                  {/* Option 2: Open standalone printable document in new tab */}
-                  {activePrintUrl && (
-                    <a
-                      href={activePrintUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={() => {
-                        setTimeout(() => setShowPrintModal(false), 800);
-                      }}
-                      className="w-full bg-white hover:bg-emerald-50 border-2 border-[#1B4332] text-[#1B4332] font-bold py-3 px-4 rounded-xl text-sm transition-all flex items-center justify-between cursor-pointer shadow-xs active:scale-98"
-                    >
-                      <div className="flex items-center gap-2.5">
-                        <ExternalLink className="h-4 w-4 text-[#1B4332]" />
-                        <span>2. Otevřít tiskový list v novém okně</span>
-                      </div>
-                      <span className="text-xs font-mono text-[#2D6A4F] font-semibold">Nové okno ↗</span>
-                    </a>
-                  )}
-
-                  {/* Option 3: Download PDF */}
-                  <button
-                    onClick={() => {
-                      setShowPrintModal(false);
-                      downloadRecipePDF();
-                    }}
-                    className="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 px-4 rounded-xl text-sm transition-all flex items-center justify-between cursor-pointer shadow-sm active:scale-98"
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <FileText className="h-4 w-4" />
-                      <span>3. Stáhnout jako PDF soubor</span>
-                    </div>
-                    <span className="text-xs font-mono bg-amber-700 px-2 py-0.5 rounded text-amber-100">PDF</span>
-                  </button>
-
-                  {/* Option 4: Download HTML file for printing */}
-                  {activePrintUrl && (
-                    <a
-                      href={activePrintUrl}
-                      download={`${selectedRecipe.title.replace(/[^a-zA-Z0-9-áčďéěíňóřšťúůýžÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ]/g, "_")}-tisk.html`}
-                      className="w-full bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-700 font-bold py-2.5 px-4 rounded-xl text-xs transition-all flex items-center justify-between cursor-pointer"
-                    >
-                      <div className="flex items-center gap-2">
-                        <Download className="h-3.5 w-3.5 text-slate-500" />
-                        <span>4. Stáhnout samostatný HTML soubor k tisku</span>
-                      </div>
-                      <span className="text-[10px] font-mono text-slate-500">.HTML</span>
-                    </a>
-                  )}
-                </div>
-              </div>
-
-              {/* Modal Footer */}
-              <div className="bg-[#F5F5F0] border-t border-[#E8E8E1] px-6 py-3 flex justify-end">
-                <button
-                  onClick={() => setShowPrintModal(false)}
-                  className="px-4 py-2 bg-white border border-slate-300 hover:bg-slate-50 rounded-xl text-xs font-bold text-slate-700 transition-colors cursor-pointer"
-                >
-                  Zavřít
-                </button>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
 
 
 
       {/* HEADER */}
       <header className="no-print bg-white border-b border-[#E8E8E1] py-3.5 px-4 md:px-6 sticky top-0 z-40 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-3">
-        <button
-          onClick={() => {
-            setSelectedRecipe(null);
-            setIsEditing(false);
-            setSearchQuery("");
-            setShowExportView(false);
-            setAuditSteps(null);
-            setProposedChange(null);
-            setAuditModifiedRecipe(null);
-            setActiveStepIndex(-1);
-            setErrorMessage(null);
-          }}
-          className="flex items-center gap-3 hover:opacity-90 active:scale-98 transition-all text-left bg-transparent border-0 p-0 m-0 cursor-pointer group shrink-0"
-          title="Přejít na hlavní stránku"
-        >
-          <div className="bg-[#1B4332] text-white p-2 rounded-xl shadow-md group-hover:bg-[#2D6A4F] transition-colors">
-            <ChefHat className="h-6 w-6" />
-          </div>
-          <div>
-            <h1 className="font-serif italic font-semibold text-2xl text-[#1B4332] flex items-center gap-2 group-hover:text-[#2D6A4F] transition-colors">
-              AI Kuchařka
-              <span className="text-[10px] bg-[#F0F4F1] text-[#2D6A4F] border border-[#2D6A4F]/20 font-bold px-2 py-0.5 rounded-full uppercase tracking-wider font-sans normal-case">
-                5x Pilířová Syntéza
-              </span>
-            </h1>
-            <p className="text-xs text-[#5C5C50] hidden sm:block font-medium">Vědecky podložená a technologicky vyladěná gastronomie</p>
-          </div>
-        </button>
+        <div className="flex items-center gap-2.5 sm:gap-3.5">
+          {/* BACK ARROW BUTTON IN THE LINE/ROW NEXT TO AI KUCHAŘ */}
+          {hasBackStep && (
+            <button
+              type="button"
+              onClick={handleGoBack}
+              className="bg-[#1B4332] hover:bg-[#2D6A4F] text-white py-2 px-3 rounded-xl shadow-xs transition-all flex items-center justify-center gap-1.5 text-xs sm:text-sm font-bold cursor-pointer active:scale-95 group shrink-0"
+              title="Krok zpět v aplikaci"
+            >
+              <ChevronLeft className="h-5 w-5 group-hover:-translate-x-0.5 transition-transform" />
+              <span className="inline">Zpět</span>
+            </button>
+          )}
+
+          <button
+            onClick={() => navigateHome()}
+            className="flex items-center gap-3 hover:opacity-90 active:scale-98 transition-all text-left bg-transparent border-0 p-0 m-0 cursor-pointer group shrink-0"
+            title="Přejít na hlavní stránku"
+          >
+            <div className="bg-[#1B4332] text-white p-2 rounded-xl shadow-md group-hover:bg-[#2D6A4F] transition-colors">
+              <ChefHat className="h-6 w-6" />
+            </div>
+            <div>
+              <h1 className="font-serif italic font-semibold text-2xl text-[#1B4332] flex items-center gap-2 group-hover:text-[#2D6A4F] transition-colors">
+                AI Kuchařka
+                <span className="text-[10px] bg-[#F0F4F1] text-[#2D6A4F] border border-[#2D6A4F]/20 font-bold px-2 py-0.5 rounded-full uppercase tracking-wider font-sans normal-case">
+                  5x Pilířová Syntéza
+                </span>
+              </h1>
+              <p className="text-xs text-[#5C5C50] hidden sm:block font-medium">Vědecky podložená a technologicky vyladěná gastronomie</p>
+            </div>
+          </button>
+        </div>
 
         <div className="flex flex-wrap items-center gap-2 md:gap-2.5 ml-auto md:ml-0">
           {/* 1. RECIPE SPECIFIC HEADER CONTROLS (WHEN A RECIPE IS SELECTED) */}
@@ -3480,7 +3253,7 @@ ${separator}`;
               {isEditing ? (
                 <button
                   type="button"
-                  onClick={() => setIsEditing(false)}
+                  onClick={handleGoBack}
                   className="bg-[#F5F5F0] hover:bg-[#E8E8E1] text-[#2C2C2C] border border-[#E8E8E1] font-bold py-2 px-3 rounded-xl shadow-xs transition-all flex items-center justify-center gap-1.5 text-xs sm:text-sm cursor-pointer active:scale-98"
                   title="Zrušit úpravy a vrátit se"
                 >
@@ -3489,16 +3262,7 @@ ${separator}`;
                 </button>
               ) : (
                 <button
-                  onClick={() => {
-                    setSelectedRecipe(null);
-                    setIsEditing(false);
-                    setShowExportView(false);
-                    setAuditSteps(null);
-                    setProposedChange(null);
-                    setAuditModifiedRecipe(null);
-                    setActiveStepIndex(-1);
-                    setErrorMessage(null);
-                  }}
+                  onClick={handleGoBack}
                   className="bg-[#1B4332] hover:bg-[#2D6A4F] text-white font-bold py-2 px-3 rounded-xl shadow-xs transition-all flex items-center justify-center gap-1.5 text-xs sm:text-sm cursor-pointer hover:shadow-md active:scale-98"
                   title="Zpět na hlavní přehled receptů"
                 >
@@ -3516,32 +3280,14 @@ ${separator}`;
                 const handlePrev = () => {
                   if (hasPrev) {
                     const prevR = filteredRecipes[currentIndex - 1];
-                    setSelectedRecipe(prevR);
-                    setCheckedIngredients({});
-                    setCheckedInstructions({});
-                    setIsEditing(false);
-                    setShowExportView(false);
-                    setAuditSteps(null);
-                    setProposedChange(null);
-                    setAuditModifiedRecipe(null);
-                    setActiveStepIndex(-1);
-                    setErrorMessage(null);
+                    navigateToRecipe(prevR);
                   }
                 };
 
                 const handleNext = () => {
                   if (hasNext) {
                     const nextR = filteredRecipes[currentIndex + 1];
-                    setSelectedRecipe(nextR);
-                    setCheckedIngredients({});
-                    setCheckedInstructions({});
-                    setIsEditing(false);
-                    setShowExportView(false);
-                    setAuditSteps(null);
-                    setProposedChange(null);
-                    setAuditModifiedRecipe(null);
-                    setActiveStepIndex(-1);
-                    setErrorMessage(null);
+                    navigateToRecipe(nextR);
                   }
                 };
 
@@ -3615,7 +3361,7 @@ ${separator}`;
                   {/* UPRAVIT RECEPT (For Admin) */}
                   {isAdmin && (
                     <button
-                      onClick={startEditingRecipe}
+                      onClick={navigateToEditRecipe}
                       className="bg-white border border-[#1B4332] text-[#1B4332] hover:bg-emerald-50 font-bold py-2 px-3 rounded-xl shadow-xs transition-all flex items-center gap-1.5 text-xs sm:text-sm cursor-pointer"
                       title="Upravit a doladit kulinářské parametry receptu"
                     >
@@ -3623,8 +3369,6 @@ ${separator}`;
                       <span>Upravit recept</span>
                     </button>
                   )}
-
-
                 </>
               )}
             </>
@@ -3632,7 +3376,7 @@ ${separator}`;
             <>
               {/* HEADER BUTTON: Nový recept */}
               <button
-                onClick={handleOpenAddRecipeModal}
+                onClick={navigateToAddRecipeModal}
                 className="bg-[#D97706] hover:bg-[#C26405] active:scale-95 text-white font-bold py-2 px-3.5 rounded-xl shadow-sm hover:shadow-md transition-all flex items-center gap-1.5 text-xs sm:text-sm cursor-pointer"
                 title="Vytvořit zcela nový recept"
               >
@@ -3645,7 +3389,7 @@ ${separator}`;
           {/* GENERAL ACTIONS (Shed for both home and recipe detailed views) */}
           {/* NÁKUPNÍ KOŠÍK / LIST */}
           <button
-            onClick={() => setIsCartOpen(true)}
+            onClick={navigateToCartModal}
             className="bg-emerald-50 hover:bg-emerald-100 text-[#1B4332] border border-emerald-200/60 font-bold p-2 rounded-xl shadow-xs transition-all flex items-center justify-center cursor-pointer relative"
             title="Zobrazit nákupní lístek / košík surovin"
           >
@@ -3663,10 +3407,7 @@ ${separator}`;
           {isAdmin && (
             <button
               type="button"
-              onClick={() => {
-                setActiveAdminTab("backup");
-                setShowAdminSettingsModal(true);
-              }}
+              onClick={navigateToAdminSettingsModal}
               className="bg-white hover:bg-[#FDFCF7] text-slate-700 hover:text-[#1B4332] border border-[#E8E8E1] hover:border-[#1B4332]/30 font-bold p-2 rounded-xl shadow-xs transition-all flex items-center justify-center cursor-pointer"
               title="Administrace a nastavení kuchařky"
             >
@@ -3683,7 +3424,7 @@ ${separator}`;
         {!selectedRecipe && (
           <div className="md:hidden no-print w-full bg-white border-b border-[#E8E8E1] p-2 flex gap-2 flex-shrink-0">
             <button
-              onClick={() => setMobileActiveTab("list")}
+              onClick={() => navigateToMobileTab("list")}
               className={`flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
                 mobileActiveTab === "list"
                   ? "bg-[#1B4332] text-white shadow-xs"
@@ -3694,7 +3435,7 @@ ${separator}`;
               <span>Seznam receptů</span>
             </button>
             <button
-              onClick={() => setMobileActiveTab("home")}
+              onClick={() => navigateToMobileTab("home")}
               className={`flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
                 mobileActiveTab === "home"
                   ? "bg-[#1B4332] text-white shadow-xs"
@@ -3725,7 +3466,7 @@ ${separator}`;
               </span>
               <button
                 type="button"
-                onClick={handleOpenAddRecipeModal}
+                onClick={navigateToAddRecipeModal}
                 className="bg-[#D97706] hover:bg-[#C26405] active:scale-95 text-white font-bold py-1.5 px-3 rounded-lg text-xs transition-all flex items-center gap-1 cursor-pointer shadow-xs"
                 title="Vytvořit zcela nový recept"
               >
@@ -3869,8 +3610,7 @@ ${separator}`;
                                   <div
                                     key={recipe.id}
                                     onClick={() => {
-                                      setSelectedRecipe(recipe);
-                                      setErrorMessage(null);
+                                      navigateToRecipe(recipe);
                                       window.scrollTo({ top: document.getElementById('main-area')?.offsetTop || 0, behavior: 'smooth' });
                                     }}
                                     className={`group relative py-1.5 px-2.5 rounded-md border transition-all duration-200 cursor-pointer ${
@@ -3966,8 +3706,7 @@ ${separator}`;
                                   <div
                                     key={recipe.id}
                                     onClick={() => {
-                                      setSelectedRecipe(recipe);
-                                      setErrorMessage(null);
+                                      navigateToRecipe(recipe);
                                       window.scrollTo({ top: document.getElementById('main-area')?.offsetTop || 0, behavior: 'smooth' });
                                     }}
                                     className={`group relative py-1.5 px-2.5 rounded-md border transition-all duration-200 cursor-pointer ${
@@ -5461,7 +5200,7 @@ ${separator}`;
                           );
                         })()}
 
-                        <div className="space-y-1 bg-[#FAF8F5] p-4 sm:p-5 rounded-2xl border border-[#E8E8E1] shadow-2xs">
+                        <div className="ingredients-container space-y-1 bg-[#FAF8F5] p-4 sm:p-5 rounded-2xl border border-[#E8E8E1] shadow-2xs">
                           {selectedRecipe.ingredients.map((ing, i) => {
                             if (isIngredientHeader(ing)) {
                               const headerTitle = cleanHeaderTitle(ing);
@@ -6122,7 +5861,7 @@ ${separator}`;
               <button
                 type="button"
                 onClick={() => {
-                  setShowLoginModal(false);
+                  handleGoBack();
                   setLoginError(null);
                   setGithubStatusResult(null);
                   setSaveGithubConfigSuccess(null);
@@ -6398,7 +6137,7 @@ ${separator}`;
               </div>
               <button
                 type="button"
-                onClick={() => setIsCartOpen(false)}
+                onClick={handleGoBack}
                 className="text-white/80 hover:text-white hover:bg-white/10 p-1.5 rounded-lg transition-all cursor-pointer"
               >
                 <X className="h-5 w-5" />
@@ -6588,9 +6327,7 @@ ${separator}`;
               </div>
               <button
                 type="button"
-                onClick={() => {
-                  setShowAdminSettingsModal(false);
-                }}
+                onClick={handleGoBack}
                 className="text-white/80 hover:text-white hover:bg-white/10 p-2 rounded-lg transition-all cursor-pointer"
                 title="Zavřít administraci"
               >
@@ -7111,9 +6848,7 @@ ${separator}`;
             <div className="bg-[#F4F3EA] p-4 border-t border-[#E8E8E1] flex justify-end shrink-0 gap-2">
               <button
                 type="button"
-                onClick={() => {
-                  setShowAdminSettingsModal(false);
-                }}
+                onClick={handleGoBack}
                 className="px-5 py-2 bg-[#1B4332] hover:bg-[#153528] active:scale-95 text-white text-xs font-bold rounded-xl shadow-sm transition-all cursor-pointer"
               >
                 Hotovo / Zavřít
@@ -7137,9 +6872,7 @@ ${separator}`;
               </div>
               <button
                 type="button"
-                onClick={() => {
-                  setShowCategoryEditorModal(false);
-                }}
+                onClick={handleGoBack}
                 className="text-white/80 hover:text-white hover:bg-white/10 p-1.5 rounded-lg transition-all cursor-pointer"
               >
                 <X className="h-5 w-5" />
@@ -7482,7 +7215,7 @@ ${separator}`;
             <div className="bg-[#F4F3EA] p-4 border-t border-[#E8E8E1] flex justify-end shrink-0">
               <button
                 type="button"
-                onClick={() => setShowCategoryEditorModal(false)}
+                onClick={handleGoBack}
                 className="px-5 py-2 bg-[#1B4332] hover:bg-[#153528] active:scale-95 text-white text-xs font-bold rounded-lg shadow-sm transition-all cursor-pointer"
               >
                 Hotovo / Zavřít
@@ -7514,7 +7247,7 @@ ${separator}`;
               </div>
               <button
                 type="button"
-                onClick={() => setShowAddRecipeModal(false)}
+                onClick={handleGoBack}
                 className="text-white/80 hover:text-white hover:bg-white/10 p-2 rounded-lg transition-all cursor-pointer"
                 title="Zavřít okno"
               >
@@ -7928,7 +7661,7 @@ ${separator}`;
             <div className="bg-[#F4F3EA] p-4 border-t border-[#E8E8E1] flex items-center justify-between gap-3 shrink-0">
               <button
                 type="button"
-                onClick={() => setShowAddRecipeModal(false)}
+                onClick={handleGoBack}
                 className="px-4 py-2.5 bg-white hover:bg-slate-100 text-slate-700 border border-[#E8E8E1] text-xs font-bold rounded-xl transition-all cursor-pointer shadow-2xs"
               >
                 Zrušit
