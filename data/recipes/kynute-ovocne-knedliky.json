@@ -1,0 +1,42 @@
+{
+  "title": "Kynuté ovocné knedlíky",
+  "summary": "Tradiční kynuté ovocné knedlíky vařené v páře s dokonalou a nadýchanou střídou. Postup zahrnuje 110 minut míchání a kynutí v domácí pekárně, 20 minut sekundárního dokynutí a 10 minut vaření v páře.",
+  "ingredients": [
+    "[Těsto]",
+    "250 g hrubé mouky",
+    "250 g polohrubé mouky",
+    "250 ml vlažného plnotučného mléka",
+    "20 g čerstvého droždí",
+    "1 ks vejce",
+    "20 g vlažného rozpuštěného másla",
+    "20 g cukru krupice",
+    "5 g soli",
+    "[Náplň]",
+    "400 g čerstvého ovocného plnění (jahody, meruňky, borůvky nebo švestky)",
+    "[Na servírování]",
+    "100 g rozpuštěného másla",
+    "150 g strouhaného tvrdého tvarohu",
+    "50 g moučkového cukru"
+  ],
+  "instructions": [
+    "Do formy domácí pekárny nalijte vlažné mléko, rozpuštěné máslo a rozšlehané vejce.",
+    "Nasypte prosátou hrubou i polohrubou mouku, do jednoho rohu dejte sůl s cukrem a uprostřed vytvarujte důlek, do kterého nadrobte droždí.",
+    "Spusťte program Těsto s garantovanou délkou míchání a kynutí po dobu 110 minut.",
+    "Vykynuté těsto vyklopte na lehce pomoučenou plochu, rozdělejte na stejně velké díly a vytvarujte z nich placky.",
+    "Střed placek naplňte připraveným ovocem, pečlivě uzavřete spoj a vytvarujte souměrné knedlíky.",
+    "Knedlíky položte spojem dolů na pomoučený povrch, zakryjte utěrkou a nechte probíhat sekundární dokynutí po dobu 20 minut.",
+    "Pripravte si parní hrnec nebo parní troubu vyhřátou na plnou páru.",
+    "Knedlíky vkládejte s dostatečnými rozestupy a vařte v páře po dobu 10 minut.",
+    "Ihned po vyjmutí z páry každý knedlík lehce propíchněte špejlí, aby se uvolnila vnitřní pára a zabránilo se sražení.",
+    "Servírujte posypané strouhaným tvarohem, moučkovým cukrem a bohatě přelité rozpuštěným máslem."
+  ],
+  "applianceTips": "V případě použití kuchyňského robota typu Thermomix nejprve ohřejte mléko s cukrem a droždím na 37 °C po dobu 2 minut, přidejte ostatní suroviny na těsto a hněťte 3 minuty. V parní troubě vařte při 100 % páře přesně 10 minut bez otevírání dvířek.",
+  "expertJustification": "Kombinace hrubé a polohrubé mouky v poměru 1:1 vytváří stabilní lepkovou mřížku; hrubé částice brání pryžovatění střídy při napařování. Tuk přidaný do těsta obalí lepek a udrží vláčnost. Sekundární dokynutí po dobu 20 minut je klíčové pro uvolnění napětí v těstě po tvarování, což umožní rychlou expanzi plynů v horké páře bez deformace tvaru.",
+  "applianceType": "Domácí pekárna / Parní hrnec",
+  "cookingTime": "140 min",
+  "estimatedCookingTime": "10 min",
+  "difficulty": "Snadné",
+  "category": "Sladká jídla a moučníky",
+  "id": "recipe-ai-1786866933474",
+  "updatedAt": "2026-08-16T07:55:33.474Z"
+}
