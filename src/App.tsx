@@ -49,7 +49,8 @@ import {
   Scale,
   Square,
   GitBranch,
-  ShoppingBag
+  ShoppingBag,
+  Type
 } from "lucide-react";
 import { Recipe } from "./types";
 import { DEFAULT_RECIPES } from "./defaultRecipes";
@@ -2049,6 +2050,44 @@ ${separator}`;
       const clonedHtml = element.innerHTML;
 
       // 2. Clean CSS styles defining look & feel of the PDF *without* any "oklch"
+      const pdfBaseSizes = {
+        "normal": {
+          xs: "13.5px",
+          sm: "15px",
+          base: "16.5px",
+          lg: "19px",
+          h2: "32px",
+          h3: "20.5px",
+          lineHeight: "1.45"
+        },
+        "large": {
+          xs: "15px",
+          sm: "16.5px",
+          base: "18.5px",
+          lg: "21px",
+          h2: "35px",
+          h3: "22.5px",
+          lineHeight: "1.55"
+        },
+        "extra-large": {
+          xs: "16.5px",
+          sm: "18px",
+          base: "20.5px",
+          lg: "23px",
+          h2: "38px",
+          h3: "24.5px",
+          lineHeight: "1.65"
+        }
+      }[paperFontSize] || {
+        xs: "13.5px",
+        sm: "15px",
+        base: "16.5px",
+        lg: "19px",
+        h2: "32px",
+        h3: "20.5px",
+        lineHeight: "1.45"
+      };
+
       const safeStyles = `
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
         
@@ -2058,6 +2097,7 @@ ${separator}`;
           background-color: #FFFFFF;
           font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
           color: #2C2C2C;
+          line-height: ${pdfBaseSizes.lineHeight};
           -webkit-print-color-adjust: exact;
           print-color-adjust: exact;
         }
@@ -2067,8 +2107,8 @@ ${separator}`;
           color: #2C2C2C;
           border: 1px solid #E3DDCF;
           border-radius: 8px;
-          padding: 12px 16px;
-          max-width: 760px;
+          padding: 14px 18px;
+          max-width: 780px;
           margin: 0 auto;
           box-shadow: none;
           page-break-inside: auto;
@@ -2196,31 +2236,31 @@ ${separator}`;
         }
 
         .text-\\[10px\\] {
-          font-size: 11.5px;
+          font-size: 12px;
         }
 
         .text-xs {
-          font-size: 13px;
+          font-size: ${pdfBaseSizes.xs};
         }
 
         .text-sm {
-          font-size: 14.5px;
+          font-size: ${pdfBaseSizes.sm};
         }
 
         .text-base {
-          font-size: 16px;
+          font-size: ${pdfBaseSizes.base};
         }
 
         .text-lg {
-          font-size: 18.5px;
+          font-size: ${pdfBaseSizes.lg};
         }
 
         .text-3xl {
-          font-size: 27px;
+          font-size: ${pdfBaseSizes.h2};
         }
 
         .text-4xl {
-          font-size: 32px;
+          font-size: ${pdfBaseSizes.h2};
         }
 
         .text-\\[\\#888172\\] {
@@ -2409,13 +2449,104 @@ ${separator}`;
     const applianceTips = selectedRecipe.applianceTips || "";
     const expertJustification = selectedRecipe.expertJustification || "";
 
-    // Ingredients list with scaled quantities
+    // Scaled typography based on user selected font size (Standardní / Větší +1 / Největší +2)
+    const fontConfig = {
+      "normal": {
+        bodySize: "13.5px",
+        bodyLineHeight: "1.45",
+        titleSize: "23px",
+        summarySize: "12.5px",
+        sectionTitleSize: "15px",
+        headerSize: "13px",
+        ingSize: "13.5px",
+        ingLineHeight: "1.4",
+        stepNumSize: "21px",
+        stepNumFont: "11.5px",
+        stepSize: "13.5px",
+        stepLineHeight: "1.45",
+        expertTitle: "11.5px",
+        expertText: "11.5px",
+        paramLabel: "9px",
+        paramValue: "12.5px",
+        portionBadge: "10.5px",
+        categoryBadge: "10.5px",
+        checkboxSize: "11px",
+        sizeName: "Standardní (14 pt)"
+      },
+      "large": {
+        bodySize: "15.5px",
+        bodyLineHeight: "1.55",
+        titleSize: "26px",
+        summarySize: "14px",
+        sectionTitleSize: "17.5px",
+        headerSize: "15px",
+        ingSize: "15.5px",
+        ingLineHeight: "1.5",
+        stepNumSize: "24px",
+        stepNumFont: "13px",
+        stepSize: "15.5px",
+        stepLineHeight: "1.55",
+        expertTitle: "13px",
+        expertText: "13px",
+        paramLabel: "10px",
+        paramValue: "14.5px",
+        portionBadge: "12px",
+        categoryBadge: "12px",
+        checkboxSize: "13px",
+        sizeName: "Větší (+1 řádek / 16 pt)"
+      },
+      "extra-large": {
+        bodySize: "17.5px",
+        bodyLineHeight: "1.65",
+        titleSize: "30px",
+        summarySize: "15.5px",
+        sectionTitleSize: "20px",
+        headerSize: "16.5px",
+        ingSize: "17.5px",
+        ingLineHeight: "1.6",
+        stepNumSize: "27px",
+        stepNumFont: "14.5px",
+        stepSize: "17.5px",
+        stepLineHeight: "1.65",
+        expertTitle: "14.5px",
+        expertText: "14.5px",
+        paramLabel: "11px",
+        paramValue: "16.5px",
+        portionBadge: "13px",
+        categoryBadge: "13px",
+        checkboxSize: "15px",
+        sizeName: "Největší (+2 řádky / 18 pt)"
+      }
+    }[paperFontSize] || {
+      bodySize: "13.5px",
+      bodyLineHeight: "1.45",
+      titleSize: "23px",
+      summarySize: "12.5px",
+      sectionTitleSize: "15px",
+      headerSize: "13px",
+      ingSize: "13.5px",
+      ingLineHeight: "1.4",
+      stepNumSize: "21px",
+      stepNumFont: "11.5px",
+      stepSize: "13.5px",
+      stepLineHeight: "1.45",
+      expertTitle: "11.5px",
+      expertText: "11.5px",
+      paramLabel: "9px",
+      paramValue: "12.5px",
+      portionBadge: "10.5px",
+      categoryBadge: "10.5px",
+      checkboxSize: "11px",
+      sizeName: "Standardní (14 pt)"
+    };
+
+    // Ingredients list with scaled quantities and dynamic font size
     const ingredientsHtml = selectedRecipe.ingredients && selectedRecipe.ingredients.length > 0 
       ? selectedRecipe.ingredients.map(ing => {
           if (isIngredientHeader(ing)) {
             const headerTitle = cleanHeaderTitle(ing);
             return `
-              <li style="column-span: all; -webkit-column-span: all; list-style: none; padding: 4px 0 1px 0; border-bottom: 1.5px solid #1B4332; font-weight: 800; font-size: 12px; color: #1B4332; text-transform: uppercase; letter-spacing: 0.5px; page-break-after: avoid; break-after: avoid; margin-top: 5px; margin-bottom: 2px;">
+              <li style="column-span: all; -webkit-column-span: all; list-style: none; padding: 5px 0 2px 0; border-bottom: 1.5px solid #1B4332; font-weight: 800; font-size: ${fontConfig.headerSize}; color: #1B4332; text-transform: uppercase; letter-spacing: 0.5px; page-break-after: avoid; break-after: avoid; margin-top: 6px; margin-bottom: 3px;">
                 📌 ${headerTitle}
               </li>
             `;
@@ -2423,31 +2554,31 @@ ${separator}`;
           const parsed = parseIngredientString(ing);
           const displayIng = scaleIngredient(parsed, scaleFactor);
           return `
-            <li style="padding: 1.5px 0; border-bottom: 1px solid #EBE8E0; font-size: 12px; color: #2C2C2C; page-break-inside: avoid; break-inside: avoid; line-height: 1.3; font-weight: 500; display: flex; align-items: center; gap: 6px;">
-              <span style="display:inline-block; width:10px; height:10px; border:1.5px solid #1B4332; border-radius:2px; flex-shrink:0;"></span>
+            <li style="padding: 2.5px 0; border-bottom: 1px solid #EBE8E0; font-size: ${fontConfig.ingSize}; color: #2C2C2C; page-break-inside: avoid; break-inside: avoid; line-height: ${fontConfig.ingLineHeight}; font-weight: 500; display: flex; align-items: center; gap: 8px;">
+              <span style="display:inline-block; width:${fontConfig.checkboxSize}; height:${fontConfig.checkboxSize}; border:1.5px solid #1B4332; border-radius:3px; flex-shrink:0;"></span>
               <span>${displayIng}</span>
             </li>
           `;
         }).join("")
       : `<li style="font-style: italic; color: #666; padding: 2px 0; column-span: all; -webkit-column-span: all;">Žádné ingredience nejsou zapsány.</li>`;
 
-    // Instructions list
+    // Instructions list with dynamic font size
     let pdfStepNum = 1;
     const instructionsHtml = selectedRecipe.instructions && selectedRecipe.instructions.length > 0
       ? selectedRecipe.instructions.map((step) => {
           if (isIngredientHeader(step)) {
             const headerTitle = cleanHeaderTitle(step);
             return `
-              <div style="font-weight: 800; font-size: 12px; color: #1B4332; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1.5px solid #1B4332; padding: 4px 0 1px 0; margin-top: 6px; margin-bottom: 3px; page-break-after: avoid; break-after: avoid;">
+              <div style="font-weight: 800; font-size: ${fontConfig.headerSize}; color: #1B4332; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1.5px solid #1B4332; padding: 5px 0 2px 0; margin-top: 8px; margin-bottom: 4px; page-break-after: avoid; break-after: avoid;">
                 📌 ${headerTitle}
               </div>
             `;
           }
           const currentNum = pdfStepNum++;
           return `
-            <div class="instruction-step" style="display: flex; gap: 8px; align-items: flex-start; padding: 3px 0; margin-bottom: 3px; border-bottom: 1px dotted #DCD8CE; page-break-inside: avoid !important; break-inside: avoid !important;">
-              <div style="font-weight: 700; font-size: 11px; color: #FFFFFF; background-color: #1B4332; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px;">${currentNum}</div>
-              <div style="font-size: 12px; line-height: 1.35; color: #2C2C2C; flex: 1;">${step}</div>
+            <div class="instruction-step" style="display: flex; gap: 10px; align-items: flex-start; padding: 4px 0; margin-bottom: 4px; border-bottom: 1px dotted #DCD8CE; page-break-inside: avoid !important; break-inside: avoid !important;">
+              <div style="font-weight: 700; font-size: ${fontConfig.stepNumFont}; color: #FFFFFF; background-color: #1B4332; width: ${fontConfig.stepNumSize}; height: ${fontConfig.stepNumSize}; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px;">${currentNum}</div>
+              <div style="font-size: ${fontConfig.stepSize}; line-height: ${fontConfig.stepLineHeight}; color: #2C2C2C; flex: 1;">${step}</div>
             </div>
           `;
         }).join("")
@@ -2476,16 +2607,16 @@ ${separator}`;
       color: #1B4332;
       margin: 0;
       padding: 10px 6px;
-      line-height: 1.3;
+      line-height: ${fontConfig.bodyLineHeight};
       -webkit-print-color-adjust: exact;
       print-color-adjust: exact;
     }
     .print-control-banner {
-      max-width: 800px;
+      max-width: 820px;
       margin: 0 auto 10px auto;
       background-color: #1B4332;
       color: #FFFFFF;
-      padding: 8px 14px;
+      padding: 9px 14px;
       border-radius: 8px;
       display: flex;
       align-items: center;
@@ -2504,7 +2635,7 @@ ${separator}`;
       color: #FFFFFF;
       border: none;
       font-weight: 800;
-      padding: 5px 12px;
+      padding: 6px 14px;
       border-radius: 6px;
       cursor: pointer;
       font-size: 12px;
@@ -2514,27 +2645,27 @@ ${separator}`;
       background-color: #C26405;
     }
     .recipe-sheet {
-      max-width: 800px;
+      max-width: 820px;
       margin: 0 auto;
       background: #FFFFFF;
-      padding: 12px 16px;
+      padding: 14px 18px;
       border-radius: 8px;
       border: 1px solid #E8E5DC;
       box-shadow: 0 2px 10px rgba(0,0,0,0.04);
     }
     .sheet-header {
       border-bottom: 1.5px solid #E8E5DC;
-      padding-bottom: 6px;
-      margin-bottom: 6px;
+      padding-bottom: 8px;
+      margin-bottom: 8px;
     }
     .meta-brand-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 2px;
+      margin-bottom: 3px;
     }
     .meta-brand {
-      font-size: 9.5px;
+      font-size: 10px;
       font-weight: 800;
       color: #888172;
       letter-spacing: 1px;
@@ -2542,41 +2673,41 @@ ${separator}`;
     }
     .recipe-title {
       font-family: 'Playfair Display', Georgia, serif;
-      font-size: 20px;
+      font-size: ${fontConfig.titleSize};
       color: #1B4332;
-      margin: 1px 0 2px 0;
+      margin: 2px 0 4px 0;
       font-weight: 800;
-      line-height: 1.2;
+      line-height: 1.25;
     }
     .recipe-category {
       display: inline-block;
-      font-size: 9.5px;
+      font-size: ${fontConfig.categoryBadge};
       font-weight: 700;
       color: #2D6A4F;
       background-color: #E8F5E9;
-      padding: 1px 6px;
+      padding: 2px 8px;
       border-radius: 4px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
     .portion-badge {
       display: inline-block;
-      font-size: 9.5px;
+      font-size: ${fontConfig.portionBadge};
       font-weight: 700;
       color: #1B4332;
       background-color: #FAF8F3;
       border: 1px solid #E8E4DB;
-      padding: 1px 6px;
+      padding: 2px 8px;
       border-radius: 4px;
     }
     .section-title {
       font-family: 'Playfair Display', Georgia, serif;
-      font-size: 13.5px;
+      font-size: ${fontConfig.sectionTitleSize};
       font-weight: 700;
       color: #1B4332;
       border-bottom: 1.5px solid #E8E5DC;
-      padding-bottom: 2px;
-      margin: 6px 0 3px 0;
+      padding-bottom: 3px;
+      margin: 8px 0 4px 0;
       page-break-after: avoid !important;
       break-after: avoid !important;
     }
@@ -2592,16 +2723,16 @@ ${separator}`;
     .summary-text {
       font-style: italic;
       color: #4A4A40;
-      font-size: 11px;
-      margin-top: 2px;
-      line-height: 1.35;
+      font-size: ${fontConfig.summarySize};
+      margin-top: 3px;
+      line-height: 1.4;
     }
     .parameters-bottom-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 4px;
-      margin-top: 3px;
-      padding: 4px 6px;
+      gap: 6px;
+      margin-top: 4px;
+      padding: 5px 8px;
       background-color: #FDFBF7;
       border: 1px solid #E8E5DC;
       border-radius: 4px;
@@ -2609,7 +2740,7 @@ ${separator}`;
     }
     .param-label {
       display: block;
-      font-size: 8.5px;
+      font-size: ${fontConfig.paramLabel};
       font-weight: 700;
       color: #7A7A70;
       text-transform: uppercase;
@@ -2617,7 +2748,7 @@ ${separator}`;
       margin-bottom: 1px;
     }
     .param-value {
-      font-size: 11.5px;
+      font-size: ${fontConfig.paramValue};
       font-weight: 700;
       color: #1B4332;
     }
@@ -2625,26 +2756,26 @@ ${separator}`;
       background-color: #FDFBF7;
       border: 1px solid #E8E5DC;
       border-radius: 6px;
-      padding: 5px 8px;
-      margin-top: 6px;
-      font-size: 10.5px;
+      padding: 6px 10px;
+      margin-top: 8px;
+      font-size: ${fontConfig.expertText};
       page-break-inside: avoid !important;
       break-inside: avoid !important;
     }
     .expert-block h4 {
-      margin: 0 0 2px 0;
-      font-size: 10.5px;
+      margin: 0 0 3px 0;
+      font-size: ${fontConfig.expertTitle};
       color: #1B4332;
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
     .footer-stamp {
-      margin-top: 6px;
-      padding-top: 3px;
+      margin-top: 8px;
+      padding-top: 4px;
       border-top: 1px solid #E8E5DC;
       display: flex;
       justify-content: space-between;
-      font-size: 9px;
+      font-size: 9.5px;
       font-weight: 700;
       color: #888172;
       text-transform: uppercase;
@@ -2674,7 +2805,7 @@ ${separator}`;
 <body>
   <div class="no-print print-control-banner">
     <div class="print-control-title">
-      <span>🖨️ Tiskový lístek s receptem připraven</span>
+      <span>🖨️ Tiskový lístek • Písmo: <strong>${fontConfig.sizeName}</strong></span>
     </div>
     <div style="display: flex; gap: 8px;">
       <button class="btn-print-now" onclick="window.print()">Vytisknout / Uložit do PDF</button>
@@ -2689,6 +2820,7 @@ ${separator}`;
         <div style="display: flex; gap: 6px;">
           <span class="recipe-category">${category}</span>
           <span class="portion-badge">Porce: ${scaleFactor === 1 ? "1x" : `${formatCzechNumber(scaleFactor)}x`}</span>
+          <span class="portion-badge">Písmo: ${paperFontSize === "normal" ? "Standard" : paperFontSize === "large" ? "Větší (+1)" : "Největší (+2)"}</span>
         </div>
       </div>
       <h1 class="recipe-title">${title}</h1>
@@ -4912,22 +5044,32 @@ ${separator}`;
                           )}
                         </div>
 
-                        {/* Velikost textu (Font Size Selector) */}
-                        <div className="flex items-center gap-1 bg-white border border-[#E8E4DB] rounded-xl p-1 font-sans text-xs shadow-2xs shrink-0">
-                          <span className="px-1.5 font-bold text-[#555] whitespace-nowrap">Velikost textu:</span>
+                        {/* Velikost textu a tisku (Font Size Selector) */}
+                        <div className="flex items-center gap-1 bg-white border border-[#E8E4DB] rounded-xl p-1 font-sans text-xs shadow-2xs shrink-0" title="Zvolte velikost písma pro zobrazení na obrazovce i pro tisk a PDF export">
+                          <span className="px-1.5 font-bold text-[#444] whitespace-nowrap flex items-center gap-1">
+                            <Type className="h-3.5 w-3.5 text-[#1B4332]" />
+                            <span>Písmo / tisk:</span>
+                          </span>
                           <div className="flex items-center gap-0.5">
                             {(["normal", "large", "extra-large"] as const).map((size) => (
                               <button
                                 type="button"
                                 key={size}
                                 onClick={() => setPaperFontSize(size)}
-                                className={`px-2 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+                                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
                                   paperFontSize === size
                                     ? "bg-[#2D6A4F] text-white shadow-3xs"
                                     : "bg-[#FDFBF7] text-slate-600 hover:bg-slate-100"
                                 }`}
+                                title={
+                                  size === "normal"
+                                    ? "Standardní velikost písma (vhodné pro běžný tisk a displej)"
+                                    : size === "large"
+                                    ? "Větší písmo (+1 řádek / velikost pro snadné čtení a velký tisk)"
+                                    : "Největší písmo (+2 řádky / velikosti pro maximální čitelnost)"
+                                }
                               >
-                                {size === "normal" ? "Standardní" : size === "large" ? "Větší" : "Největší"}
+                                {size === "normal" ? "Standardní" : size === "large" ? "Větší (+1)" : "Největší (+2)"}
                               </button>
                             ))}
                           </div>
