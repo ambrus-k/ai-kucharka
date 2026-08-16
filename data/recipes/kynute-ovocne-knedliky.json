@@ -1,0 +1,39 @@
+{
+  "title": "Kynuté ovocné knedlíky",
+  "summary": "Klasické kynuté knedlíky plněné ovocem připravené pomocí domácí pekárny a vařené v páře. Zahrnuje 110 minut zpracování a kynutí těsta v pekárně, 15 minut tvarování, 20 minut sekundárního dokynutí a 10 minut vaření v páře.",
+  "ingredients": [
+    "[Těsto]",
+    "250 g hrubé mouky",
+    "250 g polohrubé mouky",
+    "250 ml vlažného plnotučného mléka",
+    "20 g čerstvého droždí",
+    "1 ks vejce",
+    "20 g rozpuštěného másla",
+    "20 g cukru krupice",
+    "5 g soli",
+    "[Ovocná náplň]",
+    "400 g čerstvého ovoce",
+    "[Na podávání]",
+    "100 g rozpuštěného másla",
+    "150 g strouhaného tvrdého tvarohu",
+    "50 g moučkového cukru"
+  ],
+  "instructions": [
+    "Do nádoby domácí pekárny nalijte vlažné mléko, přidejte rozpuštěné vlažné máslo a rozšlehané vejce.",
+    "Přisypte prosátou hrubou a polohrubou mouku, do jednoho rohu nasypte sůl s cukrem a uprostřed vytvořte důlek, do kterého nadrobte čerstvé droždí.",
+    "Zavřete víko a spusťte program Těsto, který zajišťuje hnětení a kynutí po dobu 110 minut.",
+    "Vykynuté těsto přeneste na pomoučený vál, rozdělte na stejné díly a vytvarujte z nich placky.",
+    "Do středu každé placky vložte ovoce, těsto pevně zabalte do kuličky a nechte na vále pod utěrkou sekundárně kynout po dobu 20 minut.",
+    "Knedlíky rozložte s rozestupy do parního hrnce nebo parní trouby a vařte v ostré páře po dobu 10 minut.",
+    "Po vyjmutí z páry každý knedlík ihned propíchněte vidličkou, aby unikla horká pára a střída se nesrazila, poté podávejte posypané tvarohem, cukrem a přelité rozpuštěným máslem."
+  ],
+  "applianceTips": "Domácí pekárna zajistí stabilní teplotu při kynutí po dobu 110 minut. Pro vaření využijte parní hrnec nebo parní konvektomat nastavený na 100 °C po dobu 10 minut, což zabrání podmáčení a vytvoří dokonalý objem.",
+  "expertJustification": "Kombinace hrubé a polohrubé mouky v poměru 1:1 drží stabilní lelepkovou síť, která v páře nekolabuje. Přídavek malého množství tuku přímo do těsta zvláční proteinová vlákna a zabrání gumovité struktuře. Dvacetiminutové sekundární dokynutí uvolní tenzi po mechanickém tvarování a zajistí rychlý nárůst objemu okamžitě po kontaktu s horkou párou.",
+  "applianceType": "Domácí pekárna a parní hrnec",
+  "cookingTime": "155 min",
+  "estimatedCookingTime": "10 min",
+  "difficulty": "Snadné",
+  "category": "Sladká jídla a moučníky",
+  "id": "recipe-ai-1786866607848",
+  "updatedAt": "2026-08-16T07:50:07.848Z"
+}
