@@ -1,0 +1,32 @@
+{
+  "title": "Chléb Šumava s pšeničným rozkvasem",
+  "summary": "Tradiční pšenično-žitný chléb na pšeničném rozkvasu s nadýchanou střídou. Příprava vyžaduje 8–10 hodin zrání rozkvasu, 2 hodiny primární fermentace s překládáním, 60–90 minut kynutí v ošatce a 45–50 minut pečení při 250 °C a 200 °C.",
+  "ingredients": [
+    "[Pšeničný rozkvas]",
+    "100 g pšeničné chlebové mouky T650",
+    "100 g vlažné vody (25 °C)",
+    "20 g aktivního žitného kvásku",
+    "[Hlavní těsto]",
+    "400 g pšeničné chlebové mouky T650",
+    "200 g žitné chlebové mouky T930",
+    "380 g chladné vody (10–15 °C)",
+    "14 g mořské soli",
+    "10 g celého kmínu"
+  ],
+  "instructions": [
+    "V skleněné nádobě smíchejte žitný kvas s vlažnou vodou a pšeničnou chlebovou moukou. Nechte přikryté fermentovat při pokojové teplotě po dobu 8–10 hodin, dokud rozkvas neztrojnásobí svůj objem a nezíská pěnovou strukturu.",
+    "Do mísy hnětače vložte vyzrálý rozkvas, pšeničnou chlebovou mouku, žitnou chlebovou mouku, chladnou vodu, sůl i kmín. Míchejte hákem na nejnižší rychlost po dobu 2 minut do propojení surovin a poté hněťte na první rychlostní stupeň po dobu 5–6 minut, dokud nezískáte hladké elastické těsto.",
+    "Těsto přesuňte do jemně naolejované mísy a nechte primárně fermentovat po dobu 2 hodin při pokojové teplotě. Během této fáze proveďte dvě šetrné série překladů těsta namočenýma rukama ve 40. a 80. minutě, zbylých 40 minut nechte těsto v klidu odpočívat.",
+    "Těsto vyklopte na pomoučený vál, stočte do pevného bochníku s utaženým povrchovým napětím a vložte jej spojem nahoru do škrobem vysypané ošatky. Nechte kynout při pokojové teplotě po dobu 60–90 minut, dokud se po jemném stlačení prstem důlek pomalu nevrací.",
+    "Vytvarovaný bochník vyklopte na sázecí lopatu s pečicím papírem a podélně nařízněte. Pečte v plně předehřáté troubě se zapařením při 250 °C po dobu 15 minut, poté troubu odvětrejte, snižte teplotu na 200 °C a dopékejte po dobu 30–35 minut do zlatohnědé kůrky. Po upečení nechce bochník chladnout na mřížce po dobu 2 hodin."
+  ],
+  "applianceTips": "V kuchyňském robotu s hnětacím hákem míchejte těsto přesně 2 minuty na nízkou rychlost a 5 minut na střední rychlost, aby nedošlo k přehození žitné složky. V parní troubě využijte program se vstřikováním páry na prvních 15 minut při 250 °C a následně přepněte na horkovzdušný režim při 200 °C bez páry po dobu 30 minut.",
+  "expertJustification": "Vypuštění autolýzy a okamžitý přídavek soli s fermentovaným rozkvasem okamžitě snižuje pH a zvyšuje ionic sílu prostředí. Sůl a kyselost zpevňují lepkovou síť pšeničné složky a zároveň tlumí amylolytickou enzymatickou aktivitu žitné mouky, což zamezuje nadměrnému rozkladu škrobů na mazlavé cukry a zajišťuje pevnou, nedrobivou střídu. Nízké hnětací časy respektují přítomnost žitné mouky, která namísto lepkového skeletu vytváří slizovité pentosany.",
+  "applianceType": "Trouba s parní funkcí / Kuchyňský robot",
+  "cookingTime": "12 hodin",
+  "estimatedCookingTime": "50 min",
+  "difficulty": "Střední",
+  "category": "Pečivo",
+  "id": "recipe-ai-1786992687182",
+  "updatedAt": "2026-08-17T18:51:44.545Z"
+}
