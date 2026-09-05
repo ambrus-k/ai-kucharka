@@ -1,3 +1,14 @@
+export interface Nutrition {
+  calories: number; // kcal
+  proteins: number; // g
+  carbohydrates: number; // g
+  sugars: number; // g
+  fats: number; // g
+  saturatedFats: number; // g
+  fiber: number; // g
+  salt: number; // g
+}
+
 export interface Recipe {
   id: string;
   title: string;
@@ -13,4 +24,5 @@ export interface Recipe {
   category?: string;
   isDefault?: boolean;
   updatedAt?: string; // ISO timestamp to track modifications and resolve merge conflicts
+  nutritionPer100g?: Nutrition;
 }

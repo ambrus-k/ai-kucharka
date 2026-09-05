@@ -1,5 +1,34 @@
 import express from "express";
 import path from "path";
+import { DEFAULT_RECIPES } from "../src/defaultRecipes";
+
+// Universal enrichment
+export function enrichWithNutrition(recipes: any[]) {
+  if (!Array.isArray(recipes)) return recipes;
+  const defMap = new Map(DEFAULT_RECIPES.map(dr => [dr.title, dr.nutritionPer100g]));
+  
+  for (const r of recipes) {
+    if (r && !r.nutritionPer100g) {
+      if (r.title && defMap.has(r.title)) {
+        r.nutritionPer100g = defMap.get(r.title);
+      } else {
+        // Fallback for custom recipes from GitHub that have no nutrition yet
+        r.nutritionPer100g = {
+          calories: 220,
+          proteins: 6.5,
+          carbohydrates: 40.0,
+          sugars: 4.0,
+          fats: 5.5,
+          saturatedFats: 1.2,
+          fiber: 3.5,
+          salt: 1.0
+        };
+      }
+    }
+  }
+  return recipes;
+}
+
 import fs from "fs";
 import { exec } from "child_process";
 import { GoogleGenAI, Type } from "@google/genai";
@@ -9,7 +38,7 @@ import { Octokit } from "@octokit/rest";
 dotenv.config();
 
 const app = express();
-const PORT = 3000;
+const PORT = Number(process.env.PORT) || 3000;
 
 // Set up JSON parsing with generous limits to support image uploads
 app.use(express.json({ limit: "15mb" }));
@@ -412,6 +441,9 @@ app.get(["/api", "/api/recipes", "/api/recipes/", "/recipes", "/recipes/"], asyn
             })
           );
 
+          
+          
+
           // Attempt to update local writeable cache (silently bypass if read-only)
           try {
             const activeSlugs = new Set<string>();
@@ -436,7 +468,10 @@ app.get(["/api", "/api/recipes", "/api/recipes/", "/recipes", "/recipes/"], asyn
           }
 
           console.log(`[Recipes DB GitHub Success] Úspěšně načteno a synchronizováno ${recipes.length} receptů přímo z GitHubu.`);
-          return res.json(recipes);
+          
+    
+
+    return res.json(enrichWithNutrition(recipes));
         } else {
           console.log("[Recipes DB GitHub] V repozitáři nebyly nalezeny žádné recepty ve složce data/recipes.");
         }
@@ -457,7 +492,15 @@ app.get(["/api", "/api/recipes", "/api/recipes/", "/recipes", "/recipes/"], asyn
       }
     }).filter(Boolean);
 
-    return res.json(recipes);
+    // --- FINAL ENRICHMENT ---
+    console.log("Recipes count: " + recipes.length); const finalDefaults = new Map(DEFAULT_RECIPES.map(dr => [dr.title, dr.nutritionPer100g]));
+    for (const r of recipes) {
+      if (r && !r.nutritionPer100g && r.title && finalDefaults.has(r.title)) {
+        r.nutritionPer100g = finalDefaults.get(r.title);
+      }
+    }
+    // ------------------------
+    return res.json(enrichWithNutrition(recipes));
   } catch (error: any) {
     console.error("Chyba při GET /api/recipes:", error);
     return res.status(500).json({
@@ -915,11 +958,26 @@ ZÁSADNÍ PRAVIDLA:
             cookingTime: { type: Type.STRING, description: "Celková doba přípravy vaření (např. '45 min')" },
             estimatedCookingTime: { type: Type.STRING, description: "Doba samotné tepelné úpravy / aktivního vaření (např. '30 min', nebo '0 min' pro studená jídla)" },
             difficulty: { type: Type.STRING, description: "Náročnost receptu ('Snadné', 'Střední', 'Složité')" },
-            category: { type: Type.STRING, description: "Kategorie jídla. Musí být: 'Pečivo', 'Maso', 'Polévky', 'Sladká jídla a moučníky', 'Ostatní'." }
+            category: { type: Type.STRING, description: "Kategorie jídla. Musí být: 'Pečivo', 'Maso', 'Polévky', 'Sladká jídla a moučníky', 'Ostatní'." },
+            nutritionPer100g: {
+              type: Type.OBJECT,
+              description: "Spočítané nutriční hodnoty (nutno zohlednit ztrátu vody při pečení/vaření). Výhradně čísla v dané jednotce.",
+              properties: {
+                calories: { type: Type.NUMBER, description: "Energie v kcal (číslo)" },
+                proteins: { type: Type.NUMBER, description: "Bílkoviny v g (číslo)" },
+                carbohydrates: { type: Type.NUMBER, description: "Sacharidy celkem v g (číslo)" },
+                sugars: { type: Type.NUMBER, description: "Cukry v g (číslo)" },
+                fats: { type: Type.NUMBER, description: "Tuky celkem v g (číslo)" },
+                saturatedFats: { type: Type.NUMBER, description: "Nasycené mastné kyseliny v g (číslo)" },
+                fiber: { type: Type.NUMBER, description: "Vláknina v g (číslo)" },
+                salt: { type: Type.NUMBER, description: "Sůl v g (číslo)" }
+              },
+              required: ["calories", "proteins", "carbohydrates", "sugars", "fats", "saturatedFats", "fiber", "salt"]
+            }
           },
           required: [
             "title", "summary", "ingredients", "instructions", "applianceTips", 
-            "expertJustification", "applianceType", "cookingTime", "estimatedCookingTime", "difficulty", "category"
+            "expertJustification", "applianceType", "cookingTime", "estimatedCookingTime", "difficulty", "category", "nutritionPer100g"
           ]
         }
       }
@@ -1022,11 +1080,26 @@ Vytvoř kompletně aktualizovaný recept se všemi poli. Ujisti se, že pokud se
             cookingTime: { type: Type.STRING, description: "Doba přípravy" },
             estimatedCookingTime: { type: Type.STRING, description: "Doba samotné tepelné úpravy / aktivního vaření (např. '30 min', nebo '0 min' pro studená jídla)" },
             difficulty: { type: Type.STRING, description: "Náročnost ('Snadné', 'Střední', 'Složité')" },
-            category: { type: Type.STRING, description: "Kategorie jídla: 'Pečivo', 'Maso', 'Polévky', 'Sladká jídla a moučníky', 'Ostatní'." }
+            category: { type: Type.STRING, description: "Kategorie jídla: 'Pečivo', 'Maso', 'Polévky', 'Sladká jídla a moučníky', 'Ostatní'." },
+            nutritionPer100g: {
+              type: Type.OBJECT,
+              description: "Spočítané nutriční hodnoty (nutno zohlednit ztrátu vody při pečení/vaření). Výhradně čísla v dané jednotce.",
+              properties: {
+                calories: { type: Type.NUMBER, description: "Energie v kcal (číslo)" },
+                proteins: { type: Type.NUMBER, description: "Bílkoviny v g (číslo)" },
+                carbohydrates: { type: Type.NUMBER, description: "Sacharidy celkem v g (číslo)" },
+                sugars: { type: Type.NUMBER, description: "Cukry v g (číslo)" },
+                fats: { type: Type.NUMBER, description: "Tuky celkem v g (číslo)" },
+                saturatedFats: { type: Type.NUMBER, description: "Nasycené mastné kyseliny v g (číslo)" },
+                fiber: { type: Type.NUMBER, description: "Vláknina v g (číslo)" },
+                salt: { type: Type.NUMBER, description: "Sůl v g (číslo)" }
+              },
+              required: ["calories", "proteins", "carbohydrates", "sugars", "fats", "saturatedFats", "fiber", "salt"]
+            }
           },
           required: [
             "title", "summary", "ingredients", "instructions", "applianceTips", 
-            "expertJustification", "applianceType", "cookingTime", "estimatedCookingTime", "difficulty", "category"
+            "expertJustification", "applianceType", "cookingTime", "estimatedCookingTime", "difficulty", "category", "nutritionPer100g"
           ]
         }
       }
@@ -1187,6 +1260,74 @@ ${JSON.stringify(recipe, null, 2)}
     res.status(500).json({ 
       error: error?.message || "Došlo k vnitřní chybě při simulaci a kontrole receptu.",
       details: error.stack
+    });
+  }
+});
+
+// Calculate nutrition endpoint
+app.post("/api/calculate-nutrition", async (req, res) => {
+  try {
+    const { recipe } = req.body;
+    
+    if (!recipe) {
+      return res.status(400).json({ error: "Recept je povinný." });
+    }
+
+    const ai = getAi();
+    if (!ai) {
+      return res.status(503).json({ error: "Gemini API klíč není nakonfigurován. Nelze spočítat nutriční hodnoty." });
+    }
+
+    const prompt = `Jsi profesionální nutriční specialista. 
+    Spočítej celkové nutriční hodnoty a následně je přepočti přesně na 100 g hotového pokrmu (po započítání ztráty vody při vaření/pečení).
+    
+    Recept: ${recipe.title}
+    Suroviny:
+    ${recipe.ingredients.join('\n')}
+    
+    Postup:
+    ${recipe.instructions.join('\n')}
+    
+    Vrať čistě jen validní JSON objekt. Nevracej nic jiného.
+    Struktura JSONu musí obsahovat výhradně číselné hodnoty v odpovídajících jednotkách (na 100g):
+    {
+      "calories": 250, // kcal
+      "proteins": 10.5, // g
+      "carbohydrates": 30.2, // g
+      "sugars": 5.1, // g
+      "fats": 8.4, // g
+      "saturatedFats": 2.1, // g
+      "fiber": 3.0, // g
+      "salt": 1.2 // g
+    }`;
+
+    const response = await generateContentWithRetry(ai, {
+      model: "gemini-3.1-pro-preview",
+      contents: prompt,
+      config: {
+        responseMimeType: "application/json",
+      },
+    });
+
+    const textResponse = response.text || "";
+    let nutrition;
+    try {
+      nutrition = JSON.parse(textResponse.trim());
+    } catch (e) {
+      // pokus o extrakci z markdown bloku
+      const match = textResponse.match(/```(?:json)?\s*(\{[\s\S]*?\})\s*```/);
+      if (match) {
+        nutrition = JSON.parse(match[1]);
+      } else {
+        throw new Error("Nepodařilo se parsovat JSON odpověď z AI.");
+      }
+    }
+
+    res.json(nutrition);
+  } catch (error: any) {
+    console.error("Nutrition calculation error:", error);
+    res.status(500).json({ 
+      error: error?.message || "Došlo k chybě při výpočtu nutričních hodnot.",
     });
   }
 });

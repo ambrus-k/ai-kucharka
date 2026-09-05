@@ -37,7 +37,17 @@ export const DEFAULT_RECIPES: Recipe[] = [
     "category": "Sladká jídla a moučníky",
     "id": "gen-1781467904494",
     "estimatedCookingTime": "45",
-    "updatedAt": "2026-08-02T22:46:50.663Z"
+    "updatedAt": "2026-08-02T22:46:50.663Z",
+    "nutritionPer100g": {
+      "calories": 352.5,
+      "proteins": 5.8,
+      "carbohydrates": 44.2,
+      "sugars": 22.4,
+      "fats": 17.6,
+      "saturatedFats": 7.9,
+      "fiber": 2.8,
+      "salt": 0.65
+    }
   },
   {
     "title": "Bavorské vdolečky",
@@ -77,7 +87,17 @@ export const DEFAULT_RECIPES: Recipe[] = [
     "category": "Sladká jídla a moučníky",
     "id": "gen-1781777265750",
     "estimatedCookingTime": "10",
-    "updatedAt": "2026-08-02T22:46:50.663Z"
+    "updatedAt": "2026-08-02T22:46:50.663Z",
+    "nutritionPer100g": {
+      "calories": 372,
+      "proteins": 7.4,
+      "carbohydrates": 34.6,
+      "sugars": 12.8,
+      "fats": 22.9,
+      "saturatedFats": 6.8,
+      "fiber": 1.4,
+      "salt": 0.45
+    }
   },
   {
     "id": "bucek",
@@ -111,7 +131,17 @@ export const DEFAULT_RECIPES: Recipe[] = [
     "category": "Maso",
     "isDefault": true,
     "updatedAt": "2026-08-02T22:46:50.664Z",
-    "estimatedCookingTime": "65 min"
+    "estimatedCookingTime": "65 min",
+    "nutritionPer100g": {
+      "calories": 448,
+      "proteins": 13.9,
+      "carbohydrates": 0.4,
+      "sugars": 0.1,
+      "fats": 42.6,
+      "saturatedFats": 15.8,
+      "fiber": 0.1,
+      "salt": 1.1
+    }
   },
   {
     "title": "Buřtguláš",
@@ -149,7 +179,17 @@ export const DEFAULT_RECIPES: Recipe[] = [
     "category": "Polévky",
     "id": "gen-1783884136320",
     "updatedAt": "2026-08-02T22:46:50.664Z",
-    "estimatedCookingTime": "45 min"
+    "estimatedCookingTime": "45 min",
+    "nutritionPer100g": {
+      "calories": 136,
+      "proteins": 4.8,
+      "carbohydrates": 11.2,
+      "sugars": 1.4,
+      "fats": 7.9,
+      "saturatedFats": 2.8,
+      "fiber": 1.5,
+      "salt": 1.1
+    }
   },
   {
     "title": "Chléb  kváskový s kmínem",
@@ -184,7 +224,17 @@ export const DEFAULT_RECIPES: Recipe[] = [
     "category": "Pečivo",
     "id": "gen-1783526818566",
     "updatedAt": "2026-08-02T22:46:50.664Z",
-    "estimatedCookingTime": "50 min"
+    "estimatedCookingTime": "50 min",
+    "nutritionPer100g": {
+      "calories": 235.4,
+      "proteins": 7.8,
+      "carbohydrates": 47.2,
+      "sugars": 0.9,
+      "fats": 1.4,
+      "saturatedFats": 0.2,
+      "fiber": 4.5,
+      "salt": 1.5
+    }
   },
   {
     "title": "Chléb  pšenično-žitný s droždím",
@@ -220,7 +270,17 @@ export const DEFAULT_RECIPES: Recipe[] = [
     "category": "Pečivo",
     "id": "gen-1783415546359",
     "estimatedCookingTime": "35 min",
-    "updatedAt": "2026-08-02T22:46:50.664Z"
+    "updatedAt": "2026-08-02T22:46:50.664Z",
+    "nutritionPer100g": {
+      "calories": 235.8,
+      "proteins": 7.9,
+      "carbohydrates": 45.6,
+      "sugars": 1.4,
+      "fats": 2.1,
+      "saturatedFats": 0.3,
+      "fiber": 3.8,
+      "salt": 1.4
+    }
   },
   {
     "title": "Chléb pšenično-žitný",
@@ -256,7 +316,17 @@ export const DEFAULT_RECIPES: Recipe[] = [
     "category": "Pečivo",
     "id": "gen-1781773438337",
     "estimatedCookingTime": "45 min",
-    "updatedAt": "2026-08-02T22:46:50.665Z"
+    "updatedAt": "2026-08-02T22:46:50.665Z",
+    "nutritionPer100g": {
+      "calories": 238.4,
+      "proteins": 7.8,
+      "carbohydrates": 48.2,
+      "sugars": 0.9,
+      "fats": 1.1,
+      "saturatedFats": 0.2,
+      "fiber": 4.5,
+      "salt": 1.2
+    }
   },
   {
     "title": "Chléb pšeničný kváskový",
@@ -290,7 +360,17 @@ export const DEFAULT_RECIPES: Recipe[] = [
     "category": "Pečivo",
     "id": "gen-1781443902352",
     "estimatedCookingTime": "45 min",
-    "updatedAt": "2026-08-02T22:46:50.665Z"
+    "updatedAt": "2026-08-02T22:46:50.665Z",
+    "nutritionPer100g": {
+      "calories": 235.8,
+      "proteins": 7.9,
+      "carbohydrates": 48.6,
+      "sugars": 0.8,
+      "fats": 1.1,
+      "saturatedFats": 0.2,
+      "fiber": 2.8,
+      "salt": 1.4
+    }
   },
   {
     "title": "Chléb Šumava",
@@ -325,7 +405,17 @@ export const DEFAULT_RECIPES: Recipe[] = [
     "category": "Pečivo",
     "id": "gen-1783540977144",
     "updatedAt": "2026-08-02T22:46:50.665Z",
-    "estimatedCookingTime": "45 min"
+    "estimatedCookingTime": "45 min",
+    "nutritionPer100g": {
+      "calories": 242.4,
+      "proteins": 7.8,
+      "carbohydrates": 48.6,
+      "sugars": 1.1,
+      "fats": 1.2,
+      "saturatedFats": 0.2,
+      "fiber": 4.5,
+      "salt": 1.5
+    }
   },
   {
     "title": "Chléb žitno-pšeničný 5:3",
@@ -359,7 +449,17 @@ export const DEFAULT_RECIPES: Recipe[] = [
     "category": "Pečivo",
     "id": "gen-1783527082168",
     "updatedAt": "2026-08-02T22:46:50.665Z",
-    "estimatedCookingTime": "50 min"
+    "estimatedCookingTime": "50 min",
+    "nutritionPer100g": {
+      "calories": 238,
+      "proteins": 7.8,
+      "carbohydrates": 48.2,
+      "sugars": 0.9,
+      "fats": 1.2,
+      "saturatedFats": 0.2,
+      "fiber": 5.4,
+      "salt": 1.3
+    }
   },
   {
     "title": "Coleslaw",
@@ -394,7 +494,17 @@ export const DEFAULT_RECIPES: Recipe[] = [
     "category": "Ostatní",
     "id": "gen-1782536706330",
     "estimatedCookingTime": "0 min",
-    "updatedAt": "2026-08-02T22:46:50.666Z"
+    "updatedAt": "2026-08-02T22:46:50.666Z",
+    "nutritionPer100g": {
+      "calories": 142.5,
+      "proteins": 1.1,
+      "carbohydrates": 8.5,
+      "sugars": 5.8,
+      "fats": 11.4,
+      "saturatedFats": 1.9,
+      "fiber": 2.2,
+      "salt": 0.85
+    }
   },
   {
     "title": "Dalamánky",
@@ -427,7 +537,17 @@ export const DEFAULT_RECIPES: Recipe[] = [
     "category": "Pečivo",
     "id": "gen-1783722072636",
     "updatedAt": "2026-08-02T22:46:50.666Z",
-    "estimatedCookingTime": "20 min"
+    "estimatedCookingTime": "20 min",
+    "nutritionPer100g": {
+      "calories": 236,
+      "proteins": 7.8,
+      "carbohydrates": 46.2,
+      "sugars": 0.8,
+      "fats": 1.4,
+      "saturatedFats": 0.2,
+      "fiber": 5.4,
+      "salt": 1.4
+    }
   },
   {
     "title": "Dukátové buchtičky",
@@ -467,7 +587,17 @@ export const DEFAULT_RECIPES: Recipe[] = [
     "category": "Sladká jídla a moučníky",
     "id": "gen-1783884254487",
     "updatedAt": "2026-08-02T22:46:50.666Z",
-    "estimatedCookingTime": "68 min"
+    "estimatedCookingTime": "68 min",
+    "nutritionPer100g": {
+      "calories": 284,
+      "proteins": 7.8,
+      "carbohydrates": 41.2,
+      "sugars": 14.5,
+      "fats": 9.7,
+      "saturatedFats": 4.6,
+      "fiber": 1.2,
+      "salt": 0.35
+    }
   },
   {
     "title": "Holandské řízky",
@@ -505,7 +635,17 @@ export const DEFAULT_RECIPES: Recipe[] = [
     "category": "Maso",
     "id": "gen-1781776733049",
     "estimatedCookingTime": "19 min",
-    "updatedAt": "2026-08-02T22:46:50.666Z"
+    "updatedAt": "2026-08-02T22:46:50.666Z",
+    "nutritionPer100g": {
+      "calories": 428,
+      "proteins": 14.5,
+      "carbohydrates": 15.2,
+      "sugars": 1.4,
+      "fats": 35.8,
+      "saturatedFats": 12.6,
+      "fiber": 0.8,
+      "salt": 1.3
+    }
   },
   {
     "title": "Hovězí guláš",
@@ -545,7 +685,17 @@ export const DEFAULT_RECIPES: Recipe[] = [
     "category": "Maso",
     "id": "gen-1782448905657",
     "updatedAt": "2026-08-02T22:46:50.667Z",
-    "estimatedCookingTime": "2 hodiny"
+    "estimatedCookingTime": "2 hodiny",
+    "nutritionPer100g": {
+      "calories": 162.4,
+      "proteins": 12.8,
+      "carbohydrates": 6.3,
+      "sugars": 2.2,
+      "fats": 9.4,
+      "saturatedFats": 3.6,
+      "fiber": 1.1,
+      "salt": 0.8
+    }
   },
   {
     "title": "Krkonošské kyselo",
@@ -585,7 +735,17 @@ export const DEFAULT_RECIPES: Recipe[] = [
     "category": "Polévky",
     "id": "gen-1781777007027",
     "estimatedCookingTime": "30 min",
-    "updatedAt": "2026-08-02T22:46:50.667Z"
+    "updatedAt": "2026-08-02T22:46:50.667Z",
+    "nutritionPer100g": {
+      "calories": 78.4,
+      "proteins": 2.9,
+      "carbohydrates": 9.2,
+      "sugars": 1.4,
+      "fats": 3.4,
+      "saturatedFats": 1.7,
+      "fiber": 1.6,
+      "salt": 0.6
+    }
   },
   {
     "title": "Kuře na paprice",
@@ -625,7 +785,17 @@ export const DEFAULT_RECIPES: Recipe[] = [
     "category": "Maso",
     "id": "gen-1783887414122",
     "updatedAt": "2026-08-02T22:46:50.667Z",
-    "estimatedCookingTime": "113 min"
+    "estimatedCookingTime": "113 min",
+    "nutritionPer100g": {
+      "calories": 142.5,
+      "proteins": 14.1,
+      "carbohydrates": 3.8,
+      "sugars": 1.9,
+      "fats": 7.9,
+      "saturatedFats": 3.4,
+      "fiber": 0.6,
+      "salt": 0.6
+    }
   },
   {
     "title": "Kuře z jednoho pekáče",
@@ -673,7 +843,17 @@ export const DEFAULT_RECIPES: Recipe[] = [
     "difficulty": "Střední",
     "category": "Maso",
     "id": "gen-1784271338613",
-    "updatedAt": "2026-08-02T22:46:50.667Z"
+    "updatedAt": "2026-08-02T22:46:50.667Z",
+    "nutritionPer100g": {
+      "calories": 162.4,
+      "proteins": 12.8,
+      "carbohydrates": 8.5,
+      "sugars": 1.4,
+      "fats": 8.7,
+      "saturatedFats": 2.1,
+      "fiber": 1.1,
+      "salt": 1.1
+    }
   },
   {
     "title": "Kynuté ovocné knedlíky",
@@ -711,7 +891,17 @@ export const DEFAULT_RECIPES: Recipe[] = [
     "category": "Sladká jídla a moučníky",
     "id": "gen-1782536913905",
     "estimatedCookingTime": "10 min",
-    "updatedAt": "2026-08-02T22:46:50.667Z"
+    "updatedAt": "2026-08-02T22:46:50.667Z",
+    "nutritionPer100g": {
+      "calories": 242.4,
+      "proteins": 7.2,
+      "carbohydrates": 38.8,
+      "sugars": 6.8,
+      "fats": 6.4,
+      "saturatedFats": 3.2,
+      "fiber": 1.4,
+      "salt": 0.35
+    }
   },
   {
     "title": "Langoše",
@@ -750,7 +940,17 @@ export const DEFAULT_RECIPES: Recipe[] = [
     "category": "Slaná jídla bez masa",
     "id": "gen-1781590909243",
     "updatedAt": "2026-08-02T22:46:50.668Z",
-    "estimatedCookingTime": "15 min"
+    "estimatedCookingTime": "15 min",
+    "nutritionPer100g": {
+      "calories": 448,
+      "proteins": 7.8,
+      "carbohydrates": 26.5,
+      "sugars": 2.1,
+      "fats": 35.2,
+      "saturatedFats": 5.8,
+      "fiber": 1.2,
+      "salt": 0.9
+    }
   },
   {
     "title": "Linecké cukroví",
@@ -783,7 +983,17 @@ export const DEFAULT_RECIPES: Recipe[] = [
     "category": "Sladká jídla a moučníky",
     "id": "gen-1783883769608",
     "updatedAt": "2026-08-02T22:46:50.668Z",
-    "estimatedCookingTime": "8 min"
+    "estimatedCookingTime": "8 min",
+    "nutritionPer100g": {
+      "calories": 448.2,
+      "proteins": 4.6,
+      "carbohydrates": 54.8,
+      "sugars": 28.5,
+      "fats": 23.4,
+      "saturatedFats": 14.2,
+      "fiber": 1.2,
+      "salt": 0.15
+    }
   },
   {
     "title": "Loupáky",
@@ -820,7 +1030,17 @@ export const DEFAULT_RECIPES: Recipe[] = [
     "category": "Pečivo",
     "id": "gen-1781776531747",
     "estimatedCookingTime": "15 min",
-    "updatedAt": "2026-08-02T22:46:50.668Z"
+    "updatedAt": "2026-08-02T22:46:50.668Z",
+    "nutritionPer100g": {
+      "calories": 338.4,
+      "proteins": 8.7,
+      "carbohydrates": 49.2,
+      "sugars": 7.8,
+      "fats": 12.1,
+      "saturatedFats": 5.9,
+      "fiber": 1.7,
+      "salt": 0.8
+    }
   },
   {
     "title": "Makový koláč se švestkami",
@@ -871,7 +1091,17 @@ export const DEFAULT_RECIPES: Recipe[] = [
     "category": "Sladká jídla a moučníky",
     "id": "gen-1783883583875",
     "updatedAt": "2026-08-02T22:46:50.668Z",
-    "estimatedCookingTime": "30 min"
+    "estimatedCookingTime": "30 min",
+    "nutritionPer100g": {
+      "calories": 288.4,
+      "proteins": 6.8,
+      "carbohydrates": 38.6,
+      "sugars": 15.2,
+      "fats": 12.4,
+      "saturatedFats": 6.2,
+      "fiber": 3.4,
+      "salt": 0.35
+    }
   },
   {
     "title": "Máslová veka",
@@ -902,7 +1132,17 @@ export const DEFAULT_RECIPES: Recipe[] = [
     "category": "Pečivo",
     "id": "gen-1781777771572",
     "estimatedCookingTime": "25 min",
-    "updatedAt": "2026-08-02T22:46:50.668Z"
+    "updatedAt": "2026-08-02T22:46:50.668Z",
+    "nutritionPer100g": {
+      "calories": 288.5,
+      "proteins": 8.7,
+      "carbohydrates": 45.4,
+      "sugars": 2.4,
+      "fats": 7.8,
+      "saturatedFats": 4.6,
+      "fiber": 1.7,
+      "salt": 1.4
+    }
   },
   {
     "title": "Mazanec",
@@ -943,7 +1183,17 @@ export const DEFAULT_RECIPES: Recipe[] = [
     "category": "Pečivo",
     "id": "gen-1781776592663",
     "estimatedCookingTime": "45 min",
-    "updatedAt": "2026-08-02T22:46:50.669Z"
+    "updatedAt": "2026-08-02T22:46:50.669Z",
+    "nutritionPer100g": {
+      "calories": 372,
+      "proteins": 7.4,
+      "carbohydrates": 44.2,
+      "sugars": 15.8,
+      "fats": 17.6,
+      "saturatedFats": 9.2,
+      "fiber": 1.4,
+      "salt": 0.4
+    }
   },
   {
     "title": "Moravské koláčky",
@@ -989,7 +1239,17 @@ export const DEFAULT_RECIPES: Recipe[] = [
     "category": "Pečivo",
     "id": "gen-1781777490075",
     "updatedAt": "2026-08-02T22:46:50.669Z",
-    "estimatedCookingTime": "25 min"
+    "estimatedCookingTime": "25 min",
+    "nutritionPer100g": {
+      "calories": 338,
+      "proteins": 8.2,
+      "carbohydrates": 42.5,
+      "sugars": 21.8,
+      "fats": 15.6,
+      "saturatedFats": 8.9,
+      "fiber": 1.4,
+      "salt": 0.35
+    }
   },
   {
     "id": "knedliky",
@@ -1030,7 +1290,17 @@ export const DEFAULT_RECIPES: Recipe[] = [
     "isDefault": true,
     "category": "Sladká jídla a moučníky",
     "estimatedCookingTime": "12 min",
-    "updatedAt": "2026-08-02T22:46:50.669Z"
+    "updatedAt": "2026-08-02T22:46:50.669Z",
+    "nutritionPer100g": {
+      "calories": 258,
+      "proteins": 6.8,
+      "carbohydrates": 38.5,
+      "sugars": 8.2,
+      "fats": 8.9,
+      "saturatedFats": 5.2,
+      "fiber": 1.9,
+      "salt": 0.25
+    }
   },
   {
     "title": "Piškotová roláda s malinami",
@@ -1064,7 +1334,17 @@ export const DEFAULT_RECIPES: Recipe[] = [
     "category": "Sladká jídla a moučníky",
     "id": "gen-1783883983238",
     "updatedAt": "2026-08-02T22:46:50.669Z",
-    "estimatedCookingTime": "8 min"
+    "estimatedCookingTime": "8 min",
+    "nutritionPer100g": {
+      "calories": 284.5,
+      "proteins": 5.6,
+      "carbohydrates": 54.8,
+      "sugars": 42.4,
+      "fats": 4.1,
+      "saturatedFats": 1.2,
+      "fiber": 0.8,
+      "salt": 0.3
+    }
   },
   {
     "title": "Pizza se sladěnkou",
@@ -1095,7 +1375,17 @@ export const DEFAULT_RECIPES: Recipe[] = [
     "category": "Slaná jídla bez masa",
     "id": "gen-1781777082731",
     "estimatedCookingTime": "10 min",
-    "updatedAt": "2026-08-02T22:46:50.669Z"
+    "updatedAt": "2026-08-02T22:46:50.669Z",
+    "nutritionPer100g": {
+      "calories": 257,
+      "proteins": 8.3,
+      "carbohydrates": 49.2,
+      "sugars": 1.4,
+      "fats": 2.9,
+      "saturatedFats": 0.4,
+      "fiber": 1.8,
+      "salt": 1.4
+    }
   },
   {
     "title": "Plněné papriky v rajské omáčce",
@@ -1150,7 +1440,17 @@ export const DEFAULT_RECIPES: Recipe[] = [
     "difficulty": "Střední",
     "category": "Maso",
     "id": "recipe-ai-1785707213088",
-    "updatedAt": "2026-08-02T22:46:50.670Z"
+    "updatedAt": "2026-08-02T22:46:50.670Z",
+    "nutritionPer100g": {
+      "calories": 164,
+      "proteins": 8.2,
+      "carbohydrates": 12.4,
+      "sugars": 5.8,
+      "fats": 9.3,
+      "saturatedFats": 3.4,
+      "fiber": 1.5,
+      "salt": 0.85
+    }
   },
   {
     "title": "Preclíky ze Sedlice",
@@ -1183,7 +1483,17 @@ export const DEFAULT_RECIPES: Recipe[] = [
     "category": "Pečivo",
     "id": "gen-1781777534961",
     "estimatedCookingTime": "15 min",
-    "updatedAt": "2026-08-02T22:46:50.670Z"
+    "updatedAt": "2026-08-02T22:46:50.670Z",
+    "nutritionPer100g": {
+      "calories": 448.2,
+      "proteins": 8.8,
+      "carbohydrates": 43.1,
+      "sugars": 1.9,
+      "fats": 26.5,
+      "saturatedFats": 10.9,
+      "fiber": 2.1,
+      "salt": 1.8
+    }
   },
   {
     "title": "Rohlíky pšeničné",
@@ -1215,7 +1525,17 @@ export const DEFAULT_RECIPES: Recipe[] = [
     "category": "Pečivo",
     "id": "gen-1781436210192",
     "updatedAt": "2026-08-02T22:46:50.670Z",
-    "estimatedCookingTime": "15 min"
+    "estimatedCookingTime": "15 min",
+    "nutritionPer100g": {
+      "calories": 278.4,
+      "proteins": 8.3,
+      "carbohydrates": 50.1,
+      "sugars": 0.8,
+      "fats": 4.9,
+      "saturatedFats": 1.9,
+      "fiber": 1.7,
+      "salt": 1.4
+    }
   },
   {
     "title": "Rohlíky se sladovým výtažkem",
@@ -1246,7 +1566,17 @@ export const DEFAULT_RECIPES: Recipe[] = [
     "category": "Pečivo",
     "id": "gen-1781775974569",
     "updatedAt": "2026-08-02T22:46:50.670Z",
-    "estimatedCookingTime": "18 min"
+    "estimatedCookingTime": "18 min",
+    "nutritionPer100g": {
+      "calories": 278,
+      "proteins": 8.4,
+      "carbohydrates": 49.3,
+      "sugars": 1.2,
+      "fats": 5.4,
+      "saturatedFats": 2.1,
+      "fiber": 1.7,
+      "salt": 1.4
+    }
   },
   {
     "title": "Rohlíky/housky žitno-pšeničné",
@@ -1279,7 +1609,17 @@ export const DEFAULT_RECIPES: Recipe[] = [
     "category": "Pečivo",
     "id": "gen-1783916906147",
     "updatedAt": "2026-08-02T22:46:50.670Z",
-    "estimatedCookingTime": "25 min"
+    "estimatedCookingTime": "25 min",
+    "nutritionPer100g": {
+      "calories": 258,
+      "proteins": 8.3,
+      "carbohydrates": 49.5,
+      "sugars": 1.2,
+      "fats": 3.2,
+      "saturatedFats": 1.1,
+      "fiber": 3.9,
+      "salt": 1.2
+    }
   },
   {
     "title": "Sekaná",
@@ -1320,7 +1660,17 @@ export const DEFAULT_RECIPES: Recipe[] = [
     "category": "Maso",
     "id": "gen-1783884048202",
     "updatedAt": "2026-08-02T22:46:50.670Z",
-    "estimatedCookingTime": "90 min"
+    "estimatedCookingTime": "90 min",
+    "nutritionPer100g": {
+      "calories": 278,
+      "proteins": 15.4,
+      "carbohydrates": 5.8,
+      "sugars": 1.2,
+      "fats": 21.6,
+      "saturatedFats": 8.5,
+      "fiber": 0.4,
+      "salt": 1.3
+    }
   },
   {
     "title": "Škvarkové placky",
@@ -1361,7 +1711,17 @@ export const DEFAULT_RECIPES: Recipe[] = [
     "category": "Pečivo",
     "id": "gen-1781778421698",
     "estimatedCookingTime": "20 min",
-    "updatedAt": "2026-08-02T22:46:50.671Z"
+    "updatedAt": "2026-08-02T22:46:50.671Z",
+    "nutritionPer100g": {
+      "calories": 468,
+      "proteins": 7.2,
+      "carbohydrates": 26.5,
+      "sugars": 1.2,
+      "fats": 38.1,
+      "saturatedFats": 13.9,
+      "fiber": 1.1,
+      "salt": 1.4
+    }
   },
   {
     "title": "Špekáčkový salát",
@@ -1399,7 +1759,17 @@ export const DEFAULT_RECIPES: Recipe[] = [
     "category": "Ostatní",
     "id": "gen-1781777658404",
     "estimatedCookingTime": "20 min",
-    "updatedAt": "2026-08-02T22:46:50.671Z"
+    "updatedAt": "2026-08-02T22:46:50.671Z",
+    "nutritionPer100g": {
+      "calories": 288.5,
+      "proteins": 8.7,
+      "carbohydrates": 5.2,
+      "sugars": 3.8,
+      "fats": 25.8,
+      "saturatedFats": 8.2,
+      "fiber": 0.9,
+      "salt": 2.1
+    }
   },
   {
     "id": "svickova",
@@ -1451,7 +1821,17 @@ export const DEFAULT_RECIPES: Recipe[] = [
     "category": "Maso",
     "isDefault": true,
     "estimatedCookingTime": "60 min",
-    "updatedAt": "2026-08-02T22:46:50.671Z"
+    "updatedAt": "2026-08-02T22:46:50.671Z",
+    "nutritionPer100g": {
+      "calories": 162.4,
+      "proteins": 10.9,
+      "carbohydrates": 8.1,
+      "sugars": 5.4,
+      "fats": 9.8,
+      "saturatedFats": 5.2,
+      "fiber": 1.4,
+      "salt": 0.65
+    }
   },
   {
     "title": "Třená bábovka",
@@ -1487,7 +1867,17 @@ export const DEFAULT_RECIPES: Recipe[] = [
     "category": "Sladká jídla a moučníky",
     "id": "gen-1781848561960",
     "estimatedCookingTime": "50 min",
-    "updatedAt": "2026-08-02T22:46:50.671Z"
+    "updatedAt": "2026-08-02T22:46:50.671Z",
+    "nutritionPer100g": {
+      "calories": 358,
+      "proteins": 6.4,
+      "carbohydrates": 49.2,
+      "sugars": 27.8,
+      "fats": 15.1,
+      "saturatedFats": 8.8,
+      "fiber": 1.2,
+      "salt": 0.4
+    }
   },
   {
     "title": "Tvarohový koláč",

@@ -51,7 +51,8 @@ import {
   GitBranch,
   ShoppingBag,
   Type,
-  Home
+  Home,
+  Activity
 } from "lucide-react";
 import { Recipe } from "./types";
 import { DEFAULT_RECIPES } from "./defaultRecipes";
@@ -683,6 +684,12 @@ export default function App() {
   const [editingCategoryName, setEditingCategoryName] = useState<string | null>(null);
   const [editingCategoryValue, setEditingCategoryValue] = useState("");
 
+  // Nutrition states
+  const [showNutritionModal, setShowNutritionModal] = useState(false);
+  
+  const [isSavingRecipe, setIsSavingRecipe] = useState(false);
+  
+
   // States for Add New Recipe Modal Window
   const [showAddRecipeModal, setShowAddRecipeModal] = useState(false);
   const [addRecipeTab, setAddRecipeTab] = useState<"manual" | "ai">("manual");
@@ -1278,6 +1285,8 @@ export default function App() {
     setMobileActiveTab(tab);
   };
 
+
+
   const handleGoBack = () => {
     if (window.history.state && window.history.state.type && window.history.state.type !== "home") {
       window.history.back();
@@ -1464,9 +1473,11 @@ export default function App() {
     setIsEditing(true);
   };
 
-  const handleSaveEditedRecipe = (e?: React.FormEvent) => {
+  const handleSaveEditedRecipe = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (!selectedRecipe) return;
+    
+    setIsSavingRecipe(true);
 
     const updatedRecipe: Recipe = {
       ...selectedRecipe,
@@ -1484,10 +1495,24 @@ export default function App() {
       updatedAt: new Date().toISOString()
     };
 
+    try {
+      const response = await fetch("/api/calculate-nutrition", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ recipe: updatedRecipe }),
+      });
+      if (response.ok) {
+        updatedRecipe.nutritionPer100g = await response.json();
+      }
+    } catch (err) {
+      console.warn("Could not calculate nutrition for edited recipe", err);
+    }
+
     const updatedRecipesList = recipes.map(r => r.id === selectedRecipe.id ? updatedRecipe : r);
     saveRecipesToStorage(updatedRecipesList, updatedRecipe);
     setSelectedRecipe(updatedRecipe);
     setIsEditing(false);
+    setIsSavingRecipe(false);
   };
 
   const handleAiEditRecipe = async () => {
@@ -1682,7 +1707,7 @@ export default function App() {
     });
   };
 
-  const handleSaveManualRecipe = (e: React.FormEvent) => {
+  const handleSaveManualRecipe = async (e: React.FormEvent) => {
     e.preventDefault();
     setAddFormError(null);
 
@@ -1719,6 +1744,8 @@ export default function App() {
       return;
     }
 
+    setIsSavingRecipe(true);
+
     const newRecipe: Recipe = {
       id: "recipe-" + Date.now(),
       title: addTitle.trim(),
@@ -1735,10 +1762,25 @@ export default function App() {
       updatedAt: new Date().toISOString()
     };
 
+    try {
+      const response = await fetch("/api/calculate-nutrition", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ recipe: newRecipe }),
+      });
+      if (response.ok) {
+        newRecipe.nutritionPer100g = await response.json();
+      }
+    } catch (err) {
+      console.warn("Could not calculate nutrition for new recipe", err);
+    }
+
     const updatedRecipes = [newRecipe, ...recipes];
     saveRecipesToStorage(updatedRecipes, newRecipe);
     setSelectedRecipe(newRecipe);
     setShowAddRecipeModal(false);
+    setIsSavingRecipe(false);
+    
     setToast({
       title: "Recept byl vytvořen!",
       message: `Nový recept "${newRecipe.title}" byl úspěšně uložen do vaší kuchařky.`
@@ -3475,11 +3517,21 @@ ${separator}`;
                   <button
                     type="submit"
                     form="edit-recipe-form"
-                    className="bg-[#1B4332] hover:bg-[#2D6A4F] text-white font-bold py-2 px-3.5 rounded-xl shadow-xs hover:shadow-md transition-all flex items-center gap-1.5 text-xs sm:text-sm cursor-pointer active:scale-98"
+                    disabled={isSavingRecipe}
+                    className="bg-[#1B4332] hover:bg-[#2D6A4F] disabled:bg-[#1B4332]/50 text-white font-bold py-2 px-3.5 rounded-xl shadow-xs hover:shadow-md transition-all flex items-center gap-1.5 text-xs sm:text-sm cursor-pointer active:scale-98"
                     title="Uložit změny v receptu"
                   >
-                    <Check className="h-4.5 w-4.5" />
-                    <span>Uložit</span>
+                    {isSavingRecipe ? (
+                      <>
+                        <div className="h-4.5 w-4.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        <span>Ukládám...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Check className="h-4.5 w-4.5" />
+                        <span>Uložit</span>
+                      </>
+                    )}
                   </button>
                 </>
               ) : (
@@ -3542,6 +3594,83 @@ ${separator}`;
           )}
         </div>
       </header>
+
+      {/* ========================================= */}
+      {/* NUTRITION MODAL (CALORIE TABLE STYLE)     */}
+      {/* ========================================= */}
+      {showNutritionModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999] flex justify-center items-center p-4">
+          <div className="bg-white w-full max-w-sm rounded-2xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden border border-[#E8E8E1]">
+            <div className="bg-[#1B4332] px-4 py-3 border-b border-[#143024] flex items-center justify-between shrink-0">
+              <h2 className="text-lg font-bold text-white flex items-center gap-2 font-serif tracking-wide">
+                <Activity className="h-5 w-5 text-emerald-400" />
+                Nutriční hodnoty
+              </h2>
+              <button
+                onClick={() => setShowNutritionModal(false)}
+                className="text-white/70 hover:text-white transition-colors cursor-pointer p-1 rounded-md hover:bg-white/10"
+              >
+                <Square className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="p-5 overflow-y-auto bg-[#FDFDFB]">
+              {selectedRecipe?.nutritionPer100g ? (
+                <div className="bg-white border border-[#E8E8E1] rounded-xl shadow-xs overflow-hidden">
+                  <div className="bg-[#F5F5F0] p-3 text-center border-b border-[#E8E8E1]">
+                    <p className="text-xs text-[#5C5C50] font-bold uppercase tracking-wider">Hodnoty na 100 g hotové porce</p>
+                  </div>
+                  <div className="divide-y divide-[#E8E8E1]">
+                    <div className="flex justify-between items-center p-3 hover:bg-emerald-50/50 transition-colors">
+                      <span className="font-bold text-[#1B4332] text-sm sm:text-base">Energie</span>
+                      <span className="font-mono font-black text-lg text-[#1B4332]">{selectedRecipe.nutritionPer100g.calories} kcal</span>
+                    </div>
+                    <div className="flex justify-between items-center p-3 hover:bg-emerald-50/50 transition-colors">
+                      <span className="font-medium text-[#2C2C2C] text-sm">Bílkoviny</span>
+                      <span className="font-mono font-bold text-[#2C2C2C]">{selectedRecipe.nutritionPer100g.proteins} g</span>
+                    </div>
+                    <div className="flex justify-between items-center p-3 hover:bg-emerald-50/50 transition-colors">
+                      <span className="font-medium text-[#2C2C2C] text-sm">Sacharidy</span>
+                      <span className="font-mono font-bold text-[#2C2C2C]">{selectedRecipe.nutritionPer100g.carbohydrates} g</span>
+                    </div>
+                    <div className="flex justify-between items-center p-2 pl-6 bg-[#FDFDFB] hover:bg-emerald-50/30 transition-colors">
+                      <span className="text-xs text-[#5C5C50]">z toho cukry</span>
+                      <span className="font-mono text-xs font-semibold text-[#5C5C50]">{selectedRecipe.nutritionPer100g.sugars} g</span>
+                    </div>
+                    <div className="flex justify-between items-center p-3 hover:bg-emerald-50/50 transition-colors">
+                      <span className="font-medium text-[#2C2C2C] text-sm">Tuky</span>
+                      <span className="font-mono font-bold text-[#2C2C2C]">{selectedRecipe.nutritionPer100g.fats} g</span>
+                    </div>
+                    <div className="flex justify-between items-center p-2 pl-6 bg-[#FDFDFB] hover:bg-emerald-50/30 transition-colors">
+                      <span className="text-xs text-[#5C5C50]">z toho nasycené mastné kys.</span>
+                      <span className="font-mono text-xs font-semibold text-[#5C5C50]">{selectedRecipe.nutritionPer100g.saturatedFats} g</span>
+                    </div>
+                    <div className="flex justify-between items-center p-3 hover:bg-emerald-50/50 transition-colors">
+                      <span className="font-medium text-[#2C2C2C] text-sm">Vláknina</span>
+                      <span className="font-mono font-bold text-[#2C2C2C]">{selectedRecipe.nutritionPer100g.fiber} g</span>
+                    </div>
+                    <div className="flex justify-between items-center p-3 hover:bg-emerald-50/50 transition-colors">
+                      <span className="font-medium text-[#2C2C2C] text-sm">Sůl</span>
+                      <span className="font-mono font-bold text-[#2C2C2C]">{selectedRecipe.nutritionPer100g.salt} g</span>
+                    </div>
+                  </div>
+                  <div className="bg-[#F5F5F0]/50 p-2 text-center border-t border-[#E8E8E1]">
+                     <p className="text-[10px] text-[#9A9A8C] italic">Hodnoty jsou orientační a vypočítané pomocí AI s ohledem na odpar během přípravy.</p>
+                  </div>
+                </div>
+              ) : null}
+            </div>
+            <div className="p-4 bg-[#F5F5F0] border-t border-[#E8E8E1] flex justify-end shrink-0">
+              <button
+                type="button"
+                onClick={() => setShowNutritionModal(false)}
+                className="bg-[#2C2C2C] hover:bg-black text-white px-5 py-2 rounded-xl font-bold text-sm shadow-sm transition-all active:scale-95 cursor-pointer"
+              >
+                Zavřít
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* BODY WORKSPACE */}
       <div className="flex-1 max-w-[1600px] w-full mx-auto flex flex-col md:flex-row gap-0 overflow-hidden relative print:h-auto print:overflow-visible">
@@ -5176,6 +5305,17 @@ ${separator}`;
                           <span className="text-xs font-mono bg-[#1B4332]/10 text-[#1B4332] px-2.5 py-1 rounded-md font-bold">
                             Porce: {scaleFactor === 1 ? "Výchozí (1x)" : `${formatCzechNumber(scaleFactor)}x`}
                           </span>
+                          {selectedRecipe.nutritionPer100g && (
+                            <button
+                              type="button"
+                              onClick={() => setShowNutritionModal(true)}
+                              className="text-xs font-mono bg-[#D97706]/10 text-[#D97706] hover:bg-[#D97706]/20 px-2.5 py-1 rounded-md font-bold cursor-pointer transition-colors flex items-center gap-1.5 active:scale-95"
+                              title="Zobrazit tabulku nutričních hodnot"
+                            >
+                              <Activity className="h-3.5 w-3.5" />
+                              Nutriční hodnoty
+                            </button>
+                          )}
                         </div>
                       </div>
 
@@ -7817,10 +7957,20 @@ ${separator}`;
                 <button
                   type="submit"
                   form="add-recipe-manual-form"
-                  className="px-6 py-2.5 bg-[#D97706] hover:bg-[#C26405] active:scale-95 text-white text-xs font-bold rounded-xl shadow-sm transition-all cursor-pointer flex items-center gap-2"
+                  disabled={isSavingRecipe}
+                  className="px-6 py-2.5 bg-[#D97706] hover:bg-[#C26405] disabled:bg-[#D97706]/50 active:scale-95 text-white text-xs font-bold rounded-xl shadow-sm transition-all cursor-pointer flex items-center gap-2"
                 >
-                  <Plus className="h-4 w-4 stroke-[3]" />
-                  <span>Uložit nový recept</span>
+                  {isSavingRecipe ? (
+                    <>
+                      <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      <span>Ukládám...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Plus className="h-4 w-4 stroke-[3]" />
+                      <span>Uložit nový recept</span>
+                    </>
+                  )}
                 </button>
               ) : (
                 <button
