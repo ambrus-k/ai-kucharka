@@ -306,19 +306,20 @@ function getAi(): GoogleGenAI {
 
 // Model fallback retry wrapper to handle transient 503/429 errors gracefully
 async function generateContentWithRetry(ai: GoogleGenAI, options: any, maxRetries = 5, initialDelayMs = 1500) {
-  const originalModel = options.model || "gemini-3.6-flash";
+  const originalModel = options.model || "gemini-3.1-pro-preview";
   const modelFallbackSequence = Array.from(new Set([
     originalModel,
-    "gemini-3.6-flash",
     "gemini-3.1-pro-preview",
+    "gemini-3.8-flash",
     "gemini-flash-latest",
     "gemini-3.1-flash-lite"
   ]));
 
   let lastError: any = null;
+
   for (const currentModel of modelFallbackSequence) {
     let attempt = 0;
-    while (attempt < 2) {
+    while (attempt < 3) {
       try {
         const currentOptions = { ...options, model: currentModel };
         return await ai.models.generateContent(currentOptions);
@@ -337,7 +338,7 @@ async function generateContentWithRetry(ai: GoogleGenAI, options: any, maxRetrie
 
         if (isTransient) {
           const delay = initialDelayMs * Math.pow(2, attempt - 1) + Math.random() * 500;
-          console.log(`[Gemini API] Model ${currentModel} dočasně přetížen, zkouším pokus ${attempt}/2 za ${Math.round(delay)}ms...`);
+          console.log(`[Gemini API] Model ${currentModel} dočasně přetížen, zkouším pokus ${attempt}/3 za ${Math.round(delay)}ms...`);
           await new Promise(resolve => setTimeout(resolve, delay));
         } else {
           throw error;
@@ -804,7 +805,7 @@ app.post("/api/test-diagnostics", async (req, res) => {
       } else {
         const ai = getAi();
         const response = await generateContentWithRetry(ai, {
-          model: "gemini-3.6-flash",
+          model: "gemini-3.1-pro-preview",
           contents: "Ahoj, odpověz jedním slovem: 'Ano'.",
         });
         if (response && response.text) {
@@ -891,7 +892,7 @@ ZÁSADNÍ PRAVIDLA:
     parts.push({ text: userPrompt });
 
     const response = await generateContentWithRetry(ai, {
-      model: "gemini-3.6-flash",
+      model: "gemini-3.1-pro-preview",
       contents: [
         {
           role: "user",
@@ -998,7 +999,7 @@ Vytvoř kompletně aktualizovaný recept se všemi poli. Ujisti se, že pokud se
 `;
 
     const response = await generateContentWithRetry(ai, {
-      model: "gemini-3.6-flash",
+      model: "gemini-3.1-pro-preview",
       contents: [
         {
           role: "user",
@@ -1120,7 +1121,7 @@ ${JSON.stringify(recipe, null, 2)}
 `;
 
     const response = await generateContentWithRetry(ai, {
-      model: "gemini-3.6-flash",
+      model: "gemini-3.1-pro-preview",
       contents: [
         {
           role: "user",

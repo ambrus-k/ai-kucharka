@@ -50,7 +50,8 @@ import {
   Square,
   GitBranch,
   ShoppingBag,
-  Type
+  Type,
+  Home
 } from "lucide-react";
 import { Recipe } from "./types";
 import { DEFAULT_RECIPES } from "./defaultRecipes";
@@ -124,6 +125,13 @@ export function formatCzechNumber(val: number): string {
   const precision = val < 10 ? 100 : 10;
   const rounded = Math.round(val * precision) / precision;
   return rounded.toString().replace(".", ",");
+}
+
+export function formatRecipeDate(isoString?: string): string | null {
+  if (!isoString) return null;
+  const d = new Date(isoString);
+  if (isNaN(d.getTime())) return null;
+  return `(${d.getDate()}. ${d.getMonth() + 1}. ${d.getFullYear()})`;
 }
 
 export function isIngredientHeader(ing: string): boolean {
@@ -1037,7 +1045,7 @@ export default function App() {
 
       sendWorkFinishedNotification(
         "Vědecká kontrola dokončena",
-        `Rozbor receptu "${selectedRecipe.title}" pomocí Gemini 3.6 Flash proběhl úspěšně.`
+        `Rozbor receptu "${selectedRecipe.title}" pomocí Gemini 3.1 Pro proběhl úspěšně.`
       );
 
     } catch (err: any) {
@@ -1747,7 +1755,7 @@ export default function App() {
     setIsGeneratingAiModal(true);
     setAddFormError(null);
     setAiModalProgressPercent(12);
-    setAiModalProgressText("Iniciace spojení s Google Gemini 3.6 Flash...");
+    setAiModalProgressText("Iniciace spojení s Google Gemini 3.1 Pro...");
 
     const aiModalSteps = [
       { p: 25, t: "Skenování surovin a rozpoznávání textu/dokumentu..." },
@@ -1905,7 +1913,7 @@ export default function App() {
       setDiagnosticsStepIndex(1);
       await sleep(700);
 
-      setDiagnosticsProgressText("Navazování spojení s Google Gemini AI (gemini-3.6-flash)...");
+      setDiagnosticsProgressText("Navazování spojení s Google Gemini AI (gemini-3.1-pro-preview)...");
       setDiagnosticsProgressPercent(60);
       setDiagnosticsStepIndex(2);
 
@@ -3344,65 +3352,51 @@ ${separator}`;
       {/* HEADER */}
       <header className="no-print bg-white border-b border-[#E8E8E1] py-3.5 px-4 md:px-6 sticky top-0 z-40 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-3">
         <div className="flex items-center gap-2.5 sm:gap-3.5">
-          {/* BACK ARROW BUTTON IN THE LINE/ROW NEXT TO AI KUCHAŘ */}
-          {hasBackStep && (
+          <div className="flex items-center gap-1.5 shrink-0">
+            {/* DOMŮ BUTTON */}
+            <button
+              type="button"
+              onClick={() => navigateHome()}
+              className="bg-[#1B4332] hover:bg-[#2D6A4F] text-white p-2 sm:px-3 rounded-xl shadow-xs transition-all flex items-center justify-center gap-1.5 text-xs sm:text-sm font-bold cursor-pointer active:scale-95 group shrink-0"
+              title="Domů na přehled receptů"
+            >
+              <Home className="h-5 w-5 group-hover:-translate-y-0.5 transition-transform" />
+              <span className="hidden sm:inline">Domů</span>
+            </button>
+
+            {/* BACK ARROW BUTTON */}
             <button
               type="button"
               onClick={handleGoBack}
-              className="bg-[#1B4332] hover:bg-[#2D6A4F] text-white py-2 px-3 rounded-xl shadow-xs transition-all flex items-center justify-center gap-1.5 text-xs sm:text-sm font-bold cursor-pointer active:scale-95 group shrink-0"
+              disabled={!hasBackStep}
+              className={`py-2 px-3 rounded-xl shadow-xs transition-all flex items-center justify-center gap-1.5 text-xs sm:text-sm font-bold active:scale-95 group shrink-0 ${hasBackStep ? 'bg-[#F5F5F0] hover:bg-[#E8E8E1] text-[#2C2C2C] border border-[#E8E8E1] cursor-pointer' : 'bg-[#F5F5F0] text-[#A0A096] border border-[#E8E8E1] opacity-60 cursor-not-allowed'}`}
               title="Krok zpět v aplikaci"
             >
-              <ChevronLeft className="h-5 w-5 group-hover:-translate-x-0.5 transition-transform" />
-              <span className="inline">Zpět</span>
+              <ChevronLeft className={`h-5 w-5 ${hasBackStep ? 'group-hover:-translate-x-0.5 transition-transform' : ''}`} />
+              <span className="hidden sm:inline">Zpět</span>
             </button>
-          )}
+          </div>
 
-          <button
-            onClick={() => navigateHome()}
-            className="flex items-center gap-3 hover:opacity-90 active:scale-98 transition-all text-left bg-transparent border-0 p-0 m-0 cursor-pointer group shrink-0"
-            title="Přejít na hlavní stránku"
-          >
-            <div className="bg-[#1B4332] text-white p-2 rounded-xl shadow-md group-hover:bg-[#2D6A4F] transition-colors">
+          <div className="flex items-center gap-3 text-left bg-transparent border-0 p-0 m-0 cursor-default group shrink-0 ml-1">
+            <div className="bg-[#1B4332] text-white p-2 rounded-xl shadow-md hidden lg:block">
               <ChefHat className="h-6 w-6" />
             </div>
             <div>
-              <h1 className="font-serif italic font-semibold text-2xl text-[#1B4332] flex items-center gap-2 group-hover:text-[#2D6A4F] transition-colors">
+              <h1 className="font-serif italic font-semibold text-2xl text-[#1B4332] flex items-center gap-2">
                 AI Kuchařka
-                <span className="text-[10px] bg-[#F0F4F1] text-[#2D6A4F] border border-[#2D6A4F]/20 font-bold px-2 py-0.5 rounded-full uppercase tracking-wider font-sans normal-case">
+                <span className="text-[10px] bg-[#F0F4F1] text-[#2D6A4F] border border-[#2D6A4F]/20 font-bold px-2 py-0.5 rounded-full uppercase tracking-wider font-sans normal-case hidden sm:inline-block">
                   5x Pilířová Syntéza
                 </span>
               </h1>
-              <p className="text-xs text-[#5C5C50] hidden sm:block font-medium">Vědecky podložená a technologicky vyladěná gastronomie</p>
+              <p className="text-xs text-[#5C5C50] hidden lg:block font-medium">Vědecky podložená a technologicky vyladěná gastronomie</p>
             </div>
-          </button>
+          </div>
         </div>
 
         <div className="flex flex-wrap items-center gap-2 md:gap-2.5 ml-auto md:ml-0">
           {/* 1. RECIPE SPECIFIC HEADER CONTROLS (WHEN A RECIPE IS SELECTED) */}
           {selectedRecipe ? (
             <>
-              {/* BACK BUTTON */}
-              {isEditing ? (
-                <button
-                  type="button"
-                  onClick={handleGoBack}
-                  className="bg-[#F5F5F0] hover:bg-[#E8E8E1] text-[#2C2C2C] border border-[#E8E8E1] font-bold py-2 px-3 rounded-xl shadow-xs transition-all flex items-center justify-center gap-1.5 text-xs sm:text-sm cursor-pointer active:scale-98"
-                  title="Zrušit úpravy a vrátit se"
-                >
-                  <ChevronLeft className="h-4.5 w-4.5" />
-                  <span>Zpět</span>
-                </button>
-              ) : (
-                <button
-                  onClick={handleGoBack}
-                  className="bg-[#1B4332] hover:bg-[#2D6A4F] text-white font-bold py-2 px-3 rounded-xl shadow-xs transition-all flex items-center justify-center gap-1.5 text-xs sm:text-sm cursor-pointer hover:shadow-md active:scale-98"
-                  title="Zpět na hlavní přehled receptů"
-                >
-                  <ChevronLeft className="h-4.5 w-4.5" />
-                  <span>Zpět</span>
-                </button>
-              )}
-
               {/* PREVIOUS & NEXT RECIPE BUTTONS */}
               {(() => {
                 const currentIndex = filteredRecipes.findIndex(r => r.id === selectedRecipe.id);
@@ -4039,14 +4033,14 @@ ${separator}`;
                           <div className="text-center space-y-3">
                             <p className="text-sm font-bold text-emerald-400 flex items-center justify-center gap-1.5">
                               <span className="inline-block h-2 w-2 bg-emerald-500 rounded-full animate-ping"></span>
-                              Zpracovávám pomocí Gemini 3.6 Flash...
+                              Zpracovávám pomocí Gemini 3.1 Pro...
                             </p>
                             <p className="text-xs text-slate-400 max-w-md mx-auto leading-relaxed">
-                              Právě probíhá kompletní kulinářský audit s vědeckým kulinářským modelem <strong className="text-emerald-300">Gemini 3.6 Flash</strong>. Recept prochází chemickou simulací reakcí surovin, vyvažováním chutí a eliminací konzervantů.
+                              Právě probíhá kompletní kulinářský audit s vědeckým kulinářským modelem <strong className="text-emerald-300">Gemini 3.1 Pro</strong>. Recept prochází chemickou simulací reakcí surovin, vyvažováním chutí a eliminací konzervantů.
                             </p>
                             <div className="text-[10px] text-slate-500 font-mono flex items-center justify-center gap-1 bg-slate-950 p-2 rounded-lg max-w-sm mx-auto border border-slate-800">
                               <span>🚀 Aktivní relace: </span>
-                              <span className="text-emerald-400 font-bold">gemini-3.6-flash</span>
+                              <span className="text-emerald-400 font-bold">gemini-3.1-pro-preview</span>
                             </div>
                             <button
                               type="button"
@@ -4556,7 +4550,7 @@ ${separator}`;
                         </div>
                         <div className="text-[10px] text-[#92400E] font-mono font-bold bg-amber-50 px-2 py-1 rounded-lg border border-amber-200/40 flex items-center gap-1">
                           <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                          Aktivní model: Gemini 3.6 Flash
+                          Aktivní model: Gemini 3.1 Pro
                         </div>
                       </div>
                       {editError && (
@@ -4880,8 +4874,13 @@ ${separator}`;
                             </span>
                           </div>
                         </div>
-                        <h2 className="text-3xl sm:text-4xl font-serif font-black text-[#1B4332] tracking-tight">
-                          {selectedRecipe.title}
+                        <h2 className="text-3xl sm:text-4xl font-serif font-black text-[#1B4332] tracking-tight flex items-baseline flex-wrap gap-x-3">
+                          <span>{selectedRecipe.title}</span>
+                          {formatRecipeDate(selectedRecipe.updatedAt) && (
+                            <span className="text-sm font-sans font-normal text-slate-500 whitespace-nowrap">
+                              {formatRecipeDate(selectedRecipe.updatedAt)}
+                            </span>
+                          )}
                         </h2>
                         {selectedRecipe.summary && (
                           <p className="text-sm sm:text-base text-[#46463D] leading-relaxed font-serif italic pt-0.5">
@@ -5158,8 +5157,13 @@ ${separator}`;
                             {selectedRecipe.category}
                           </span>
                         )}
-                        <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif font-black text-[#1B4332] leading-tight tracking-tight">
-                          {selectedRecipe.title}
+                        <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif font-black text-[#1B4332] leading-tight tracking-tight flex items-baseline flex-wrap gap-x-3">
+                          <span>{selectedRecipe.title}</span>
+                          {formatRecipeDate(selectedRecipe.updatedAt) && (
+                            <span className="text-sm md:text-base font-sans font-normal text-slate-500 whitespace-nowrap">
+                              {formatRecipeDate(selectedRecipe.updatedAt)}
+                            </span>
+                          )}
                         </h2>
 
                         {selectedRecipe.summary && (
@@ -7756,7 +7760,7 @@ ${separator}`;
                           Probíhá generování receptu přes AI
                         </h4>
                         <p className="text-xs text-emerald-100/80 mt-1 font-medium max-w-sm mx-auto">
-                          Kulinářský model Gemini 3.6 Flash zpracovává zadání a dopočítává časy u všech kroků postupu.
+                          Kulinářský model Gemini 3.1 Pro zpracovává zadání a dopočítává časy u všech kroků postupu.
                         </p>
                       </div>
 
